@@ -1,0 +1,24 @@
+
+# User-specific
+.gitignore.user
+# ↑ For this to work, run the following **at the root of this git repository**:
+# git config --local core.excludesFile .gitignore.user
+
+# Environment
+.env
+.env.*
+# ↑ but the scaffolded example, which carries no secrets, is the only record
+#   of which keys an app needs.
+!.env.example
+
+# Build output
+build/
+dist/
+
+# nodeJS / Deno / Bun / etc.
+node_modules/
+pnpm-lock.yaml
+
+# Operating system
+## MacOS
+.DS_Store
