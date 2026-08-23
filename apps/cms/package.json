@@ -9,6 +9,7 @@
 		"console": "strapi console",
 		"dev": "strapi develop",
 		"develop": "strapi develop",
+		"seed": "node scripts/seed/index.ts",
 		"start": "strapi start",
 		"strapi": "strapi",
 		"test": "vitest run",

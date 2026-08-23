@@ -1,0 +1,35 @@
+{
+	"collectionName": "components_text_plain_string_v1",
+	"info": {
+		"displayName": "Plain string",
+		"description": "A single line of unformatted text."
+	},
+	"options": {},
+	"attributes": {
+		"content": {
+			"type": "string"
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"content": {
+				"edit": {
+					"label": "Content",
+					"description": "Plain text. No formatting is applied and none is available."
+				},
+				"list": {
+					"label": "Content"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "content", "size": 12 }
+				]
+			]
+		}
+	}
+}

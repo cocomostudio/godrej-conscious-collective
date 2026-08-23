@@ -1,0 +1,71 @@
+{
+	"collectionName": "components_navigation_link_v1",
+	"info": {
+		"displayName": "Link",
+		"description": "A label, a destination and how it should look."
+	},
+	"options": {},
+	"attributes": {
+		"label": {
+			"type": "string",
+			"required": false
+		},
+		"url": {
+			"type": "string",
+			"required": true
+		},
+		"style": {
+			"type": "enumeration",
+			"enum": [
+				"plain",
+				"button"
+			],
+			"default": "plain",
+			"required": true
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"label": {
+				"edit": {
+					"label": "Label",
+					"description": "The words the visitor reads. Leave this empty where the link wraps an image."
+				},
+				"list": {
+					"label": "Label"
+				}
+			},
+			"url": {
+				"edit": {
+					"label": "URL",
+					"description": "Where the link goes. A path such as /about for this site, or a full address for another."
+				},
+				"list": {
+					"label": "URL"
+				}
+			},
+			"style": {
+				"edit": {
+					"label": "Style",
+					"description": "Whether the link reads as text in a sentence or stands on its own as a button."
+				},
+				"list": {
+					"label": "Style"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "label", "size": 6 },
+					{ "name": "url", "size": 6 }
+				],
+				[
+					{ "name": "style", "size": 6 }
+				]
+			]
+		}
+	}
+}

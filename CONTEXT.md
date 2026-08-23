@@ -49,7 +49,9 @@ The single page shell marked as the one new entries adopt. Exactly one page shel
 _Avoid_: "fallback shell", "base shell", "main shell"
 
 **Page layout**:
-The column arrangement of a rendered page. An editor chooses between `1-column` and `2-column`. A third arrangement, the contributor layout, exists in the rendered result but is never chosen, because it follows from the content type rather than from an editor's choice.
+The column arrangement of a rendered page. An editor chooses between `one-column` and `two-column`. A third arrangement, the contributor layout, exists in the rendered result but is never chosen, because it follows from the content type rather than from an editor's choice.
+
+The stored values spell the numbers out because Strapi refuses an enumeration value that begins with a digit.
 _Avoid_: "layout" unqualified, "page type"
 
 **Sidebar**:
@@ -85,6 +87,10 @@ _Avoid_: "container", "wrapper", "layout component"
 **Leaf component**:
 A component that carries no region. A leaf component is the bottom of the render tree.
 _Avoid_: "atom", "primitive", "simple component"
+
+**Envelope**:
+What the CMS returns for one page: the entry, its page shell, the main event and the resolved event, in a single response. A page is one request and one cache entry.
+_Avoid_: "payload", "page response", "page data"
 
 **Rich text**:
 The content of a Strapi `blocks` field. Rich text is never called "blocks", because "block" already names a node in the render tree.

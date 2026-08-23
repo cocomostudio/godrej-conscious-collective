@@ -20,6 +20,7 @@
 		"tests/",
 		"**/*.test.ts",
 		"vitest.config.ts",
-		"src/plugins/**"
+		"src/plugins/**",
+		"scripts/"
 	]
 }

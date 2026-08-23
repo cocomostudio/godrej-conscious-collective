@@ -1,0 +1,86 @@
+{
+	"collectionName": "components_container_section_v1",
+	"info": {
+		"displayName": "Section",
+		"description": "A standalone section of a page. Everything an editor places in a main region is a section."
+	},
+	"options": {},
+	"attributes": {
+		"title": {
+			"type": "string",
+			"required": true
+		},
+		"register_with_toc": {
+			"type": "boolean",
+			"default": false,
+			"required": true
+		},
+		"heading": {
+			"type": "component",
+			"component": "text.heading-v1",
+			"required": false
+		},
+		"content": {
+			"type": "dynamiczone",
+			"components": [
+				"text.plain-string-v1"
+			]
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"title": {
+				"edit": {
+					"label": "Title",
+					"description": "How this section is named in the table of contents. It is not shown in the section itself — the heading below is."
+				},
+				"list": {
+					"label": "Title"
+				}
+			},
+			"register_with_toc": {
+				"edit": {
+					"label": "Show in the table of contents?",
+					"description": "Lists this section in the table of contents, where the page has one."
+				},
+				"list": {
+					"label": "Show in the table of contents?"
+				}
+			},
+			"heading": {
+				"edit": {
+					"label": "Heading",
+					"description": "Shown at the top of the section."
+				},
+				"list": {
+					"label": "Heading"
+				}
+			},
+			"content": {
+				"edit": {
+					"label": "Content",
+					"description": "What the section holds."
+				},
+				"list": {
+					"label": "Content"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "title", "size": 6 },
+					{ "name": "register_with_toc", "size": 6 }
+				],
+				[
+					{ "name": "heading", "size": 12 }
+				],
+				[
+					{ "name": "content", "size": 12 }
+				]
+			]
+		}
+	}
+}

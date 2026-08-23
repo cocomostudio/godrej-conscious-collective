@@ -1,0 +1,93 @@
+{
+	"collectionName": "components_text_heading_v1",
+	"info": {
+		"displayName": "Heading",
+		"description": "A heading, optionally carrying a link and optionally listed in the table of contents."
+	},
+	"options": {},
+	"attributes": {
+		"content": {
+			"type": "string",
+			"required": true
+		},
+		"level": {
+			"type": "enumeration",
+			"enum": [
+				"h1",
+				"h2",
+				"h3",
+				"h4",
+				"h5",
+				"h6"
+			],
+			"default": "h2",
+			"required": true
+		},
+		"register_with_toc": {
+			"type": "boolean",
+			"default": false,
+			"required": true
+		},
+		"link": {
+			"type": "component",
+			"component": "navigation.link-v1",
+			"required": false
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"content": {
+				"edit": {
+					"label": "Content",
+					"description": "The words of the heading."
+				},
+				"list": {
+					"label": "Content"
+				}
+			},
+			"level": {
+				"edit": {
+					"label": "Level",
+					"description": "How large the heading looks. It does not decide the heading's rank in the document — that follows from how deeply the heading is nested."
+				},
+				"list": {
+					"label": "Level"
+				}
+			},
+			"register_with_toc": {
+				"edit": {
+					"label": "Show in the table of contents?",
+					"description": "Lists this heading in the table of contents, where the page has one."
+				},
+				"list": {
+					"label": "Show in the table of contents?"
+				}
+			},
+			"link": {
+				"edit": {
+					"label": "Link",
+					"description": "An optional link shown beside the heading."
+				},
+				"list": {
+					"label": "Link"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "content", "size": 8 },
+					{ "name": "level", "size": 4 }
+				],
+				[
+					{ "name": "register_with_toc", "size": 6 }
+				],
+				[
+					{ "name": "link", "size": 12 }
+				]
+			]
+		}
+	}
+}

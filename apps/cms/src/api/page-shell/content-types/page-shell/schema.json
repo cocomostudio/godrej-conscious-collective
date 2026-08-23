@@ -1,0 +1,144 @@
+{
+	"kind": "collectionType",
+	"collectionName": "page_shells",
+	"info": {
+		"singularName": "page-shell",
+		"pluralName": "page-shells",
+		"displayName": "Page Shell",
+		"description": "The chrome that wraps a rendered page. A page shell carries no page content of its own."
+	},
+	"options": {
+		"draftAndPublish": false
+	},
+	"attributes": {
+		"name": {
+			"type": "string",
+			"required": true
+		},
+		"default": {
+			"type": "boolean",
+			"default": false,
+			"required": true
+		},
+		"site_title": {
+			"type": "string",
+			"required": false
+		},
+		"site_description": {
+			"type": "text",
+			"required": false
+		},
+		"navigation_header": {
+			"type": "component",
+			"component": "navigation.link-v1",
+			"repeatable": true,
+			"required": false
+		},
+		"navigation_footer": {
+			"type": "component",
+			"component": "navigation.link-v1",
+			"repeatable": true,
+			"required": false,
+			"max": 3
+		},
+		"form_slideshow": {
+			"type": "media",
+			"allowedTypes": ["images"],
+			"multiple": true,
+			"required": false
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"name": {
+				"edit": {
+					"label": "Name",
+					"description": "How this page shell is named in this list. Visitors never see it."
+				},
+				"list": {
+					"label": "Name"
+				}
+			},
+			"default": {
+				"edit": {
+					"label": "Default page shell",
+					"description": "New entries adopt whichever page shell is marked default. Marking this one demotes the one that held it."
+				},
+				"list": {
+					"label": "Default"
+				}
+			},
+			"site_title": {
+				"edit": {
+					"label": "Site title",
+					"description": "Shown in the header and used as the browser tab's title."
+				},
+				"list": {
+					"label": "Site title"
+				}
+			},
+			"site_description": {
+				"edit": {
+					"label": "Site description",
+					"description": "A sentence describing the site, used where no page supplies its own."
+				},
+				"list": {
+					"label": "Site description"
+				}
+			},
+			"navigation_header": {
+				"edit": {
+					"label": "Header navigation",
+					"description": "The links across the top of every page, in order."
+				},
+				"list": {
+					"label": "Header navigation"
+				}
+			},
+			"navigation_footer": {
+				"edit": {
+					"label": "Footer navigation",
+					"description": "The links in the footer of every page, in order. At most three are shown."
+				},
+				"list": {
+					"label": "Footer navigation"
+				}
+			},
+			"form_slideshow": {
+				"edit": {
+					"label": "Registration form slideshow",
+					"description": "The pictures that cycle beside the registration form."
+				},
+				"list": {
+					"label": "Registration form slideshow"
+				}
+			}
+		},
+		"layouts": {
+			"list": ["name", "default", "site_title"],
+			"edit": [
+				[
+					{ "name": "name", "size": 6 },
+					{ "name": "default", "size": 6 }
+				],
+				[
+					{ "name": "site_title", "size": 6 }
+				],
+				[
+					{ "name": "site_description", "size": 12 }
+				],
+				[
+					{ "name": "navigation_header", "size": 12 }
+				],
+				[
+					{ "name": "navigation_footer", "size": 12 }
+				],
+				[
+					{ "name": "form_slideshow", "size": 12 }
+				]
+			]
+		}
+	}
+}

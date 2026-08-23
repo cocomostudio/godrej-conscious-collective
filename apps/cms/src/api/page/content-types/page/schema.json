@@ -1,0 +1,187 @@
+{
+	"kind": "collectionType",
+	"collectionName": "pages",
+	"info": {
+		"singularName": "page",
+		"pluralName": "pages",
+		"displayName": "Page",
+		"description": "A page an editor builds by placing sections into its main region."
+	},
+	"options": {
+		"draftAndPublish": true
+	},
+	"pluginOptions": {
+		"webtools": {
+			"enabled": true
+		}
+	},
+	"attributes": {
+		"title": {
+			"type": "string",
+			"required": true
+		},
+		"standfirst": {
+			"type": "text",
+			"required": false
+		},
+		"page_shell": {
+			"type": "relation",
+			"relation": "manyToOne",
+			"target": "api::page-shell.page-shell",
+			"required": false
+		},
+		"page_layout": {
+			"type": "enumeration",
+			"enum": [
+				"one-column",
+				"two-column"
+			],
+			"default": "two-column",
+			"required": true
+		},
+		"toc": {
+			"type": "boolean",
+			"default": true,
+			"required": true
+		},
+		"is_archived": {
+			"type": "boolean",
+			"default": false,
+			"required": true
+		},
+		"side_region": {
+			"type": "dynamiczone",
+			"components": [
+				"text.heading-v1",
+				"text.plain-string-v1"
+			]
+		},
+		"main_region": {
+			"type": "dynamiczone",
+			"components": [
+				"container.section-v1"
+			]
+		},
+		"url_alias": {
+			"type": "relation",
+			"relation": "oneToMany",
+			"target": "plugin::webtools.url-alias",
+			"writable": true,
+			"configurable": false,
+			"editable": false,
+			"visible": false,
+			"unique": true
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"title": {
+				"edit": {
+					"label": "Title",
+					"description": "The page's name. It is shown in the sidebar, and the page's URL is derived from it."
+				},
+				"list": {
+					"label": "Title"
+				}
+			},
+			"standfirst": {
+				"edit": {
+					"label": "Standfirst",
+					"description": "A short introductory line shown beneath the title."
+				},
+				"list": {
+					"label": "Standfirst"
+				}
+			},
+			"page_shell": {
+				"edit": {
+					"label": "Page shell",
+					"description": "The site chrome that wraps this page. Left empty, it fills itself from the default page shell."
+				},
+				"list": {
+					"label": "Page shell"
+				}
+			},
+			"page_layout": {
+				"edit": {
+					"label": "Page layout",
+					"description": "A two-column page carries a sidebar. A one-column page carries none of it — no back link, no table of contents and no side region."
+				},
+				"list": {
+					"label": "Page layout"
+				}
+			},
+			"toc": {
+				"edit": {
+					"label": "Table of contents",
+					"description": "Lists the sections that opted in, at the top of the sidebar. Two-column pages only."
+				},
+				"list": {
+					"label": "Table of contents"
+				}
+			},
+			"is_archived": {
+				"edit": {
+					"label": "Archived",
+					"description": "Marks this page as belonging to a past festival edition. Turning it off does not un-archive a page whose event is archived."
+				},
+				"list": {
+					"label": "Archived"
+				}
+			},
+			"side_region": {
+				"edit": {
+					"label": "Side region",
+					"description": "What this page adds to the sidebar, below the back link and the table of contents."
+				},
+				"list": {
+					"label": "Side region"
+				}
+			},
+			"main_region": {
+				"edit": {
+					"label": "Main region",
+					"description": "The page itself. Only sections go here — background, spacing and anchoring all live on the section."
+				},
+				"list": {
+					"label": "Main region"
+				}
+			},
+			"url_alias": {
+				"edit": {
+					"label": "URL alias"
+				},
+				"list": {
+					"label": "URL alias"
+				},
+				"editable": false,
+				"visible": false
+			}
+		},
+		"layouts": {
+			"list": ["title", "page_layout", "page_shell"],
+			"edit": [
+				[
+					{ "name": "title", "size": 8 },
+					{ "name": "page_layout", "size": 4 }
+				],
+				[
+					{ "name": "standfirst", "size": 12 }
+				],
+				[
+					{ "name": "page_shell", "size": 6 },
+					{ "name": "toc", "size": 3 },
+					{ "name": "is_archived", "size": 3 }
+				],
+				[
+					{ "name": "main_region", "size": 12 }
+				],
+				[
+					{ "name": "side_region", "size": 12 }
+				]
+			]
+		}
+	}
+}
