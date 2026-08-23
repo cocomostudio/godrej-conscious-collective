@@ -1,0 +1,22 @@
+packages:
+ - "apps/*"
+ - "packages/*"
+
+# Build scripts are blocked by default. Only these are allowed to run.
+#
+# better-sqlite3 is deliberately absent: it carries a `binding.gyp`, so allowing
+# it makes pnpm run `node-gyp rebuild` and ignore the prebuilt binaries the
+# package already ships for every platform we target.
+onlyBuiltDependencies:
+ - "@swc/core"
+ - "esbuild"
+ - "sharp"
+
+supportedArchitectures:
+ cpu:
+  - "x64"
+  - "arm64"
+  - "current"
+ os:
+  - "linux"
+  - "darwin"

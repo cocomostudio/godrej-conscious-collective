@@ -1,0 +1,12 @@
+# Toolchain pins for this repository.
+#
+# Node is pinned above React Router 8.3.0's floor of 22.22.0 and inside Strapi
+# 5.52.1's supported range of >=20.0.0 <=26.x.x.
+#
+# dprint is pinned here rather than installed as a workspace dependency so that
+# formatting the repository never depends on a `pnpm install` having run.
+
+[tools]
+node = "24.11.1"
+pnpm = "10.29.1"
+dprint = "0.51.1"
