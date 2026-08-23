@@ -38,6 +38,53 @@ export type Page_Shell = {
 	[attribute: string]: unknown
 }
 
+/**
+ |
+ | A file the CMS holds, populated rather than left as a relation id. Only the
+ | few attributes anything here reads are named.
+ |
+ */
+export type Media = {
+	url: string
+	name?: string | null
+	ext?: string | null
+	size?: number | null
+	[attribute: string]: unknown
+}
+
+/**
+ |
+ | A festival edition.
+ |
+ | It arrives twice in every envelope and the two copies mean different things.
+ | As the **main event** it is the site chrome's source — the header's date
+ | range, the Register Now button, the footer's date line — and it is the same
+ | on every page of the site. As the **resolved event** it is this page's own
+ | context: its colours, its listing filters and its schedule document.
+ |
+ | The six colours arrive twice as well. `colour_*` is what the editor picked
+ | and nothing here reads it; `colour_*_rgb` is the same colour as three bare
+ | channels, derived by the CMS on save, and that is what the colour tokens
+ | compile against.
+ |
+ */
+export type Event = {
+	documentId: string
+	name: string
+	main: boolean
+	date_start: string | null
+	date_end: string | null
+	is_archived: boolean
+	schedule: Media | null
+	colour_theme_rgb: string | null
+	colour_showcase_rgb: string | null
+	colour_experience_rgb: string | null
+	colour_conversation_rgb: string | null
+	colour_workshop_rgb: string | null
+	colour_contributor_rgb: string | null
+	[attribute: string]: unknown
+}
+
 export type Entry = {
 	contentType: string
 	documentId: string
@@ -59,11 +106,18 @@ export type Envelope = {
 	page_shell: Page_Shell | null
 	/**
 	 |
-	 | The main event supplies the site chrome; the resolved event supplies
-	 | colours, listing filters and the schedule document. Both arrive null
-	 | until the Event content type exists.
+	 | The site chrome follows the **main event**, on every page, always,
+	 | including archived ones — so a visitor arriving on an old page through an
+	 | old link still has a route to the festival that is actually running.
+	 |
+	 | Everything else event-derived follows the **resolved event**: the entry's
+	 | own event, failing that the main event. Colours have a third level below
+	 | that, a hardcoded palette, because either slot may be null.
+	 |
+	 | Both are null when no event answers, and the chrome degrades rather than
+	 | failing.
 	 |
 	 */
-	main_event: null
-	resolved_event: null
+	main_event: Event | null
+	resolved_event: Event | null
 }

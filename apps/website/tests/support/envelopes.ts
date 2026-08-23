@@ -14,6 +14,7 @@ import type {
 	Block,
 	Entry,
 	Envelope,
+	Event,
 	Page_Shell,
 } from "../../src/web/cms/envelope.ts"
 
@@ -34,6 +35,32 @@ export function page_shell ( over: Partial<Page_Shell> = {} ): Page_Shell {
 	}
 }
 
+/**
+ |
+ | A festival edition. The colours arrive as RGB channel triplets because that
+ | is what the CMS derives and what the colour tokens compile against; the hex
+ | siblings ride along unread by anything the website renders.
+ |
+ */
+export function event ( over: Partial<Event> = {} ): Event {
+	return {
+		colour_contributor_rgb: "255, 92, 35",
+		colour_conversation_rgb: "0, 85, 230",
+		colour_experience_rgb: "0, 225, 182",
+		colour_showcase_rgb: "240, 80, 61",
+		colour_theme_rgb: "0, 85, 230",
+		colour_workshop_rgb: "250, 188, 29",
+		date_end: "2025-12-14",
+		date_start: "2025-12-11",
+		documentId: `document-${id()}`,
+		is_archived: false,
+		main: true,
+		name: "Conscious Collective 2025",
+		schedule: null,
+		...over,
+	}
+}
+
 export function envelope (
 	entry: Partial<Entry> = {},
 	over: Partial<Envelope> = {},
@@ -50,9 +77,9 @@ export function envelope (
 			toc: true,
 			...entry,
 		},
-		main_event: null,
+		main_event: event(),
 		page_shell: page_shell(),
-		resolved_event: null,
+		resolved_event: event(),
 		...over,
 	}
 }

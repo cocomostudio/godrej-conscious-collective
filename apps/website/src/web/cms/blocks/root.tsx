@@ -12,15 +12,29 @@
  | two. **A one-column page renders none of the sidebar**: not a narrower one,
  | none of it.
  |
- | The site header and footer are the main event's, and arrive with it.
+ | It also owns the page's outermost element, which is why the chrome and the
+ | context colours are here rather than in a route layout. The header and the
+ | footer follow the **main** event and are the same on every page of the site;
+ | the colours follow the **resolved** event and are this page's own. Both need
+ | to be outside the columns, and the colours need to be somewhere that can
+ | differ from one page to the next.
  |
  */
 
-import type { ReactNode } from "react"
+import type {
+	CSSProperties,
+	ReactNode,
+} from "react"
 
-import type { Page_Layout } from "../envelope.ts"
+import type {
+	Event,
+	Page_Layout,
+	Page_Shell,
+} from "../envelope.ts"
 
 import { ONE_COLUMN } from "../assemble-root.ts"
+import { Site_Footer } from "../chrome/site-footer.tsx"
+import { Site_Header } from "../chrome/site-header.tsx"
 
 import {
 	H,
@@ -31,18 +45,38 @@ type Root_Props = {
 	page_layout: Page_Layout
 	title: string
 	standfirst?: string | null
+	colours: Record<string, string>
+	main_event: Event | null
+	page_shell: Page_Shell | null
 	back_link: ReactNode
 	sidebar: ReactNode
 	main: ReactNode
 }
 
 export function Root (
-	{ back_link, main, page_layout, sidebar, standfirst, title }: Root_Props,
+	{
+		back_link,
+		colours,
+		main,
+		main_event,
+		page_layout,
+		page_shell,
+		sidebar,
+		standfirst,
+		title,
+	}: Root_Props,
 ) {
 	const two_column = page_layout !== ONE_COLUMN
 
-	return <div className="h-full bg-white">
+	// Custom properties are not part of React's `CSSProperties`, and widening
+	// the type is the whole of what the cast buys. The keys are this project's
+	// own, produced one line away in `context-colours.ts`.
+	return <div className="h-full bg-white" style={ colours as CSSProperties }>
 		<div className="min-h-full flex flex-col bg-black">
+			<Site_Header
+				main_event={ main_event }
+				page_shell={ page_shell } />
+
 			<main className="grow md:flex">
 				{ two_column && <Sidebar
 					back_link={ back_link }
@@ -58,6 +92,10 @@ export function Root (
 					{ main }
 				</Main_Column>
 			</main>
+
+			<Site_Footer
+				main_event={ main_event }
+				page_shell={ page_shell } />
 		</div>
 	</div>
 }

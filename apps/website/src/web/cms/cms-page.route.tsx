@@ -57,7 +57,7 @@ export async function loader ( { params, request }: Route.LoaderArgs ) {
 	}
 
 	const { entry, page_shell } = fetched.envelope
-	const { root, table_of_contents } = assemble_root( entry )
+	const { root, table_of_contents } = assemble_root( fetched.envelope )
 
 	return {
 		anchors: table_of_contents.anchors,

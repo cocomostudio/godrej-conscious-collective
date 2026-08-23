@@ -21,10 +21,14 @@
 import type {
 	Block,
 	Entry,
+	Envelope,
+	Event,
 	Page_Layout,
+	Page_Shell,
 } from "./envelope.ts"
 import type { Table_Of_Contents } from "./table-of-contents.ts"
 
+import { context_colours } from "./context-colours.ts"
 import {
 	collect_table_of_contents,
 	EMPTY_TABLE_OF_CONTENTS,
@@ -59,6 +63,22 @@ export type Root = Block & {
 	page_layout: Page_Layout
 	title: string
 	standfirst: string | null
+	/**
+	 |
+	 | The chrome, and the colours it sits inside.
+	 |
+	 | The root owns the page's outermost element, which is the only place the
+	 | context colours can go: two pages in one site belong to different
+	 | editions, so a declaration any higher would be site-wide.
+	 |
+	 | The chrome reads the **main event** and the colours read the **resolved**
+	 | one, and on a page belonging to an older or a newer edition those are
+	 | two different events. That disagreement is deliberate and recorded.
+	 |
+	 */
+	colours: Record<string, string>
+	main_event: Event | null
+	page_shell: Page_Shell | null
 	/** Exactly one block, or none on a one-column page. */
 	back_link: Block[]
 	/** The content type's contributions, then components'. */
@@ -71,7 +91,8 @@ export type Assembled = {
 	table_of_contents: Table_Of_Contents
 }
 
-export function assemble_root ( entry: Entry ): Assembled {
+export function assemble_root ( envelope: Envelope ): Assembled {
+	const { entry, main_event, page_shell, resolved_event } = envelope
 	const main = entry.main_region ?? []
 
 	// A one-column page renders none of the sidebar: no back link, no table of
@@ -88,8 +109,11 @@ export function assemble_root ( entry: Entry ): Assembled {
 			back_link: has_sidebar
 				? [ { __component: BACK_LINK, ...back_link_for() } ]
 				: [],
+			colours: context_colours( resolved_event ),
 			main,
+			main_event,
 			page_layout: entry.page_layout,
+			page_shell,
 			sidebar: has_sidebar
 				? build_sidebar( entry, table_of_contents )
 				: [],

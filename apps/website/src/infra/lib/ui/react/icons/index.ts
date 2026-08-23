@@ -15,6 +15,7 @@
  */
 
 export const ICON_MAP = {
+	"arrow-right": "arrow-right",
 	"calendar": "calendar",
 	"chevron-down": "chevron-down",
 	"chevron-left": "chevron-left",
