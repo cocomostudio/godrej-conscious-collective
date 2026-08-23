@@ -27,10 +27,64 @@ type Strapi = any
 export async function write_seed_content ( strapi: Strapi ) {
 	await write_url_patterns( strapi )
 
+	const events = await write_events( strapi )
 	const page_shells = await write_page_shells( strapi )
-	await write_pages( strapi, page_shells )
+	await write_pages( strapi, page_shells, events )
 
 	await grant_public_permissions( strapi )
+}
+
+/**
+ |
+ | Two festival editions.
+ |
+ | 2025 is the main one, so its dates and its Register Now button are the site
+ | chrome on every page — including the pages belonging to 2027. 2027 exists so
+ | that the resolution rule has something to resolve *to*: a page naming it
+ | keeps its colours while wearing 2025's chrome, which is the whole shape of
+ | the arrangement in one pair of rows.
+ |
+ | The colours are the static site's inline palette, which is where they were
+ | hardcoded before an editor could reach them. The RGB triplets are **not**
+ | written here — a middleware derives each one from its colour on save, and
+ | writing them by hand would be a second copy of that rule which could disagree
+ | with the first.
+ |
+ */
+async function write_events ( strapi: Strapi ) {
+	const main = await strapi.documents( "api::event.event" ).create( {
+		data: {
+			colour_contributor: "#FF5C23",
+			colour_conversation: "#0055E6",
+			colour_experience: "#00E1B6",
+			colour_showcase: "#F0503D",
+			colour_theme: "#0055E6",
+			colour_workshop: "#FABC1D",
+			date_end: "2025-12-14",
+			date_start: "2025-12-11",
+			is_archived: false,
+			main: true,
+			name: "Conscious Collective 2025",
+		},
+	} )
+
+	const other = await strapi.documents( "api::event.event" ).create( {
+		data: {
+			colour_contributor: "#7A5CFF",
+			colour_conversation: "#1B7F4B",
+			colour_experience: "#E8B4A0",
+			colour_showcase: "#C2410C",
+			colour_theme: "#1B7F4B",
+			colour_workshop: "#F59E0B",
+			date_end: "2027-12-05",
+			date_start: "2027-12-02",
+			is_archived: false,
+			main: false,
+			name: "Conscious Collective 2027",
+		},
+	} )
+
+	return { main, other }
 }
 
 /**
@@ -149,6 +203,7 @@ const REMAINING_ROUTE_TABLE = [
 async function write_pages (
 	strapi: Strapi,
 	page_shells: { archive: any; primary: any },
+	events: { main: any; other: any },
 ) {
 	// "Home" resolves to `/home`, and the website falls back to it when `/`
 	// resolves to nothing. `/home` itself redirects permanently to `/`.
@@ -259,6 +314,29 @@ async function write_pages (
 			title,
 		} )
 	}
+
+	// A page belonging to the edition that is **not** main. It takes 2027's
+	// colours and 2027's schedule document while the header and the footer
+	// above it still advertise 2025, which is the resolution rule made visible
+	// in one page.
+	await create_page( strapi, {
+		event: events.other.documentId,
+		main_region: [
+			section( "Conscious Collective 2027", {
+				heading: heading_component(
+					"Conscious Collective 2027",
+					"h2",
+				),
+				register_with_toc: true,
+				strings: [
+					"The next edition is being put together. Dates are set; the programme is not.",
+				],
+			} ),
+		],
+		page_shell: page_shells.primary.documentId,
+		standfirst: "A first look at the edition after this one.",
+		title: "Conscious Collective 2027",
+	} )
 
 	// An archived page, on the archive shell, so that a second shell has a
 	// reader.

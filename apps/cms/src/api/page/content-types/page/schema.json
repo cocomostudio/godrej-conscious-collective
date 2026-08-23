@@ -30,6 +30,12 @@
 			"target": "api::page-shell.page-shell",
 			"required": false
 		},
+		"event": {
+			"type": "relation",
+			"relation": "manyToOne",
+			"target": "api::event.event",
+			"required": false
+		},
 		"page_layout": {
 			"type": "enumeration",
 			"enum": [
@@ -104,6 +110,15 @@
 					"label": "Page shell"
 				}
 			},
+			"event": {
+				"edit": {
+					"label": "Event",
+					"description": "The festival edition this page belongs to. Left empty, the page takes the main event's colours, listings and schedule document."
+				},
+				"list": {
+					"label": "Event"
+				}
+			},
 			"page_layout": {
 				"edit": {
 					"label": "Page layout",
@@ -172,6 +187,9 @@
 				],
 				[
 					{ "name": "page_shell", "size": 6 },
+					{ "name": "event", "size": 6 }
+				],
+				[
 					{ "name": "toc", "size": 3 },
 					{ "name": "is_archived", "size": 3 }
 				],

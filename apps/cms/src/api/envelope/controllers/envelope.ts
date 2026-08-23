@@ -30,6 +30,7 @@
 
 import type { UID } from "@strapi/strapi"
 
+import { populate_event } from "../../../this/api/event/populate"
 import { POPULATE_BY_CONTENT_TYPE } from "../../../this/api/populate-by-content-type"
 
 /**
@@ -103,8 +104,9 @@ export default {
 			return ctx.notFound()
 		}
 
-		// The page shell is lifted out **before** sanitising and sanitised in
-		// its own right, against its own schema.
+		// The page shell and the entry's own event are lifted out **before**
+		// sanitising, and each is sanitised in its own right against its own
+		// schema.
 		//
 		// Not an evasion of the permission model, and worth spelling out
 		// because it looks like one. `removeRestrictedRelations` drops any
@@ -115,23 +117,36 @@ export default {
 		//
 		// The envelope is the composition point: a caller authorised to read a
 		// page is being handed that page, and a page's chrome is part of what a
-		// page is. The same applies to the main and resolved events, which are
-		// likewise never routes.
-		const { page_shell, ...entry_without_shell } = entry as Record<
+		// page is. An Event is unroutable for the same reason, so the entry's
+		// own event comes out here too and reaches the caller through the
+		// resolved slot below rather than nested inside the entry.
+		const { event, page_shell, ...entry_without_chrome } = entry as Record<
 			string,
 			any
 		>
 
+		// **The main event supplies the site chrome** — the header's date
+		// range, the Register Now button, the footer's date line — on every
+		// page, always, including archived ones.
+		//
+		// **The resolved event supplies page context** — colours, listing
+		// filters and the schedule document. One rule: the entry's own event,
+		// failing that the main event. Colour has a third level below both,
+		// because no event may be marked main; that one is a hardcoded palette
+		// and it lives in the website, which is where a null here degrades.
+		//
+		// The rule runs here rather than in the website because this is where
+		// the data is, and because a page is one request and one cache key.
+		const main_event = await find_main_event()
+		const resolved_event = event ?? main_event
+
 		ctx.body = {
 			data: {
 				entry: {
-					...await sanitise( entry_without_shell, uid, auth ),
+					...await sanitise( entry_without_chrome, uid, auth ),
 					contentType: uid,
 				},
-				// The main event supplies the site chrome; the resolved event
-				// supplies the page's colours, its listings and its schedule
-				// document. Both are filled once the Event content type exists.
-				main_event: null,
+				main_event: await sanitise_event( main_event, auth ),
 				page_shell: page_shell
 					? await sanitise(
 						page_shell,
@@ -139,11 +154,45 @@ export default {
 						auth,
 					)
 					: null,
-				resolved_event: null,
+				resolved_event: await sanitise_event( resolved_event, auth ),
 			},
 			meta: {},
 		}
 	},
+}
+
+/**
+ |
+ | The one event carrying `main`. A middleware demotes the previous holder on
+ | every write, so at most one row can answer.
+ |
+ | `findFirst` rather than a count-and-complain: if the invariant were ever
+ | broken the chrome should still render, and the alternative is a whole site
+ | answering 500 because two rows disagree about which festival is running.
+ |
+ */
+async function find_main_event () {
+	return await strapi.documents( "api::event.event" ).findFirst( {
+		filters: { main: true },
+		populate: populate_event,
+	} )
+}
+
+/**
+ |
+ | An event is sanitised against its own schema, in its own right, exactly as
+ | the page shell is and for the same reason: it is never a route. It carries no
+ | page and no URL, so no `find` permission exists for anyone to hold, and left
+ | inside the entry `removeRestrictedRelations` would drop it from every
+ | response with the join rows still sitting in the database.
+ |
+ | The envelope is the composition point. A caller authorised to read a page is
+ | being handed that page, and which festival that page belongs to is part of
+ | what the page is.
+ |
+ */
+async function sanitise_event ( event: unknown, auth: any ) {
+	return event ? await sanitise( event, "api::event.event", auth ) : null
 }
 
 /**

@@ -15,9 +15,11 @@
 import { populate_section_v1 } from "../../components/container/section-v1"
 import { populate_heading_v1 } from "../../components/text/heading-v1"
 import { populate_plain_string_v1 } from "../../components/text/plain-string-v1"
+import { populate_event } from "../event/populate"
 import { populate_page_shell } from "../page-shell/populate"
 
 export const populate_page = {
+	event: { populate: populate_event },
 	main_region: {
 		on: {
 			"container.section-v1": { populate: populate_section_v1 },

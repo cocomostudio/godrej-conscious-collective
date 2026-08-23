@@ -1,0 +1,246 @@
+{
+	"kind": "collectionType",
+	"collectionName": "events",
+	"info": {
+		"singularName": "event",
+		"pluralName": "events",
+		"displayName": "Event",
+		"description": "A festival edition. Pure configuration: it has no page of its own and no URL, and is never a route."
+	},
+	"options": {
+		"draftAndPublish": false
+	},
+	"attributes": {
+		"name": {
+			"type": "string",
+			"required": true
+		},
+		"main": {
+			"type": "boolean",
+			"default": false,
+			"required": true
+		},
+		"date_start": {
+			"type": "date",
+			"required": false
+		},
+		"date_end": {
+			"type": "date",
+			"required": false
+		},
+		"schedule": {
+			"type": "media",
+			"allowedTypes": ["files"],
+			"multiple": false,
+			"required": false
+		},
+		"is_archived": {
+			"type": "boolean",
+			"default": false,
+			"required": true
+		},
+		"colour_theme": {
+			"type": "string",
+			"customField": "plugin::color-picker.color"
+		},
+		"colour_theme_rgb": {
+			"type": "string"
+		},
+		"colour_showcase": {
+			"type": "string",
+			"customField": "plugin::color-picker.color"
+		},
+		"colour_showcase_rgb": {
+			"type": "string"
+		},
+		"colour_experience": {
+			"type": "string",
+			"customField": "plugin::color-picker.color"
+		},
+		"colour_experience_rgb": {
+			"type": "string"
+		},
+		"colour_conversation": {
+			"type": "string",
+			"customField": "plugin::color-picker.color"
+		},
+		"colour_conversation_rgb": {
+			"type": "string"
+		},
+		"colour_workshop": {
+			"type": "string",
+			"customField": "plugin::color-picker.color"
+		},
+		"colour_workshop_rgb": {
+			"type": "string"
+		},
+		"colour_contributor": {
+			"type": "string",
+			"customField": "plugin::color-picker.color"
+		},
+		"colour_contributor_rgb": {
+			"type": "string"
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot. The six *_rgb siblings are hidden: they are derived on save and an editor has no business typing into them.",
+		"metadatas": {
+			"name": {
+				"edit": {
+					"label": "Name",
+					"description": "The festival edition, as it is written — \"Conscious Collective 2025\"."
+				},
+				"list": {
+					"label": "Name"
+				}
+			},
+			"main": {
+				"edit": {
+					"label": "Main event",
+					"description": "The edition the site is currently advertising. The header and the footer follow it on every page. Marking this one demotes the one that held it."
+				},
+				"list": {
+					"label": "Main"
+				}
+			},
+			"date_start": {
+				"edit": {
+					"label": "First day",
+					"description": "Shown in the header's date range and in the footer."
+				},
+				"list": {
+					"label": "First day"
+				}
+			},
+			"date_end": {
+				"edit": {
+					"label": "Last day",
+					"description": "Must not fall before the first day; a save that inverts the range is refused."
+				},
+				"list": {
+					"label": "Last day"
+				}
+			},
+			"schedule": {
+				"edit": {
+					"label": "Schedule document",
+					"description": "The downloadable programme for this edition, as a PDF."
+				},
+				"list": {
+					"label": "Schedule document"
+				}
+			},
+			"is_archived": {
+				"edit": {
+					"label": "Archived",
+					"description": "Marks this edition as past. Stored rather than worked out from the last day, so that an edition keeps a grace period after it closes."
+				},
+				"list": {
+					"label": "Archived"
+				}
+			},
+			"colour_theme": {
+				"edit": {
+					"label": "Theme colour",
+					"description": "This edition's principal colour. It is also what a page with no role of its own is coloured by."
+				},
+				"list": {
+					"label": "Theme colour"
+				}
+			},
+			"colour_showcase": {
+				"edit": {
+					"label": "Showcase colour"
+				},
+				"list": {
+					"label": "Showcase colour"
+				}
+			},
+			"colour_experience": {
+				"edit": {
+					"label": "Experience colour"
+				},
+				"list": {
+					"label": "Experience colour"
+				}
+			},
+			"colour_conversation": {
+				"edit": {
+					"label": "Conversation colour"
+				},
+				"list": {
+					"label": "Conversation colour"
+				}
+			},
+			"colour_workshop": {
+				"edit": {
+					"label": "Workshop colour"
+				},
+				"list": {
+					"label": "Workshop colour"
+				}
+			},
+			"colour_contributor": {
+				"edit": {
+					"label": "Collaborator colour",
+					"description": "\"Collaborator\" is what a contributor is called in public, and this colour is what a collaborator's page is coloured by."
+				},
+				"list": {
+					"label": "Collaborator colour"
+				}
+			},
+			"colour_theme_rgb": {
+				"edit": { "label": "Theme colour (RGB)", "visible": false },
+				"list": { "label": "Theme colour (RGB)" }
+			},
+			"colour_showcase_rgb": {
+				"edit": { "label": "Showcase colour (RGB)", "visible": false },
+				"list": { "label": "Showcase colour (RGB)" }
+			},
+			"colour_experience_rgb": {
+				"edit": { "label": "Experience colour (RGB)", "visible": false },
+				"list": { "label": "Experience colour (RGB)" }
+			},
+			"colour_conversation_rgb": {
+				"edit": { "label": "Conversation colour (RGB)", "visible": false },
+				"list": { "label": "Conversation colour (RGB)" }
+			},
+			"colour_workshop_rgb": {
+				"edit": { "label": "Workshop colour (RGB)", "visible": false },
+				"list": { "label": "Workshop colour (RGB)" }
+			},
+			"colour_contributor_rgb": {
+				"edit": { "label": "Collaborator colour (RGB)", "visible": false },
+				"list": { "label": "Collaborator colour (RGB)" }
+			}
+		},
+		"layouts": {
+			"list": ["name", "main", "date_start", "date_end"],
+			"edit": [
+				[
+					{ "name": "name", "size": 8 },
+					{ "name": "main", "size": 4 }
+				],
+				[
+					{ "name": "date_start", "size": 4 },
+					{ "name": "date_end", "size": 4 },
+					{ "name": "is_archived", "size": 4 }
+				],
+				[
+					{ "name": "schedule", "size": 6 }
+				],
+				[
+					{ "name": "colour_theme", "size": 4 },
+					{ "name": "colour_contributor", "size": 4 }
+				],
+				[
+					{ "name": "colour_showcase", "size": 3 },
+					{ "name": "colour_experience", "size": 3 },
+					{ "name": "colour_conversation", "size": 3 },
+					{ "name": "colour_workshop", "size": 3 }
+				]
+			]
+		}
+	}
+}
