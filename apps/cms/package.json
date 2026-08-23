@@ -11,7 +11,9 @@
 		"develop": "strapi develop",
 		"start": "strapi start",
 		"strapi": "strapi",
-		"typecheck": "tsc --noEmit"
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.tests.json"
 	},
 	"engines": {
 		"node": ">=22.22.0"
@@ -38,6 +40,7 @@
 		"@types/node": "22.20.1",
 		"@types/react": "18.3.31",
 		"@types/react-dom": "18.3.7",
-		"typescript": "5.9.3"
+		"typescript": "5.9.3",
+		"vitest": "4.1.11"
 	}
 }

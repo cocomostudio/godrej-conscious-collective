@@ -17,6 +17,7 @@
 		"start": "pnpm --recursive --parallel run start",
 		"typecheck": "pnpm --recursive run typecheck",
 		"format": "dprint fmt",
-		"format:check": "dprint check"
+		"format:check": "dprint check",
+		"test": "pnpm --recursive run test"
 	}
 }

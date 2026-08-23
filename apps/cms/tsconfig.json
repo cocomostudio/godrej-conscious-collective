@@ -17,7 +17,9 @@
 		".cache/",
 		".tmp/",
 		"src/admin/",
+		"tests/",
 		"**/*.test.ts",
+		"vitest.config.ts",
 		"src/plugins/**"
 	]
 }

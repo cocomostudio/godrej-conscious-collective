@@ -1,6 +1,8 @@
 
 import type { Core } from "@strapi/strapi"
 
+import { configure_admin_metadata } from "./this/admin-metadata/configure-admin-metadata"
+
 export default {
 	/**
 	 |
@@ -14,5 +16,7 @@ export default {
 	 | Runs once the application has started.
 	 |
 	 */
-	bootstrap ( _context: { strapi: Core.Strapi } ) {},
+	async bootstrap ( { strapi }: { strapi: Core.Strapi } ) {
+		await configure_admin_metadata( strapi )
+	},
 }
