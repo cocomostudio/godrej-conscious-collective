@@ -1,25 +1,13 @@
 # No SEO plugin — the SEO component schemas are ours
 
-Status: accepted
+Per-entry SEO metadata would normally come from `@notum-cz/strapi-plugin-seo`, the legitimate successor to Strapi's deprecated plugin. We do not take that dependency. The two component schemas it would install — a root SEO component and a nested open-graph one — are written and owned in this repository under the `page_meta` category, and attached by hand to Page, Session and Contributor.
 
-The site needs per-entry SEO metadata, and the obvious route is `@notum-cz/strapi-plugin-seo`, the legitimate successor to Strapi's own deprecated plugin. We are **not** taking that dependency. The two component schemas it would have installed — a root SEO component and a nested open-graph component — are written and owned directly in this repository instead, under the `page_meta` category, and attached by hand to Page, Session and Contributor.
-
-## Why the plugin does not work
-
-Version 2.0.12 is broken on Strapi 5, and its peer range claims compatibility, so nothing warns you. Its admin bundle derives its plugin id by stripping a `^@strapi/plugin-` prefix that the package name no longer carries, having moved scope. The admin therefore calls a route under the full package name while the server registers its routes under `seo`, and the plugin's page throws before rendering. Verified in the shipped `dist` chunk. The fix exists as an open, unmerged pull request. Secondarily, `@strapi/design-system` and React are declared as runtime dependencies rather than peers, which breaks admin builds under pnpm.
-
-## Considered options
-
-**Adopt it behind a `pnpm patch`** fixing the plugin id. Rejected. This effort already carries `strapi-plugin-webtools` as a fragile dependency — bus factor one, CI nineteen stable Strapi releases behind the version we pin, and a paid addon we have not bought for the feature we most need. Adding a second plugin that requires patching on day one merely to boot is the wrong direction.
-
-**Find another plugin.** There isn't one. Both `strapi/strapi-plugin-seo` and `strapi-community/plugin-seo` now redirect to this repository; it is the end of the line.
+Version 2.0.12 is broken on Strapi 5, and its peer range claims compatibility so nothing warns you: its admin bundle derives the plugin id by stripping a `@strapi/plugin-` prefix the package no longer carries, calls routes under the full package name while the server registers them under `seo`, and throws before rendering. The fix exists as an open, unmerged pull request. Adopting it behind a `pnpm patch` was rejected — this effort already carries `strapi-plugin-webtools` as a fragile dependency, and a second plugin needing a day-one patch merely to boot is the wrong direction. There is no alternative: both other SEO plugin repositories now redirect to this one.
 
 ## Consequences
 
-We lose the admin's SEO analysis panel, and nothing else. The schemas, the attribute wiring and the populate branch were ours to write under every option — the plugin never registered its components, it wrote their JSON into the application's own components directory through the content-type builder, after which they were owned locally anyway.
+We lose the admin's SEO analysis panel and nothing else. The plugin never registered its components — it wrote their JSON into the application's own components directory, after which they were locally owned anyway. Owning them outright means they can carry a `__` admin-metadata declaration like every other component in the catalogue.
 
-We gain the ability to put a `__` metadata declaration inside those two component files, so their field labels and descriptions are version-controlled exactly like every other component in the catalogue. Under the plugin they would have been the only two that were not.
+Adopting the plugin later, if it is ever fixed, is cheap: the attribute is already named `seo`, which is the name its admin hardcodes.
 
-Note for anyone comparing against documentation: the shipped shape is one root component with nine attributes plus a nested open-graph component. There is **no** repeatable social-media component. That is the plugin's version 1 shape, and both its own README and Strapi's public components repository are stale on the point.
-
-Adopting the plugin later is cheap if it is ever fixed — the attribute is already named `seo`, which is the name its admin hardcodes.
+Its true shipped shape — one root component with nine attributes plus a nested open-graph component, and **no** repeatable social-media component — is recorded in `__this-project/build-plans/2026-08-23__cms-and-frontend/assets/seo-plugin-surface.md`. Its own README and Strapi's public components repository are both stale on the point.
