@@ -17,10 +17,11 @@ export const links: Route.LinksFunction = () => [
 export default function PrimaryLayout () {
 	return <>
 		<Favicons />
-		<div className="h-full bg-white">
-			<Outlet />
-		</div>
+		<Outlet />
 	</>
+	// ↑ No wrapper element. The page's own root block owns the outermost
+	// 	element, because that is where the resolved event's colour variables
+	// 	are set, and those vary per page.
 }
 
 function Favicons () {

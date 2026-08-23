@@ -102,7 +102,16 @@ function start_listening ( express_app: Express.Application ) {
 }
 
 export const WebServer = {
-	async init () {
+	/**
+	 |
+	 | The configured Express application, not yet listening.
+	 |
+	 | Separate from `init` so that the tests can drive the real server over
+	 | HTTP on a port of the operating system's choosing, rather than
+	 | reassembling a second one that would then be the thing under test.
+	 |
+	 */
+	async build () {
 		const express_app = build_express_server()
 		configure_express_server( express_app )
 
@@ -115,6 +124,10 @@ export const WebServer = {
 			await register_static_middleware( express_app )
 		}
 
-		start_listening( express_app )
+		return express_app
+	},
+
+	async init () {
+		start_listening( await WebServer.build() )
 	},
 }
