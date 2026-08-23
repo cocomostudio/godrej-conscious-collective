@@ -12,4 +12,4 @@ The protection is not simply surrendered. What `strictParams` guarded here is on
 
 Turning `strictParams` back on later removes an author capability silently rather than breaking a build. The symptom will be reported as "the URL field disappeared", with nothing in the logs.
 
-Two related hazards, recorded here because they share the same blast radius and are documented nowhere else. The **"Re-generate all URL aliases"** bulk action deletes and recreates every alias for a content type with no predicate on the manual flag and no warning in its dialog, destroying every override. And webtools' schema-sync hook deletes every alias for a content type whenever its plugin setting is absent — firing at boot on any schema difference, so it cannot distinguish a deliberate change from a bad merge. Neither is recoverable except by reseeding or restoring the database.
+Two destructive webtools hazards share this blast radius, and are written up at `docs/runbooks/webtools-url-aliases.md`.
