@@ -54,7 +54,7 @@ import type {
 } from "../envelope.ts"
 
 import { Event_Date_Range } from "./event-date-range.tsx"
-import { Nav_Link } from "./nav-link.tsx"
+import { Nav_Link } from "../nav-link.tsx"
 
 import { Button } from "#infra/lib/ui/react/buttons/button.tsx"
 import { Arrow_Right } from "#infra/lib/ui/react/icons/arrow-right.tsx"

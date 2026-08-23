@@ -1,0 +1,61 @@
+{
+	"collectionName": "components_media_gallery_v1",
+	"info": {
+		"displayName": "Gallery",
+		"description": "Two pictures side by side, in one row."
+	},
+	"options": {},
+	"attributes": {
+		"layout": {
+			"type": "enumeration",
+			"enum": [
+				"equal",
+				"wide-first"
+			],
+			"default": "equal",
+			"required": true
+		},
+		"images": {
+			"type": "component",
+			"component": "media.image-v1",
+			"repeatable": true,
+			"required": true,
+			"min": 2,
+			"max": 2
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"layout": {
+				"edit": {
+					"label": "Layout",
+					"description": "How the row is divided. Equal gives both pictures the same width; wide first gives the first one more."
+				},
+				"list": {
+					"label": "Layout"
+				}
+			},
+			"images": {
+				"edit": {
+					"label": "Images",
+					"description": "Exactly two, in the order they are shown."
+				},
+				"list": {
+					"label": "Images"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "layout", "size": 12 }
+				],
+				[
+					{ "name": "images", "size": 12 }
+				]
+			]
+		}
+	}
+}

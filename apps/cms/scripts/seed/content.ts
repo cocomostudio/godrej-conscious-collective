@@ -149,6 +149,19 @@ async function write_page_shells ( strapi: Strapi ) {
 	const archive = await strapi.documents( "api::page-shell.page-shell" )
 		.create( {
 			data: {
+				// Injected code sits on the shell rather than on a page, so it
+				// is reachable only by whoever may edit site chrome. It is
+				// seeded on the archive shell rather than the primary one so
+				// that it has a reader without running on every seeded page.
+				arbitrary_code: {
+					before_head_closing: [
+						{
+							__component: "code.script-v1",
+							code: "window.__seeded_hook = \"before_head_closing\"",
+							type: "text/javascript",
+						},
+					],
+				},
 				default: false,
 				name: "Archive",
 				navigation_header: [
@@ -224,6 +237,89 @@ async function write_pages (
 					"Installations, concept designs, workshops, conversations and more, across four days.",
 				],
 			} ),
+			// The marquee, the image stack, the Instagram strip and the
+			// sponsors are the home page's own furniture in the static site.
+			// They are seeded here so that every one of them has a page to be
+			// looked at on.
+			section( "Practicalities", {
+				blocks: [
+					marquee( [
+						"Plant 13, Godrej Enterprises Group, Pirojshanagar, Vikhroli, Mumbai 400079",
+						"11 - 14 Dec 2025",
+						"9:00 AM - 10:00 PM",
+					] ),
+				],
+				register_with_toc: false,
+			} ),
+			section( "Reclaiming Cool", {
+				background_gradient: "white-to-light",
+				background_pattern: "spider-web-1",
+				background_position: "left",
+				blocks: [
+					{
+						__component:
+							"container.image-stack-and-content-v1",
+						content: [
+							heading( "Reclaiming Cool", "h1" ),
+							plain_string(
+								"Our theme for Conscious Collective 2025 is a movement for heat-resilient design, equitable futures, and climate-responsive living.",
+							),
+							plain_string(
+								"As temperatures rise and cities become heat traps, “cool” is no longer a comfort, it’s a right.",
+							),
+						],
+						images: [
+							responsive_image( {
+								alt: "A workshop in progress",
+								url: IMAGES.stack_one,
+							} ),
+							responsive_image( {
+								alt: "An installation being built",
+								url: IMAGES.stack_two,
+							} ),
+							responsive_image( {
+								alt: "Visitors at a showcase",
+								url: IMAGES.stack_three,
+							} ),
+						],
+						layout: "images-left",
+					},
+				],
+				register_with_toc: true,
+			} ),
+			section( "Follow our Instagram", {
+				background_gradient: "conversation-to-light",
+				blocks: [
+					{
+						__component: "media.instagram-feed-v1",
+						slides: INSTAGRAM_SLIDES.map( ( slide ) =>
+							image_link(
+								slide.url,
+								slide.label,
+								slide.image,
+							)
+						),
+					},
+				],
+				register_with_toc: false,
+			} ),
+			section( "Sponsors", {
+				background_gradient: "light",
+				blocks: [
+					{
+						__component: "list.sponsors-list-v1",
+						sponsors: SPONSORS.map( ( sponsor ) => ( {
+							image: image( {
+								alt: sponsor.name,
+								url: sponsor.url,
+							} ),
+							name: sponsor.name,
+						} ) ),
+					},
+				],
+				horizontal_rule: true,
+				register_with_toc: false,
+			} ),
 		],
 		page_shell: page_shells.primary.documentId,
 		side_region: [
@@ -259,6 +355,114 @@ async function write_pages (
 					"Godrej Design Lab is an initiative of Godrej Enterprise Group to encourage and advance design excellence and exploration. It is our way to reach out and collaborate on multiple fronts with the ever growing Indian design ecosystem.",
 					"Since 2015, we have worked with talented individuals, firms, and organizations to explore how design can innovate and impact, making pioneering strides in the areas of product and architectural design, material development and social impact.",
 				],
+			} ),
+			section( "About Godrej Design Lab", {
+				blocks: [
+					{
+						__component: "container.image-and-content-v1",
+						content: [
+							heading( "A word from the Director", "h3" ),
+							wysiwyg( [
+								"Godrej Design Lab is an initiative of Godrej Enterprises Group to encourage and advance design excellence and exploration.",
+								"Since 2015, we have worked with talented individuals, firms and organisations to explore how design can innovate and impact.",
+							] ),
+						],
+						image: image( {
+							alt: "Nyrika Holkar",
+							caption:
+								"highlights the role of curiosity, conscious choices, and the power of design to shape a better tomorrow.",
+							title:
+								"Nyrika Holkar, Executive Director, Godrej Enterprises Group",
+							url: IMAGES.portrait_two,
+						} ),
+						layout: "image-right",
+					},
+					quote(
+						"A life spent making mistakes is not only more honorable, but more useful than a life spent doing nothing.",
+						"George Bernard Shaw, playwright, critic, polemicist",
+						IMAGES.portrait_one,
+					),
+					gallery( "wide-first", [
+						{
+							alt: "",
+							caption:
+								"Debasmita explores the push and pull between age-old practices and modern dreams.",
+							title: "Living with the Land",
+							url: IMAGES.gallery_one,
+						},
+						{
+							alt: "",
+							caption:
+								"Native cotton, and the people who still grow it.",
+							title: "Reweaving the Ecosystem",
+							url: IMAGES.gallery_two,
+						},
+					] ),
+				],
+				heading: heading_component(
+					"About Godrej Design Lab",
+					"h2",
+				),
+				horizontal_rule: true,
+				opening_line:
+					"How the Lab supports Conscious Collective, and who is behind it.",
+				register_with_toc: true,
+			} ),
+			section( "The Core Team", {
+				blocks: [
+					{
+						__component: "list.profile-list-v1",
+						profiles: TEAM.map( ( person ) => ( {
+							description: person.description,
+							image: image( {
+								alt: person.name,
+								url: person.image,
+							} ),
+							name: person.name,
+							role: person.role,
+						} ) ),
+					},
+				],
+				heading: heading_component( "The Core Team", "h2" ),
+				horizontal_rule: true,
+				register_with_toc: true,
+			} ),
+			section( "Location", {
+				blocks: [
+					{
+						__component: "container.map-and-content-v1",
+						content: [
+							plain_string(
+								"Please arrive prepared for a grand buffet at the offsite location.",
+							),
+						],
+						layout: "map-left",
+						map: google_map( {
+							address:
+								"Plant 13, Godrej Enterprises Group\nPirojshanagar, Vikhroli, Mumbai 400079",
+							image_url: IMAGES.sketch_map,
+							label: "View on Maps",
+							map_url: "https://example.com/maps/plant-13",
+						} ),
+					},
+					{
+						__component: "miscellaneous.horizontal-rule-v1",
+						shade: "light",
+					},
+					{
+						__component: "media.vanilla-carousel-v1",
+						slides: INSTAGRAM_SLIDES.slice( 0, 4 ).map( (
+							slide,
+						) => image_link(
+							slide.url,
+							slide.label,
+							slide.image,
+						) ),
+					},
+				],
+				heading: heading_component( "Location", "h2" ),
+				horizontal_rule: true,
+				register_with_toc: true,
 			} ),
 			// Deliberately not registered with the table of contents, so that
 			// the opt-in is observable rather than assumed.
@@ -432,6 +636,208 @@ async function grant_public_permissions ( strapi: Strapi ) {
 	}
 }
 
+/* _____
+ | Pictures, and the people in them.
+ |
+ | Every url points somewhere else. **No image is stored in this repository** —
+ | the image component carries a `url` beside its `file` for exactly this, and
+ | the seed uses it so that a fresh clone needs no binary assets and no upload
+ | step to have a page worth looking at.
+ |
+ */
+const IMAGES = {
+	gallery_one:
+		"https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=720&auto=format&fit=crop",
+	gallery_two:
+		"https://images.unsplash.com/photo-1591299177061-2151e53fcaea?q=80&w=720&auto=format&fit=crop",
+	portrait_one:
+		"https://media.cocomo.199101991.xyz/2025/godrej-design-lab/cc-collaborator__01.png",
+	portrait_two:
+		"https://media.cocomo.199101991.xyz/2025/godrej-design-lab/cc-collaborator__02.png",
+	sketch_map:
+		"https://media.cocomo.199101991.xyz/locales/the-shire__sketch-map.svg",
+	stack_one:
+		"https://media.cocomo.199101991.xyz/2025/godrej-design-lab/cc-2024__01.png",
+	stack_three:
+		"https://media.cocomo.199101991.xyz/2025/godrej-design-lab/cc-2024__02.png",
+	stack_two:
+		"https://media.cocomo.199101991.xyz/2025/godrej-design-lab/arthur-mamou-mani.jpg",
+}
+
+/**
+ |
+ | The Instagram strip's slides, and the About page's carousel's.
+ |
+ | The two components hold the same attributes and render nothing like each
+ | other, so seeding both from one list is the clearest way to show that the
+ | difference is in the rendering rather than in the content.
+ |
+ */
+const INSTAGRAM_SLIDES = [
+	{
+		image:
+			"https://images.unsplash.com/photo-1763365716252-b34f6e500bdc?q=80&w=720&auto=format&fit=crop",
+		label: "Opening night",
+		url: "https://www.instagram.com/godrejdesignlab",
+	},
+	{
+		image:
+			"https://images.unsplash.com/photo-1777303799010-d062e096c5ff?q=80&w=720&auto=format&fit=crop",
+		label: "A workshop in progress",
+		url: "https://www.instagram.com/godrejdesignlab",
+	},
+	{
+		image:
+			"https://images.unsplash.com/photo-1777353245243-831faded69f8?q=80&w=720&auto=format&fit=crop",
+		label: "Building the pergola",
+		url: "https://www.instagram.com/godrejdesignlab",
+	},
+	{
+		image:
+			"https://images.unsplash.com/photo-1764351661280-bda9c2a653ff?q=80&w=720&auto=format&fit=crop",
+		label: "The conversation stage",
+		url: "https://www.instagram.com/godrejdesignlab",
+	},
+	{
+		image:
+			"https://images.unsplash.com/photo-1776684012353-787d693dda8f?q=80&w=720&auto=format&fit=crop",
+		label: "Closing the last day",
+		url: "https://www.instagram.com/godrejdesignlab",
+	},
+]
+
+const SPONSORS = [
+	{
+		name: "Laika",
+		url: "https://upload.wikimedia.org/wikipedia/commons/5/58/Laika_logo.svg",
+	},
+	{
+		name: "NASA",
+		url: "https://upload.wikimedia.org/wikipedia/commons/e/e5/NASA_logo.svg",
+	},
+	{
+		name: "Godrej Design Lab",
+		url: "https://media.cocomo.199101991.xyz/2025/godrej-design-lab/cc-2024__01.png",
+	},
+]
+
+const TEAM = [
+	{
+		description:
+			"Leads the Lab's programming, and has been the thread running through every edition since the first.",
+		image: IMAGES.portrait_one,
+		name: "Nandini Rao",
+		role: "Programme lead",
+	},
+	{
+		description:
+			"Looks after the fellows, from the first conversation to the last day of the festival.",
+		image: IMAGES.portrait_two,
+		name: "Arjun Menon",
+		role: "Fellowship lead",
+	},
+]
+
+/* _____
+ | The catalogue.
+ |
+ | Every helper below writes one component of the catalogue, in the shape the
+ | document service wants it. Images are written as bare urls rather than as
+ | uploaded files: the image component carries a `url` beside its `file`
+ | precisely so that no picture has to be stored in this repository.
+ |
+ */
+
+type Image_Fields = {
+	url: string
+	title?: string
+	caption?: string
+	alt?: string
+}
+
+function image ( { alt = "", caption, title, url }: Image_Fields ) {
+	return { alt, caption, title, url }
+}
+
+/**
+ |
+ | The same picture at all three widths.
+ |
+ | Art direction is the exception rather than the rule, and the website falls
+ | back from any missing width to the nearest one that was filled in — so a
+ | responsive image with one crop is a legitimate shape and the one the seed
+ | writes.
+ |
+ */
+function responsive_image ( fields: Image_Fields ) {
+	return { small: image( fields ) }
+}
+
+function image_link ( url: string, label: string, image_url: string ) {
+	return {
+		image: responsive_image( { alt: label, url: image_url } ),
+		label,
+		url,
+	}
+}
+
+function wysiwyg ( paragraphs: string[] ) {
+	return {
+		__component: "text.wysiwyg-v1",
+		rich_text: paragraphs.map( ( paragraph ) => ( {
+			children: [ { text: paragraph, type: "text" } ],
+			type: "paragraph",
+		} ) ),
+	}
+}
+
+function quote ( quote_text: string, attribution: string, image_url?: string ) {
+	return {
+		__component: "text.quote-v1",
+		attribution,
+		quote: quote_text,
+		...( image_url ? { image: image( { url: image_url } ) } : {} ),
+	}
+}
+
+function marquee ( items: string[] ) {
+	return {
+		__component: "text.marquee-v1",
+		items: items.map( ( content ) => ( { content } ) ),
+	}
+}
+
+function gallery ( layout: "equal" | "wide-first", images: Image_Fields[] ) {
+	return {
+		__component: "media.gallery-v1",
+		images: images.map( image ),
+		layout,
+	}
+}
+
+function google_map (
+	{ address, image_url, label, map_url }: {
+		address: string
+		map_url: string
+		label?: string
+		image_url?: string
+	},
+) {
+	return {
+		address,
+		label,
+		map_url,
+		...( image_url
+			? {
+				image: responsive_image( {
+					alt: "Location map",
+					url: image_url,
+				} ),
+			}
+			: {} ),
+	}
+}
+
 function link (
 	label: string,
 	url: string,
@@ -477,23 +883,44 @@ function heading ( content: string, level: Level, register_with_toc = false ) {
 function section (
 	title: string,
 	{
+		background_gradient,
+		background_pattern,
+		background_position,
+		blocks = [] as any[],
 		heading: section_heading,
+		horizontal_rule,
+		link: section_link,
+		opening_line,
 		register_with_toc = false,
 		strings = [] as string[],
 	}: {
+		background_gradient?: string
+		background_pattern?: string
+		background_position?: string
+		/** Catalogue components, after whatever `strings` contributed. */
+		blocks?: any[]
 		heading?: ReturnType<typeof heading_component>
+		horizontal_rule?: boolean
+		link?: ReturnType<typeof link>
+		opening_line?: string
 		register_with_toc?: boolean
 		strings?: string[]
 	},
 ) {
 	return {
 		__component: "container.section-v1",
-		content: strings.map( plain_string ),
+		content: [ ...strings.map( plain_string ), ...blocks ],
 		// Present-but-undefined is not the same as absent here: the document
 		// service reads the key, builds an empty heading component from it, and
 		// then refuses the whole entry because that component's required
 		// `content` is null.
 		...( section_heading ? { heading: section_heading } : {} ),
+		...( section_link ? { link: section_link } : {} ),
+		...( background_gradient ? { background_gradient } : {} ),
+		...( background_pattern ? { background_pattern } : {} ),
+		...( background_position ? { background_position } : {} ),
+		...( horizontal_rule === undefined ? {} : { horizontal_rule } ),
+		...( opening_line ? { opening_line } : {} ),
 		register_with_toc,
 		title,
 	}

@@ -24,6 +24,11 @@
 			"type": "text",
 			"required": false
 		},
+		"cover": {
+			"type": "component",
+			"component": "media.responsive-image-v1",
+			"required": false
+		},
 		"page_shell": {
 			"type": "relation",
 			"relation": "manyToOne",
@@ -99,6 +104,15 @@
 				},
 				"list": {
 					"label": "Standfirst"
+				}
+			},
+			"cover": {
+				"edit": {
+					"label": "Cover",
+					"description": "The picture at the top of the page."
+				},
+				"list": {
+					"label": "Cover"
 				}
 			},
 			"page_shell": {
@@ -184,6 +198,9 @@
 				],
 				[
 					{ "name": "standfirst", "size": 12 }
+				],
+				[
+					{ "name": "cover", "size": 12 }
 				],
 				[
 					{ "name": "page_shell", "size": 6 },

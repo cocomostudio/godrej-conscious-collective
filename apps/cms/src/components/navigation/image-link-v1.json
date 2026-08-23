@@ -1,0 +1,67 @@
+{
+	"collectionName": "components_navigation_image_link_v1",
+	"info": {
+		"displayName": "Image link",
+		"description": "A picture that is also a link."
+	},
+	"options": {},
+	"attributes": {
+		"label": {
+			"type": "string",
+			"required": false
+		},
+		"url": {
+			"type": "string",
+			"required": true
+		},
+		"image": {
+			"type": "component",
+			"component": "media.responsive-image-v1",
+			"required": true
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"label": {
+				"edit": {
+					"label": "Label",
+					"description": "Read out to a visitor who cannot see the picture, and shown where the design shows words."
+				},
+				"list": {
+					"label": "Label"
+				}
+			},
+			"url": {
+				"edit": {
+					"label": "URL",
+					"description": "Where the link goes. A path such as /about for this site, or a full address for another."
+				},
+				"list": {
+					"label": "URL"
+				}
+			},
+			"image": {
+				"edit": {
+					"label": "Image",
+					"description": "The picture the link wraps."
+				},
+				"list": {
+					"label": "Image"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "label", "size": 6 },
+					{ "name": "url", "size": 6 }
+				],
+				[
+					{ "name": "image", "size": 12 }
+				]
+			]
+		}
+	}
+}

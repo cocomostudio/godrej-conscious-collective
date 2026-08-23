@@ -1,0 +1,83 @@
+{
+	"collectionName": "components_media_google_map_v1",
+	"info": {
+		"displayName": "Map",
+		"description": "Where something is, as a picture or as an embedded map."
+	},
+	"options": {},
+	"attributes": {
+		"label": {
+			"type": "string",
+			"required": false
+		},
+		"address": {
+			"type": "text",
+			"required": false
+		},
+		"map_url": {
+			"type": "string",
+			"required": true
+		},
+		"image": {
+			"type": "component",
+			"component": "media.responsive-image-v1",
+			"required": false
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"label": {
+				"edit": {
+					"label": "Label",
+					"description": "The words on the button that opens the map. Left empty, it reads \"View on Maps\"."
+				},
+				"list": {
+					"label": "Label"
+				}
+			},
+			"address": {
+				"edit": {
+					"label": "Address",
+					"description": "The address as it should be read. Line breaks are kept."
+				},
+				"list": {
+					"label": "Address"
+				}
+			},
+			"map_url": {
+				"edit": {
+					"label": "Map URL",
+					"description": "Where the map opens when the picture is clicked."
+				},
+				"list": {
+					"label": "Map URL"
+				}
+			},
+			"image": {
+				"edit": {
+					"label": "Image",
+					"description": "A drawn or photographed map. Fill this in and the page makes no request to Google at all; leave it empty and a Google Map is embedded, which loads their scripts and sets their cookies before the visitor has done anything."
+				},
+				"list": {
+					"label": "Image"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "label", "size": 6 },
+					{ "name": "map_url", "size": 6 }
+				],
+				[
+					{ "name": "address", "size": 12 }
+				],
+				[
+					{ "name": "image", "size": 12 }
+				]
+			]
+		}
+	}
+}

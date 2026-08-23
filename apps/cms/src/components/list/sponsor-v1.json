@@ -1,0 +1,53 @@
+{
+	"collectionName": "components_list_sponsor_v1",
+	"info": {
+		"displayName": "Sponsor",
+		"description": "One organisation in a sponsors list."
+	},
+	"options": {},
+	"attributes": {
+		"name": {
+			"type": "string",
+			"required": true
+		},
+		"image": {
+			"type": "component",
+			"component": "media.image-v1",
+			"required": true
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"name": {
+				"edit": {
+					"label": "Name",
+					"description": "Read out to a visitor who cannot see the logo."
+				},
+				"list": {
+					"label": "Name"
+				}
+			},
+			"image": {
+				"edit": {
+					"label": "Logo",
+					"description": "Shown in grey until the visitor points at it."
+				},
+				"list": {
+					"label": "Logo"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "name", "size": 12 }
+				],
+				[
+					{ "name": "image", "size": 12 }
+				]
+			]
+		}
+	}
+}

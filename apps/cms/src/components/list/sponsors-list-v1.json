@@ -1,0 +1,39 @@
+{
+	"collectionName": "components_list_sponsors_list_v1",
+	"info": {
+		"displayName": "Sponsors list",
+		"description": "The organisations that support the event, scrolling sideways on their own."
+	},
+	"options": {},
+	"attributes": {
+		"sponsors": {
+			"type": "component",
+			"component": "list.sponsor-v1",
+			"repeatable": true,
+			"required": true,
+			"min": 1
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"sponsors": {
+				"edit": {
+					"label": "Sponsors",
+					"description": "In the order they should appear. The strip repeats them until it fills the screen."
+				},
+				"list": {
+					"label": "Sponsors"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "sponsors", "size": 12 }
+				]
+			]
+		}
+	}
+}

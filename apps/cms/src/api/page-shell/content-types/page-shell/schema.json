@@ -46,6 +46,11 @@
 			"allowedTypes": ["images"],
 			"multiple": true,
 			"required": false
+		},
+		"arbitrary_code": {
+			"type": "component",
+			"component": "code.html-document-hooks-v1",
+			"required": false
 		}
 	},
 
@@ -114,6 +119,15 @@
 				"list": {
 					"label": "Registration form slideshow"
 				}
+			},
+			"arbitrary_code": {
+				"edit": {
+					"label": "Injected code",
+					"description": "Scripts added to every page wearing this shell. Anything put here runs in every visitor's browser."
+				},
+				"list": {
+					"label": "Injected code"
+				}
 			}
 		},
 		"layouts": {
@@ -137,6 +151,9 @@
 				],
 				[
 					{ "name": "form_slideshow", "size": 12 }
+				],
+				[
+					{ "name": "arbitrary_code", "size": 12 }
 				]
 			]
 		}

@@ -1,0 +1,39 @@
+{
+	"collectionName": "components_text_marquee_v1",
+	"info": {
+		"displayName": "Marquee",
+		"description": "A line of short facts that scrolls sideways, on its own, forever."
+	},
+	"options": {},
+	"attributes": {
+		"items": {
+			"type": "component",
+			"component": "text.plain-string-v1",
+			"repeatable": true,
+			"required": true,
+			"min": 1
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"items": {
+				"edit": {
+					"label": "Items",
+					"description": "Each one is separated from the next by a dot. Keep them short — the venue, the dates, the opening hours."
+				},
+				"list": {
+					"label": "Items"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "items", "size": 12 }
+				]
+			]
+		}
+	}
+}

@@ -1,0 +1,71 @@
+{
+	"collectionName": "components_media_responsive_image_v1",
+	"info": {
+		"displayName": "Responsive image",
+		"description": "Three pictures of the same thing, art-directed for three widths. This is not about resolution — the upload's own breakpoints handle that."
+	},
+	"options": {},
+	"attributes": {
+		"small": {
+			"type": "component",
+			"component": "media.image-v1",
+			"required": false
+		},
+		"medium": {
+			"type": "component",
+			"component": "media.image-v1",
+			"required": false
+		},
+		"large": {
+			"type": "component",
+			"component": "media.image-v1",
+			"required": false
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"small": {
+				"edit": {
+					"label": "Small screens",
+					"description": "Shown on phones. Where only one of the three is filled in, it is used at every width."
+				},
+				"list": {
+					"label": "Small screens"
+				}
+			},
+			"medium": {
+				"edit": {
+					"label": "Medium screens",
+					"description": "Shown from 1024 pixels wide."
+				},
+				"list": {
+					"label": "Medium screens"
+				}
+			},
+			"large": {
+				"edit": {
+					"label": "Large screens",
+					"description": "Shown from 1440 pixels wide."
+				},
+				"list": {
+					"label": "Large screens"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "small", "size": 12 }
+				],
+				[
+					{ "name": "medium", "size": 12 }
+				],
+				[
+					{ "name": "large", "size": 12 }
+				]
+			]
+		}
+	}
+}

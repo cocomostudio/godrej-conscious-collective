@@ -1,0 +1,41 @@
+{
+	"collectionName": "components_miscellaneous_horizontal_rule_v1",
+	"info": {
+		"displayName": "Horizontal rule",
+		"description": "A line across the column."
+	},
+	"options": {},
+	"attributes": {
+		"shade": {
+			"type": "enumeration",
+			"enum": [
+				"light",
+				"dark"
+			],
+			"default": "light",
+			"required": true
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"shade": {
+				"edit": {
+					"label": "Shade",
+					"description": "How dark the line is."
+				},
+				"list": {
+					"label": "Shade"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "shade", "size": 12 }
+				]
+			]
+		}
+	}
+}

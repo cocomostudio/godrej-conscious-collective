@@ -1,0 +1,79 @@
+{
+	"collectionName": "components_container_map_and_content_v1",
+	"info": {
+		"displayName": "Map and content",
+		"description": "A map beside words."
+	},
+	"options": {},
+	"attributes": {
+		"layout": {
+			"type": "enumeration",
+			"enum": [
+				"map-left",
+				"map-right"
+			],
+			"default": "map-left",
+			"required": true
+		},
+		"map": {
+			"type": "component",
+			"component": "media.google-map-v1",
+			"required": true
+		},
+		"content": {
+			"type": "dynamiczone",
+			"components": [
+				"text.heading-v1",
+				"text.plain-string-v1",
+				"text.wysiwyg-v1",
+				"navigation.link-v1"
+			]
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"layout": {
+				"edit": {
+					"label": "Layout",
+					"description": "Which side the map sits on, from 1024 pixels wide."
+				},
+				"list": {
+					"label": "Layout"
+				}
+			},
+			"map": {
+				"edit": {
+					"label": "Map",
+					"description": "Give it a picture and the page makes no third-party request."
+				},
+				"list": {
+					"label": "Map"
+				}
+			},
+			"content": {
+				"edit": {
+					"label": "Content",
+					"description": "What sits beside the map."
+				},
+				"list": {
+					"label": "Content"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "layout", "size": 6 }
+				],
+				[
+					{ "name": "map", "size": 12 }
+				],
+				[
+					{ "name": "content", "size": 12 }
+				]
+			]
+		}
+	}
+}

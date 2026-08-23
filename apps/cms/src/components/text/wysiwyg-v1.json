@@ -1,0 +1,35 @@
+{
+	"collectionName": "components_text_wysiwyg_v1",
+	"info": {
+		"displayName": "WYSIWYG",
+		"description": "Formatted text — paragraphs, headings, lists, quotes and links."
+	},
+	"options": {},
+	"attributes": {
+		"rich_text": {
+			"type": "blocks"
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"rich_text": {
+				"edit": {
+					"label": "Text",
+					"description": "Formatting is available here. The attribute is not called \"content\", because \"content\" names a region everywhere else in this catalogue."
+				},
+				"list": {
+					"label": "Text"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "rich_text", "size": 12 }
+				]
+			]
+		}
+	}
+}

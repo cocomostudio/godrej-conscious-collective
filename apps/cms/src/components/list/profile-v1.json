@@ -1,0 +1,83 @@
+{
+	"collectionName": "components_list_profile_v1",
+	"info": {
+		"displayName": "Profile",
+		"description": "One person in a profile list. Not a Collaborator — these people are not part of a session."
+	},
+	"options": {},
+	"attributes": {
+		"name": {
+			"type": "string",
+			"required": true
+		},
+		"role": {
+			"type": "string",
+			"required": false
+		},
+		"description": {
+			"type": "text",
+			"required": false
+		},
+		"image": {
+			"type": "component",
+			"component": "media.image-v1",
+			"required": false
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"name": {
+				"edit": {
+					"label": "Name",
+					"description": ""
+				},
+				"list": {
+					"label": "Name"
+				}
+			},
+			"role": {
+				"edit": {
+					"label": "Role",
+					"description": "What they do, in a line."
+				},
+				"list": {
+					"label": "Role"
+				}
+			},
+			"description": {
+				"edit": {
+					"label": "Description",
+					"description": "A paragraph about them, shown beneath their name and role."
+				},
+				"list": {
+					"label": "Description"
+				}
+			},
+			"image": {
+				"edit": {
+					"label": "Portrait",
+					"description": "Shown as a grey circle."
+				},
+				"list": {
+					"label": "Portrait"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "name", "size": 6 },
+					{ "name": "role", "size": 6 }
+				],
+				[
+					{ "name": "description", "size": 12 }
+				],
+				[
+					{ "name": "image", "size": 12 }
+				]
+			]
+		}
+	}
+}

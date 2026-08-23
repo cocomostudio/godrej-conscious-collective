@@ -1,0 +1,82 @@
+{
+	"collectionName": "components_container_image_stack_and_content_v1",
+	"info": {
+		"displayName": "Image stack and content",
+		"description": "Three pictures scattered over one another, beside words."
+	},
+	"options": {},
+	"attributes": {
+		"layout": {
+			"type": "enumeration",
+			"enum": [
+				"images-left",
+				"images-right"
+			],
+			"default": "images-left",
+			"required": true
+		},
+		"images": {
+			"type": "component",
+			"component": "media.responsive-image-v1",
+			"repeatable": true,
+			"required": true,
+			"min": 3,
+			"max": 3
+		},
+		"content": {
+			"type": "dynamiczone",
+			"components": [
+				"text.heading-v1",
+				"text.plain-string-v1",
+				"text.wysiwyg-v1",
+				"navigation.link-v1"
+			]
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"layout": {
+				"edit": {
+					"label": "Layout",
+					"description": "Which side the stack sits on, from 1024 pixels wide."
+				},
+				"list": {
+					"label": "Layout"
+				}
+			},
+			"images": {
+				"edit": {
+					"label": "Images",
+					"description": "Exactly three. The first sits at the top left, the second at the right, the third across the middle."
+				},
+				"list": {
+					"label": "Images"
+				}
+			},
+			"content": {
+				"edit": {
+					"label": "Content",
+					"description": "What sits beside the stack. Its top lines up with the top of the middle picture rather than with the middle of the stack."
+				},
+				"list": {
+					"label": "Content"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "layout", "size": 6 }
+				],
+				[
+					{ "name": "images", "size": 12 }
+				],
+				[
+					{ "name": "content", "size": 12 }
+				]
+			]
+		}
+	}
+}

@@ -1,0 +1,180 @@
+{
+	"collectionName": "components_code_script_v1",
+	"info": {
+		"displayName": "Script",
+		"description": "One <script> tag, injected into the document."
+	},
+	"options": {},
+	"attributes": {
+		"type": {
+			"type": "enumeration",
+			"enum": [
+				"text/javascript",
+				"module",
+				"importmap"
+			],
+			"default": "text/javascript",
+			"required": true
+		},
+		"src": {
+			"type": "string",
+			"required": false
+		},
+		"code": {
+			"type": "text",
+			"required": false
+		},
+		"async": {
+			"type": "boolean",
+			"default": false,
+			"required": false
+		},
+		"defer": {
+			"type": "boolean",
+			"default": false,
+			"required": false
+		},
+		"cross_origin": {
+			"type": "enumeration",
+			"enum": [
+				"anonymous",
+				"use-credentials"
+			],
+			"default": "anonymous",
+			"required": true
+		},
+		"integrity": {
+			"type": "string",
+			"required": false
+		},
+		"nonce": {
+			"type": "string",
+			"required": false
+		},
+		"referrer_policy": {
+			"type": "enumeration",
+			"enum": [
+				"no-referrer",
+				"no-referrer-when-downgrade",
+				"origin",
+				"origin-when-cross-origin",
+				"same-origin",
+				"strict-origin",
+				"strict-origin-when-cross-origin",
+				"unsafe-url"
+			],
+			"default": "strict-origin-when-cross-origin",
+			"required": true
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"type": {
+				"edit": {
+					"label": "Type",
+					"description": "A classic script, a module, or an import map."
+				},
+				"list": {
+					"label": "Type"
+				}
+			},
+			"src": {
+				"edit": {
+					"label": "Script URL",
+					"description": "The address of a script hosted elsewhere."
+				},
+				"list": {
+					"label": "Script URL"
+				}
+			},
+			"code": {
+				"edit": {
+					"label": "Code",
+					"description": "The script itself. Leave this empty when the script URL above is filled in."
+				},
+				"list": {
+					"label": "Code"
+				}
+			},
+			"async": {
+				"edit": {
+					"label": "Async",
+					"description": "Runs as soon as it has loaded, without waiting for the rest of the page."
+				},
+				"list": {
+					"label": "Async"
+				}
+			},
+			"defer": {
+				"edit": {
+					"label": "Defer",
+					"description": "Waits until the page has finished loading."
+				},
+				"list": {
+					"label": "Defer"
+				}
+			},
+			"cross_origin": {
+				"edit": {
+					"label": "Cross origin",
+					"description": ""
+				},
+				"list": {
+					"label": "Cross origin"
+				}
+			},
+			"integrity": {
+				"edit": {
+					"label": "Integrity",
+					"description": "A checksum the browser verifies the script against before running it."
+				},
+				"list": {
+					"label": "Integrity"
+				}
+			},
+			"nonce": {
+				"edit": {
+					"label": "Nonce",
+					"description": ""
+				},
+				"list": {
+					"label": "Nonce"
+				}
+			},
+			"referrer_policy": {
+				"edit": {
+					"label": "Referrer policy",
+					"description": ""
+				},
+				"list": {
+					"label": "Referrer policy"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "type", "size": 6 },
+					{ "name": "src", "size": 6 }
+				],
+				[
+					{ "name": "code", "size": 12 }
+				],
+				[
+					{ "name": "async", "size": 6 },
+					{ "name": "defer", "size": 6 }
+				],
+				[
+					{ "name": "integrity", "size": 6 },
+					{ "name": "nonce", "size": 6 }
+				],
+				[
+					{ "name": "cross_origin", "size": 6 },
+					{ "name": "referrer_policy", "size": 6 }
+				]
+			]
+		}
+	}
+}

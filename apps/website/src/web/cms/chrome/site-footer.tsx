@@ -22,7 +22,7 @@ import type {
 	Page_Shell,
 } from "../envelope.ts"
 
-import { Nav_Link } from "./nav-link.tsx"
+import { Nav_Link } from "../nav-link.tsx"
 import { When_And_Where } from "./when-and-where.tsx"
 
 import { Conscious_Collective_Logo } from "#infra/lib/ui/react/logos/conscious-collective-logo.tsx"

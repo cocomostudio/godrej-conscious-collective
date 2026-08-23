@@ -1,0 +1,79 @@
+{
+	"collectionName": "components_container_image_and_content_v1",
+	"info": {
+		"displayName": "Image and content",
+		"description": "A picture beside words. The words wrap beneath the picture once there are more of them than the picture is tall."
+	},
+	"options": {},
+	"attributes": {
+		"layout": {
+			"type": "enumeration",
+			"enum": [
+				"image-left",
+				"image-right"
+			],
+			"default": "image-left",
+			"required": true
+		},
+		"image": {
+			"type": "component",
+			"component": "media.image-v1",
+			"required": true
+		},
+		"content": {
+			"type": "dynamiczone",
+			"components": [
+				"text.heading-v1",
+				"text.plain-string-v1",
+				"text.wysiwyg-v1",
+				"navigation.link-v1"
+			]
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"layout": {
+				"edit": {
+					"label": "Layout",
+					"description": "Which side the picture sits on, from 1024 pixels wide. Below that the picture always sits above the words."
+				},
+				"list": {
+					"label": "Layout"
+				}
+			},
+			"image": {
+				"edit": {
+					"label": "Image",
+					"description": "Its title and caption sit in the column of words rather than under the picture."
+				},
+				"list": {
+					"label": "Image"
+				}
+			},
+			"content": {
+				"edit": {
+					"label": "Content",
+					"description": "What sits beside the picture."
+				},
+				"list": {
+					"label": "Content"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "layout", "size": 6 }
+				],
+				[
+					{ "name": "image", "size": 12 }
+				],
+				[
+					{ "name": "content", "size": 12 }
+				]
+			]
+		}
+	}
+}

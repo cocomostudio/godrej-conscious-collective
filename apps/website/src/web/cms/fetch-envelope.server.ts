@@ -20,6 +20,21 @@ export type Fetched =
 
 /**
  |
+ | Where a picture the CMS stores is served from.
+ |
+ | Strapi's own upload provider writes a relative path, so the browser has to be
+ | told the origin to put in front of it — and the browser cannot read
+ | server-side configuration. It travels in the loader's data instead, which is
+ | why the question is answered here, in the one module that already knows the
+ | CMS exists and is guaranteed never to reach the browser bundle.
+ |
+ */
+export function media_origin () {
+	return Environment.get( "CMS_URL" )
+}
+
+/**
+ |
  | `status` is passed straight through. It is what drives the admin's Entry
  | Preview, which renders the website in an iframe against unpublished content.
  |

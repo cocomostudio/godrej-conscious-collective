@@ -11,7 +11,6 @@
  |
  */
 
-import { Link } from "react-router"
 import { H } from "#infra/lib/ui/react/headings.tsx"
 
 import type {
@@ -20,6 +19,7 @@ import type {
 } from "../envelope.ts"
 
 import { use_anchor } from "../anchors.tsx"
+import { Nav_Link } from "../nav-link.tsx"
 import { Button } from "#infra/lib/ui/react/buttons/button.tsx"
 
 const SIZES: Record<string, string> = {
@@ -60,7 +60,7 @@ function Heading_Link ( { link }: { link: Link_Attribute } ) {
 	return <Button
 		emphasis="outline"
 		color="context"
-		render={ <Link to={ link.url } /> }>
+		render={ <Nav_Link url={ link.url } /> }>
 		{ link.label ?? link.url }
 	</Button>
 }

@@ -32,8 +32,13 @@ import {
 
 import { Anchors } from "./anchors.tsx"
 import { assemble_root } from "./assemble-root.ts"
+import {
+	fetch_envelope,
+	media_origin,
+} from "./fetch-envelope.server.ts"
+import { Media_Origin } from "./media-origin.tsx"
+import { Page_Layout } from "./page-layout.tsx"
 import { render_block } from "./render-block.tsx"
-import { fetch_envelope } from "./fetch-envelope.server.ts"
 
 const HOME_PATH = "/home"
 
@@ -61,6 +66,14 @@ export async function loader ( { params, request }: Route.LoaderArgs ) {
 
 	return {
 		anchors: table_of_contents.anchors,
+		// The page shell's HTML document hooks, read by the document's layout
+		// rather than by this route — they belong to `<head>` and `<body>`,
+		// which sit above every route.
+		injected_code: page_shell?.arbitrary_code ?? null,
+		// Where a picture the CMS stores is served from. Server-side
+		// configuration, so it travels in the loader's data rather than being
+		// read again in the browser.
+		media_origin: media_origin(),
 		root,
 		site_title: page_shell?.site_title ?? null,
 		title: entry.title,
@@ -76,9 +89,13 @@ export function meta ( { loaderData }: Route.MetaArgs ) {
 }
 
 export default function Cms_Page ( { loaderData }: Route.ComponentProps ) {
-	return <Anchors anchors={ loaderData.anchors }>
-		{ render_block( loaderData.root ) }
-	</Anchors>
+	return <Media_Origin origin={ loaderData.media_origin }>
+		<Page_Layout layout={ loaderData.root.page_layout }>
+			<Anchors anchors={ loaderData.anchors }>
+				{ render_block( loaderData.root ) }
+			</Anchors>
+		</Page_Layout>
+	</Media_Origin>
 }
 
 export function ErrorBoundary ( { error }: Route.ErrorBoundaryProps ) {

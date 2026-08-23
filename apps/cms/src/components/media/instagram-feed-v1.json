@@ -1,0 +1,39 @@
+{
+	"collectionName": "components_media_instagram_feed_v1",
+	"info": {
+		"displayName": "Instagram feed",
+		"description": "A full-width carousel of pictures that loops forever, under a heading inviting the visitor to follow. It does not call Instagram — the pictures are the ones added below."
+	},
+	"options": {},
+	"attributes": {
+		"slides": {
+			"type": "component",
+			"component": "navigation.image-link-v1",
+			"repeatable": true,
+			"required": true,
+			"min": 1
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"slides": {
+				"edit": {
+					"label": "Slides",
+					"description": "The pictures the strip is made of. The strip repeats them until it fills the screen, so a handful is enough."
+				},
+				"list": {
+					"label": "Slides"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "slides", "size": 12 }
+				]
+			]
+		}
+	}
+}

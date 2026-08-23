@@ -1,0 +1,39 @@
+{
+	"collectionName": "components_media_vanilla_carousel_v1",
+	"info": {
+		"displayName": "Carousel",
+		"description": "A row of pictures the visitor scrolls sideways. Each one is a link."
+	},
+	"options": {},
+	"attributes": {
+		"slides": {
+			"type": "component",
+			"component": "navigation.image-link-v1",
+			"repeatable": true,
+			"required": true,
+			"min": 1
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"slides": {
+				"edit": {
+					"label": "Slides",
+					"description": "Portrait pictures work best. Every slide is shown at the same height."
+				},
+				"list": {
+					"label": "Slides"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "slides", "size": 12 }
+				]
+			]
+		}
+	}
+}

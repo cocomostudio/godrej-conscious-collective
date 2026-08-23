@@ -1,0 +1,39 @@
+{
+	"collectionName": "components_list_profile_list_v1",
+	"info": {
+		"displayName": "Profile list",
+		"description": "A group of people, such as the core team. Deliberately separate from Collaborators, who take part in sessions."
+	},
+	"options": {},
+	"attributes": {
+		"profiles": {
+			"type": "component",
+			"component": "list.profile-v1",
+			"repeatable": true,
+			"required": true,
+			"min": 1
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"profiles": {
+				"edit": {
+					"label": "Profiles",
+					"description": "In the order they should appear."
+				},
+				"list": {
+					"label": "Profiles"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "profiles", "size": 12 }
+				]
+			]
+		}
+	}
+}

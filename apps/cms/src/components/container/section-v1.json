@@ -20,10 +20,84 @@
 			"component": "text.heading-v1",
 			"required": false
 		},
+		"opening_line": {
+			"type": "text",
+			"required": false
+		},
+		"link": {
+			"type": "component",
+			"component": "navigation.link-v1",
+			"required": false
+		},
+		"background_gradient": {
+			"type": "enumeration",
+			"enum": [
+				"none",
+				"light",
+				"white-to-light",
+				"theme-to-light",
+				"context-to-light",
+				"showcase-to-light",
+				"experience-to-light",
+				"conversation-to-light",
+				"workshop-to-light",
+				"collaborator-to-light"
+			],
+			"default": "none",
+			"required": true
+		},
+		"background_pattern": {
+			"type": "enumeration",
+			"enum": [
+				"none",
+				"spider-web-1",
+				"spider-web-2",
+				"spider-web-3"
+			],
+			"default": "none",
+			"required": true
+		},
+		"background_position": {
+			"type": "enumeration",
+			"enum": [
+				"left",
+				"right",
+				"top-left",
+				"top-right",
+				"bottom-left",
+				"bottom-right",
+				"center"
+			],
+			"default": "left",
+			"required": true
+		},
+		"horizontal_rule": {
+			"type": "boolean",
+			"default": false,
+			"required": true
+		},
 		"content": {
 			"type": "dynamiczone",
 			"components": [
-				"text.plain-string-v1"
+				"text.heading-v1",
+				"text.plain-string-v1",
+				"text.wysiwyg-v1",
+				"text.quote-v1",
+				"text.marquee-v1",
+				"navigation.link-v1",
+				"navigation.image-link-v1",
+				"media.image-v1",
+				"media.responsive-image-v1",
+				"media.gallery-v1",
+				"media.google-map-v1",
+				"media.vanilla-carousel-v1",
+				"media.instagram-feed-v1",
+				"list.sponsors-list-v1",
+				"list.profile-list-v1",
+				"miscellaneous.horizontal-rule-v1",
+				"container.image-and-content-v1",
+				"container.image-stack-and-content-v1",
+				"container.map-and-content-v1"
 			]
 		}
 	},
@@ -52,10 +126,64 @@
 			"heading": {
 				"edit": {
 					"label": "Heading",
-					"description": "Shown at the top of the section."
+					"description": "Shown at the top of the section. Leave it empty and the opening line below is not shown either — it has nothing to open."
 				},
 				"list": {
 					"label": "Heading"
+				}
+			},
+			"opening_line": {
+				"edit": {
+					"label": "Opening line",
+					"description": "A line beneath the heading. It is not shown at all when there is no heading above it."
+				},
+				"list": {
+					"label": "Opening line"
+				}
+			},
+			"link": {
+				"edit": {
+					"label": "Link",
+					"description": "A link beside the heading. Where the heading carries a link of its own, the heading's is the one shown."
+				},
+				"list": {
+					"label": "Link"
+				}
+			},
+			"background_gradient": {
+				"edit": {
+					"label": "Background",
+					"description": "A colour fading down into grey, or a flat grey, or nothing."
+				},
+				"list": {
+					"label": "Background"
+				}
+			},
+			"background_pattern": {
+				"edit": {
+					"label": "Background pattern",
+					"description": "A drawing laid over the background."
+				},
+				"list": {
+					"label": "Background pattern"
+				}
+			},
+			"background_position": {
+				"edit": {
+					"label": "Background pattern position",
+					"description": "Where the pattern sits. It has no effect where there is no pattern."
+				},
+				"list": {
+					"label": "Background pattern position"
+				}
+			},
+			"horizontal_rule": {
+				"edit": {
+					"label": "Rule above?",
+					"description": "Draws a line across the top of this section, separating it from the one before."
+				},
+				"list": {
+					"label": "Rule above?"
 				}
 			},
 			"content": {
@@ -76,6 +204,20 @@
 				],
 				[
 					{ "name": "heading", "size": 12 }
+				],
+				[
+					{ "name": "opening_line", "size": 12 }
+				],
+				[
+					{ "name": "link", "size": 12 }
+				],
+				[
+					{ "name": "background_gradient", "size": 4 },
+					{ "name": "background_pattern", "size": 4 },
+					{ "name": "background_position", "size": 4 }
+				],
+				[
+					{ "name": "horizontal_rule", "size": 4 }
 				],
 				[
 					{ "name": "content", "size": 12 }

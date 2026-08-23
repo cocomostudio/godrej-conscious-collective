@@ -1,0 +1,69 @@
+{
+	"collectionName": "components_text_quote_v1",
+	"info": {
+		"displayName": "Quote",
+		"description": "Somebody's words, and who said them."
+	},
+	"options": {},
+	"attributes": {
+		"quote": {
+			"type": "text",
+			"required": true
+		},
+		"attribution": {
+			"type": "string",
+			"required": false
+		},
+		"image": {
+			"type": "component",
+			"component": "media.image-v1",
+			"required": false
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"quote": {
+				"edit": {
+					"label": "Quote",
+					"description": "The words themselves. The quotation marks are drawn by the design — do not type them."
+				},
+				"list": {
+					"label": "Quote"
+				}
+			},
+			"attribution": {
+				"edit": {
+					"label": "Attribution",
+					"description": "Who said it, and anything else about them worth reading."
+				},
+				"list": {
+					"label": "Attribution"
+				}
+			},
+			"image": {
+				"edit": {
+					"label": "Portrait",
+					"description": "An optional picture of the person quoted."
+				},
+				"list": {
+					"label": "Portrait"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "quote", "size": 12 }
+				],
+				[
+					{ "name": "attribution", "size": 12 }
+				],
+				[
+					{ "name": "image", "size": 12 }
+				]
+			]
+		}
+	}
+}

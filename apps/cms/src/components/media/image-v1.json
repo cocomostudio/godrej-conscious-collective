@@ -1,0 +1,99 @@
+{
+	"collectionName": "components_media_image_v1",
+	"info": {
+		"displayName": "Image",
+		"description": "One picture, with the words that go with it."
+	},
+	"options": {},
+	"attributes": {
+		"file": {
+			"type": "media",
+			"allowedTypes": ["images"],
+			"multiple": false,
+			"required": false
+		},
+		"url": {
+			"type": "string",
+			"required": false
+		},
+		"title": {
+			"type": "string",
+			"required": false
+		},
+		"caption": {
+			"type": "text",
+			"required": false
+		},
+		"alt": {
+			"type": "string",
+			"required": false
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"file": {
+				"edit": {
+					"label": "File",
+					"description": "The picture itself."
+				},
+				"list": {
+					"label": "File"
+				}
+			},
+			"url": {
+				"edit": {
+					"label": "URL",
+					"description": "An address to load the picture from instead of uploading one. The seed script uses this; an editor should use the file above.",
+					"visible": false
+				},
+				"list": {
+					"label": "URL"
+				}
+			},
+			"title": {
+				"edit": {
+					"label": "Title",
+					"description": "Shown beneath the picture, where the design shows a caption."
+				},
+				"list": {
+					"label": "Title"
+				}
+			},
+			"caption": {
+				"edit": {
+					"label": "Caption",
+					"description": "A second, smaller line beneath the title."
+				},
+				"list": {
+					"label": "Caption"
+				}
+			},
+			"alt": {
+				"edit": {
+					"label": "Alternative text",
+					"description": "What the picture shows, for a visitor who cannot see it. Leave it empty when the picture is decoration."
+				},
+				"list": {
+					"label": "Alternative text"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "file", "size": 6 },
+					{ "name": "url", "size": 6 }
+				],
+				[
+					{ "name": "title", "size": 6 },
+					{ "name": "alt", "size": 6 }
+				],
+				[
+					{ "name": "caption", "size": 12 }
+				]
+			]
+		}
+	}
+}

@@ -1,0 +1,74 @@
+{
+	"collectionName": "components_code_html_document_hooks_v1",
+	"info": {
+		"displayName": "HTML document hooks",
+		"description": "Code injected at three fixed points of every page's HTML document."
+	},
+	"options": {},
+	"attributes": {
+		"before_head_closing": {
+			"type": "dynamiczone",
+			"components": [
+				"code.script-v1"
+			]
+		},
+		"after_body_opening": {
+			"type": "dynamiczone",
+			"components": [
+				"code.script-v1"
+			]
+		},
+		"before_body_closing": {
+			"type": "dynamiczone",
+			"components": [
+				"code.script-v1"
+			]
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"before_head_closing": {
+				"edit": {
+					"label": "Before the closing </head> tag",
+					"description": "Analytics and anything else that must run before the page is drawn."
+				},
+				"list": {
+					"label": "Before </head>"
+				}
+			},
+			"after_body_opening": {
+				"edit": {
+					"label": "After the opening <body> tag",
+					"description": ""
+				},
+				"list": {
+					"label": "After <body>"
+				}
+			},
+			"before_body_closing": {
+				"edit": {
+					"label": "Before the closing </body> tag",
+					"description": "Anything that can wait until the page has been drawn."
+				},
+				"list": {
+					"label": "Before </body>"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "before_head_closing", "size": 12 }
+				],
+				[
+					{ "name": "after_body_opening", "size": 12 }
+				],
+				[
+					{ "name": "before_body_closing", "size": 12 }
+				]
+			]
+		}
+	}
+}
