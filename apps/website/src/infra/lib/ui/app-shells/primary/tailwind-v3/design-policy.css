@@ -1,0 +1,17 @@
+/**
+ |
+ | Design policy
+ |
+ |
+ */
+
+@layer utilities {
+	.block-text { @apply mt-4; }
+	.block-media { @apply my-6 md:my-8; }
+	.block-media:first-child { @apply !-mt-6 md:!-mt-8 pt-6 md:pt-8; }
+	.block-non-primitive {}
+	.block-list {}
+	.block-rich {}
+
+	.block--section { @apply py-6 md:py-8 *-first:mt-0 *-last:mb-0; }
+}

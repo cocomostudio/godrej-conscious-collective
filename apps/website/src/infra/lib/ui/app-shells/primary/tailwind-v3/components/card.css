@@ -1,0 +1,91 @@
+/**
+ |
+ | Card (Phase 5) — ported from the v4 `tailwind/components/card.css`.
+ |
+ | This is the one ported concern kept as a plain-CSS partial rather than a JS
+ | plugin: the v4 source is `@apply`-heavy (it leans on `min-w-8c`, `aspect-4/3`,
+ | `space-y-1`, `max-lg:min-w-89`, …), and `@apply` is only available in CSS — a
+ | plugin would force every utility to be hand-resolved to raw declarations, which
+ | is both verbose and error-prone. So the v4 directives are translated 1:1:
+ |   • `@utility x { … }`           → `.x { … }` inside `@layer components`
+ |   • `@variant md/lg { … }`       → `@media (min-width: 1024px / 1320px) { … }`
+ |   • nested `& .image` / `& > .image` → flat `.x .image` / `.x > .image`
+ |     (so no PostCSS nesting plugin is needed)
+ |
+ | Cards live in `@layer components`, so v3 JIT still generates variants for them
+ | — `first:card--featured` (workshops-section) applies the featured style to the
+ | first card only.
+ |
+ | Imported by `./index.css`. See the v4 source's note on why these are utilities
+ | and not components: https://github.com/tailwindlabs/tailwindcss/issues/16000
+ |
+ | See the static site's docs/tailwind-v3-migration-handoff.md §5.6 / §7 (Phase 5).
+ |
+ */
+
+@layer components {
+	/* _____
+	 | card--featured (md+)
+	 */
+	@media (min-width: 1024px) {
+		.card--featured { @apply flex w-full h-121.5; }
+		.card--featured .points { @apply mt-4; }
+		.card--featured .additional-details { display: block; }
+		.card--featured .details .when { display: none; }
+		.card--featured > .image { @apply min-w-8c aspect-auto; }
+		.card--featured > .details { @apply shrink; }
+	}
+
+	/* _____
+	 | card--lg
+	 */
+	.card--lg { @apply max-lg:min-w-89; }
+	.card--lg .image { @apply aspect-4/3; }
+	.card--lg .when {
+		@apply absolute top-0 left-4 py-1;
+		@apply space-y-1;
+	}
+	.card--lg .details { @apply px-4 pt-2 pb-4; }
+	@media (min-width: 1320px) {
+		.card--lg .when { @apply left-8; }
+		.card--lg .details { @apply px-8 pt-4 pb-8; }
+	}
+
+	/* _____
+	 | card--md
+	 */
+	.card--md { @apply max-lg:min-w-73; }
+	.card--md .image { @apply aspect-4/3; }
+	.card--md .when {
+		@apply absolute top-0 left-4 py-1;
+		@apply space-y-1;
+	}
+	.card--md .details { @apply px-4 pt-2 pb-4; }
+	@media (min-width: 1320px) {
+		.card--md .when { @apply left-8; }
+		.card--md .details { @apply px-8 pt-4 pb-8; }
+	}
+
+	/* _____
+	 | card--sm
+	 */
+	.card--sm { @apply max-lg:min-w-41; }
+	.card--sm .image { @apply aspect-square lg:aspect-4/3; }
+	.card--sm .when {
+		@apply absolute top-0 left-4 py-1;
+		@apply space-y-1;
+	}
+	.card--sm .details { @apply px-4 pt-2 pb-4; }
+
+	/* _____
+	 | card--xs
+	 */
+	.card--xs { @apply max-lg:min-w-37; }
+	.card--xs .image { @apply aspect-square; }
+	.card--xs .when {
+		@apply absolute top-0 left-2 py-0.5;
+		@apply space-y-0.5;
+	}
+	.card--xs .details { @apply px-2 pt-2 pb-4; }
+	@media (min-width: 1320px) { .card--xs .details { @apply px-4; } }
+}

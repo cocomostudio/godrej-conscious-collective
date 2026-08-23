@@ -1,0 +1,92 @@
+/*
+ |
+ | ─── Sample Custom utilities & components ───────────────────────────────────────────
+ |
+ | These aren't pulled into production code.
+ | They are merely a reference of how custom Tailwind utilities/components can be built.
+ |
+ | Wrap new classes in `@layer utilities` (single-purpose, one concern) or
+ | `@layer components` (multi-declaration, a "thing"). Tailwind hoists each block
+ | to the matching `@tailwind` directive in ./index.css, so the cascade order is
+ | base → components → your utilities, exactly like built-ins.
+ |
+ | Two things you get for free by using @layer rather than writing bare rules:
+ |   • VARIANTS — the JIT generates `lg:`, `hover:`, `focus:`, and every variant
+ |     from ./selectors.ts (`not-last:`, `*-odd:`, …) on your class automatically.
+ |     Never hand-write the media query; write the base class and use `lg:my-class`.
+ |   • PURGING — the class only ships if it is actually used.
+ |
+ | ⚠ THE PURGE GOTCHA. `content` in ./tailwind.config.ts scans .ts/.tsx under ./src
+ |   ONLY (glob elided here — a `*` followed by a slash would close this comment).
+ |   A @layer class is dropped from the build unless its literal name appears in a
+ |   scanned file. Consequences:
+ |     • Composed class names lose — `` className={ `text-${ tone }` } `` finds
+ |       nothing. Write full names: `tone === "loud" ? "text-loud" : "text-quiet"`.
+ |     • A class used only from .css or .html is dropped. `@apply` is exempt — it
+ |       is resolved at build time, so applying a class always works even when the
+ |       class itself never ships.
+ |   The examples below are unused on purpose, so they compile to nothing until you
+ |   reference them. That is the mechanism working, not a bug.
+ |
+ */
+
+@layer utilities {
+	/* 1 ─ Plain utility — raw declarations, no Tailwind machinery needed.
+	 | Use as `sample-----hyphenate`; `md:sample-----hyphenate`, `not-last:sample-----hyphenate`, … come free.
+	 | Pick a name no built-in already owns: Tailwind 3.4 ships a lot (`text-pretty`,
+	 | `text-balance`, `hyphens-auto`, …) and a same-named block silently merges. */
+	.sample-----hyphenate {
+		hyphens: auto;
+		overflow-wrap: break-word;
+	}
+
+	/* 2 ─ Built out of existing utilities via @apply — the common case. */
+	.sample-----stack-tight { @apply flex flex-col gap-1; }
+
+	/* 3 ─ Reading theme tokens with `theme()`. Works for every scale, including
+	 | the project's `<alpha-value>` colours from ./colors.ts — Tailwind substitutes
+	 | the placeholder, so `theme( "colors.black" )` emits
+	 | `rgba( var( --color-black ), 1 )`, not a broken declaration.
+	 | For any alpha other than 1, use `@apply text-black/50` or hand-write the
+	 | `rgba( var( --color-black ), 0.5 )` — `theme()` has no slash syntax. */
+	.sample-----gutter-inline {
+		padding-inline: theme("spacing.4");
+		color: theme("colors.black");
+	}
+
+	/* 4 ─ Baked-in breakpoint via `screen( … )` — note the SINGULAR name and the
+	 | UNQUOTED key; `screen( md )` compiles to `(min-width: 1024px)`. An unknown
+	 | function name is not an error, it just passes through verbatim and the
+	 | browser drops the whole rule, so typos here fail silently.
+	 |
+	 | Usually you don't need this at all: write the base class and use `md:…` in
+	 | the markup. Reach for `screen()` only when the query must wrap something that
+	 | isn't a single class. `@media ( min-width: theme( "screens.md" ) )` also works. */
+	@media screen(md) {
+		.sample-----edge-bleed {
+			margin-inline: calc(-1 * theme("spacing.4"));
+		}
+	}
+}
+
+@layer components {
+	/* 5 ─ A component class — several declarations that travel together, and that
+	 | want to sit *below* utilities so a `px-8` in the markup still wins. */
+	.sample-----pill {
+		@apply inline-flex items-center rounded-full px-3 py-1 text-black;
+
+		background: theme("colors.gray-light");
+	}
+}
+
+/*
+ | ─── When to use a JS plugin instead ─────────────────────────────────────────
+ |
+ | CSS can't express a utility that takes an arbitrary value. If you need
+ | `text-shadow-[4px]`-style parameterisation, a whole family generated from a
+ | theme scale, or vendor pseudo-elements, write a plugin next to this file and
+ | register it in ./tailwind.config.ts — see ./scrollbars.ts (`addUtilities`) for
+ | the minimal shape, and ./selectors.ts for the variant-heavy end.
+ | Rule of thumb: static class → here; generated or parameterised → plugin.
+ |
+ */

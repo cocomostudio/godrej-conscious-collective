@@ -1,0 +1,52 @@
+{
+	"name": "app.website",
+	"version": "0.0.1",
+	"private": true,
+	"description": "The Godrej Conscious Collective website.",
+	"license": "ISC",
+	"type": "module",
+	"imports": {
+		"#infra/*": "./src/infra/*",
+		"#web/*": "./src/web/*",
+		"#~/*": "./*"
+	},
+	"scripts": {
+		"build": "react-router build",
+		"dev": "NODE_ENV=development node --conditions development --env-file-if-exists .env entry-point.ts",
+		"start": "NODE_ENV=production node --env-file-if-exists .env.production entry-point.ts",
+		"typecheck": "react-router typegen && tsc"
+	},
+	"engines": {
+		"node": ">=22.22.0"
+	},
+	"browserslist": [
+		"Safari >= 15",
+		"Firefox >= 92",
+		"Chrome >= 94"
+	],
+	"dependencies": {
+		"@fontsource/public-sans": "5.3.0",
+		"@react-router/express": "8.3.0",
+		"@react-router/node": "8.3.0",
+		"express": "5.2.1",
+		"isbot": "5.2.1",
+		"react": "19.2.8",
+		"react-accessible-headings": "4.2.0",
+		"react-dom": "19.2.8",
+		"react-router": "8.3.0"
+	},
+	"devDependencies": {
+		"@react-router/dev": "8.3.0",
+		"@types/express": "5.0.6",
+		"@types/node": "22.20.1",
+		"@types/react": "19.2.18",
+		"@types/react-dom": "19.2.4",
+		"autoprefixer": "10.5.4",
+		"hex-rgb": "5.0.0",
+		"postcss": "8.5.26",
+		"tailwindcss": "3.4.19",
+		"typescript": "5.9.3",
+		"vite": "7.3.6",
+		"vite-tsconfig-paths": "5.1.4"
+	}
+}

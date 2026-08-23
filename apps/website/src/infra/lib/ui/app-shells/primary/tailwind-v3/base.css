@@ -1,0 +1,18 @@
+/**
+ |
+ | Base styles & keyframes (Phase 5) — plain-CSS partial.
+ |
+ | Ports two v4 concerns that need no Tailwind machinery:
+ |   • `interpolate-size: allow-keywords` (v4 `tailwind/base.css`) — a
+ |     progressive-enhancement reset, ignored on browsers that don't support it.
+ |   • `@keyframes fade_in` (v4 `tailwind/animations.css`) — consumed by the
+ |     arbitrary animation `animate-[fade_in_250ms_ease-in_forwards]` in
+ |     `category-listing/filtration-widget-container.tsx`.
+ |
+ | Imported by `./index.css`. See the static site's docs/tailwind-v3-migration-handoff.md §7 (Phase 5).
+ |
+ */
+
+@layer base { :root { interpolate-size: allow-keywords; } }
+
+@keyframes fade_in { from { opacity: 0; } }

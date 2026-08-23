@@ -1,0 +1,22 @@
+/**
+ |
+ | Tailwind CSS v3 entry stylesheet (ACTIVE).
+ |
+ | Compiled by PostCSS (tailwindcss@3 + autoprefixer). The plain-CSS partials
+ | are @imported below.
+ |
+ */
+
+/* Plain-CSS partials (must precede the @tailwind directives per the CSS spec).
+ | `@apply`/`@layer` inside them are still resolved by Tailwind globally, so card
+ | (a `@layer components` partial) is hoisted into the components layer correctly
+ | regardless of import position. */
+@import "./__samples.css"; /* custom styles that demonstrate how Tailwind v3 can be used */
+@import "./typography.css"; /* Phase 3 — @font-face, font-smoothing */
+@import "./base.css"; /* Phase 5 — interpolate-size, @keyframes fade_in */
+@import "./components/card.css"; /* Phase 5 — card--featured/lg/md/sm/xs */
+@import "./design-policy.css"; /* Hand-written design policy (non-Tailwind-generated) */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
