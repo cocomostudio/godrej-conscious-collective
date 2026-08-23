@@ -18,7 +18,7 @@ Version 2.0.12 is broken on Strapi 5, and its peer range claims compatibility, s
 
 We lose the admin's SEO analysis panel, and nothing else. The schemas, the attribute wiring and the populate branch were ours to write under every option — the plugin never registered its components, it wrote their JSON into the application's own components directory through the content-type builder, after which they were owned locally anyway.
 
-We gain the ability to put a `__` metadata block inside those two component files, so their field labels and descriptions are version-controlled exactly like every other component in the catalogue. Under the plugin they would have been the only two that were not.
+We gain the ability to put a `__` metadata declaration inside those two component files, so their field labels and descriptions are version-controlled exactly like every other component in the catalogue. Under the plugin they would have been the only two that were not.
 
 Note for anyone comparing against documentation: the shipped shape is one root component with nine attributes plus a nested open-graph component. There is **no** repeatable social-media component. That is the plugin's version 1 shape, and both its own README and Strapi's public components repository are stale on the point.
 
