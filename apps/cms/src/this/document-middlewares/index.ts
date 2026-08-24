@@ -38,6 +38,7 @@ import { demote_other_default_page_shells } from "./demote-other-default-page-sh
 import { demote_other_main_events } from "./demote-other-main-events"
 import { default_session_event_to_main } from "./default-session-event-to-main"
 import { derive_colour_triplets } from "./derive-colour-triplets"
+import { derive_contributor_events } from "./derive-contributor-events"
 import { derive_session_dates } from "./derive-session-dates"
 import { fill_page_shell_from_default } from "./fill-page-shell-from-default"
 import { reject_inverted_date_range } from "./reject-inverted-date-range"
@@ -66,4 +67,8 @@ export function register_document_middlewares ( strapi: Core.Strapi ) {
 	strapi.documents.use( fill_page_shell_from_default( strapi ) )
 	strapi.documents.use( demote_other_main_events( strapi ) )
 	strapi.documents.use( demote_other_default_page_shells( strapi ) )
+	// Reconciles Contributor.events after every session write. Runs last: it
+	// reads the stored contributor list on both sides of `next()`, so anything
+	// earlier that amends the write into place should have done so already.
+	strapi.documents.use( derive_contributor_events( strapi ) )
 }

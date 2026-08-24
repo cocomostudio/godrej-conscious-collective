@@ -9,7 +9,10 @@
  |
  */
 
-import type { Responsive_Image_Attribute } from "./media.ts"
+import type {
+	Image_Attribute,
+	Responsive_Image_Attribute,
+} from "./media.ts"
 
 /**
  |
@@ -106,6 +109,7 @@ type Entry_Common = {
 
 export const PAGE = "api::page.page"
 export const SESSION = "api::session.session"
+export const CONTRIBUTOR = "api::contributor.contributor"
 
 export type Page_Entry = Entry_Common & {
 	contentType: typeof PAGE
@@ -148,7 +152,36 @@ export type Session_Entry = Entry_Common & {
 	checkout_url: string | null
 }
 
-export type Entry = Page_Entry | Session_Entry
+/**
+ |
+ | A person taking part in a session — a "Collaborator" everywhere a visitor or
+ | editor reads it.
+ |
+ | It carries no region and no `page_layout`. Its page is two-column by
+ | construction, and its main column is a single ContributorProfile block that
+ | root assembly builds from `name`, `role`, `image` and `blurb` — the same
+ | pattern the Masthead uses. The `events` relation is derived and hidden, so
+ | it never travels in the envelope.
+ |
+ */
+export type Contributor_Entry = Entry_Common & {
+	contentType: typeof CONTRIBUTOR
+	name: string
+	role: string | null
+	/**
+	 |
+	 | The contributor's picture. Named `image` because the underlying component
+	 | is `media.image-v1` and every other schema that carries one uses that
+	 | word too; the editor sees it labelled "Portrait", which is what the
+	 | picture *is* rather than what type of thing it is.
+	 |
+	 */
+	image: Image_Attribute | null
+	/** Strapi `blocks` content — the same shape the WYSIWYG component holds. */
+	blurb: unknown
+}
+
+export type Entry = Page_Entry | Session_Entry | Contributor_Entry
 
 /**
  |
@@ -185,6 +218,10 @@ export function is_session ( entry: Entry ): entry is Session_Entry {
 	return entry.contentType === SESSION
 }
 
+export function is_contributor ( entry: Entry ): entry is Contributor_Entry {
+	return entry.contentType === CONTRIBUTOR
+}
+
 /**
  |
  | What the entry is called.
@@ -196,7 +233,15 @@ export function is_session ( entry: Entry ): entry is Session_Entry {
  |
  */
 export function name_of ( entry: Entry ): string {
-	return is_session( entry ) ? entry.name : entry.title
+	if ( is_session( entry ) ) {
+		return entry.name
+	}
+
+	if ( is_contributor( entry ) ) {
+		return entry.name
+	}
+
+	return entry.title
 }
 
 export type Envelope = {

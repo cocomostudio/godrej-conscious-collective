@@ -11,10 +11,12 @@
  |
  */
 
+import { populate_contributor } from "./contributor/populate"
 import { populate_page } from "./page/populate"
 import { populate_session } from "./session/populate"
 
 export const POPULATE_BY_CONTENT_TYPE: Record<string, object> = {
+	"api::contributor.contributor": populate_contributor,
 	"api::page.page": populate_page,
 	"api::session.session": populate_session,
 }

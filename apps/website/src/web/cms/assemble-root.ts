@@ -20,6 +20,7 @@
 
 import type {
 	Block,
+	Contributor_Entry,
 	Envelope,
 	Event,
 	Page_Entry,
@@ -31,7 +32,10 @@ import type { Role } from "./context-colours.ts"
 import type { Table_Of_Contents } from "./table-of-contents.ts"
 
 import { context_colours } from "./context-colours.ts"
-import { is_session } from "./envelope.ts"
+import {
+	is_contributor,
+	is_session,
+} from "./envelope.ts"
 import {
 	back_link_to_category,
 	role_of,
@@ -69,6 +73,7 @@ export const TABLE_OF_CONTENTS = "this.table-of-contents-v1"
 export const MASTHEAD = "this.masthead-v1"
 export const SESSION_DETAILS = "this.session-details-v1"
 export const ADD_TO_CALENDAR = "this.add-to-calendar-v1"
+export const CONTRIBUTOR_PROFILE = "this.contributor-profile-v1"
 
 /**
  |
@@ -146,6 +151,8 @@ export function assemble_root ( envelope: Envelope ): Assembled {
 	const { entry, main_event, page_shell, resolved_event } = envelope
 	const contribution = is_session( entry )
 		? of_a_session( entry )
+		: is_contributor( entry )
+		? of_a_contributor( entry )
 		: of_a_page( entry )
 
 	// A one-column page renders none of the sidebar: no back link, no table of
@@ -156,6 +163,10 @@ export function assemble_root ( envelope: Envelope ): Assembled {
 	// attribute at all**, and is two-column by construction.
 	const has_sidebar = contribution.page_layout !== ONE_COLUMN
 
+	// Only content types with a region collect a table of contents from it. A
+	// contributor's page has no region for a section to opt into, so its
+	// `main` blocks below come from the contribution rather than from the
+	// entry.
 	const table_of_contents = has_sidebar && contribution.collects_a_toc
 		? collect_table_of_contents( entry.main_region ?? [] )
 		: EMPTY_TABLE_OF_CONTENTS
@@ -170,7 +181,7 @@ export function assemble_root ( envelope: Envelope ): Assembled {
 				resolved_event,
 				contribution.context_role,
 			),
-			main: entry.main_region ?? [],
+			main: contribution.main ?? entry.main_region ?? [],
 			main_event,
 			masthead: contribution.masthead,
 			page_layout: contribution.page_layout,
@@ -226,6 +237,18 @@ type Content_Type_Contribution = {
 	standfirst: string | null
 	back_link: { label: string; url: string }
 	masthead: Block[]
+	/**
+	 |
+	 | The main column's blocks, when the content type builds them itself rather
+	 | than reading them from the entry's region.
+	 |
+	 | A Page and a session both leave this undefined, and root assembly falls
+	 | back to `entry.main_region ?? []`. A Contributor has no region and its
+	 | main column is a single implicit ContributorProfile block, so it sets
+	 | this and the fallback does not apply.
+	 |
+	 */
+	main?: Block[]
 	/** The content type's own sidebar contributions, before any component's. */
 	sidebar: Block[]
 	/**
@@ -250,6 +273,55 @@ type Content_Type_Contribution = {
 	 |
 	 */
 	collects_a_toc: boolean
+}
+
+/**
+ |
+ | A contributor's page.
+ |
+ | Two-column by construction — a contributor page in one column would have no
+ | way back to the listing — and the sidebar carries the back link and nothing
+ | else. There is no side region, no table of contents, and no standfirst;
+ | the ContributorProfile in the main column carries the name as the
+ | document's `h1` and the role beneath it.
+ |
+ | The block owns the portrait-and-prose split. That arrangement is the whole
+ | shape of the page, and the CMS holds it as four flat attributes rather than
+ | as a region — one implicit block is what turns those four attributes into a
+ | node the renderer can walk.
+ |
+ */
+function of_a_contributor (
+	entry: Contributor_Entry,
+): Content_Type_Contribution {
+	// The ContributorProfile occupies the masthead slot rather than the main
+	// region — because the masthead is the one place in the main column that
+	// sits **outside** the `<Level>` a section's headings nest inside, and the
+	// contributor's name has to render as the document's `h1`. It draws its
+	// own padded container to match, and `main` is deliberately empty so
+	// nothing else appears beneath it.
+	return {
+		back_link: { label: "Back to Collaborators", url: "/collaborators" },
+		collects_a_toc: false,
+		context_role: "contributor",
+		main: [],
+		masthead: [ {
+			__component: CONTRIBUTOR_PROFILE,
+			blurb: entry.blurb ?? null,
+			image: entry.image,
+			name: entry.name,
+			role: entry.role,
+		} ],
+		page_layout: TWO_COLUMN,
+		sidebar: [],
+		sidebar_at_every_width: true,
+		sidebar_repeat: [],
+		// The ContributorProfile in the masthead slot carries the name, and
+		// the role sits beneath it there. Repeating either in the sidebar
+		// would be two `h1`s, or the role in two places.
+		standfirst: null,
+		title: null,
+	}
 }
 
 function of_a_page ( entry: Page_Entry ): Content_Type_Contribution {

@@ -1,0 +1,156 @@
+{
+	"kind": "collectionType",
+	"collectionName": "contributors",
+	"info": {
+		"singularName": "contributor",
+		"pluralName": "contributors",
+		"displayName": "Collaborator",
+		"description": "A person who takes part in a session. Called \"Contributor\" in code, \"Collaborator\" everywhere an editor or visitor reads it."
+	},
+	"options": {
+		"draftAndPublish": false
+	},
+	"pluginOptions": {
+		"webtools": {
+			"enabled": true
+		}
+	},
+	"attributes": {
+		"name": {
+			"type": "string",
+			"required": true
+		},
+		"role": {
+			"type": "string",
+			"required": false
+		},
+		"image": {
+			"type": "component",
+			"component": "media.image-v1",
+			"required": false
+		},
+		"blurb": {
+			"type": "blocks",
+			"required": false
+		},
+		"page_shell": {
+			"type": "relation",
+			"relation": "manyToOne",
+			"target": "api::page-shell.page-shell",
+			"required": false
+		},
+		"events": {
+			"type": "relation",
+			"relation": "manyToMany",
+			"target": "api::event.event",
+			"configurable": false,
+			"writable": true,
+			"visible": false,
+			"editable": false
+		},
+		"url_alias": {
+			"type": "relation",
+			"relation": "oneToMany",
+			"target": "plugin::webtools.url-alias",
+			"writable": true,
+			"configurable": false,
+			"editable": false,
+			"visible": false,
+			"unique": true
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot. There is no page_layout attribute and no region — a collaborator's page is two-column by construction, and its main region holds a single implicit ContributorProfile block built from the four content attributes above.",
+		"metadatas": {
+			"name": {
+				"edit": {
+					"label": "Name",
+					"description": "What this collaborator is called. It is the page's heading, and the page's URL is derived from it."
+				},
+				"list": {
+					"label": "Name"
+				}
+			},
+			"role": {
+				"edit": {
+					"label": "Role",
+					"description": "What they do, in a line. Shown beneath the name."
+				},
+				"list": {
+					"label": "Role"
+				}
+			},
+			"image": {
+				"edit": {
+					"label": "Portrait",
+					"description": "A picture of them, shown beside the prose."
+				},
+				"list": {
+					"label": "Portrait"
+				}
+			},
+			"blurb": {
+				"edit": {
+					"label": "Blurb",
+					"description": "A paragraph or two about them. The page's main column."
+				},
+				"list": {
+					"label": "Blurb"
+				}
+			},
+			"page_shell": {
+				"edit": {
+					"label": "Page shell",
+					"description": "The site chrome that wraps this page. Left empty, it fills itself from the default page shell."
+				},
+				"list": {
+					"label": "Page shell"
+				}
+			},
+			"events": {
+				"edit": {
+					"label": "Events",
+					"description": "Derived from the collaborator's published sessions. Not editable.",
+					"editable": false,
+					"visible": false
+				},
+				"list": {
+					"label": "Events"
+				}
+			},
+			"url_alias": {
+				"edit": {
+					"label": "URL alias",
+					"editable": false,
+					"visible": false
+				},
+				"list": {
+					"label": "URL alias"
+				}
+			}
+		},
+		"layouts": {
+			"list": [
+				"name",
+				"role",
+				"page_shell"
+			],
+			"edit": [
+				[
+					{ "name": "name", "size": 8 },
+					{ "name": "role", "size": 4 }
+				],
+				[
+					{ "name": "image", "size": 12 }
+				],
+				[
+					{ "name": "blurb", "size": 12 }
+				],
+				[
+					{ "name": "page_shell", "size": 6 }
+				]
+			]
+		}
+	}
+}

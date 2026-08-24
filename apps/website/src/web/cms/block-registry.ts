@@ -19,6 +19,7 @@ import type { ComponentType } from "react"
 
 import { Add_To_Calendar } from "./blocks/add-to-calendar.tsx"
 import { Back_Link } from "./blocks/back-link.tsx"
+import { Contributor_Profile } from "./blocks/contributor-profile.tsx"
 import { Gallery } from "./blocks/gallery.tsx"
 import { Google_Map } from "./blocks/google-map.tsx"
 import { Heading } from "./blocks/heading.tsx"
@@ -53,6 +54,7 @@ import { Wysiwyg } from "./blocks/wysiwyg.tsx"
 import {
 	ADD_TO_CALENDAR,
 	BACK_LINK,
+	CONTRIBUTOR_PROFILE,
 	MASTHEAD,
 	ROOT,
 	SESSION_DETAILS,
@@ -82,6 +84,7 @@ export const BLOCK_REGISTRY: Record<string, Registered> = {
 	[MASTHEAD]: { Renderer: Masthead },
 	[SESSION_DETAILS]: { Renderer: Session_Details },
 	[ADD_TO_CALENDAR]: { Renderer: Add_To_Calendar },
+	[CONTRIBUTOR_PROFILE]: { Renderer: Contributor_Profile },
 
 	// The catalogue.
 	[HTML_DOCUMENT_HOOKS]: {

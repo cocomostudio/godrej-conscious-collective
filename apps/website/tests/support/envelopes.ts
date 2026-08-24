@@ -12,6 +12,7 @@
 
 import type {
 	Block,
+	Contributor_Entry,
 	Envelope,
 	Event,
 	Link as Link_Attribute,
@@ -122,6 +123,39 @@ export function session_envelope (
 			session_date_last: "2025-12-11",
 			standfirst: null,
 			venue: null,
+			...entry,
+		},
+		main_event: event(),
+		page_shell: page_shell(),
+		resolved_event: event(),
+		...over,
+	}
+}
+
+/**
+ |
+ | A collaborator's envelope.
+ |
+ | A contributor page has no `page_layout`, no region, and none of the sidebar
+ | scaffolding a Page carries. The four content attributes the ContributorProfile
+ | reads are all this builder fills in — plus the standard `documentId` — and a
+ | caller wanting to leave one out passes it as `null`.
+ |
+ */
+export function contributor_envelope (
+	entry: Partial<Contributor_Entry> = {},
+	over: Partial<Envelope> = {},
+): Envelope {
+	return {
+		entry: {
+			blurb: null,
+			contentType: "api::contributor.contributor",
+			documentId: `document-${id()}`,
+			image: null,
+			main_region: [],
+			name: "A Collaborator",
+			role: null,
+			standfirst: null,
 			...entry,
 		},
 		main_event: event(),

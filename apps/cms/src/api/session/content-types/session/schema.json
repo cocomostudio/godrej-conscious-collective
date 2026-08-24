@@ -99,6 +99,11 @@
 				"container.section-v1"
 			]
 		},
+		"contributors": {
+			"type": "relation",
+			"relation": "manyToMany",
+			"target": "api::contributor.contributor"
+		},
 		"url_alias": {
 			"type": "relation",
 			"relation": "oneToMany",
@@ -253,6 +258,15 @@
 					"label": "Main region"
 				}
 			},
+			"contributors": {
+				"edit": {
+					"label": "Collaborators",
+					"description": "The people taking part in this session. Their events lists — used by the collaborators listing — are derived from published sessions, so a collaborator added here only appears in an edition once this session is published."
+				},
+				"list": {
+					"label": "Collaborators"
+				}
+			},
 			"url_alias": {
 				"edit": {
 					"label": "URL alias",
@@ -300,6 +314,9 @@
 				],
 				[
 					{ "name": "venue", "size": 12 }
+				],
+				[
+					{ "name": "contributors", "size": 12 }
 				],
 				[
 					{ "name": "main_region", "size": 12 }

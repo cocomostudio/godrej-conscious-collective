@@ -30,7 +30,8 @@ export async function write_seed_content ( strapi: Strapi ) {
 	const events = await write_events( strapi )
 	const page_shells = await write_page_shells( strapi )
 	await write_pages( strapi, page_shells, events )
-	await write_sessions( strapi, page_shells, events )
+	const contributors = await write_contributors( strapi, page_shells )
+	await write_sessions( strapi, page_shells, events, contributors )
 
 	await grant_public_permissions( strapi )
 }
@@ -121,6 +122,14 @@ async function write_url_patterns ( strapi: Strapi ) {
 			contenttype: "api::session.session",
 			languages: [],
 			pattern: "/sessions/[name]",
+		},
+	} )
+
+	await strapi.db.query( "plugin::webtools.url-pattern" ).create( {
+		data: {
+			contenttype: "api::contributor.contributor",
+			languages: [],
+			pattern: "/collaborators/[name]",
 		},
 	} )
 }
@@ -600,6 +609,144 @@ async function create_page (
 }
 
 /* _____
+ | Contributors.
+ |
+ | Six people, each with a page of the CMS's simplest publishable content type.
+ | Draft-and-publish is off on the schema, so every one of them is live at its
+ | URL the moment it is written — see decision record 00002 for why.
+ |
+ | Each contributor is created here without any `events`. The relation is
+ | hidden, read-only and maintained by `derive_contributor_events`, which fills
+ | it in when the sessions below attach these contributors on publish.
+ |
+ */
+type Seeded_Contributors = {
+	debasmita: any
+	arthur: any
+	priya: any
+	rahul: any
+	kaveri: any
+	iris: any
+}
+
+async function write_contributors (
+	strapi: Strapi,
+	page_shells: { archive: any; primary: any },
+): Promise<Seeded_Contributors> {
+	const shell = page_shells.primary.documentId
+	const contributor = strapi.documents( "api::contributor.contributor" )
+
+	const debasmita = await contributor.create( {
+		data: {
+			blurb: paragraphs(
+				"Debasmita Ghosh is an installation artist whose work sits "
+					+ "at the edge of craft and climate.",
+				"She has spent the last three years working with the Kondh "
+					+ "community in Odisha's Rayagada district.",
+			),
+			image: image( {
+				alt: "Debasmita Ghosh",
+				url: IMAGES.portrait_one,
+			} ),
+			name: "Debasmita Ghosh",
+			page_shell: shell,
+			role: "Installation artist",
+		},
+	} )
+
+	const arthur = await contributor.create( {
+		data: {
+			blurb: paragraphs(
+				"Arthur Mamou-Mani is a Franco-British architect known for "
+					+ "large-scale timber structures that visitors can walk "
+					+ "under.",
+			),
+			image: image( {
+				alt: "Arthur Mamou-Mani",
+				url: IMAGES.portrait_two,
+			} ),
+			name: "Arthur Mamou-Mani",
+			page_shell: shell,
+			role: "Architect",
+		},
+	} )
+
+	const priya = await contributor.create( {
+		data: {
+			blurb: paragraphs(
+				"Priya Iyer is a workshop facilitator who has taught block "
+					+ "printing to two decades of children across Mumbai.",
+			),
+			image: image( { alt: "Priya Iyer", url: IMAGES.portrait_one } ),
+			name: "Priya Iyer",
+			page_shell: shell,
+			role: "Workshop facilitator",
+		},
+	} )
+
+	const rahul = await contributor.create( {
+		data: {
+			blurb: paragraphs(
+				"Rahul Verma is an urban ecologist writing about the design "
+					+ "choices that decide who a city stays cool for.",
+			),
+			image: image( { alt: "Rahul Verma", url: IMAGES.portrait_two } ),
+			name: "Rahul Verma",
+			page_shell: shell,
+			role: "Urban ecologist",
+		},
+	} )
+
+	// Belongs to the 2027 event's sessions only — so this contributor's
+	// events list points at 2027 rather than at 2025.
+	const kaveri = await contributor.create( {
+		data: {
+			blurb: paragraphs(
+				"Kaveri Nair is a curator putting the 2027 programme "
+					+ "together.",
+			),
+			image: image( { alt: "Kaveri Nair", url: IMAGES.portrait_one } ),
+			name: "Kaveri Nair",
+			page_shell: shell,
+			role: "Curator",
+		},
+	} )
+
+	// Only attached to a draft session below. The middleware derives events
+	// from **published** sessions only, so this contributor stays eventless
+	// and appears in no edition listing — the archival rule the schema asks
+	// for, applied to a contributor whose work is not yet announced.
+	const iris = await contributor.create( {
+		data: {
+			blurb: paragraphs(
+				"Not announced yet, but has a page to prove it. The events "
+					+ "list for this row is empty because the one session "
+					+ "that links them is a draft.",
+			),
+			image: image( { alt: "Iris Han", url: IMAGES.portrait_two } ),
+			name: "Iris Han",
+			page_shell: shell,
+			role: "Guest programmer",
+		},
+	} )
+
+	return { arthur, debasmita, iris, kaveri, priya, rahul }
+}
+
+/**
+ |
+ | Rich-text paragraphs in Strapi's `blocks` shape. Contributor.blurb is a
+ | blocks field, and this is what its value looks like on disk.
+ |
+ */
+function paragraphs ( ...lines: string[] ) {
+	return lines.map( ( line ) => ( {
+		children: [ { text: line, type: "text" } ],
+		type: "paragraph",
+	} ) )
+}
+
+/* _____
  | Sessions.
  |
  | One programme item each, hung off an event. Every branch a session page can
@@ -625,6 +772,7 @@ async function write_sessions (
 	strapi: Strapi,
 	page_shells: { archive: any; primary: any },
 	events: { main: any; other: any },
+	contributors: Seeded_Contributors,
 ) {
 	const shell = page_shells.primary.documentId
 	const main = events.main.documentId
@@ -633,6 +781,10 @@ async function write_sessions (
 		all_day_event: true,
 		category: "Showcase",
 		checkout_url: "https://example.com/cc/living-with-the-land",
+		contributors: [
+			contributors.debasmita.documentId,
+			contributors.arthur.documentId,
+		],
 		cover: responsive_image( {
 			alt: "A Kondh house, half rebuilt",
 			url: IMAGES.stack_two,
@@ -693,6 +845,7 @@ async function write_sessions (
 		age_group: "Children",
 		category: "Workshop",
 		checkout_url: "https://example.com/cc/block-printing",
+		contributors: [ contributors.priya.documentId ],
 		event: main,
 		instances: [
 			instance( "2025-12-12", "10:00", "12:30" ),
@@ -721,6 +874,7 @@ async function write_sessions (
 	// showing "Free".
 	await create_session( strapi, {
 		category: "Conversation",
+		contributors: [ contributors.rahul.documentId ],
 		event: main,
 		instances: [ instance( "2025-12-13", "17:00", "18:30" ) ],
 		main_region: [
@@ -770,6 +924,7 @@ async function write_sessions (
 	// The event that is not main: 2027's colours under 2025's chrome.
 	await create_session( strapi, {
 		category: "Conversation",
+		contributors: [ contributors.kaveri.documentId ],
 		event: events.other.documentId,
 		instances: [ instance( "2027-12-03", "16:00", "17:00" ) ],
 		main_region: [
@@ -810,9 +965,12 @@ async function write_sessions (
 	} )
 
 	// Never published, so the published path provably does not serve it and
-	// draft preview has a session to preview.
+	// draft preview has a session to preview. The contributor attached here
+	// is the one whose events list must stay empty: the middleware derives
+	// events from **published** sessions only.
 	await create_session( strapi, {
 		category: "Showcase",
+		contributors: [ contributors.iris.documentId ],
 		event: main,
 		instances: [ instance( "2025-12-13", "12:00", "13:00" ) ],
 		main_region: [
@@ -1549,6 +1707,7 @@ const PROGRAMME = [
  */
 async function grant_public_permissions ( strapi: Strapi ) {
 	const actions = [
+		"api::contributor.contributor.find",
 		"api::envelope.envelope.find",
 		"api::page.page.find",
 		"api::session.session.find",
