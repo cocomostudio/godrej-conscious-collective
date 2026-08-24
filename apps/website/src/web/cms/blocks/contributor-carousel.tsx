@@ -49,7 +49,7 @@ import {
 import useEmblaCarousel from "embla-carousel-react"
 
 import { use_repetitions_needed_for_looping } from "#infra/lib/ui/react/embla-carousel/use-repetitions-needed-for-looping.ts"
-import { Button } from "#infra/lib/ui/react/buttons/button.tsx"
+import { Icon_Button } from "#infra/lib/ui/react/buttons/icon-button.tsx"
 import { Chevron_Left } from "#infra/lib/ui/react/icons/chevron-left.tsx"
 import { Chevron_Right } from "#infra/lib/ui/react/icons/chevron-right.tsx"
 import { use_media_query_event } from "#infra/lib/ui/react/use-media-query-event.tsx"
@@ -476,24 +476,29 @@ export function Contributor_Carousel (
 	}, [ begin ] )
 
 	return <div>
+		{
+			/* The static site's own pagination: two outlined squares, drawn by
+			   `Icon_Button` rather than by `Button` with the words taken out.
+			   `Button` is sized by its text and pads horizontally, so an icon
+			   inside one comes out as a pill of whatever width the glyph
+			   happens to be — which is what this was before. */
+		}
 		<div className="flex justify-end gap-4 max-md:hidden">
-			<Button
+			<Icon_Button
 				aria-label="View the previous collaborator"
-				className="rounded-full size-10 p-0"
-				color="white"
+				colour="white"
 				emphasis="outline"
 				onClick={ () => step( false ) }>
 				<Chevron_Left />
-			</Button>
+			</Icon_Button>
 
-			<Button
+			<Icon_Button
 				aria-label="View the next collaborator"
-				className="rounded-full size-10 p-0"
-				color="white"
+				colour="white"
 				emphasis="outline"
 				onClick={ () => step( true ) }>
 				<Chevron_Right />
-			</Button>
+			</Icon_Button>
 		</div>
 
 		{
