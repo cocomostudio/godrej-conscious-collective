@@ -1,0 +1,310 @@
+{
+	"kind": "collectionType",
+	"collectionName": "sessions",
+	"info": {
+		"singularName": "session",
+		"pluralName": "sessions",
+		"displayName": "Session",
+		"description": "One programme item within an event — a single workshop, showcase, conversation or experience. The public reads it as an \"Event\"."
+	},
+	"options": {
+		"draftAndPublish": true
+	},
+	"pluginOptions": {
+		"webtools": {
+			"enabled": true
+		}
+	},
+	"attributes": {
+		"name": {
+			"type": "string",
+			"required": true
+		},
+		"standfirst": {
+			"type": "text",
+			"required": false
+		},
+		"cover": {
+			"type": "component",
+			"component": "media.responsive-image-v1",
+			"required": false
+		},
+		"page_shell": {
+			"type": "relation",
+			"relation": "manyToOne",
+			"target": "api::page-shell.page-shell",
+			"required": false
+		},
+		"event": {
+			"type": "relation",
+			"relation": "manyToOne",
+			"target": "api::event.event",
+			"required": true
+		},
+		"category": {
+			"type": "enumeration",
+			"enum": [
+				"Showcase",
+				"Experience",
+				"Conversation",
+				"Workshop"
+			],
+			"required": true
+		},
+		"instances": {
+			"type": "component",
+			"component": "session.session-instance-v1",
+			"repeatable": true,
+			"required": true,
+			"min": 1
+		},
+		"session_date_first": {
+			"type": "date"
+		},
+		"session_date_last": {
+			"type": "date"
+		},
+		"all_day_event": {
+			"type": "boolean",
+			"default": false,
+			"required": true
+		},
+		"price": {
+			"type": "integer",
+			"required": false,
+			"min": 0
+		},
+		"venue": {
+			"type": "component",
+			"component": "navigation.link-v1",
+			"required": false
+		},
+		"age_group": {
+			"type": "enumeration",
+			"enum": [
+				"All",
+				"Children",
+				"Adults"
+			],
+			"default": "All",
+			"required": true
+		},
+		"checkout_url": {
+			"type": "text",
+			"required": false
+		},
+		"main_region": {
+			"type": "dynamiczone",
+			"components": [
+				"container.section-v1"
+			]
+		},
+		"url_alias": {
+			"type": "relation",
+			"relation": "oneToMany",
+			"target": "plugin::webtools.url-alias",
+			"writable": true,
+			"configurable": false,
+			"editable": false,
+			"visible": false,
+			"unique": true
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"name": {
+				"edit": {
+					"label": "Name",
+					"description": "What this session is called. It is the page's heading, and the page's URL is derived from it."
+				},
+				"list": {
+					"label": "Name"
+				}
+			},
+			"standfirst": {
+				"edit": {
+					"label": "Standfirst",
+					"description": "A short introductory line, shown beneath the name in the masthead."
+				},
+				"list": {
+					"label": "Standfirst"
+				}
+			},
+			"cover": {
+				"edit": {
+					"label": "Cover",
+					"description": "The picture in the masthead, beside the name."
+				},
+				"list": {
+					"label": "Cover"
+				}
+			},
+			"page_shell": {
+				"edit": {
+					"label": "Page shell",
+					"description": "The site chrome that wraps this page. Left empty, it fills itself from the default page shell."
+				},
+				"list": {
+					"label": "Page shell"
+				}
+			},
+			"event": {
+				"edit": {
+					"label": "Event",
+					"description": "The event this session belongs to. Left empty on a new session, it fills itself with the main event. A session is archived when its event is."
+				},
+				"list": {
+					"label": "Event"
+				}
+			},
+			"category": {
+				"edit": {
+					"label": "Category",
+					"description": "What kind of session this is. It decides the page's colour and where the back link goes."
+				},
+				"list": {
+					"label": "Category"
+				}
+			},
+			"instances": {
+				"edit": {
+					"label": "Instances",
+					"description": "Every time this session runs, one row each. A session running on three days has three instances."
+				},
+				"list": {
+					"label": "Instances"
+				}
+			},
+			"session_date_first": {
+				"edit": {
+					"label": "First date",
+					"description": "Derived from the instances. Not editable.",
+					"editable": false,
+					"visible": false
+				},
+				"list": {
+					"label": "First date"
+				}
+			},
+			"session_date_last": {
+				"edit": {
+					"label": "Last date",
+					"description": "Derived from the instances. Not editable.",
+					"editable": false,
+					"visible": false
+				},
+				"list": {
+					"label": "Last date"
+				}
+			},
+			"all_day_event": {
+				"edit": {
+					"label": "All day",
+					"description": "The website reads \"All day\" instead of the times. The instances keep their times either way, because a calendar entry still needs them."
+				},
+				"list": {
+					"label": "All day"
+				}
+			},
+			"price": {
+				"edit": {
+					"label": "Price",
+					"description": "In rupees, with no symbol. Zero reads as \"Free\"; left empty, no price is shown at all."
+				},
+				"list": {
+					"label": "Price"
+				}
+			},
+			"venue": {
+				"edit": {
+					"label": "Venue",
+					"description": "Where it happens. The label is the place's name and the URL points at a map."
+				},
+				"list": {
+					"label": "Venue"
+				}
+			},
+			"age_group": {
+				"edit": {
+					"label": "Age group",
+					"description": "Who this session is suitable for."
+				},
+				"list": {
+					"label": "Age group"
+				}
+			},
+			"checkout_url": {
+				"edit": {
+					"label": "Booking link",
+					"description": "Where a visitor reserves a place. Independent of the price — a free session can still need one for capacity."
+				},
+				"list": {
+					"label": "Booking link"
+				}
+			},
+			"main_region": {
+				"edit": {
+					"label": "Main region",
+					"description": "The session's own content, below the masthead. Only sections go here — background, spacing and anchoring all live on the section."
+				},
+				"list": {
+					"label": "Main region"
+				}
+			},
+			"url_alias": {
+				"edit": {
+					"label": "URL alias",
+					"editable": false,
+					"visible": false
+				},
+				"list": {
+					"label": "URL alias"
+				}
+			}
+		},
+		"layouts": {
+			"list": [
+				"name",
+				"category",
+				"session_date_first",
+				"session_date_last",
+				"event"
+			],
+			"edit": [
+				[
+					{ "name": "name", "size": 8 },
+					{ "name": "category", "size": 4 }
+				],
+				[
+					{ "name": "standfirst", "size": 12 }
+				],
+				[
+					{ "name": "cover", "size": 12 }
+				],
+				[
+					{ "name": "event", "size": 6 },
+					{ "name": "page_shell", "size": 6 }
+				],
+				[
+					{ "name": "instances", "size": 12 }
+				],
+				[
+					{ "name": "all_day_event", "size": 3 },
+					{ "name": "age_group", "size": 4 }
+				],
+				[
+					{ "name": "price", "size": 4 },
+					{ "name": "checkout_url", "size": 8 }
+				],
+				[
+					{ "name": "venue", "size": 12 }
+				],
+				[
+					{ "name": "main_region", "size": 12 }
+				]
+			]
+		}
+	}
+}

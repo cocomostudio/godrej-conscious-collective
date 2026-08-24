@@ -32,18 +32,37 @@
 
 import type { Core } from "@strapi/strapi"
 
+import { assume_event_time } from "./assume-event-time"
+
 import { demote_other_default_page_shells } from "./demote-other-default-page-shells"
 import { demote_other_main_events } from "./demote-other-main-events"
+import { default_session_event_to_main } from "./default-session-event-to-main"
 import { derive_colour_triplets } from "./derive-colour-triplets"
+import { derive_session_dates } from "./derive-session-dates"
 import { fill_page_shell_from_default } from "./fill-page-shell-from-default"
 import { reject_inverted_date_range } from "./reject-inverted-date-range"
+import { reject_session_without_event } from "./reject-session-without-event"
 
 export function register_document_middlewares ( strapi: Core.Strapi ) {
-	// Order matters in exactly one place: the date range is refused before
-	// anything else touches the event's data, so a rejected save leaves no
-	// half-amended `params` behind it.
+	// Order matters, and one rule settles it: **every refusal runs before every
+	// amendment**, so a rejected save leaves no half-amended `params` behind
+	// it. Both refusals therefore sit at the top.
+	//
+	// The one exception is the middleware that fills a session's event, which
+	// has to run before the refusal that reads the attribute — otherwise every
+	// session created without an event would be refused rather than given the
+	// main one. It amends `params` and a refusal can still follow it, so the
+	// rule above is stated as what it is: an ordering with one deliberate
+	// inversion, rather than an absolute.
 	strapi.documents.use( reject_inverted_date_range( strapi ) )
+	strapi.documents.use( default_session_event_to_main( strapi ) )
+	strapi.documents.use( reject_session_without_event( strapi ) )
+	// Before the dates are derived from them: the derivation asks which day a
+	// datetime falls on, and a datetime that has not said where it is has no
+	// answer to that.
+	strapi.documents.use( assume_event_time( strapi ) )
 	strapi.documents.use( derive_colour_triplets( strapi ) )
+	strapi.documents.use( derive_session_dates( strapi ) )
 	strapi.documents.use( fill_page_shell_from_default( strapi ) )
 	strapi.documents.use( demote_other_main_events( strapi ) )
 	strapi.documents.use( demote_other_default_page_shells( strapi ) )

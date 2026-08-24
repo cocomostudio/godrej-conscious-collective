@@ -30,13 +30,14 @@ export async function write_seed_content ( strapi: Strapi ) {
 	const events = await write_events( strapi )
 	const page_shells = await write_page_shells( strapi )
 	await write_pages( strapi, page_shells, events )
+	await write_sessions( strapi, page_shells, events )
 
 	await grant_public_permissions( strapi )
 }
 
 /**
  |
- | Two festival editions.
+ | Two events.
  |
  | 2025 is the main one, so its dates and its Register Now button are the site
  | chrome on every page — including the pages belonging to 2027. 2027 exists so
@@ -114,6 +115,14 @@ async function write_url_patterns ( strapi: Strapi ) {
 			pattern: "/[title]",
 		},
 	} )
+
+	await strapi.db.query( "plugin::webtools.url-pattern" ).create( {
+		data: {
+			contenttype: "api::session.session",
+			languages: [],
+			pattern: "/sessions/[name]",
+		},
+	} )
 }
 
 async function write_page_shells ( strapi: Strapi ) {
@@ -168,7 +177,7 @@ async function write_page_shells ( strapi: Strapi ) {
 					link( "Back to this year", "/" ),
 				],
 				site_description:
-					"A past edition of Godrej Conscious Collective.",
+					"Godrej Conscious Collective, in earlier years.",
 				site_title: "Conscious Collective — Archive",
 			},
 		} )
@@ -184,7 +193,7 @@ async function write_page_shells ( strapi: Strapi ) {
  */
 const REMAINING_ROUTE_TABLE = [
 	{
-		standfirst: "Installations and concept designs across the festival.",
+		standfirst: "Installations and concept designs across all four days.",
 		title: "Showcases",
 	},
 	{
@@ -519,7 +528,7 @@ async function write_pages (
 		} )
 	}
 
-	// A page belonging to the edition that is **not** main. It takes 2027's
+	// A page belonging to the event that is **not** main. It takes 2027's
 	// colours and 2027's schedule document while the header and the footer
 	// above it still advertise 2025, which is the resolution rule made visible
 	// in one page.
@@ -533,12 +542,12 @@ async function write_pages (
 				),
 				register_with_toc: true,
 				strings: [
-					"The next edition is being put together. Dates are set; the programme is not.",
+					"The next one is being put together. Dates are set; the programme is not.",
 				],
 			} ),
 		],
 		page_shell: page_shells.primary.documentId,
-		standfirst: "A first look at the edition after this one.",
+		standfirst: "A first look at what comes after this one.",
 		title: "Conscious Collective 2027",
 	} )
 
@@ -554,7 +563,7 @@ async function write_pages (
 				),
 				register_with_toc: true,
 				strings: [
-					"A record of the 2023 edition.",
+					"A record of 2023.",
 				],
 			} ),
 		],
@@ -590,6 +599,941 @@ async function create_page (
 	} )
 }
 
+/* _____
+ | Sessions.
+ |
+ | One programme item each, hung off an event. Every branch a session page can
+ | take has a row here, because the seed is what a developer looks at and every
+ | one of these is invisible in a test that does not know to ask:
+ |
+ |   • an **all-day** session, which reads "All day" and shows no times;
+ |   • a session that is **free** and still carries a booking link, because a
+ |     free session can need one for capacity;
+ |   • a session with **no price at all**, which shows none;
+ |   • a session running on **several days**, so a visitor can pick one;
+ |   • a session belonging to the event that is **not** main, which wears its
+ |     own colours under the main event's chrome; and
+ |   • a session created with **no event named**, which the middleware fills
+ |     with the main one.
+ |
+ | `session_date_first` and `session_date_last` are never written here. A
+ | middleware derives both from the instances, and a second copy of that rule in
+ | the seed could disagree with the first.
+ |
+ */
+async function write_sessions (
+	strapi: Strapi,
+	page_shells: { archive: any; primary: any },
+	events: { main: any; other: any },
+) {
+	const shell = page_shells.primary.documentId
+	const main = events.main.documentId
+
+	await create_session( strapi, {
+		all_day_event: true,
+		category: "Showcase",
+		checkout_url: "https://example.com/cc/living-with-the-land",
+		cover: responsive_image( {
+			alt: "A Kondh house, half rebuilt",
+			url: IMAGES.stack_two,
+		} ),
+		event: main,
+		instances: instances_daily(
+			"2025-12-11",
+			"2025-12-14",
+			"09:00",
+			"22:00",
+		),
+		main_region: [
+			section( "Living with the Land", {
+				heading: heading_component( "Living with the Land", "h2" ),
+				register_with_toc: true,
+				strings: [
+					"Debasmita Ghosh’s installation stems from months spent working closely with the Kondh community in Odisha’s Rayagada district.",
+					"Through hands-on workshops with Kondh youth, Debasmita explores the push and pull between age-old practices and modern dreams.",
+				],
+			} ),
+			section( "About Sustaina India", {
+				blocks: [
+					gallery( "equal", [
+						{
+							alt: "",
+							caption:
+								"Debasmita explores the push and pull between age-old practices and modern dreams.",
+							title: "Living with the Land",
+							url: IMAGES.gallery_one,
+						},
+						{
+							alt: "",
+							caption:
+								"Native cotton, and the people who still grow it.",
+							title: "Reweaving the Ecosystem",
+							url: IMAGES.gallery_two,
+						},
+					] ),
+				],
+				heading: heading_component( "About Sustaina India", "h2" ),
+				horizontal_rule: true,
+				register_with_toc: true,
+			} ),
+		],
+		name: "Living with the Land",
+		page_shell: shell,
+		price: 1599,
+		standfirst:
+			"A two-part showcase bringing together the Sustaina fellows, whose "
+			+ "work engages with climate impact, cultural continuity and "
+			+ "ecological resilience.",
+		venue: link( "Outdoor Pergola", "https://example.com/maps/pergola" ),
+	} )
+
+	// Free, and still carrying a booking link: the two are independent, because
+	// a free session can need one for capacity.
+	await create_session( strapi, {
+		age_group: "Children",
+		category: "Workshop",
+		checkout_url: "https://example.com/cc/block-printing",
+		event: main,
+		instances: [
+			instance( "2025-12-12", "10:00", "12:30" ),
+			instance( "2025-12-12", "14:00", "16:30" ),
+		],
+		main_region: [
+			section( "Block Printing with Native Cotton", {
+				heading: heading_component(
+					"What you will make",
+					"h2",
+				),
+				register_with_toc: true,
+				strings: [
+					"Two hours at the table with a set of hand-cut blocks and a length of organic khadi to take home.",
+				],
+			} ),
+		],
+		name: "Block Printing with Native Cotton",
+		page_shell: shell,
+		price: 0,
+		standfirst: "Hands on a block, ink and a length of khadi.",
+		venue: link( "Studio Two", "https://example.com/maps/studio-two" ),
+	} )
+
+	// No price at all, so the website shows none — which is not the same as
+	// showing "Free".
+	await create_session( strapi, {
+		category: "Conversation",
+		event: main,
+		instances: [ instance( "2025-12-13", "17:00", "18:30" ) ],
+		main_region: [
+			section( "Designing for Heat", {
+				heading: heading_component( "Designing for Heat", "h2" ),
+				register_with_toc: true,
+				strings: [
+					"Three practitioners on what a heat-resilient city asks of the people who draw it.",
+				],
+			} ),
+		],
+		name: "Designing for Heat",
+		page_shell: shell,
+		standfirst: "A panel on what a heat-resilient city asks of design.",
+		venue: link(
+			"The Conversation Stage",
+			"https://example.com/maps/stage",
+		),
+	} )
+
+	await create_session( strapi, {
+		age_group: "Adults",
+		category: "Experience",
+		event: main,
+		instances: instances_daily(
+			"2025-12-11",
+			"2025-12-14",
+			"11:00",
+			"19:00",
+		),
+		main_region: [
+			section( "The Cooling Pergola", {
+				heading: heading_component( "The Cooling Pergola", "h2" ),
+				register_with_toc: true,
+				strings: [
+					"Walk under twelve metres of woven bamboo and feel the temperature drop.",
+				],
+			} ),
+		],
+		name: "The Cooling Pergola",
+		page_shell: shell,
+		price: 250,
+		standfirst: "Twelve metres of woven bamboo, and the air beneath it.",
+		venue: link( "Outdoor Pergola", "https://example.com/maps/pergola" ),
+	} )
+
+	// The event that is not main: 2027's colours under 2025's chrome.
+	await create_session( strapi, {
+		category: "Conversation",
+		event: events.other.documentId,
+		instances: [ instance( "2027-12-03", "16:00", "17:00" ) ],
+		main_region: [
+			section( "Notes for 2027", {
+				heading: heading_component( "Notes for 2027", "h2" ),
+				register_with_toc: true,
+				strings: [
+					"An early look at what comes after this one.",
+				],
+			} ),
+		],
+		name: "Notes for 2027",
+		page_shell: shell,
+		standfirst: "The first thing announced for what comes next.",
+	} )
+
+	// No event named. The middleware fills it with the main one on creation,
+	// which is the whole of user story 31 in one row.
+	await create_session( strapi, {
+		category: "Workshop",
+		instances: [ instance( "2025-12-14", "10:00", "11:30" ) ],
+		main_region: [
+			section( "Repairing What You Own", {
+				heading: heading_component(
+					"Repairing What You Own",
+					"h2",
+				),
+				register_with_toc: true,
+				strings: [
+					"Bring one broken thing. Leave with it working, or with a plan.",
+				],
+			} ),
+		],
+		name: "Repairing What You Own",
+		page_shell: shell,
+		price: 400,
+		standfirst: "Bring one broken thing.",
+	} )
+
+	// Never published, so the published path provably does not serve it and
+	// draft preview has a session to preview.
+	await create_session( strapi, {
+		category: "Showcase",
+		event: main,
+		instances: [ instance( "2025-12-13", "12:00", "13:00" ) ],
+		main_region: [
+			section( "Unannounced", {
+				heading: heading_component( "Unannounced", "h2" ),
+				register_with_toc: true,
+				strings: [ "This session has never been published." ],
+			} ),
+		],
+		name: "Unannounced Showcase",
+		page_shell: shell,
+		published: false,
+	} )
+
+	// The rest of the programme. Thin, and deliberately so: what these are for
+	// is filling the category listings and the schedule page, which are tickets
+	// 08 and 09.
+	for ( const filler of PROGRAMME ) {
+		await create_session( strapi, {
+			age_group: filler.age_group,
+			category: filler.category,
+			checkout_url: filler.checkout_url,
+			event: filler.year === 2027 ? events.other.documentId : main,
+			instances: [
+				instance( filler.day, filler.from, filler.to ),
+			],
+			main_region: [
+				section( filler.name, {
+					heading: heading_component( filler.name, "h2" ),
+					register_with_toc: true,
+					strings: [ filler.standfirst ],
+				} ),
+			],
+			name: filler.name,
+			page_shell: shell,
+			price: filler.price,
+			standfirst: filler.standfirst,
+			venue: link( filler.venue, "https://example.com/maps/plant-13" ),
+		} )
+	}
+}
+
+async function create_session (
+	strapi: Strapi,
+	{ published = true, ...data }: Record<string, any>,
+) {
+	return await strapi.documents( "api::session.session" ).create( {
+		data,
+		status: published ? "published" : "draft",
+	} )
+}
+
+/**
+ |
+ | One instance, as the two datetimes the schema holds.
+ |
+ | Written with the event's own offset spelled out rather than as a bare
+ | local time, because a seed that means half past ten in Mumbai must not mean
+ | half past ten wherever the developer running it happens to be.
+ |
+ */
+function instance ( day: string, from: string, to: string ) {
+	return {
+		time_end: `${day}T${to}:00.000+05:30`,
+		time_start: `${day}T${from}:00.000+05:30`,
+	}
+}
+
+/** The same hours on every day of a range, one instance each. */
+function instances_daily (
+	first: string,
+	last: string,
+	from: string,
+	to: string,
+) {
+	const days: string[] = []
+
+	for (
+		let day = new Date( `${first}T00:00:00.000Z` );
+		day <= new Date( `${last}T00:00:00.000Z` );
+		day.setUTCDate( day.getUTCDate() + 1 )
+	) {
+		days.push( day.toISOString().slice( 0, 10 ) )
+	}
+
+	return days.map( ( day ) => instance( day, from, to ) )
+}
+
+/**
+ |
+ | The rest of the programme, one line each.
+ |
+ | Every one of these becomes a page of its own, and what they are really for is
+ | the category listings and the schedule page — **a listing capped at ten needs
+ | more than ten sessions in one category before the cap is observable**, which
+ | is why there are this many rather than a handful.
+ |
+ | They are thin by design: a name, a line, one instance and a venue. The
+ | sessions above carry the content worth reading; these carry the count.
+ |
+ */
+const PROGRAMME = [
+	{
+		age_group: "All",
+		category: "Showcase",
+		checkout_url: undefined as string | undefined,
+		day: "2025-12-11",
+		from: "10:00",
+		name: "Reweaving the Ecosystem",
+		price: 1599,
+		standfirst:
+			"India’s fading indigenous cotton, and the people still growing it.",
+		to: "20:00",
+		venue: "Gallery One",
+		year: 2025,
+	},
+	{
+		age_group: "All",
+		category: "Showcase",
+		checkout_url: undefined,
+		day: "2025-12-12",
+		from: "10:00",
+		name: "Making the Invisible Visible",
+		price: 1599,
+		standfirst:
+			"Indoor heat, unpaid domestic work and women’s resilience.",
+		to: "20:00",
+		venue: "Gallery One",
+		year: 2025,
+	},
+	{
+		age_group: "All",
+		category: "Showcase",
+		checkout_url: undefined,
+		day: "2025-12-13",
+		from: "10:00",
+		name: "The Force Within",
+		price: 0,
+		standfirst: "A room that answers to the weather outside it.",
+		to: "20:00",
+		venue: "Gallery Two",
+		year: 2025,
+	},
+	{
+		age_group: "Children",
+		category: "Experience",
+		checkout_url: "https://example.com/cc/shade-garden",
+		day: "2025-12-12",
+		from: "09:30",
+		name: "The Shade Garden",
+		price: 0,
+		standfirst: "Forty species that ask for no water and give back shade.",
+		to: "18:00",
+		venue: "North Lawn",
+		year: 2025,
+	},
+	{
+		age_group: "All",
+		category: "Experience",
+		checkout_url: undefined,
+		day: "2025-12-13",
+		from: "09:30",
+		name: "Soundings from the Mangrove",
+		price: 300,
+		standfirst:
+			"Two years of recordings from the creek, played back at scale.",
+		to: "18:00",
+		venue: "The Dark Room",
+		year: 2025,
+	},
+	{
+		age_group: "Adults",
+		category: "Conversation",
+		checkout_url: undefined,
+		day: "2025-12-11",
+		from: "15:00",
+		name: "Who Pays for Cool",
+		price: undefined as number | undefined,
+		standfirst: "Cooling as a right, and who is left out of it.",
+		to: "16:30",
+		venue: "The Conversation Stage",
+		year: 2025,
+	},
+	{
+		age_group: "Adults",
+		category: "Conversation",
+		checkout_url: undefined,
+		day: "2025-12-14",
+		from: "15:00",
+		name: "Building with What Is Already There",
+		price: undefined,
+		standfirst: "Reuse, retrofit and the case against the new.",
+		to: "16:30",
+		venue: "The Conversation Stage",
+		year: 2025,
+	},
+	{
+		age_group: "Children",
+		category: "Workshop",
+		checkout_url: "https://example.com/cc/clay-pots",
+		day: "2025-12-11",
+		from: "11:00",
+		name: "Cooling Pots in Clay",
+		price: 350,
+		standfirst: "Throw a pot that keeps water cold without a plug.",
+		to: "13:00",
+		venue: "Studio One",
+		year: 2025,
+	},
+	{
+		age_group: "Adults",
+		category: "Workshop",
+		checkout_url: "https://example.com/cc/reading-a-site",
+		day: "2025-12-13",
+		from: "11:00",
+		name: "Reading a Site for Heat",
+		price: 900,
+		standfirst:
+			"An afternoon with a thermal camera and a plan of the plant.",
+		to: "14:00",
+		venue: "Studio Two",
+		year: 2025,
+	},
+	{
+		age_group: "All",
+		category: "Experience",
+		checkout_url: undefined,
+		day: "2027-12-02",
+		from: "10:00",
+		name: "A First Walk Through 2027",
+		price: undefined,
+		standfirst: "The site as it stands, a year out.",
+		to: "17:00",
+		venue: "Plant 13",
+		year: 2027,
+	},
+	{
+		age_group: "All",
+		category: "Workshop",
+		checkout_url: undefined,
+		day: "2027-12-04",
+		from: "11:00",
+		name: "Drawing What Comes Next",
+		price: undefined,
+		standfirst:
+			"An open table for whoever wants a hand in what comes next.",
+		to: "13:00",
+		venue: "Plant 13",
+		year: 2027,
+	},
+	{
+		age_group: "All",
+		category: "Showcase",
+		checkout_url: undefined,
+		day: "2025-12-11",
+		from: "10:00",
+		name: "Terracotta, Recast",
+		price: 1599,
+		standfirst:
+			"A roof tile redrawn for a city that no longer cools at night.",
+		to: "20:00",
+		venue: "Gallery One",
+		year: 2025,
+	},
+	{
+		age_group: "All",
+		category: "Showcase",
+		checkout_url: undefined,
+		day: "2025-12-12",
+		from: "10:00",
+		name: "The Weight of Water",
+		price: 1200,
+		standfirst: "What a household carries, measured over one summer week.",
+		to: "20:00",
+		venue: "Gallery Two",
+		year: 2025,
+	},
+	{
+		age_group: "All",
+		category: "Showcase",
+		checkout_url: undefined,
+		day: "2025-12-13",
+		from: "10:00",
+		name: "Kiln and Contour",
+		price: 0,
+		standfirst: "Fired earth shaped to the land it came out of.",
+		to: "20:00",
+		venue: "Gallery Two",
+		year: 2025,
+	},
+	{
+		age_group: "All",
+		category: "Showcase",
+		checkout_url: undefined,
+		day: "2025-12-14",
+		from: "10:00",
+		name: "Threads of the Deccan",
+		price: 1599,
+		standfirst: "Six weaving households, one loom rebuilt in the round.",
+		to: "20:00",
+		venue: "Gallery One",
+		year: 2025,
+	},
+	{
+		age_group: "All",
+		category: "Showcase",
+		checkout_url: undefined,
+		day: "2025-12-11",
+		from: "10:00",
+		name: "A Wall That Breathes",
+		price: undefined,
+		standfirst: "A prototype facade tested through three Mumbai summers.",
+		to: "20:00",
+		venue: "North Lawn",
+		year: 2025,
+	},
+	{
+		age_group: "All",
+		category: "Showcase",
+		checkout_url: undefined,
+		day: "2025-12-12",
+		from: "10:00",
+		name: "Salt, Sun, Settlement",
+		price: 1200,
+		standfirst: "The Rann as a drawing, over sixty years.",
+		to: "20:00",
+		venue: "Gallery Three",
+		year: 2025,
+	},
+	{
+		age_group: "All",
+		category: "Showcase",
+		checkout_url: undefined,
+		day: "2025-12-13",
+		from: "10:00",
+		name: "After the Monsoon",
+		price: undefined,
+		standfirst: "What the water leaves, and what is built on it.",
+		to: "20:00",
+		venue: "Gallery Three",
+		year: 2025,
+	},
+	{
+		age_group: "All",
+		category: "Showcase",
+		checkout_url: undefined,
+		day: "2025-12-14",
+		from: "10:00",
+		name: "Common Ground",
+		price: 0,
+		standfirst: "Twelve courtyards, photographed at the same hour.",
+		to: "20:00",
+		venue: "Gallery Three",
+		year: 2025,
+	},
+	{
+		age_group: "All",
+		category: "Experience",
+		checkout_url: undefined,
+		day: "2025-12-11",
+		from: "09:30",
+		name: "The Listening Room",
+		price: 300,
+		standfirst: "Sit for ten minutes with a city you cannot see.",
+		to: "18:00",
+		venue: "The Dark Room",
+		year: 2025,
+	},
+	{
+		age_group: "Children",
+		category: "Experience",
+		checkout_url: undefined,
+		day: "2025-12-12",
+		from: "09:30",
+		name: "Barefoot on Seven Surfaces",
+		price: 0,
+		standfirst: "Stone, clay, grass, gravel, tile, timber and tar.",
+		to: "18:00",
+		venue: "North Lawn",
+		year: 2025,
+	},
+	{
+		age_group: "Adults",
+		category: "Experience",
+		checkout_url: undefined,
+		day: "2025-12-13",
+		from: "09:30",
+		name: "A Room at Forty Degrees",
+		price: undefined,
+		standfirst: "Ten minutes inside the summer we are designing for.",
+		to: "18:00",
+		venue: "Pavilion",
+		year: 2025,
+	},
+	{
+		age_group: "All",
+		category: "Experience",
+		checkout_url: "https://example.com/cc/long-table",
+		day: "2025-12-14",
+		from: "12:00",
+		name: "The Long Table",
+		price: 450,
+		standfirst: "Eat with strangers, at a table built for the week.",
+		to: "15:00",
+		venue: "North Lawn",
+		year: 2025,
+	},
+	{
+		age_group: "All",
+		category: "Experience",
+		checkout_url: undefined,
+		day: "2025-12-11",
+		from: "11:00",
+		name: "Wind Tunnel, Slowly",
+		price: undefined,
+		standfirst: "Watch air find its way through six plans.",
+		to: "17:00",
+		venue: "Pavilion",
+		year: 2025,
+	},
+	{
+		age_group: "Children",
+		category: "Experience",
+		checkout_url: undefined,
+		day: "2025-12-13",
+		from: "11:00",
+		name: "Ink and Rain",
+		price: 0,
+		standfirst: "A drawing finished by the weather.",
+		to: "17:00",
+		venue: "Studio One",
+		year: 2025,
+	},
+	{
+		age_group: "Adults",
+		category: "Conversation",
+		checkout_url: undefined,
+		day: "2025-12-12",
+		from: "15:00",
+		name: "The Cost of Comfort",
+		price: undefined,
+		standfirst: "Who pays for the air conditioning, and who cannot.",
+		to: "16:30",
+		venue: "The Conversation Stage",
+		year: 2025,
+	},
+	{
+		age_group: "Adults",
+		category: "Conversation",
+		checkout_url: undefined,
+		day: "2025-12-13",
+		from: "11:00",
+		name: "Drawing for the Unbuilt",
+		price: undefined,
+		standfirst: "Three practices on the work that never breaks ground.",
+		to: "12:30",
+		venue: "The Conversation Stage",
+		year: 2025,
+	},
+	{
+		age_group: "All",
+		category: "Conversation",
+		checkout_url: undefined,
+		day: "2025-12-11",
+		from: "17:00",
+		name: "What the Craftsperson Knows",
+		price: undefined,
+		standfirst: "Knowledge that never made it into a specification.",
+		to: "18:30",
+		venue: "The Conversation Stage",
+		year: 2025,
+	},
+	{
+		age_group: "Adults",
+		category: "Conversation",
+		checkout_url: undefined,
+		day: "2025-12-12",
+		from: "11:00",
+		name: "Material Honesty, Revisited",
+		price: 0,
+		standfirst: "An old argument, put to people who build now.",
+		to: "12:30",
+		venue: "Seminar Room",
+		year: 2025,
+	},
+	{
+		age_group: "Adults",
+		category: "Conversation",
+		checkout_url: undefined,
+		day: "2025-12-14",
+		from: "11:00",
+		name: "Heat and the Working Day",
+		price: undefined,
+		standfirst: "Labour, shade and the hours nobody schedules.",
+		to: "12:30",
+		venue: "Seminar Room",
+		year: 2025,
+	},
+	{
+		age_group: "All",
+		category: "Conversation",
+		checkout_url: undefined,
+		day: "2025-12-14",
+		from: "17:00",
+		name: "Twenty Years of the Lab",
+		price: undefined,
+		standfirst: "What the Lab set out to do, and what it did.",
+		to: "18:30",
+		venue: "The Conversation Stage",
+		year: 2025,
+	},
+	{
+		age_group: "Adults",
+		category: "Workshop",
+		checkout_url: "https://example.com/cc/lime-plaster",
+		day: "2025-12-12",
+		from: "09:30",
+		name: "Lime Plaster, Start to Finish",
+		price: 1200,
+		standfirst: "Slake, mix, float. One panel each, taken home wet.",
+		to: "13:00",
+		venue: "Studio One",
+		year: 2025,
+	},
+	{
+		age_group: "Adults",
+		category: "Workshop",
+		checkout_url: "https://example.com/cc/bamboo-joints",
+		day: "2025-12-13",
+		from: "14:00",
+		name: "Bamboo Joints Without Nails",
+		price: 800,
+		standfirst: "Six joints, a saw and an afternoon.",
+		to: "17:00",
+		venue: "Studio Two",
+		year: 2025,
+	},
+	{
+		age_group: "Children",
+		category: "Workshop",
+		checkout_url: "https://example.com/cc/natural-dye",
+		day: "2025-12-14",
+		from: "09:30",
+		name: "Natural Dye from the Kitchen",
+		price: 0,
+		standfirst: "Onion skin, turmeric, tea and iron.",
+		to: "12:00",
+		venue: "Studio One",
+		year: 2025,
+	},
+	{
+		age_group: "Adults",
+		category: "Workshop",
+		checkout_url: "https://example.com/cc/the-section",
+		day: "2025-12-11",
+		from: "14:00",
+		name: "Drawing the Section",
+		price: 600,
+		standfirst: "The one drawing that says how a building works.",
+		to: "17:00",
+		venue: "Seminar Room",
+		year: 2025,
+	},
+	{
+		age_group: "Children",
+		category: "Workshop",
+		checkout_url: undefined,
+		day: "2025-12-12",
+		from: "16:00",
+		name: "Paper, Folded for Shade",
+		price: 0,
+		standfirst: "A screen you fold in two hours and unfold at home.",
+		to: "18:00",
+		venue: "Studio Two",
+		year: 2025,
+	},
+	{
+		age_group: "All",
+		category: "Workshop",
+		checkout_url: "https://example.com/cc/your-street",
+		day: "2025-12-14",
+		from: "14:00",
+		name: "Measuring Your Own Street",
+		price: undefined,
+		standfirst: "A tape, a thermometer and one hour outside.",
+		to: "15:30",
+		venue: "Plant 13 Gate",
+		year: 2025,
+	},
+	{
+		age_group: "All",
+		category: "Showcase",
+		checkout_url: undefined,
+		day: "2027-12-02",
+		from: "10:00",
+		name: "Site Notes: The North Yard",
+		price: undefined,
+		standfirst: "What is there now, before anything is proposed.",
+		to: "18:00",
+		venue: "Plant 13",
+		year: 2027,
+	},
+	{
+		age_group: "All",
+		category: "Showcase",
+		checkout_url: undefined,
+		day: "2027-12-03",
+		from: "10:00",
+		name: "Site Notes: The Water Tank",
+		price: undefined,
+		standfirst: "A structure nobody has decided what to do with.",
+		to: "18:00",
+		venue: "Plant 13",
+		year: 2027,
+	},
+	{
+		age_group: "Adults",
+		category: "Conversation",
+		checkout_url: undefined,
+		day: "2027-12-02",
+		from: "15:00",
+		name: "An Open Brief",
+		price: undefined,
+		standfirst: "The theme, still being argued about, in public.",
+		to: "16:30",
+		venue: "Plant 13",
+		year: 2027,
+	},
+	{
+		age_group: "Adults",
+		category: "Conversation",
+		checkout_url: undefined,
+		day: "2027-12-03",
+		from: "15:00",
+		name: "Who Should Be Here",
+		price: undefined,
+		standfirst: "On who the next one is actually for.",
+		to: "16:30",
+		venue: "Plant 13",
+		year: 2027,
+	},
+	{
+		age_group: "Adults",
+		category: "Conversation",
+		checkout_url: undefined,
+		day: "2027-12-05",
+		from: "11:00",
+		name: "Two Years of Lead Time",
+		price: undefined,
+		standfirst: "What can be built when there is time to build it.",
+		to: "12:30",
+		venue: "Plant 13",
+		year: 2027,
+	},
+	{
+		age_group: "All",
+		category: "Experience",
+		checkout_url: undefined,
+		day: "2027-12-03",
+		from: "10:00",
+		name: "Prototype Yard",
+		price: undefined,
+		standfirst: "Half-finished things, shown on purpose.",
+		to: "17:00",
+		venue: "Plant 13",
+		year: 2027,
+	},
+	{
+		age_group: "All",
+		category: "Experience",
+		checkout_url: undefined,
+		day: "2027-12-04",
+		from: "10:00",
+		name: "The Shade Trial",
+		price: undefined,
+		standfirst: "Six canopies, one summer, no conclusions yet.",
+		to: "17:00",
+		venue: "Plant 13",
+		year: 2027,
+	},
+	{
+		age_group: "Adults",
+		category: "Experience",
+		checkout_url: undefined,
+		day: "2027-12-05",
+		from: "10:00",
+		name: "A Walk with the Engineers",
+		price: undefined,
+		standfirst: "The plant as the people who run it see it.",
+		to: "17:00",
+		venue: "Plant 13",
+		year: 2027,
+	},
+	{
+		age_group: "Adults",
+		category: "Workshop",
+		checkout_url: undefined,
+		day: "2027-12-02",
+		from: "11:00",
+		name: "Making the Brief",
+		price: undefined,
+		standfirst: "Bring a proposal; leave with it argued over.",
+		to: "13:00",
+		venue: "Plant 13",
+		year: 2027,
+	},
+	{
+		age_group: "Adults",
+		category: "Workshop",
+		checkout_url: undefined,
+		day: "2027-12-05",
+		from: "14:00",
+		name: "Casting a Test Panel",
+		price: undefined,
+		standfirst: "One panel, one mix, one week to cure.",
+		to: "16:00",
+		venue: "Plant 13",
+		year: 2027,
+	},
+]
+
 /**
  |
  | The Public role's permissions.
@@ -607,6 +1551,7 @@ async function grant_public_permissions ( strapi: Strapi ) {
 	const actions = [
 		"api::envelope.envelope.find",
 		"api::page.page.find",
+		"api::session.session.find",
 	]
 
 	const role = await strapi.db
@@ -724,14 +1669,14 @@ const SPONSORS = [
 const TEAM = [
 	{
 		description:
-			"Leads the Lab's programming, and has been the thread running through every edition since the first.",
+			"Leads the Lab's programming, and has been the thread running through every year since the first.",
 		image: IMAGES.portrait_one,
 		name: "Nandini Rao",
 		role: "Programme lead",
 	},
 	{
 		description:
-			"Looks after the fellows, from the first conversation to the last day of the festival.",
+			"Looks after the fellows, from the first conversation to the last day of the event.",
 		image: IMAGES.portrait_two,
 		name: "Arjun Menon",
 		role: "Fellowship lead",

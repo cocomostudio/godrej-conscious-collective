@@ -17,6 +17,7 @@
 
 import type { ComponentType } from "react"
 
+import { Add_To_Calendar } from "./blocks/add-to-calendar.tsx"
 import { Back_Link } from "./blocks/back-link.tsx"
 import { Gallery } from "./blocks/gallery.tsx"
 import { Google_Map } from "./blocks/google-map.tsx"
@@ -35,6 +36,7 @@ import { Instagram_Feed } from "./blocks/instagram-feed.tsx"
 import { Link_Block } from "./blocks/link.tsx"
 import { Map_And_Content } from "./blocks/map-and-content.tsx"
 import { Marquee } from "./blocks/marquee.tsx"
+import { Masthead } from "./blocks/masthead.tsx"
 import { Plain_String } from "./blocks/plain-string.tsx"
 import { Profile_List } from "./blocks/profile-list.tsx"
 import { Quote } from "./blocks/quote.tsx"
@@ -42,14 +44,18 @@ import { Responsive_Image } from "./blocks/responsive-image.tsx"
 import { Root } from "./blocks/root.tsx"
 import { Script } from "./blocks/script.tsx"
 import { Section } from "./blocks/section.tsx"
+import { Session_Details } from "./blocks/session-details.tsx"
 import { Sponsors_List } from "./blocks/sponsors-list.tsx"
 import { Table_Of_Contents } from "./blocks/table-of-contents.tsx"
 import { Vanilla_Carousel } from "./blocks/vanilla-carousel.tsx"
 import { Wysiwyg } from "./blocks/wysiwyg.tsx"
 
 import {
+	ADD_TO_CALENDAR,
 	BACK_LINK,
+	MASTHEAD,
 	ROOT,
+	SESSION_DETAILS,
 	TABLE_OF_CONTENTS,
 } from "./assemble-root.ts"
 
@@ -60,11 +66,22 @@ type Registered = {
 
 export const BLOCK_REGISTRY: Record<string, Registered> = {
 	// Blocks with no component behind them, built by the website from an
-	// entry's top-level attributes. The Masthead and the ContributorProfile
-	// will join these.
-	[ROOT]: { Renderer: Root, regions: [ "back_link", "sidebar", "main" ] },
+	// entry's top-level attributes. The ContributorProfile will join these.
+	[ROOT]: {
+		Renderer: Root,
+		regions: [
+			"back_link",
+			"masthead",
+			"sidebar",
+			"sidebar_repeat",
+			"main",
+		],
+	},
 	[BACK_LINK]: { Renderer: Back_Link },
 	[TABLE_OF_CONTENTS]: { Renderer: Table_Of_Contents },
+	[MASTHEAD]: { Renderer: Masthead },
+	[SESSION_DETAILS]: { Renderer: Session_Details },
+	[ADD_TO_CALENDAR]: { Renderer: Add_To_Calendar },
 
 	// The catalogue.
 	[HTML_DOCUMENT_HOOKS]: {

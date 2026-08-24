@@ -88,18 +88,18 @@ export const FALLBACK_PALETTE: Record<Role, string> = {
  | whichever of the six matches what the page is, so a block can say
  | `bg-context` once and be right wherever it is placed.
  |
- | Every page this build renders is a Page, and a Page has no role of its own,
- | so it takes the theme. A Session will point this at its category's colour and
- | a Contributor at the contributor colour, each in the ticket that builds it.
+ | A Page has no role of its own and takes the theme. A Session points it at its
+ | category's colour, and a Contributor will point it at the contributor one.
  |
  | It aliases rather than copies so that a page which changes role without
  | changing event changes one declaration.
  |
  */
-const CONTEXT_ROLE: Role = "theme"
+const DEFAULT_ROLE: Role = "theme"
 
 export function context_colours (
 	resolved_event: Event | null,
+	context_role: Role = DEFAULT_ROLE,
 ): Record<string, string> {
 	const declarations: Record<string, string> = {}
 
@@ -108,7 +108,7 @@ export function context_colours (
 			?? FALLBACK_PALETTE[role as Role]
 	}
 
-	declarations["--ctx-context-color"] = `var(${ROLES[CONTEXT_ROLE].variable})`
+	declarations["--ctx-context-color"] = `var(${ROLES[context_role].variable})`
 
 	return declarations
 }

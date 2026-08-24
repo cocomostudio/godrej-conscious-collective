@@ -46,8 +46,24 @@ export type Event_Dates = {
 }
 
 export function event_dates ( event: Event | null ): Event_Dates | null {
-	const start = parse( event?.date_start )
-	const end = parse( event?.date_end )
+	return date_range( event?.date_start, event?.date_end )
+}
+
+/**
+ |
+ | The same rule, over two bare days rather than over an event.
+ |
+ | A session's first and last dates read exactly as an event's range does, and
+ | they are `date` attributes for the same reason — so they take the same
+ | formatting rather than a second one that could drift from it by a comma.
+ |
+ */
+export function date_range (
+	first: string | null | undefined,
+	last: string | null | undefined,
+): Event_Dates | null {
+	const start = parse( first )
+	const end = parse( last )
 
 	if ( !start ) {
 		return null

@@ -12,11 +12,12 @@
 
 import type {
 	Block,
-	Entry,
 	Envelope,
 	Event,
 	Link as Link_Attribute,
+	Page_Entry,
 	Page_Shell,
+	Session_Entry,
 } from "../../src/web/cms/envelope.ts"
 
 let next_id = 1
@@ -38,7 +39,7 @@ export function page_shell ( over: Partial<Page_Shell> = {} ): Page_Shell {
 
 /**
  |
- | A festival edition. The colours arrive as RGB channel triplets because that
+ | One run of the programme. The colours arrive as RGB channel triplets because
  | is what the CMS derives and what the colour tokens compile against; the hex
  | siblings ride along unread by anything the website renders.
  |
@@ -63,7 +64,7 @@ export function event ( over: Partial<Event> = {} ): Event {
 }
 
 export function envelope (
-	entry: Partial<Entry> = {},
+	entry: Partial<Page_Entry> = {},
 	over: Partial<Envelope> = {},
 ): Envelope {
 	return {
@@ -82,6 +83,66 @@ export function envelope (
 		page_shell: page_shell(),
 		resolved_event: event(),
 		...over,
+	}
+}
+
+/**
+ |
+ | A session's envelope.
+ |
+ | A session carries none of a Page's `title`, `toc` or `side_region`, and a
+ | fair number of attributes no other content type has. Its own builder rather
+ | than an override on the Page's, so that a caller reaching for a session gets
+ | a session's defaults and nothing of a Page's.
+ |
+ | The compiler will not hold the two apart on its own: `Entry` carries an index
+ | signature, because an entry has more attributes than the website reads, and
+ | that signature is what lets a `Partial` of either accept the other's keys.
+ | Two builders is the whole of the separation.
+ |
+ */
+export function session_envelope (
+	entry: Partial<Session_Entry> = {},
+	over: Partial<Envelope> = {},
+): Envelope {
+	return {
+		entry: {
+			age_group: "All",
+			all_day_event: false,
+			category: "Showcase",
+			checkout_url: null,
+			contentType: "api::session.session",
+			cover: null,
+			documentId: `document-${id()}`,
+			instances: [ instance( "2025-12-11", "10:00", "12:30" ) ],
+			main_region: [],
+			name: "A Session",
+			price: null,
+			session_date_first: "2025-12-11",
+			session_date_last: "2025-12-11",
+			standfirst: null,
+			venue: null,
+			...entry,
+		},
+		main_event: event(),
+		page_shell: page_shell(),
+		resolved_event: event(),
+		...over,
+	}
+}
+
+/**
+ |
+ | One instance, with the event's own offset spelled out. Both ends are
+ | datetimes even for an all-day session — the stored shape does not change,
+ | which is what the eventual Add to Calendar output needs.
+ |
+ */
+export function instance ( day: string, from: string, to: string ) {
+	return {
+		id: id(),
+		time_end: `${day}T${to}:00.000+05:30`,
+		time_start: `${day}T${from}:00.000+05:30`,
 	}
 }
 

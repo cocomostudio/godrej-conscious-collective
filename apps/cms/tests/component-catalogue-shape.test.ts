@@ -68,6 +68,10 @@ const NOT_IN_THE_SECTION_LIST = new Set( [
 	// Members of a repeatable list, reached through the list that holds them.
 	"list.profile-v1",
 	"list.sponsor-v1",
+	// A repeatable component on a content type rather than a page component.
+	// A session's instances are data about the session, never something an
+	// editor places in a region.
+	"session.session-instance-v1",
 ] )
 
 type Component = {

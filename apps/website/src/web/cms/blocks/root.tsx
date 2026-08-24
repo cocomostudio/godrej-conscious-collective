@@ -43,13 +43,39 @@ import {
 
 type Root_Props = {
 	page_layout: Page_Layout
-	title: string
+	/** Null on a content type whose masthead carries the name instead. */
+	title: string | null
 	standfirst?: string | null
 	colours: Record<string, string>
 	main_event: Event | null
 	page_shell: Page_Shell | null
 	back_link: ReactNode
+	masthead: ReactNode
 	sidebar: ReactNode
+	/**
+	 |
+	 | **Whether the sidebar column exists below the medium breakpoint.**
+	 |
+	 | A Page's does: the design shows its back link and its table of contents
+	 | on a phone, stacked above the content. A session's does not — the design
+	 | puts the masthead first there and repeats the sidebar's contents
+	 | underneath it, which is what `sidebar_repeat` carries.
+	 |
+	 */
+	sidebar_at_every_width: boolean
+	/**
+	 |
+	 | The sidebar again, for the main column, shown only below the medium
+	 | breakpoint and only on a content type whose sidebar is hidden there.
+	 |
+	 | It is deliberately a second copy of the same blocks rather than one copy
+	 | moved: the two sit in different places, wear different widths and, in the
+	 | details list's case, lay out in a different number of columns. The static
+	 | site does exactly this, and a single copy that moved would need the two
+	 | positions to agree about everything except position.
+	 |
+	 */
+	sidebar_repeat: ReactNode
 	main: ReactNode
 }
 
@@ -59,9 +85,12 @@ export function Root (
 		colours,
 		main,
 		main_event,
+		masthead,
 		page_layout,
 		page_shell,
 		sidebar,
+		sidebar_at_every_width,
+		sidebar_repeat,
 		standfirst,
 		title,
 	}: Root_Props,
@@ -79,6 +108,7 @@ export function Root (
 
 			<main className="grow md:flex">
 				{ two_column && <Sidebar
+					at_every_width={ sidebar_at_every_width }
 					back_link={ back_link }
 					standfirst={ standfirst }
 					title={ title }>
@@ -86,6 +116,8 @@ export function Root (
 				</Sidebar> }
 
 				<Main_Column
+					masthead={ masthead }
+					sidebar_repeat={ sidebar_repeat }
 					standfirst={ two_column ? null : standfirst }
 					title={ two_column ? null : title }
 					two_column={ two_column }>
@@ -112,18 +144,22 @@ export function Root (
  |
  */
 function Sidebar (
-	{ back_link, children, standfirst, title }: {
+	{ at_every_width, back_link, children, standfirst, title }: {
+		at_every_width: boolean
 		back_link: ReactNode
 		children: ReactNode
 		standfirst?: string | null
-		title: string
+		title: string | null
 	},
 ) {
-	return <div className="layout__1-4__col-1 md:pl-1ccm pb-6 bg-gray-light">
+	return <div
+		className={ `${
+			at_every_width ? "" : "max-md:hidden "
+		}layout__1-4__col-1 md:pl-1ccm pb-6 bg-gray-light` }>
 		<div className="cc mx-auto sticky top-0 flex flex-col items-start gap-6 pt-6 md:pt-8 md:pb-6">
 			{ back_link }
 
-			<div>
+			{ title && <div>
 				<H className="text-h2 md:font-semibold text-theme">
 					{ title }
 				</H>
@@ -132,7 +168,7 @@ function Sidebar (
 					&& <p className="mt-4 text-p text-black">
 						{ standfirst }
 					</p> }
-			</div>
+			</div> }
 
 			<Level>{ children }</Level>
 		</div>
@@ -145,6 +181,11 @@ function Sidebar (
  | and every heading's rank follows from where it sits rather than from what an
  | editor picked.
  |
+ | **The masthead sits outside that**, above the column's own padding and above
+ | the level it opens. It is full-bleed within the column, which the padded
+ | container inside cannot be, and it carries the document's `h1`, which a
+ | heading one level down could not be.
+ |
  | A one-column page has no sidebar to carry its title, so the title comes here
  | instead. It has to go somewhere: the sidebar is where a two-column page shows
  | it, but "no sidebar" is a rule about the back link, the table of contents and
@@ -153,8 +194,10 @@ function Sidebar (
  |
  */
 function Main_Column (
-	{ children, standfirst, title, two_column }: {
+	{ children, masthead, sidebar_repeat, standfirst, title, two_column }: {
 		children: ReactNode
+		masthead: ReactNode
+		sidebar_repeat: ReactNode
 		standfirst?: string | null
 		title?: string | null
 		two_column: boolean
@@ -164,6 +207,13 @@ function Main_Column (
 		className={ two_column
 			? "layout__1-4__col-2 bg-white"
 			: "w-full bg-white" }>
+		{ masthead }
+
+		{ has_blocks( sidebar_repeat )
+			&& <div className="md:hidden cc mx-auto pt-8 flex flex-col items-start gap-6">
+				{ sidebar_repeat }
+			</div> }
+
 		<div className="md:w-9c py-8 md:py-16 text-black">
 			<div className="cc mx-auto md:px-16">
 				{ title && <div className="pb-6 md:pb-8">
@@ -181,4 +231,15 @@ function Main_Column (
 			</div>
 		</div>
 	</div>
+}
+
+/**
+ |
+ | A region the renderer filled in comes back as an array, and an empty one is
+ | still an array — so a wrapper hung on the node itself would render its own
+ | padding around nothing on every page that contributed no blocks.
+ |
+ */
+function has_blocks ( region: ReactNode ) {
+	return Array.isArray( region ) && region.length > 0
 }

@@ -1,0 +1,50 @@
+{
+	"collectionName": "components_session_session_instance_v1",
+	"info": {
+		"displayName": "Session instance",
+		"description": "One time a session runs, with the moment it starts and the moment it ends. A session running on three days has three."
+	},
+	"options": {},
+	"attributes": {
+		"time_start": {
+			"type": "datetime",
+			"required": true
+		},
+		"time_end": {
+			"type": "datetime",
+			"required": true
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"time_start": {
+				"edit": {
+					"label": "Starts",
+					"description": "The day and the time this instance begins. An all-day session still carries both — the website hides the time rather than the session losing it."
+				},
+				"list": {
+					"label": "Starts"
+				}
+			},
+			"time_end": {
+				"edit": {
+					"label": "Ends",
+					"description": "The day and the time this instance finishes."
+				},
+				"list": {
+					"label": "Ends"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "time_start", "size": 6 },
+					{ "name": "time_end", "size": 6 }
+				]
+			]
+		}
+	}
+}

@@ -9,6 +9,8 @@
  |
  */
 
+import type { Responsive_Image_Attribute } from "./media.ts"
+
 /**
  |
  | A node in the render tree.
@@ -54,7 +56,7 @@ export type Media = {
 
 /**
  |
- | A festival edition.
+ | One run of the programme.
  |
  | It arrives twice in every envelope and the two copies mean different things.
  | As the **main event** it is the site chrome's source — the header's date
@@ -85,21 +87,117 @@ export type Event = {
 	[attribute: string]: unknown
 }
 
-export type Entry = {
-	contentType: string
+/**
+ |
+ | What every entry carries, whichever content type answered.
+ |
+ | `contentType` is the discriminator, and it is the CMS's uid rather than a
+ | word of the website's own — the envelope route already knows which type it
+ | resolved and inventing a second name for it here would be two vocabularies
+ | for one fact.
+ |
+ */
+type Entry_Common = {
 	documentId: string
-	title: string
 	standfirst: string | null
-	page_layout: Page_Layout
-	toc: boolean
 	main_region: Block[]
-	side_region: Block[]
 	[attribute: string]: unknown
 }
+
+export const PAGE = "api::page.page"
+export const SESSION = "api::session.session"
+
+export type Page_Entry = Entry_Common & {
+	contentType: typeof PAGE
+	title: string
+	/**
+	 |
+	 | One column or two — **a Page's choice alone.** A session carries no such
+	 | attribute, because there is no session page that works in one column and
+	 | an option that cannot be right is not worth offering.
+	 |
+	 */
+	page_layout: Page_Layout
+	toc: boolean
+	side_region: Block[]
+}
+
+/**
+ |
+ | One programme item. The public reads it as an "Event".
+ |
+ | Everything below `name` is what the sidebar's details list is built from,
+ | and none of it comes from a component — which is why a session's page needs
+ | more of the website than a Page's does.
+ |
+ */
+export type Session_Entry = Entry_Common & {
+	contentType: typeof SESSION
+	name: string
+	cover: Responsive_Image_Attribute | null
+	category: Category
+	instances: Session_Instance[]
+	/** Derived by the CMS from the instances. Read-only, and never edited. */
+	session_date_first: string | null
+	session_date_last: string | null
+	all_day_event: boolean
+	/** No currency: the event runs in one city. Zero means free. */
+	price: number | null
+	venue: Link | null
+	age_group: Age_Group
+	checkout_url: string | null
+}
+
+export type Entry = Page_Entry | Session_Entry
+
+/**
+ |
+ | One time a session runs. **Both ends are datetimes**, even when the session
+ | is an all-day one: the website hides the times in that case and the stored
+ | shape does not change, which is what the eventual Add to Calendar output
+ | needs.
+ |
+ */
+export type Session_Instance = {
+	time_start: string | null
+	time_end: string | null
+	[attribute: string]: unknown
+}
+
+export const CATEGORIES = [
+	"Showcase",
+	"Experience",
+	"Conversation",
+	"Workshop",
+] as const
+
+export type Category = typeof CATEGORIES[number]
+
+export const AGE_GROUPS = [ "All", "Children", "Adults" ] as const
+
+export type Age_Group = typeof AGE_GROUPS[number]
 
 export const PAGE_LAYOUTS = [ "one-column", "two-column" ] as const
 
 export type Page_Layout = typeof PAGE_LAYOUTS[number]
+
+export function is_session ( entry: Entry ): entry is Session_Entry {
+	return entry.contentType === SESSION
+}
+
+/**
+ |
+ | What the entry is called.
+ |
+ | A Page holds it in `title` and a session in `name`, because each attribute is
+ | named for what an editor is naming — a page, or a programme item — and the
+ | URL pattern interpolates the one its own content type carries. Everything
+ | that wants the words rather than the attribute asks here.
+ |
+ */
+export function name_of ( entry: Entry ): string {
+	return is_session( entry ) ? entry.name : entry.title
+}
 
 export type Envelope = {
 	entry: Entry
@@ -108,7 +206,7 @@ export type Envelope = {
 	 |
 	 | The site chrome follows the **main event**, on every page, always,
 	 | including archived ones — so a visitor arriving on an old page through an
-	 | old link still has a route to the festival that is actually running.
+	 | old link still has a route to the event that is actually running.
 	 |
 	 | Everything else event-derived follows the **resolved event**: the entry's
 	 | own event, failing that the main event. Colours have a third level below

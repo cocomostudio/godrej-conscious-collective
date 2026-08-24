@@ -32,6 +32,7 @@ import {
 
 import { Anchors } from "./anchors.tsx"
 import { assemble_root } from "./assemble-root.ts"
+import { name_of } from "./envelope.ts"
 import {
 	fetch_envelope,
 	media_origin,
@@ -76,7 +77,7 @@ export async function loader ( { params, request }: Route.LoaderArgs ) {
 		media_origin: media_origin(),
 		root,
 		site_title: page_shell?.site_title ?? null,
-		title: entry.title,
+		title: name_of( entry ),
 	}
 }
 
