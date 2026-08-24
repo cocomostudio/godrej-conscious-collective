@@ -37,7 +37,7 @@ import { YouTube_Logo } from "#infra/lib/ui/react/logos/youtube-logo.tsx"
  | The social accounts, and the copyright line below, are literals: no attribute
  | holds either, and the spec's Page Shell names none. The URLs are the static
  | site's own **placeholders** and point at `example.com` — they were never real
- | and somebody has to replace them with the accounts the festival actually has.
+ | and somebody has to replace them with the accounts the event actually has.
  |
  */
 const SOCIAL_LINKS = [

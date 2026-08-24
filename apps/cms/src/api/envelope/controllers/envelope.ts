@@ -168,7 +168,7 @@ export default {
  |
  | `findFirst` rather than a count-and-complain: if the invariant were ever
  | broken the chrome should still render, and the alternative is a whole site
- | answering 500 because two rows disagree about which festival is running.
+ | answering 500 because two rows disagree about which event is running.
  |
  */
 async function find_main_event () {
@@ -187,7 +187,7 @@ async function find_main_event () {
  | response with the join rows still sitting in the database.
  |
  | The envelope is the composition point. A caller authorised to read a page is
- | being handed that page, and which festival that page belongs to is part of
+ | being handed that page, and which event that page belongs to is part of
  | what the page is.
  |
  */

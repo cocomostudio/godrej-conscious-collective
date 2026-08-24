@@ -5,7 +5,7 @@
 		"singularName": "event",
 		"pluralName": "events",
 		"displayName": "Event",
-		"description": "A festival edition. Pure configuration: it has no page of its own and no URL, and is never a route."
+		"description": "One run of the programme. Pure configuration: it has no page of its own and no URL, and is never a route."
 	},
 	"options": {
 		"draftAndPublish": false
@@ -89,7 +89,7 @@
 			"name": {
 				"edit": {
 					"label": "Name",
-					"description": "The festival edition, as it is written — \"Conscious Collective 2025\"."
+					"description": "The event, as it is written — \"Conscious Collective 2025\"."
 				},
 				"list": {
 					"label": "Name"
@@ -98,7 +98,7 @@
 			"main": {
 				"edit": {
 					"label": "Main event",
-					"description": "The edition the site is currently advertising. The header and the footer follow it on every page. Marking this one demotes the one that held it."
+					"description": "The event the site is currently advertising. The header and the footer follow it on every page. Marking this one demotes the one that held it."
 				},
 				"list": {
 					"label": "Main"
@@ -125,7 +125,7 @@
 			"schedule": {
 				"edit": {
 					"label": "Schedule document",
-					"description": "The downloadable programme for this edition, as a PDF."
+					"description": "The downloadable programme for this event, as a PDF."
 				},
 				"list": {
 					"label": "Schedule document"
@@ -134,7 +134,7 @@
 			"is_archived": {
 				"edit": {
 					"label": "Archived",
-					"description": "Marks this edition as past. Stored rather than worked out from the last day, so that an edition keeps a grace period after it closes."
+					"description": "Marks this event as past. Stored rather than worked out from the last day, so that an event keeps a grace period after it closes."
 				},
 				"list": {
 					"label": "Archived"
@@ -143,7 +143,7 @@
 			"colour_theme": {
 				"edit": {
 					"label": "Theme colour",
-					"description": "This edition's principal colour. It is also what a page with no role of its own is coloured by."
+					"description": "This event's principal colour. It is also what a page with no role of its own is coloured by."
 				},
 				"list": {
 					"label": "Theme colour"

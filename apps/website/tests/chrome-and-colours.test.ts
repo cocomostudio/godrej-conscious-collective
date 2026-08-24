@@ -7,7 +7,7 @@
  | Two rules are under test and they deliberately disagree with each other:
  |
  |   • **the chrome follows the main event**, on every page, always — so a page
- |     belonging to a past or a future edition still advertises the festival
+ |     belonging to a past or a future event still advertises the event
  |     that is currently running; and
  |
  |   • **the colours follow the resolved event** — the entry's own event first,
@@ -78,15 +78,15 @@ let website: Website
 beforeAll( async () => {
 	website = await boot_website( {
 		// The ordinary case: no event of its own, so both slots are the main
-		// edition.
+		// event.
 		"/about": envelope(
 			{ main_region: [ section( "About" ) ], title: "About" },
 			{ main_event: MAIN, page_shell: SHELL, resolved_event: MAIN },
 		),
 
-		// A page belonging to the edition that is not running.
-		"/next-edition": envelope(
-			{ main_region: [ section( "Next" ) ], title: "Next Edition" },
+		// A page belonging to the event that is not running.
+		"/next-event": envelope(
+			{ main_region: [ section( "Next" ) ], title: "Next Event" },
 			{
 				main_event: MAIN,
 				page_shell: SHELL,
@@ -132,7 +132,7 @@ describe("the header and the footer", () => {
 		expect( text_of( html ) ).toContain( "11–14 Dec 2025" )
 
 		// Both ends carry their own machine-readable day. The static site gave
-		// the closing `<time>` the opening day's value, which said the festival
+		// the closing `<time>` the opening day's value, which said the event
 		// ended before it started.
 		expect( html ).toMatch( /datetime="2025-12-11"/i )
 		expect( html ).toMatch( /datetime="2025-12-14"/i )
@@ -144,8 +144,8 @@ describe("the header and the footer", () => {
 		expect( html ).toContain( "Register Now" )
 	})
 
-	it("show the main event's dates even on a page from another edition", async () => {
-		const { html } = await website.get( "/next-edition" )
+	it("show the main event's dates even on a page from another event", async () => {
+		const { html } = await website.get( "/next-event" )
 
 		expect( text_of( html ) ).toContain( "11–14 Dec 2025" )
 		expect( text_of( html ) ).not.toContain( "Dec 2027" )
@@ -200,8 +200,8 @@ describe("the context colours", () => {
 		} )
 	})
 
-	it("come from the entry's own edition, while the chrome does not", async () => {
-		const { html } = await website.get( "/next-edition" )
+	it("come from the entry's own event, while the chrome does not", async () => {
+		const { html } = await website.get( "/next-event" )
 
 		expect( variables( html )["--ctx-theme-color"] ).toBe( "27, 127, 75" )
 		expect( variables( html )["--ctx-showcase-color"] )
@@ -218,7 +218,7 @@ describe("the context colours", () => {
 	})
 
 	it("alias the context colour to the role that matches the page", async () => {
-		const { html } = await website.get( "/next-edition" )
+		const { html } = await website.get( "/next-event" )
 
 		// A Page has no role of its own, so its context colour is the theme.
 		expect( variables( html )["--ctx-context-color"] )

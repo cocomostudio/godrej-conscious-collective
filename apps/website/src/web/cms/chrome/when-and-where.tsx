@@ -7,7 +7,7 @@
  |
  | **The opening hours and the address are not.** Nothing in the content model
  | holds either: an Event carries a date range and a schedule document, and a
- | venue is a Session attribute rather than an edition-wide one. So these two
+ | venue is a Session attribute rather than an event-wide one. So these two
  | lines are still the literals the static site shipped, and an editor cannot
  | change them — which is the exact complaint this whole project exists to
  | answer, sitting in the footer of every page.

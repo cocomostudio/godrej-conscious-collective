@@ -7,7 +7,7 @@
  | from the page shell rather than from an array in the source, and the date
  | range and the Register Now button come from the **main event** — on every
  | page, always, including archived ones. A visitor who arrives on an old page
- | through an old link still has a route to the festival that is running.
+ | through an old link still has a route to the event that is running.
  |
  | ─── MOBILE NAVIGATION ( below md / 1024px ) ────────────────────────────────
  |
@@ -355,7 +355,7 @@ export function Site_Header ( { main_event, page_shell }: Site_Header_Props ) {
  | the foot of the page.
  |
  | It follows the main event, per the decision that the chrome does: with no
- | edition running there is nothing to register for, so the button is absent
+ | event running there is nothing to register for, so the button is absent
  | rather than present and inert.
  |
  | The overlay it opens is the registration form, which is a later ticket. Until

@@ -10,7 +10,7 @@
  |
  | The colours are named as roles rather than as values. They resolve against
  | the six `--ctx-*` variables the root sets from the resolved event, so a
- | section on a page belonging to a different edition paints in that edition's
+ | section on a page belonging to a different event paints in that event's
  | colours with nothing here changing.
  |
  */

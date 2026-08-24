@@ -64,7 +64,7 @@ describe("the site chrome", () => {
 	it("reads the main event on an archived page", async () => {
 		// The chrome follows the main event on every page, always, including
 		// archived ones — which is the decision's accepted downside rather than
-		// an oversight: an archived page advertises a festival other than the
+		// an oversight: an archived page advertises an event other than the
 		// one it describes.
 		const { body } = await cms.get( "/api/envelope?path=/archive-2023" )
 
@@ -320,7 +320,7 @@ describe("marking an event as main", () => {
 		expect( await main_event_names() ).toEqual( [ promoted.name ] )
 	})
 
-	it("leaves the site chrome reading the edition that now holds it", async () => {
+	it("leaves the site chrome reading the event that now holds it", async () => {
 		const { body } = await cms.get( "/api/envelope?path=/about" )
 
 		expect( body.data.main_event.name ).not.toBe( MAIN_EVENT_NAME )

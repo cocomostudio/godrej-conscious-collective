@@ -2,10 +2,10 @@
 /**
  |
  | Setting an event as main demotes whichever event was main before, so two
- | editions can never both claim to be the one the site is advertising.
+ | events can never both claim to be the one the site is advertising.
  |
  | The site chrome reads the main event on every page, and it reads exactly one
- | of them. Two rows carrying `main` would make which festival the header
+ | of them. Two rows carrying `main` would make which event the header
  | advertises a matter of row order.
  |
  */

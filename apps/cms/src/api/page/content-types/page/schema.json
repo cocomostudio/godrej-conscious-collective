@@ -127,7 +127,7 @@
 			"event": {
 				"edit": {
 					"label": "Event",
-					"description": "The festival edition this page belongs to. Left empty, the page takes the main event's colours, listings and schedule document."
+					"description": "The event this page belongs to. Left empty, the page takes the main event's colours, listings and schedule document."
 				},
 				"list": {
 					"label": "Event"
@@ -154,7 +154,7 @@
 			"is_archived": {
 				"edit": {
 					"label": "Archived",
-					"description": "Marks this page as belonging to a past festival edition. Turning it off does not un-archive a page whose event is archived."
+					"description": "Marks this page as belonging to a past event. Turning it off does not un-archive a page whose event is archived."
 				},
 				"list": {
 					"label": "Archived"
