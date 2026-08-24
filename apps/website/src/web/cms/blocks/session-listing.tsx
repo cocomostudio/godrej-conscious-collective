@@ -35,6 +35,7 @@ import { Card } from "../cards.tsx"
 
 import { BLOCK_SPACING } from "./block-spacing.ts"
 import { Looping_Track } from "./looping-track.tsx"
+import { use_full_bleed } from "./section-frame.tsx"
 
 type Session_Listing_Props = {
 	category?: Category
@@ -76,10 +77,15 @@ type Rendering_Props = {
  | class in the map below rather than a second copy of this — and a change to
  | how a loop measures itself cannot fix one row and miss the other.
  |
+ | **This is the rendering that takes the section's full width.** A loop that
+ | stopped at the twelve-column container would show its own ends, which is the
+ | one thing a loop is for hiding. The other two renderings are grids of tiles
+ | and stay inside the container with everything else.
+ |
  */
 function Turning ( { className = "", sessions }: Rendering_Props ) {
 	return <Looping_Track
-		className={ className }
+		className={ `${use_full_bleed()} ${className}` }
 		slide_className="w-73.5 md:w-5c">
 		{ sessions.map( ( session ) =>
 			<Card

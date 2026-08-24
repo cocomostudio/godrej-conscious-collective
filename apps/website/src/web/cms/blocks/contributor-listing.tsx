@@ -52,6 +52,10 @@ export function Contributor_Listing (
 	// visitor the plainest of the three rather than costing them the row.
 	const Rendering = LAYOUTS[layout as Contributor_Layout] ?? Natural
 
+	// **Which of the three takes the section's full width is the
+	// arrangement's own business**, and the carousel takes it for the ring
+	// alone — its pagination stays lined up with the grid. So the escape is
+	// applied inside that arrangement rather than around all three here.
 	return <div className={ BLOCK_SPACING }>
 		<Rendering contributors={ contributors } />
 	</div>

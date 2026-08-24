@@ -22,6 +22,7 @@ import { picture_of } from "../media.ts"
 import { Picture_Image } from "../pictures.tsx"
 
 import { BLOCK_SPACING } from "./block-spacing.ts"
+import { use_full_bleed } from "./section-frame.tsx"
 
 type Sponsor = {
 	name?: string | null
@@ -30,6 +31,10 @@ type Sponsor = {
 
 export function Sponsors_List ( { sponsors = [] }: { sponsors?: Sponsor[] } ) {
 	const origin = use_media_origin()
+
+	// It scrolls itself, forever, so it runs the section's full width rather
+	// than stopping at the twelve-column container and showing its own ends.
+	const full_bleed = use_full_bleed()
 
 	// The organisation's name is what a visitor who cannot see the logo is
 	// told, so it stands in wherever the picture carries no alternative text of
@@ -52,7 +57,7 @@ export function Sponsors_List ( { sponsors = [] }: { sponsors?: Sponsor[] } ) {
 		return null
 	}
 
-	return <div className={ `${BLOCK_SPACING} bg-gray-light` }>
+	return <div className={ `${BLOCK_SPACING} ${full_bleed} bg-gray-light` }>
 		<div className="py-2.25 md:py-4 overflow-hidden" ref={ viewport_ref }>
 			<ul
 				className="flex gap-4.25 md:gap-16 [&>*:first-child]:ml-4.25 md:[&>*:first-child]:ml-16"

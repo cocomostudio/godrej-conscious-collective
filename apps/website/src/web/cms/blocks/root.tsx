@@ -159,19 +159,37 @@ function Sidebar (
 		<div className="cc mx-auto sticky top-0 flex flex-col items-start gap-6 pt-6 md:pt-8 md:pb-6">
 			{ back_link }
 
-			{ title && <div>
-				<H className="text-h2 md:font-semibold text-theme">
-					{ title }
-				</H>
-
-				{ standfirst
-					&& <p className="mt-4 text-p text-black">
-						{ standfirst }
-					</p> }
-			</div> }
+			<Page_Title standfirst={ standfirst } title={ title } />
 
 			<Level>{ children }</Level>
 		</div>
+	</div>
+}
+
+/**
+ |
+ | The page's own name, and the line under it.
+ |
+ | One component for the two places it can appear — the sidebar of a two-column
+ | page, and the main column of a one-column page, which has no sidebar to put
+ | it in. It is the same heading either way, and the two must not drift.
+ |
+ */
+function Page_Title (
+	{ standfirst, title }: {
+		standfirst?: string | null
+		title: string | null
+	},
+) {
+	if ( !title ) {
+		return null
+	}
+
+	return <div>
+		<H className="text-h2 md:font-semibold text-theme">{ title }</H>
+
+		{ standfirst
+			&& <p className="mt-4 text-p text-black">{ standfirst }</p> }
 	</div>
 }
 
@@ -206,7 +224,13 @@ function Main_Column (
 	return <div
 		className={ two_column
 			? "layout__1-4__col-2 bg-white"
-			: "w-full bg-white" }>
+			// A one-column page's sections run edge to edge, and the blocks
+			// that have to run off those edges do it with margins measured
+			// from `100vw`. Where a browser draws a classic scrollbar that is
+			// a few pixels wider than the column actually is, so the overflow
+			// is clipped rather than left to put a second scrollbar along the
+			// bottom of every page.
+			: "w-full overflow-x-hidden bg-white" }>
 		{ masthead }
 
 		{ has_blocks( sidebar_repeat )
@@ -214,22 +238,29 @@ function Main_Column (
 				{ sidebar_repeat }
 			</div> }
 
-		<div className="md:w-9c py-8 md:py-16 text-black">
-			<div className="cc mx-auto md:px-16">
-				{ title && <div className="pb-6 md:pb-8">
-					<H className="text-h2 md:font-semibold text-theme">
-						{ title }
-					</H>
+		{ two_column
+			? <div className="md:w-9c py-8 md:py-16 text-black">
+				<div className="cc mx-auto md:px-16">
+					{ title && <div className="pb-6 md:pb-8">
+						<Page_Title
+							standfirst={ standfirst }
+							title={ title } />
+					</div> }
 
-					{ standfirst
-						&& <p className="mt-4 text-p text-black">
-							{ standfirst }
-						</p> }
+					<Level>{ children }</Level>
+				</div>
+			</div>
+			// Nothing wraps the blocks on a one-column page: each section is
+			// full-width and brings its own padding and its own container.
+			// Only the title needs either, because it sits above the first of
+			// them rather than inside it.
+			: <div className="text-black">
+				{ title && <div className="cc mx-auto pt-8 md:pt-16">
+					<Page_Title standfirst={ standfirst } title={ title } />
 				</div> }
 
 				<Level>{ children }</Level>
-			</div>
-		</div>
+			</div> }
 	</div>
 }
 

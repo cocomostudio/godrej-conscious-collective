@@ -59,6 +59,8 @@ import type { Contributor_Card } from "../envelope.ts"
 import { Portrait } from "../cards.tsx"
 import { MEDIUM_FROM } from "../media.ts"
 
+import { use_full_bleed } from "./section-frame.tsx"
+
 /* _____
  | The design's own measurements.
  |
@@ -139,6 +141,7 @@ const WAVE_FROM_MEDIUM: Wave = {
 export function Contributor_Carousel (
 	{ contributors }: { contributors: Contributor_Card[] },
 ) {
+	const full_bleed = use_full_bleed()
 	const travel = useRef( TRAVEL_MS )
 
 	use_media_query_event( `( min-width: ${MEDIUM_FROM}px )`, () => {
@@ -502,8 +505,15 @@ export function Contributor_Carousel (
 		     disagreed with its own script by 56 pixels, which is what a first
 		     paint against a stale number looks like. */
 		}
+		{
+			/* **The ring alone takes the section's full width**, so that it
+			   runs off both edges rather than stopping at the twelve-column
+			   container and showing where the loop ends. The pagination above
+			   stays inside the container, lined up with the section's heading,
+			   which is where the static site puts it. */
+		}
 		<div
-			className="-mt-4 overflow-hidden pt-[calc(var(--cc-overflow)+48px)] pb-[calc(var(--cc-overflow)+var(--cc-drop))] [--caption-opacity:1] [--cc-overflow:32px] md:[--cc-overflow:56px] [--cc-drop:0px] md:[--cc-drop:312px] [--cc-centre-scale:1.3764706] md:[--cc-centre-scale:1.5]"
+			className={ `${full_bleed} -mt-4 overflow-hidden pt-[calc(var(--cc-overflow)+48px)] pb-[calc(var(--cc-overflow)+var(--cc-drop))] [--caption-opacity:1] [--cc-overflow:32px] md:[--cc-overflow:56px] [--cc-drop:0px] md:[--cc-drop:312px] [--cc-centre-scale:1.3764706] md:[--cc-centre-scale:1.5]` }
 			ref={ viewport_ref }>
 			<div
 				className="flex items-start gap-4 md:gap-8 [&>*:first-child]:ml-4 md:[&>*:first-child]:ml-8 [touch-action:pan-y]"
