@@ -31,6 +31,7 @@
 import type { UID } from "@strapi/strapi"
 
 import { populate_event } from "../../../this/api/event/populate"
+import { splice_listings } from "../../../this/api/listings"
 import { POPULATE_BY_CONTENT_TYPE } from "../../../this/api/populate-by-content-type"
 
 /**
@@ -140,12 +141,26 @@ export default {
 		const main_event = await find_main_event()
 		const resolved_event = event ?? main_event
 
+		const sanitised_entry = {
+			...await sanitise( entry_without_chrome, uid, auth ),
+			contentType: uid,
+		}
+
+		// **Listings are filled in here, after sanitising, and spliced into
+		// the component's own node.** A listing holds a category and a count,
+		// or an ordered set of identities — never rows — and neither shape can
+		// be turned into rows by a populate branch. Doing it here means a block
+		// receives the same rows whether an editor curated the listing or the
+		// event supplied it, and has one code path instead of two.
+		await splice_listings( sanitised_entry, {
+			auth,
+			resolved_event,
+			status,
+		} )
+
 		ctx.body = {
 			data: {
-				entry: {
-					...await sanitise( entry_without_chrome, uid, auth ),
-					contentType: uid,
-				},
+				entry: sanitised_entry,
 				main_event: await sanitise_event( main_event, auth ),
 				page_shell: page_shell
 					? await sanitise(

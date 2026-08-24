@@ -1,0 +1,59 @@
+{
+	"collectionName": "components_list_session_listing_v1",
+	"info": {
+		"displayName": "Session listing",
+		"description": "A row of sessions from one category, filled in on its own from the event this page belongs to. Each category is shown differently."
+	},
+	"options": {},
+	"attributes": {
+		"category": {
+			"type": "enumeration",
+			"enum": [
+				"Showcase",
+				"Experience",
+				"Conversation",
+				"Workshop"
+			],
+			"required": true
+		},
+		"count": {
+			"type": "integer",
+			"required": true,
+			"default": 6,
+			"min": 1,
+			"max": 10
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"category": {
+				"edit": {
+					"label": "Category",
+					"description": "Which kind of session to show. The category also decides how the row is laid out."
+				},
+				"list": {
+					"label": "Category"
+				}
+			},
+			"count": {
+				"edit": {
+					"label": "How many",
+					"description": "At most ten. The soonest are shown first, and only sessions belonging to this page's event are considered."
+				},
+				"list": {
+					"label": "How many"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "category", "size": 6 },
+					{ "name": "count", "size": 6 }
+				]
+			]
+		}
+	}
+}

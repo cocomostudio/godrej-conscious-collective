@@ -12,12 +12,14 @@
 
 import type {
 	Block,
+	Contributor_Card,
 	Contributor_Entry,
 	Envelope,
 	Event,
 	Link as Link_Attribute,
 	Page_Entry,
 	Page_Shell,
+	Session_Card,
 	Session_Entry,
 } from "../../src/web/cms/envelope.ts"
 
@@ -311,6 +313,86 @@ export function marquee ( ...items: string[] ): Block {
 		// A repeatable component list: no `__component` on its members, which
 		// is what keeps the renderer from walking into it as a region.
 		items: items.map( ( content ) => ( { content, id: id() } ) ),
+	}
+}
+
+/* _____
+ | Listings.
+ |
+ | The rows are what the CMS **spliced in**, not what an editor stored: a
+ | listing leaves the envelope route holding narrowed rows whether an editor
+ | curated it or the event filled it, which is the contract these builders hold.
+ |
+ | So there is one row builder per content type and three component builders
+ | over it, rather than a curated shape and an automatic one.
+ |
+ */
+
+export function session_card (
+	over: Partial<Session_Card> = {},
+): Session_Card {
+	return {
+		age_group: "All",
+		category: "Showcase",
+		contributors: [],
+		cover: null,
+		documentId: `document-${id()}`,
+		name: "A Session",
+		path: "/sessions/a-session",
+		price: null,
+		session_date_first: "2025-12-11",
+		session_date_last: "2025-12-11",
+		standfirst: null,
+		...over,
+	}
+}
+
+export function contributor_card (
+	over: Partial<Contributor_Card> = {},
+): Contributor_Card {
+	return {
+		documentId: `document-${id()}`,
+		image: null,
+		name: "A Collaborator",
+		path: "/collaborators/a-collaborator",
+		role: null,
+		...over,
+	}
+}
+
+export function session_listing (
+	category: string,
+	sessions: Session_Card[],
+	count = sessions.length,
+): Block {
+	return {
+		__component: "list.session-listing-v1",
+		category,
+		count,
+		id: id(),
+		sessions,
+	}
+}
+
+export function session_list ( sessions: Session_Card[] ): Block {
+	return {
+		__component: "list.session-list-v1",
+		id: id(),
+		sessions,
+	}
+}
+
+export function contributor_listing (
+	layout: string,
+	contributors: Contributor_Card[],
+	count = contributors.length,
+): Block {
+	return {
+		__component: "list.contributor-listing-v1",
+		contributors,
+		count,
+		id: id(),
+		layout,
 	}
 }
 

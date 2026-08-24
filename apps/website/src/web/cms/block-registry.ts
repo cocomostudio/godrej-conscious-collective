@@ -19,6 +19,7 @@ import type { ComponentType } from "react"
 
 import { Add_To_Calendar } from "./blocks/add-to-calendar.tsx"
 import { Back_Link } from "./blocks/back-link.tsx"
+import { Contributor_Listing } from "./blocks/contributor-listing.tsx"
 import { Contributor_Profile } from "./blocks/contributor-profile.tsx"
 import { Gallery } from "./blocks/gallery.tsx"
 import { Google_Map } from "./blocks/google-map.tsx"
@@ -46,6 +47,8 @@ import { Root } from "./blocks/root.tsx"
 import { Script } from "./blocks/script.tsx"
 import { Section } from "./blocks/section.tsx"
 import { Session_Details } from "./blocks/session-details.tsx"
+import { Session_List } from "./blocks/session-list.tsx"
+import { Session_Listing } from "./blocks/session-listing.tsx"
 import { Sponsors_List } from "./blocks/sponsors-list.tsx"
 import { Table_Of_Contents } from "./blocks/table-of-contents.tsx"
 import { Vanilla_Carousel } from "./blocks/vanilla-carousel.tsx"
@@ -98,7 +101,10 @@ export const BLOCK_REGISTRY: Record<string, Registered> = {
 	},
 	"container.map-and-content-v1": { Renderer: Map_And_Content },
 	"container.section-v1": { Renderer: Section },
+	"list.contributor-listing-v1": { Renderer: Contributor_Listing },
 	"list.profile-list-v1": { Renderer: Profile_List },
+	"list.session-list-v1": { Renderer: Session_List },
+	"list.session-listing-v1": { Renderer: Session_Listing },
 	"list.sponsors-list-v1": { Renderer: Sponsors_List },
 	"media.gallery-v1": { Renderer: Gallery },
 	"media.google-map-v1": { Renderer: Google_Map },

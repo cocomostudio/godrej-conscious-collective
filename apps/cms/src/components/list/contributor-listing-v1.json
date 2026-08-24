@@ -1,0 +1,77 @@
+{
+	"collectionName": "components_list_contributor_listing_v1",
+	"info": {
+		"displayName": "Collaborator listing",
+		"description": "A group of collaborators. Leave the list empty and it fills itself from the event this page belongs to."
+	},
+	"options": {},
+	"attributes": {
+		"layout": {
+			"type": "enumeration",
+			"enum": [
+				"natural",
+				"carousel",
+				"grid"
+			],
+			"default": "natural",
+			"required": true
+		},
+		"count": {
+			"type": "integer",
+			"required": true,
+			"default": 10,
+			"min": 1,
+			"max": 10
+		},
+		"contributors": {
+			"type": "relation",
+			"relation": "manyToMany",
+			"target": "api::contributor.contributor",
+			"required": false
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"layout": {
+				"edit": {
+					"label": "Layout",
+					"description": "Natural sets them in a plain row. Carousel is the home page's turning ring. Grid fills the width, three across."
+				},
+				"list": {
+					"label": "Layout"
+				}
+			},
+			"count": {
+				"edit": {
+					"label": "How many",
+					"description": "At most ten. It applies only when the list below is left empty."
+				},
+				"list": {
+					"label": "How many"
+				}
+			},
+			"contributors": {
+				"edit": {
+					"label": "Collaborators",
+					"description": "Drag them into the order they should read in. Leave this empty and the listing fills itself from this page's event, up to the number above."
+				},
+				"list": {
+					"label": "Collaborators"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "layout", "size": 6 },
+					{ "name": "count", "size": 6 }
+				],
+				[
+					{ "name": "contributors", "size": 12 }
+				]
+			]
+		}
+	}
+}

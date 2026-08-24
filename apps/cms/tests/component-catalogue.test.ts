@@ -6,7 +6,7 @@
  | The populate object mirrors the schema graph by hand, with no recursion, and
  | when it is wrong the response is not an error — it is a page with content
  | missing below whatever depth the object reached. The catalogue is where that
- | goes wrong at scale: nineteen components in the section list, three of them
+ | goes wrong at scale: twenty-two components in the section list, three of them
  | carrying regions of their own, and every one of them needs a branch by name.
  |
  | So these tests read a real response body and look for the bottom of the tree.

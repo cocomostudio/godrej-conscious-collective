@@ -29,8 +29,12 @@ export async function write_seed_content ( strapi: Strapi ) {
 
 	const events = await write_events( strapi )
 	const page_shells = await write_page_shells( strapi )
-	await write_pages( strapi, page_shells, events )
+	// **Contributors come before pages**, because a page can curate a listing
+	// of them by hand and a curated relation needs something to point at. The
+	// sessions still come last: they are what fills a contributor's `events`,
+	// and a session's own page curates a list of its neighbours.
 	const contributors = await write_contributors( strapi, page_shells )
+	await write_pages( strapi, page_shells, events, contributors )
 	await write_sessions( strapi, page_shells, events, contributors )
 
 	await grant_public_permissions( strapi )
@@ -222,10 +226,6 @@ const REMAINING_ROUTE_TABLE = [
 		title: "Schedule",
 	},
 	{
-		standfirst: "The people taking part this year.",
-		title: "Collaborators",
-	},
-	{
 		standfirst: "How we collect, use and protect your personal data.",
 		title: "Privacy Policy",
 	},
@@ -235,6 +235,7 @@ async function write_pages (
 	strapi: Strapi,
 	page_shells: { archive: any; primary: any },
 	events: { main: any; other: any },
+	contributors: Seeded_Contributors,
 ) {
 	// "Home" resolves to `/home`, and the website falls back to it when `/`
 	// resolves to nothing. `/home` itself redirects permanently to `/`.
@@ -303,6 +304,66 @@ async function write_pages (
 						layout: "images-left",
 					},
 				],
+				register_with_toc: true,
+			} ),
+			// The four category carousels, and the collaborators ring
+			// beneath them. Every one of these holds a category and a count and
+			// no rows at all: the CMS fills them from the event the page
+			// resolves to, when the page is asked for.
+			//
+			// The heading, the opening line and the "View All" link belong to
+			// the **section**, which already carries all three. A listing that
+			// held its own would be a second place for a heading to live.
+			section( "Showcases", {
+				background_gradient: "showcase-to-light",
+				blocks: [ session_listing( "Showcase", 6 ) ],
+				heading: heading_component( "Showcases", "h2" ),
+				link: link( "View All", "/showcases" ),
+				opening_line:
+					"Installations and concept designs, sited across the "
+					+ "grounds for all four days.",
+				register_with_toc: true,
+			} ),
+			section( "Experiences", {
+				background_gradient: "light",
+				blocks: [ session_listing( "Experience", 3 ) ],
+				heading: heading_component( "Experiences", "h2" ),
+				link: link( "View All", "/experiences" ),
+				opening_line:
+					"Things to walk through, touch and take part in.",
+				register_with_toc: true,
+			} ),
+			section( "Conversations", {
+				background_gradient: "conversation-to-light",
+				background_pattern: "spider-web-2",
+				background_position: "bottom-right",
+				blocks: [ session_listing( "Conversation", 5 ) ],
+				heading: heading_component( "Conversations", "h2" ),
+				link: link( "View All", "/conversations" ),
+				opening_line:
+					"Talks and panels with the people making the work.",
+				register_with_toc: true,
+			} ),
+			section( "Workshops", {
+				background_gradient: "light",
+				blocks: [ session_listing( "Workshop", 4 ) ],
+				heading: heading_component( "Workshops", "h2" ),
+				link: link( "View All", "/workshops" ),
+				opening_line: "Hands-on sessions, with places to book.",
+				register_with_toc: true,
+			} ),
+			// Left empty on purpose, so that the home page is the automatic
+			// half of the contributor listing and the About page below is the
+			// curated half.
+			section( "Collaborators", {
+				background_gradient: "collaborator-to-light",
+				background_pattern: "spider-web-3",
+				background_position: "left",
+				blocks: [ contributor_listing( "carousel", 10 ) ],
+				heading: heading_component( "Collaborators", "h2" ),
+				link: link( "View All", "/collaborators" ),
+				opening_line:
+					"The people who made this year\u2019s programme.",
 				register_with_toc: true,
 			} ),
 			section( "Follow our Instagram", {
@@ -482,6 +543,20 @@ async function write_pages (
 				horizontal_rule: true,
 				register_with_toc: true,
 			} ),
+			// The **curated** half of the contributor listing: three people,
+			// named, in an order somebody chose. The home page's is the same
+			// component with the relation left empty.
+			section( "Who is behind it", {
+				blocks: [
+					contributor_listing( "natural", 10, [
+						contributors.arthur,
+						contributors.debasmita,
+						contributors.kaveri,
+					] ),
+				],
+				heading: heading_component( "Who is behind it", "h2" ),
+				register_with_toc: true,
+			} ),
 			// Deliberately not registered with the table of contents, so that
 			// the opt-in is observable rather than assumed.
 			section( "Colophon", {
@@ -515,13 +590,29 @@ async function write_pages (
 		title: "Legal Disclaimer",
 	} )
 
+	// The collaborators page: the grid, filled from the event this page
+	// resolves to. It is the third of the three layouts, and the second of the
+	// two ways a contributor listing is filled.
+	await create_page( strapi, {
+		main_region: [
+			section( "Collaborators", {
+				blocks: [ contributor_listing( "grid", 10 ) ],
+				heading: heading_component( "Collaborators", "h2" ),
+				register_with_toc: true,
+			} ),
+		],
+		page_shell: page_shells.primary.documentId,
+		standfirst: "The people taking part this year.",
+		title: "Collaborators",
+	} )
+
 	// The rest of the route table.
 	//
 	// Every one of these is linked from the page shell's navigation, so
 	// leaving them out would have the site chrome advertising seven URLs that
 	// answer 404. They are thin on purpose: each becomes a real page when the
 	// ticket that owns it arrives — the four category pages and the schedule
-	// get their listings, the collaborators page gets its contributor listing.
+	// get the filtration listings that ticket 09 builds.
 	for ( const { standfirst, title } of REMAINING_ROUTE_TABLE ) {
 		await create_page( strapi, {
 			main_region: [
@@ -553,6 +644,15 @@ async function write_pages (
 				strings: [
 					"The next one is being put together. Dates are set; the programme is not.",
 				],
+			} ),
+			// The same component as the home page's, on a page belonging to
+			// the event that is **not** main. It fills itself from 2027 while
+			// the header above it still advertises 2025 — the resolution rule
+			// and the listing filter, in one page.
+			section( "Showcases in 2027", {
+				blocks: [ session_listing( "Showcase", 10 ) ],
+				heading: heading_component( "Showcases in 2027", "h2" ),
+				register_with_toc: true,
 			} ),
 		],
 		page_shell: page_shells.primary.documentId,
@@ -777,7 +877,7 @@ async function write_sessions (
 	const shell = page_shells.primary.documentId
 	const main = events.main.documentId
 
-	await create_session( strapi, {
+	const living_with_the_land = await create_session( strapi, {
 		all_day_event: true,
 		category: "Showcase",
 		checkout_url: "https://example.com/cc/living-with-the-land",
@@ -841,7 +941,7 @@ async function write_sessions (
 
 	// Free, and still carrying a booking link: the two are independent, because
 	// a free session can need one for capacity.
-	await create_session( strapi, {
+	const block_printing = await create_session( strapi, {
 		age_group: "Children",
 		category: "Workshop",
 		checkout_url: "https://example.com/cc/block-printing",
@@ -872,7 +972,7 @@ async function write_sessions (
 
 	// No price at all, so the website shows none — which is not the same as
 	// showing "Free".
-	await create_session( strapi, {
+	const designing_for_heat = await create_session( strapi, {
 		category: "Conversation",
 		contributors: [ contributors.rahul.documentId ],
 		event: main,
@@ -957,6 +1057,22 @@ async function write_sessions (
 					"Bring one broken thing. Leave with it working, or with a plan.",
 				],
 			} ),
+			// The one **curated** listing in the seed: three sessions an
+			// editor picked, in an order they chose, rather than whatever the
+			// event happens to hold. It is the "you might also like" strip the
+			// design puts at the foot of a session.
+			section( "You might also like", {
+				blocks: [
+					session_list( [
+						designing_for_heat,
+						living_with_the_land,
+						block_printing,
+					] ),
+				],
+				heading: heading_component( "You might also like", "h3" ),
+				horizontal_rule: true,
+				register_with_toc: false,
+			} ),
 		],
 		name: "Repairing What You Own",
 		page_shell: shell,
@@ -983,6 +1099,27 @@ async function write_sessions (
 		name: "Unannounced Showcase",
 		page_shell: shell,
 		published: false,
+	} )
+
+	// A second unpublished session, in the event that is **not** main, so that
+	// draft preview is observable *inside a listing* rather than only on a page
+	// of its own. 2027 holds two published Showcases; asking for its page as a
+	// draft is what makes this one the third.
+	await create_session( strapi, {
+		category: "Showcase",
+		event: events.other.documentId,
+		instances: [ instance( "2027-12-03", "10:00", "18:00" ) ],
+		main_region: [
+			section( "Still Being Written", {
+				heading: heading_component( "Still Being Written", "h2" ),
+				register_with_toc: true,
+				strings: [ "Announced when it is ready." ],
+			} ),
+		],
+		name: "Still Being Written",
+		page_shell: shell,
+		published: false,
+		standfirst: "Announced when it is ready.",
 	} )
 
 	// The rest of the programme. Thin, and deliberately so: what these are for
@@ -1939,6 +2076,45 @@ function google_map (
 				} ),
 			}
 			: {} ),
+	}
+}
+
+/* _____
+ | Listings.
+ |
+ | Three components and, between them, both ways a listing is filled. A session
+ | listing holds a category and a count and nothing else — the CMS fills it from
+ | the page's event when the page is asked for. A session list is curated, and
+ | so is a contributor listing that is given anybody; a contributor listing left
+ | empty fills itself the same way a session listing does.
+ |
+ | Every branch of that is seeded, because the failure this arrangement can have
+ | is a listing that arrives empty, and an empty listing looks exactly like a
+ | listing nobody has filled in yet.
+ |
+ */
+
+function session_listing ( category: string, count: number ) {
+	return { __component: "list.session-listing-v1", category, count }
+}
+
+function session_list ( sessions: any[] ) {
+	return {
+		__component: "list.session-list-v1",
+		sessions: sessions.map( ( session ) => session.documentId ),
+	}
+}
+
+function contributor_listing (
+	layout: "natural" | "carousel" | "grid",
+	count: number,
+	curated: any[] = [],
+) {
+	return {
+		__component: "list.contributor-listing-v1",
+		contributors: curated.map( ( person ) => person.documentId ),
+		count,
+		layout,
 	}
 }
 

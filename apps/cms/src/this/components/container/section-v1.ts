@@ -16,7 +16,10 @@
 import { populate_image_and_content_v1 } from "./image-and-content-v1"
 import { populate_image_stack_and_content_v1 } from "./image-stack-and-content-v1"
 import { populate_map_and_content_v1 } from "./map-and-content-v1"
+import { populate_contributor_listing_v1 } from "../list/contributor-listing-v1"
 import { populate_profile_list_v1 } from "../list/profile-list-v1"
+import { populate_session_list_v1 } from "../list/session-list-v1"
+import { populate_session_listing_v1 } from "../list/session-listing-v1"
 import { populate_sponsors_list_v1 } from "../list/sponsors-list-v1"
 import { populate_gallery_v1 } from "../media/gallery-v1"
 import { populate_google_map_v1 } from "../media/google-map-v1"
@@ -41,7 +44,12 @@ export const SECTION_LIST = {
 		populate: populate_image_stack_and_content_v1,
 	},
 	"container.map-and-content-v1": { populate: populate_map_and_content_v1 },
+	"list.contributor-listing-v1": {
+		populate: populate_contributor_listing_v1,
+	},
 	"list.profile-list-v1": { populate: populate_profile_list_v1 },
+	"list.session-list-v1": { populate: populate_session_list_v1 },
+	"list.session-listing-v1": { populate: populate_session_listing_v1 },
 	"list.sponsors-list-v1": { populate: populate_sponsors_list_v1 },
 	"media.gallery-v1": { populate: populate_gallery_v1 },
 	"media.google-map-v1": { populate: populate_google_map_v1 },

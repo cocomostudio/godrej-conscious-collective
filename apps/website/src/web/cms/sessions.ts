@@ -70,7 +70,18 @@ const CATEGORIES: Record<Category, {
  |
  */
 export function role_of ( session: Session_Entry ): Role {
-	return CATEGORIES[session.category]?.role ?? "theme"
+	return role_of_category( session.category )
+}
+
+/**
+ |
+ | The same answer for a category on its own, which is what a listing card has:
+ | a row from a listing is not an entry, and the four colours belong to the
+ | category rather than to any one session.
+ |
+ */
+export function role_of_category ( category: Category ): Role {
+	return CATEGORIES[category]?.role ?? "theme"
 }
 
 export function back_link_to_category ( session: Session_Entry ) {
@@ -171,9 +182,20 @@ function time_details ( session: Session_Entry ): Detail[] {
 }
 
 function age_group_detail ( session: Session_Entry ): Detail | null {
-	const label = AGE_GROUPS[session.age_group]
+	const label = age_group_label( session.age_group )
 
 	return label ? { icon: "user", label } : null
+}
+
+/**
+ |
+ | Who a session is for, as a visitor reads it. A listing card sets it beside
+ | the price, and the sidebar gives it a row of its own; both say the same
+ | words, from here.
+ |
+ */
+export function age_group_label ( age_group: Age_Group ): string | null {
+	return AGE_GROUPS[age_group] ?? null
 }
 
 /**
@@ -245,22 +267,35 @@ function venue_detail ( session: Session_Entry ): Detail | null {
 const BOOKING = "Buy tickets"
 
 function price_detail ( session: Session_Entry ): Detail | null {
-	const has_a_price = typeof session.price === "number"
+	const label = price_label( session.price )
 	const booking = session.checkout_url
 
-	if ( !has_a_price && !booking ) {
+	if ( label === null && !booking ) {
 		return null
 	}
 
 	return {
 		icon: "ticket",
-		label: has_a_price
-			? ( session.price === 0
-				? "Free"
-				: `${CURRENCY} ${session.price}` )
-			: null,
+		label,
 		link: booking ? { label: BOOKING, url: booking } : null,
 	}
+}
+
+/**
+ |
+ | What a session costs, or null where no price was set at all.
+ |
+ | **Zero reads "Free"; empty says nothing**, and the difference matters in a
+ | listing card exactly as it does in the sidebar — which is why one function
+ | answers for both.
+ |
+ */
+export function price_label ( price: number | null ): string | null {
+	if ( typeof price !== "number" ) {
+		return null
+	}
+
+	return price === 0 ? "Free" : `${CURRENCY} ${price}`
 }
 
 /* _____

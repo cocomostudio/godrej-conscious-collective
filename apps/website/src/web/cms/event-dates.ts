@@ -45,6 +45,32 @@ export type Event_Dates = {
 	end: Event_Day | null
 }
 
+/**
+ |
+ | One bare day, split into the parts a badge sets out separately.
+ |
+ | Same rule as everything else here: a `date` attribute is never parsed into an
+ | instant, because the runtime's own timezone would then sit between the day an
+ | editor typed and the day a visitor reads.
+ |
+ */
+export type Day_Parts = {
+	day: number
+	month: string
+	/** The machine-readable day, for a `<time>` element's `dateTime`. */
+	value: string
+}
+
+export function day_parts (
+	value: string | null | undefined,
+): Day_Parts | null {
+	const parsed = parse( value )
+
+	return parsed
+		? { day: parsed.day, month: MONTHS[parsed.month], value: parsed.raw }
+		: null
+}
+
 export function event_dates ( event: Event | null ): Event_Dates | null {
 	return date_range( event?.date_start, event?.date_end )
 }

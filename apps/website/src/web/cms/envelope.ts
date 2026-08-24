@@ -183,6 +183,61 @@ export type Contributor_Entry = Entry_Common & {
 
 export type Entry = Page_Entry | Session_Entry | Contributor_Entry
 
+/* _____
+ | What a listing hands a card.
+ |
+ | **A block cannot tell a curated listing from an automatic one**, and that is
+ | the whole design. The CMS resolves both — an ordered relation an editor
+ | dragged into shape, or a category and a count filled in from the page's
+ | event — and splices the same narrowed rows into the component's node either
+ | way, so a listing block has one code path.
+ |
+ | Narrow is the point. These are the columns a card draws and nothing else: a
+ | row here is not an entry, and asking it for a region would be asking for
+ | something no listing fetches.
+ |
+ */
+
+export type Session_Card = {
+	documentId: string
+	/**
+	 |
+	 | Where the card links to, from webtools' alias table rather than derived
+	 | from the name — an editor can override any generated URL, and a rule
+	 | here would go stale the moment one did.
+	 |
+	 | Null where a session has no alias at all, and the card renders as
+	 | unlinked text rather than as a link to nowhere.
+	 |
+	 */
+	path: string | null
+	name: string
+	standfirst: string | null
+	category: Category
+	age_group: Age_Group
+	price: number | null
+	/**
+	 |
+	 | A card dates itself from these two and shows no times at all, which is
+	 | why a listing row carries no `all_day_event` and no instances: an hour a
+	 | card never draws is an hour it should not be fetching.
+	 |
+	 */
+	session_date_first: string | null
+	session_date_last: string | null
+	cover: Responsive_Image_Attribute | null
+	/** Names alone — a card reads "by" somebody and draws nothing else. */
+	contributors: { name: string }[]
+}
+
+export type Contributor_Card = {
+	documentId: string
+	path: string | null
+	name: string
+	role: string | null
+	image: Image_Attribute | null
+}
+
 /**
  |
  | One time a session runs. **Both ends are datetimes**, even when the session
