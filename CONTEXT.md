@@ -96,6 +96,32 @@ _Avoid_: "payload", "page response", "page data"
 The content of a Strapi `blocks` field. Rich text is never called "blocks", because "block" already names a node in the render tree.
 _Avoid_: "blocks", "rich content", "WYSIWYG content"
 
+### Listings
+
+**Listing**:
+A component that shows a group of sessions or of contributors. A listing stores no rows of its own: it stores either the identities an editor chose or a description of what to fetch, and the CMS turns whichever it is into rows before answering.
+_Avoid_: "collection", "feed", "carousel" as a name for the data
+
+**Curated**:
+A listing whose entries an editor picked and dragged into order.
+_Avoid_: "manual", "hand-picked", "static"
+
+**Automatic**:
+A listing filled from the resolved event, by category and count, because nobody curated it. Curated and automatic listings are indistinguishable by the time they reach a block, which is the point of both words existing only in the CMS.
+_Avoid_: "auto-populated" in code, "dynamic", "generated"
+
+**Row**:
+One entry a listing pulled, narrowed to the handful of fields the thing that draws it needs, and carrying its own URL. A row is never an entry: asking it for a region is asking for something no listing fetches.
+_Avoid_: "item", "result", "record", "entry" for this meaning
+
+**Card**:
+How a session row is drawn — a picture, a day badge, a name, and a line saying who it is by, who it is for and what it costs.
+_Avoid_: "tile", "session block", "preview"
+
+**Portrait**:
+How a contributor row is drawn — a round picture with a name and a role beneath it.
+_Avoid_: "avatar", "headshot", "collaborator card"
+
 ## How block and component relate
 
 Every component maps to exactly one block. Some blocks map to no component at all, because those blocks are built from an entry's top-level attributes instead. The Masthead on a session page is such a block, and the Masthead draws on the session's `name`, `standfirst` and `cover`.
