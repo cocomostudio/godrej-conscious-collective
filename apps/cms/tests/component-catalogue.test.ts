@@ -119,9 +119,16 @@ describe("a repeatable component list", () => {
 			"list.sponsors-list-v1",
 		)
 
-		expect( sponsors.sponsors.length ).toBe( 3 )
-		expect( sponsors.sponsors[0].name ).toBe( "Laika" )
-		expect( sponsors.sponsors[0].image.url ).toMatch( /^https:\/\// )
+		// Every member, rather than the first one and a count: the claim is
+		// that the populate reaches the picture inside each of them, and a
+		// count would fail the next time somebody adds a logo without telling
+		// anyone anything about whether the populate still reaches.
+		expect( sponsors.sponsors.length ).toBeGreaterThan( 1 )
+
+		for ( const sponsor of sponsors.sponsors ) {
+			expect( sponsor.name ).toBeTruthy()
+			expect( sponsor.image.url ).toMatch( /^https:\/\// )
+		}
 	})
 })
 

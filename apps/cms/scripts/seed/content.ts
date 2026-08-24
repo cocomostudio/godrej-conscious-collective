@@ -239,6 +239,11 @@ async function write_pages (
 ) {
 	// "Home" resolves to `/home`, and the website falls back to it when `/`
 	// resolves to nothing. `/home` itself redirects permanently to `/`.
+	//
+	// One column, because the home page is the one the static site draws
+	// full-width: the category carousels, the ticker, the Instagram strip and
+	// the sponsors all run off both edges, and there is no back link or table
+	// of contents to put in a sidebar.
 	await create_page( strapi, {
 		main_region: [
 			section( "This Year's Theme", {
@@ -400,7 +405,11 @@ async function write_pages (
 				register_with_toc: false,
 			} ),
 		],
+		page_layout: "one-column",
 		page_shell: page_shells.primary.documentId,
+		// Written even though a one-column page renders none of it, so that
+		// switching this page back to two columns shows something in the
+		// sidebar rather than an empty one.
 		side_region: [
 			heading( "Getting here", "h4" ),
 			plain_string( "Godrej One, Vikhroli East, Mumbai." ),
@@ -485,6 +494,34 @@ async function write_pages (
 				horizontal_rule: true,
 				opening_line:
 					"How the Lab supports Conscious Collective, and who is behind it.",
+				register_with_toc: true,
+			} ),
+			// The two media leaves that no composite carries for them: an image
+			// on its own, and a responsive image on its own. Both are in the
+			// catalogue and both were reachable only through a container until
+			// now, so neither had a page to be looked at on.
+			section( "Inside the Lab", {
+				blocks: [
+					image_block( {
+						alt: "The Lab's workshop floor, mid-build",
+						caption:
+							"Photographed on the last afternoon before the 2024 edition opened.",
+						title: "The workshop floor",
+						url: IMAGES.gallery_two,
+					} ),
+					responsive_image_block( {
+						alt: "The courtyard the event is built around",
+						caption:
+							"Cropped tall on a phone, landscape from 1024 pixels and letterboxed from 1440 — the same courtyard, framed for the space it lands in.",
+						large: IMAGES.art_direction_large,
+						medium: IMAGES.art_direction_medium,
+						small: IMAGES.art_direction_small,
+						title: "The courtyard",
+					} ),
+				],
+				heading: heading_component( "Inside the Lab", "h2" ),
+				opening_line:
+					"Where the work is made, and where it is shown.",
 				register_with_toc: true,
 			} ),
 			section( "The Core Team", {
@@ -573,8 +610,9 @@ async function write_pages (
 		title: "About",
 	} )
 
-	// One column: the website renders no sidebar at all for these — no back
-	// link, no table of contents, no side region.
+	// Two columns, stated rather than left to the default, because this is the
+	// page the arrangement is easiest to read off: a short document with a back
+	// link and a table of contents beside it in the sidebar.
 	await create_page( strapi, {
 		main_region: [
 			section( "Legal Disclaimer", {
@@ -584,9 +622,21 @@ async function write_pages (
 					"The contents of this website are for general information only and are subject to change without notice.",
 				],
 			} ),
+			section( "Liability", {
+				heading: heading_component( "Liability", "h2" ),
+				register_with_toc: true,
+				strings: [
+					"Neither Godrej Design Lab nor any of its collaborators accepts liability for any loss arising from reliance on what is published here.",
+					"Where this site links to another, the link is not an endorsement, and what sits at the other end of it is that site's own responsibility.",
+				],
+			} ),
 		],
-		page_layout: "one-column",
+		page_layout: "two-column",
 		page_shell: page_shells.primary.documentId,
+		side_region: [
+			heading( "Questions", "h4" ),
+			plain_string( "Write to hello@godrejdesignlab.example." ),
+		],
 		title: "Legal Disclaimer",
 	} )
 
@@ -898,6 +948,18 @@ async function write_sessions (
 		),
 		main_region: [
 			section( "Living with the Land", {
+				// A standalone image inside a two-column page, where the
+				// About page's pair sit on a wider one: the block is the same
+				// and the width it gets is not.
+				blocks: [
+					image_block( {
+						alt: "A Kondh house, half rebuilt",
+						caption:
+							"Built over three weeks with the Kondh youth who will use it.",
+						title: "The house, part way through",
+						url: IMAGES.stack_one,
+					} ),
+				],
 				heading: heading_component( "Living with the Land", "h2" ),
 				register_with_toc: true,
 				strings: [
@@ -1887,6 +1949,18 @@ async function grant_public_permissions ( strapi: Strapi ) {
  |
  */
 const IMAGES = {
+	// Three crops of one photograph, for the responsive image: tall on a
+	// phone, landscape from the medium breakpoint, and letterboxed from the
+	// large one. Art direction rather than resolution — the same picture,
+	// framed for the shape of the space it lands in. Anything cropped this way
+	// has to be one subject at three widths, which is why all three carry the
+	// same photograph's id and differ only in the box asked for.
+	art_direction_large:
+		"https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1600&h=600&auto=format&fit=crop",
+	art_direction_medium:
+		"https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1024&h=576&auto=format&fit=crop",
+	art_direction_small:
+		"https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=480&h=640&auto=format&fit=crop",
 	gallery_one:
 		"https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=720&auto=format&fit=crop",
 	gallery_two:
@@ -1947,18 +2021,138 @@ const INSTAGRAM_SLIDES = [
 	},
 ]
 
+/**
+ |
+ | The sponsors' logos, taken from the static site's own strip.
+ |
+ | Every one of them is a placeholder brand rather than a real sponsor of this
+ | event, which is the point: the strip is long enough to loop, the logos vary
+ | enough in shape and background to show what the grey-until-pointed-at
+ | treatment does to each, and nobody can mistake the list for a signed-off one.
+ |
+ | The static site's copy carries a per-logo style alongside each url — a blend
+ | mode, and a hairline scale on a few of them to hide an anti-aliasing seam.
+ | Neither travels: the sponsor component holds a name and a picture, the blend
+ | mode belongs to every logo and is applied once in the block, and a per-entry
+ | presentational style is not a thing an editor should be able to set.
+ |
+ */
 const SPONSORS = [
+	{
+		name: "HBO",
+		url: "https://blogadmin.vpsvc.com/hub/wp-content/uploads/sites/14/2016/08/hbo.png",
+	},
+	{
+		name: "LEGO",
+		url: "https://res.cloudinary.com/vistaprint/images/v1753257304/ideas-and-advice-prod/blogadmin/lego-logo_38167ed5cb/lego-logo_38167ed5cb.jpg",
+	},
+	{
+		name: "BBC",
+		url: "https://res.cloudinary.com/vistaprint/images/w_2048,h_560,c_scale/f_auto,q_auto/v1719942384/ideas-and-advice-prod/blogadmin/bbc-logo/bbc-logo.png",
+	},
 	{
 		name: "Laika",
 		url: "https://upload.wikimedia.org/wikipedia/commons/5/58/Laika_logo.svg",
+	},
+	{
+		name: "Adidas",
+		url: "https://res.cloudinary.com/vistaprint/images/f_auto,q_auto/v1705580343/ideas-and-advice-prod/en-us/adidas/adidas.png",
+	},
+	{
+		name: "McDonald's",
+		url: "https://res.cloudinary.com/vistaprint/images/f_auto,q_auto/v1719942371/ideas-and-advice-prod/blogadmin/mc-donald-logo/mc-donald-logo.jpg",
+	},
+	{
+		name: "KFC",
+		url: "https://res.cloudinary.com/vistaprint/images/f_auto,q_auto/v1705580332/ideas-and-advice-prod/en-us/kfc/kfc.png",
+	},
+	{
+		name: "Lacoste",
+		url: "https://res.cloudinary.com/vistaprint/images/w_1024,h_493,c_scale/v1753257357/ideas-and-advice-prod/blogadmin/lacoste-logo/lacoste-logo.jpg",
+	},
+	{
+		name: "Burger Kings",
+		url: "https://res.cloudinary.com/vistaprint/images/f_auto,q_auto/v1705580319/ideas-and-advice-prod/en-us/burger-king/burger-king.png",
+	},
+	{
+		name: "Starbucks",
+		url: "https://res.cloudinary.com/vistaprint/images/f_auto,q_auto/v1705580310/ideas-and-advice-prod/en-us/starbucks_142223edc2a/starbucks_142223edc2a.png",
+	},
+	{
+		name: "Harley-Davidson",
+		url: "https://res.cloudinary.com/vistaprint/images/f_auto,q_auto/v1705580316/ideas-and-advice-prod/en-us/harley_14220823ac2/harley_14220823ac2.png",
+	},
+	{
+		name: "Visa",
+		url: "https://res.cloudinary.com/vistaprint/images/f_auto,q_auto/v1705580321/ideas-and-advice-prod/en-us/visa/visa.png",
+	},
+	{
+		name: "Coca Cola",
+		url: "https://res.cloudinary.com/vistaprint/images/f_auto,q_auto/v1706089184/ideas-and-advice-prod/en-us/Coca-Cola_logo.svg_/Coca-Cola_logo.svg_.png",
+	},
+	{
+		name: "Google",
+		url: "https://res.cloudinary.com/vistaprint/images/w_1024,h_347,c_scale/v1753257211/ideas-and-advice-prod/blogadmin/google-logo/google-logo.jpg",
+	},
+	{
+		name: "Twitter",
+		url: "https://res.cloudinary.com/vistaprint/images/f_auto,q_auto/v1705580322/ideas-and-advice-prod/en-us/twitter/twitter.png",
+	},
+	{
+		name: "Chanel",
+		url: "https://res.cloudinary.com/vistaprint/images/f_auto,q_auto/v1719942393/ideas-and-advice-prod/blogadmin/logo-chanel/logo-chanel.png",
+	},
+	{
+		name: "Harvard",
+		url: "https://res.cloudinary.com/vistaprint/images/f_auto,q_auto/v1705580314/ideas-and-advice-prod/en-us/harvard/harvard.png",
+	},
+	{
+		name: "Shell",
+		url: "https://res.cloudinary.com/vistaprint/images/f_auto,q_auto/v1719942431/ideas-and-advice-prod/blogadmin/shell-logo/shell-logo.png",
 	},
 	{
 		name: "NASA",
 		url: "https://upload.wikimedia.org/wikipedia/commons/e/e5/NASA_logo.svg",
 	},
 	{
-		name: "Godrej Design Lab",
-		url: "https://media.cocomo.199101991.xyz/2025/godrej-design-lab/cc-2024__01.png",
+		name: "London Underground",
+		url: "https://res.cloudinary.com/vistaprint/images/f_auto,q_auto/v1719942421/ideas-and-advice-prod/blogadmin/underground-logo/underground-logo.png",
+	},
+	{
+		name: "PlayStation",
+		url: "https://res.cloudinary.com/vistaprint/images/w_2048,h_1559,c_scale/f_auto,q_auto/v1719942436/ideas-and-advice-prod/blogadmin/playstation-logo/playstation-logo.png",
+	},
+	{
+		name: "Barbie",
+		url: "https://res.cloudinary.com/vistaprint/images/w_2048,h_1014,c_scale/f_auto,q_auto/v1719942380/ideas-and-advice-prod/blogadmin/barbie-logo/barbie-logo.png",
+	},
+	{
+		name: "National Geographic",
+		url: "https://res.cloudinary.com/vistaprint/images/f_auto,q_auto/v1719942404/ideas-and-advice-prod/blogadmin/national-geographic-logo/national-geographic-logo.png",
+	},
+	{
+		name: "Federal Express",
+		url: "https://res.cloudinary.com/vistaprint/images/w_2048,h_573,c_scale/f_auto,q_auto/v1719942389/ideas-and-advice-prod/blogadmin/fedex-logo/fedex-logo.png",
+	},
+	{
+		name: "Mastercard",
+		url: "https://res.cloudinary.com/vistaprint/images/f_auto,q_auto/v1719961008/ideas-and-advice-prod/blogadmin/mastercard-logo-1/mastercard-logo-1.png",
+	},
+	{
+		name: "Formula 1",
+		url: "https://res.cloudinary.com/vistaprint/images/f_auto,q_auto/v1719942441/ideas-and-advice-prod/blogadmin/formula-uno-modern-logo/formula-uno-modern-logo.png",
+	},
+	{
+		name: "MTV",
+		url: "https://res.cloudinary.com/vistaprint/images/f_auto,q_auto/v1719942401/ideas-and-advice-prod/blogadmin/mtv-logo/mtv-logo.png",
+	},
+	{
+		name: "Uniqlo",
+		url: "https://res.cloudinary.com/vistaprint/images/f_auto,q_auto/v1706192386/ideas-and-advice-prod/blogadmin/Screenshot-2024-01-25-at-15.19.29/Screenshot-2024-01-25-at-15.19.29.png",
+	},
+	{
+		name: "Vans",
+		url: "https://res.cloudinary.com/vistaprint/images/w_1024,h_414,c_scale/v1753257351/ideas-and-advice-prod/blogadmin/vans-logo/vans-logo.jpg",
 	},
 ]
 
@@ -2012,6 +2206,54 @@ function image ( { alt = "", caption, title, url }: Image_Fields ) {
  */
 function responsive_image ( fields: Image_Fields ) {
 	return { small: image( fields ) }
+}
+
+/**
+ |
+ | The other shape a responsive image comes in: a different crop at each of the
+ | three widths.
+ |
+ | The exception rather than the rule, and seeded once, because a responsive
+ | image with one crop and a responsive image with three go down different
+ | branches of the website's fallback — and a component only ever seeded with
+ | one crop would leave the branch that art direction exists for untested.
+ |
+ | The words belong to the picture rather than to the crop, so all three carry
+ | the same ones. The website reads them off the small crop, which is the one it
+ | never hides.
+ |
+ */
+function art_directed_image (
+	{ alt, caption, large, medium, small, title }:
+		& Omit<Image_Fields, "url">
+		& { small: string; medium: string; large: string },
+) {
+	const words = { alt, caption, title }
+
+	return {
+		large: image( { ...words, url: large } ),
+		medium: image( { ...words, url: medium } ),
+		small: image( { ...words, url: small } ),
+	}
+}
+
+/**
+ |
+ | The image component as a block in its own right, rather than as an attribute
+ | of a composite.
+ |
+ */
+function image_block ( fields: Image_Fields ) {
+	return { __component: "media.image-v1", ...image( fields ) }
+}
+
+function responsive_image_block (
+	fields: Parameters<typeof art_directed_image>[0],
+) {
+	return {
+		__component: "media.responsive-image-v1",
+		...art_directed_image( fields ),
+	}
 }
 
 function image_link ( url: string, label: string, image_url: string ) {

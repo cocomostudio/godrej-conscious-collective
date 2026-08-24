@@ -184,11 +184,22 @@ describe("sanitisation", () => {
 
 describe("page layout", () => {
 	it("carries the layout the editor chose", async () => {
+		// The home page is the one-column page in the sample content: it is
+		// the one the design draws full-width, and it has no back link or
+		// table of contents to put in a sidebar.
 		const two = await cms.get( "/api/envelope?path=/about" )
-		const one = await cms.get( "/api/envelope?path=/legal-disclaimer" )
+		const one = await cms.get( "/api/envelope?path=/home" )
 
 		expect( two.body.data.entry.page_layout ).toBe( "two-column" )
 		expect( one.body.data.entry.page_layout ).toBe( "one-column" )
+	})
+
+	it("carries the layout an editor chose explicitly, not only the default", async () => {
+		const { body } = await cms.get(
+			"/api/envelope?path=/legal-disclaimer",
+		)
+
+		expect( body.data.entry.page_layout ).toBe( "two-column" )
 	})
 })
 
