@@ -77,20 +77,24 @@ describe("a session's envelope", () => {
 		const { body } = await cms.get( SHOWCASE )
 		const sections = body.data.entry.main_region
 
+		// The showcase takes template A of the round-robin sample content:
+		// two sections, a heading and an opening line, prose, a gallery and
+		// a quote — exercising a leaf two levels down.
 		expect( sections.length ).toBe( 2 )
 		expect( sections[0].__component ).toBe( "container.section-v1" )
-		expect( sections[0].heading.content ).toBe( "Living with the Land" )
+		expect( sections[0].heading.content ).toBe( "About the Work" )
 		expect( sections[0].content[0].__component ).toBe(
 			"text.plain-string-v1",
 		)
 
 		// A leaf two levels down, with its own component attributes populated.
-		const gallery = sections[1].content.find( ( block ) =>
+		const gallery = sections[0].content.find( ( block ) =>
 			block.__component === "media.gallery-v1"
 		)
 
 		expect( gallery.images.length ).toBe( 2 )
-		expect( gallery.images[0].title ).toBe( "Living with the Land" )
+		expect( gallery.layout ).toBe( "equal" )
+		expect( gallery.images[0].url ).toMatch( /^https?:\/\// )
 	})
 
 	it("resolves to the session's own event, not the main one", async () => {

@@ -1112,6 +1112,18 @@ async function write_sessions (
 	const shell = page_shells.primary.documentId
 	const main = events.main.documentId
 
+	// A running counter so the round-robin template is dealt in creation
+	// order. Every session that follows takes the next slot in the ring.
+	let template_position = 0
+
+	const next_template = () => {
+		const region = sample_content_templates[
+			template_position % sample_content_templates.length
+		]()
+		template_position += 1
+		return region
+	}
+
 	const living_with_the_land = await create_session( strapi, {
 		all_day_event: true,
 		category: "Showcase",
@@ -1128,51 +1140,7 @@ async function write_sessions (
 			"09:00",
 			"22:00",
 		),
-		main_region: [
-			section( "Living with the Land", {
-				// A standalone image inside a two-column page, where the
-				// About page's pair sit on a wider one: the block is the same
-				// and the width it gets is not.
-				blocks: [
-					image_block( {
-						alt: "A Kondh house, half rebuilt",
-						caption:
-							"Built over three weeks with the Kondh youth who will use it.",
-						title: "The house, part way through",
-						url: IMAGES.stack_one,
-					} ),
-				],
-				heading: heading_component( "Living with the Land", "h2" ),
-				register_with_toc: true,
-				strings: [
-					"Debasmita Ghosh’s installation stems from months spent working closely with the Kondh community in Odisha’s Rayagada district.",
-					"Through hands-on workshops with Kondh youth, Debasmita explores the push and pull between age-old practices and modern dreams.",
-				],
-			} ),
-			section( "About Sustaina India", {
-				blocks: [
-					gallery( "equal", [
-						{
-							alt: "",
-							caption:
-								"Debasmita explores the push and pull between age-old practices and modern dreams.",
-							title: "Living with the Land",
-							url: IMAGES.gallery_one,
-						},
-						{
-							alt: "",
-							caption:
-								"Native cotton, and the people who still grow it.",
-							title: "Reweaving the Ecosystem",
-							url: IMAGES.gallery_two,
-						},
-					] ),
-				],
-				heading: heading_component( "About Sustaina India", "h2" ),
-				horizontal_rule: true,
-				register_with_toc: true,
-			} ),
-		],
+		main_region: next_template(),
 		name: "Living with the Land",
 		page_shell: shell,
 		price: 1599,
@@ -1196,18 +1164,7 @@ async function write_sessions (
 			instance( "2025-12-12", "10:00", "12:30" ),
 			instance( "2025-12-12", "14:00", "16:30" ),
 		],
-		main_region: [
-			section( "Block Printing with Native Cotton", {
-				heading: heading_component(
-					"What you will make",
-					"h2",
-				),
-				register_with_toc: true,
-				strings: [
-					"Two hours at the table with a set of hand-cut blocks and a length of organic khadi to take home.",
-				],
-			} ),
-		],
+		main_region: next_template(),
 		name: "Block Printing with Native Cotton",
 		page_shell: shell,
 		price: 0,
@@ -1223,15 +1180,7 @@ async function write_sessions (
 		cover: COVERS_BY_NAME.designing_for_heat,
 		event: main,
 		instances: [ instance( "2025-12-13", "17:00", "18:30" ) ],
-		main_region: [
-			section( "Designing for Heat", {
-				heading: heading_component( "Designing for Heat", "h2" ),
-				register_with_toc: true,
-				strings: [
-					"Three practitioners on what a heat-resilient city asks of the people who draw it.",
-				],
-			} ),
-		],
+		main_region: next_template(),
 		name: "Designing for Heat",
 		page_shell: shell,
 		standfirst: "A panel on what a heat-resilient city asks of design.",
@@ -1252,15 +1201,7 @@ async function write_sessions (
 			"11:00",
 			"19:00",
 		),
-		main_region: [
-			section( "The Cooling Pergola", {
-				heading: heading_component( "The Cooling Pergola", "h2" ),
-				register_with_toc: true,
-				strings: [
-					"Walk under twelve metres of woven bamboo and feel the temperature drop.",
-				],
-			} ),
-		],
+		main_region: next_template(),
 		name: "The Cooling Pergola",
 		page_shell: shell,
 		price: 250,
@@ -1275,15 +1216,7 @@ async function write_sessions (
 		cover: COVERS_BY_NAME.notes_for_2027,
 		event: events.other.documentId,
 		instances: [ instance( "2027-12-03", "16:00", "17:00" ) ],
-		main_region: [
-			section( "Notes for 2027", {
-				heading: heading_component( "Notes for 2027", "h2" ),
-				register_with_toc: true,
-				strings: [
-					"An early look at what comes after this one.",
-				],
-			} ),
-		],
+		main_region: next_template(),
 		name: "Notes for 2027",
 		page_shell: shell,
 		standfirst: "The first thing announced for what comes next.",
@@ -1296,16 +1229,7 @@ async function write_sessions (
 		cover: COVERS_BY_NAME.repairing_what_you_own,
 		instances: [ instance( "2025-12-13", "10:00", "11:30" ) ],
 		main_region: [
-			section( "Repairing What You Own", {
-				heading: heading_component(
-					"Repairing What You Own",
-					"h2",
-				),
-				register_with_toc: true,
-				strings: [
-					"Bring one broken thing. Leave with it working, or with a plan.",
-				],
-			} ),
+			...next_template(),
 			// The one **curated** listing in the seed: three sessions an
 			// editor picked, in an order they chose, rather than whatever the
 			// event happens to hold. It is the "you might also like" strip the
@@ -1339,13 +1263,7 @@ async function write_sessions (
 		cover: COVERS_BY_NAME.unannounced,
 		event: main,
 		instances: [ instance( "2025-12-13", "12:00", "13:00" ) ],
-		main_region: [
-			section( "Unannounced", {
-				heading: heading_component( "Unannounced", "h2" ),
-				register_with_toc: true,
-				strings: [ "This session has never been published." ],
-			} ),
-		],
+		main_region: next_template(),
 		name: "Unannounced Showcase",
 		page_shell: shell,
 		published: false,
@@ -1360,13 +1278,7 @@ async function write_sessions (
 		cover: COVERS_BY_NAME.still_being_written,
 		event: events.other.documentId,
 		instances: [ instance( "2027-12-03", "10:00", "18:00" ) ],
-		main_region: [
-			section( "Still Being Written", {
-				heading: heading_component( "Still Being Written", "h2" ),
-				register_with_toc: true,
-				strings: [ "Announced when it is ready." ],
-			} ),
-		],
+		main_region: next_template(),
 		name: "Still Being Written",
 		page_shell: shell,
 		published: false,
@@ -1394,13 +1306,7 @@ async function write_sessions (
 			instances: [
 				instance( filler.day, filler.from, filler.to ),
 			],
-			main_region: [
-				section( filler.name, {
-					heading: heading_component( filler.name, "h2" ),
-					register_with_toc: true,
-					strings: [ filler.standfirst ],
-				} ),
-			],
+			main_region: next_template(),
 			name: filler.name,
 			page_shell: shell,
 			price: filler.price,
@@ -2757,6 +2663,182 @@ function contributor_listing (
 		layout,
 	}
 }
+
+function vanilla_carousel ( slides: typeof INSTAGRAM_SLIDES ) {
+	return {
+		__component: "media.vanilla-carousel-v1",
+		slides: slides.map( ( slide ) =>
+			image_link( slide.url, slide.label, slide.image )
+		),
+	}
+}
+
+/**
+ |
+ | The five sample content templates round-robin-assigned to every session.
+ |
+ | Each returns a fresh main-region array — a function rather than a value,
+ | so that Strapi never sees the same object twice and edits to one entry
+ | cannot leak into another.
+ |
+ | Between them the five cover the catalogue's blocks a session commonly
+ | wants: plain strings and wysiwyg for prose, gallery in both layouts,
+ | image blocks, the image-and-content composite, quote, horizontal rule
+ | and the vanilla carousel. The order and the mix vary: a session's page
+ | that follows a different template reads visibly different from its
+ | neighbours.
+ |
+ */
+const sample_content_templates: Array<() => any[]> = [
+	// A: Story-led — prose, then an equal-layout gallery, then a quote.
+	() => [
+		section( "About the Work", {
+			heading: heading_component( "About the Work", "h2" ),
+			opening_line:
+				"The making, the material and the reasons behind it.",
+			register_with_toc: true,
+			strings: [
+				"This piece began in conversation — long, unhurried and often circling back to the same three questions. What is worth keeping? What must change? What can be built with the little that is left?",
+				"Every element on show is an answer to one of those questions, offered by the people whose lives sit closest to it.",
+			],
+			blocks: [
+				gallery( "equal", [
+					{
+						alt: "",
+						caption: "The studio on the first morning of the build.",
+						title: "Day one in the studio",
+						url: IMAGES.gallery_one,
+					},
+					{
+						alt: "",
+						caption: "A dry run, the day before the doors opened.",
+						title: "Opening rehearsal",
+						url: IMAGES.gallery_two,
+					},
+				] ),
+			],
+		} ),
+		section( "In Their Words", {
+			heading: heading_component( "In Their Words", "h2" ),
+			register_with_toc: true,
+			blocks: [
+				quote(
+					"Materials remember. That is why we chose the ones we chose, and left the ones we left.",
+					"The lead maker, in interview",
+				),
+			],
+		} ),
+	],
+
+	// B: Programme + a vanilla carousel from the studio.
+	() => [
+		section( "What Happens", {
+			heading: heading_component( "What Happens", "h2" ),
+			opening_line: "The shape of the session, from arrival to close.",
+			register_with_toc: true,
+			strings: [
+				"The doors open twenty minutes before the start. Anything you need is at the desk on the way in, and there is somewhere to leave a bag if you have one.",
+				"Please stay for the last ten minutes — that is where the questions land, and where the parts you missed most often come back around.",
+			],
+		} ),
+		section( "Moments From the Studio", {
+			heading: heading_component( "Moments From the Studio", "h2" ),
+			register_with_toc: true,
+			blocks: [
+				vanilla_carousel( INSTAGRAM_SLIDES.slice( 0, 4 ) ),
+			],
+		} ),
+	],
+
+	// C: Editorial with an image-and-content composite.
+	() => [
+		section( "Behind the Making", {
+			heading: heading_component( "Behind the Making", "h2" ),
+			opening_line: "The people, the place, and what led here.",
+			register_with_toc: true,
+			blocks: [
+				{
+					__component: "container.image-and-content-v1",
+					content: [
+						heading( "On method", "h3" ),
+						wysiwyg( [
+							"The method is old, the questions it is being asked are new. That is the whole shape of the work on show.",
+							"This section walks through both, side by side, so that a visitor can see where the technique leaves off and where the questions begin.",
+						] ),
+						plain_string(
+							"The result is a piece that fits its site without asking anything of it.",
+						),
+					],
+					image: image( {
+						alt: "The maker at work, mid-build",
+						caption:
+							"Photographed the week before the opening, on a day the light was kind.",
+						title: "In the studio",
+						url: IMAGES.stack_two,
+					} ),
+					layout: "image-left",
+				},
+			],
+		} ),
+	],
+
+	// D: Deep-dive read with a wide-first gallery.
+	() => [
+		section( "A Longer Read", {
+			heading: heading_component( "A Longer Read", "h2" ),
+			opening_line:
+				"The context you might want before you come, or after you leave.",
+			register_with_toc: true,
+			blocks: [
+				wysiwyg( [
+					"The work sits inside a longer conversation about what we owe the places we build in, and to whom the answer is finally addressed.",
+					"That conversation started elsewhere, and it will carry on after this event is over. What you see here is one participant's contribution to it — offered in the hope that a good question can be asked twice, in two different rooms, without either room agreeing on the answer.",
+					"The reading below is what the makers were working from while the piece took shape. It is offered as a way in, not as required reading.",
+				] ),
+			],
+		} ),
+		section( "Sightlines", {
+			heading: heading_component( "Sightlines", "h2" ),
+			register_with_toc: true,
+			blocks: [
+				gallery( "wide-first", [
+					{
+						alt: "",
+						caption: "The view walking in from the west entrance.",
+						title: "The approach",
+						url: IMAGES.stack_one,
+					},
+					{
+						alt: "",
+						caption: "Looking back from the far end of the piece.",
+						title: "Looking back",
+						url: IMAGES.stack_three,
+					},
+				] ),
+			],
+		} ),
+	],
+
+	// E: Practicalities + a wider vanilla carousel.
+	() => [
+		section( "Practicalities", {
+			heading: heading_component( "Practicalities", "h2" ),
+			horizontal_rule: true,
+			register_with_toc: true,
+			strings: [
+				"There is nothing to book beyond the ticket, and nothing to bring.",
+				"If you have accessibility needs, please write to the event team ahead of your visit — the access team can arrange most things given a day's notice.",
+			],
+		} ),
+		section( "Visual Journey", {
+			heading: heading_component( "Visual Journey", "h2" ),
+			register_with_toc: true,
+			blocks: [
+				vanilla_carousel( INSTAGRAM_SLIDES ),
+			],
+		} ),
+	],
+]
 
 function link (
 	label: string,
