@@ -261,12 +261,9 @@ async function write_page_shells ( strapi: Strapi ) {
 				default: true,
 				name: "Primary",
 				navigation_footer: [
+					link( "godrejenterprises.com", "https://godrejenterprises.com/" ),
 					link( "Privacy Policy", "/privacy-policy" ),
 					link( "Legal Disclaimer", "/legal-disclaimer" ),
-					link(
-						"Contact",
-						"mailto:hello@consciouscollective.in",
-					),
 				],
 				navigation_header: [
 					link( "Showcases", "/showcases" ),
