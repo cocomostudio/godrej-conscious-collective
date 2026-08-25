@@ -285,7 +285,7 @@ function Day_Navigation (
 
 	return <nav
 		aria-label="Days"
-		className="sticky max-md:top-[var(--schedule-header-height,0px)] md:top-0 mt-2 md:order-first md:mt-0 after:absolute after:-bottom-0.25 after:w-full after:h-0.75 after:content-[''] after:bg-context after:origin-left after:scale-x-[--scale-x] after:transition-transform"
+		className="sticky max-md:top-[var(--schedule-header-height,0px)] md:top-0 -mx-1ccm md:-mx-16 md:order-first md:mt-0 md:mb-8 after:absolute after:-bottom-0.25 after:w-full after:h-0.75 after:content-[''] after:bg-context after:origin-left after:scale-x-[--scale-x] after:transition-transform"
 		ref={ ref }
 		style={ { "--scale-x": "0" } as React.CSSProperties }>
 		{
