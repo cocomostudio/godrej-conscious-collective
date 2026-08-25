@@ -120,10 +120,11 @@ export function quote (
 	}
 }
 
-export function marquee ( items: string[] ) {
+export function marquee ( items: string[], spacing_around?: string ) {
 	return {
 		__component: "text.marquee-v1",
 		items: items.map( ( content ) => ( { content } ) ),
+		...( spacing_around ? { spacing_around } : {} ),
 	}
 }
 
@@ -239,6 +240,7 @@ export function section (
 		link: section_link,
 		opening_line,
 		register_with_toc = false,
+		spacing_around,
 		strings = [] as string[],
 	}: {
 		background_gradient?: string
@@ -251,6 +253,7 @@ export function section (
 		link?: ReturnType<typeof link>
 		opening_line?: string
 		register_with_toc?: boolean
+		spacing_around?: string
 		strings?: string[]
 	},
 ) {
@@ -268,6 +271,7 @@ export function section (
 		...( background_position ? { background_position } : {} ),
 		...( horizontal_rule === undefined ? {} : { horizontal_rule } ),
 		...( opening_line ? { opening_line } : {} ),
+		...( spacing_around ? { spacing_around } : {} ),
 		register_with_toc,
 		title,
 	}

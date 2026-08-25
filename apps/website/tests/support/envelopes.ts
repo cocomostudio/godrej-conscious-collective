@@ -195,6 +195,7 @@ export function section (
 		link,
 		opening_line,
 		register_with_toc = false,
+		spacing_around,
 	}: {
 		background_gradient?: string
 		background_pattern?: string
@@ -211,6 +212,7 @@ export function section (
 		link?: Link_Attribute | null
 		opening_line?: string
 		register_with_toc?: boolean
+		spacing_around?: string
 	} = {},
 ): Block {
 	return {
@@ -225,6 +227,7 @@ export function section (
 		link,
 		opening_line,
 		register_with_toc,
+		spacing_around,
 		title,
 	}
 }
@@ -268,6 +271,22 @@ export function responsive_image_block ( url: string ): Block {
 		id: id(),
 		...responsive_image( url ),
 	}
+}
+
+/**
+ |
+ | The same block, with an editor's `spacing_around` on it.
+ |
+ | Every component that carries the attribute takes one builder over all of
+ | them rather than a spacing argument each — it is one scalar and it means the
+ | same thing wherever it sits.
+ |
+ */
+export function spaced (
+	block: Block,
+	spacing_around: string | null,
+): Block {
+	return { ...block, spacing_around }
 }
 
 export function image_link (

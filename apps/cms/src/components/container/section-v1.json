@@ -76,6 +76,17 @@
 			"default": false,
 			"required": true
 		},
+		"spacing_around": {
+			"type": "enumeration",
+			"enum": [
+				"normal",
+				"none",
+				"above",
+				"below"
+			],
+			"default": "normal",
+			"required": true
+		},
 		"content": {
 			"type": "dynamiczone",
 			"components": [
@@ -191,6 +202,15 @@
 					"label": "Rule above?"
 				}
 			},
+			"spacing_around": {
+				"edit": {
+					"label": "Spacing around",
+					"description": "The padding this section lays down above and below itself. \"normal\" lays it down on both sides, \"above\" and \"below\" on one side only, \"none\" on neither. A block sitting at the section’s edge can decline it too — the space goes if either of them says so."
+				},
+				"list": {
+					"label": "Spacing around"
+				}
+			},
 			"content": {
 				"edit": {
 					"label": "Content",
@@ -222,7 +242,8 @@
 					{ "name": "background_position", "size": 4 }
 				],
 				[
-					{ "name": "horizontal_rule", "size": 4 }
+					{ "name": "horizontal_rule", "size": 4 },
+					{ "name": "spacing_around", "size": 4 }
 				],
 				[
 					{ "name": "content", "size": 12 }

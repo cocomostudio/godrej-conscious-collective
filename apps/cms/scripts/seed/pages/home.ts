@@ -69,13 +69,18 @@ export async function write_home_page (
 			// sponsors are the home page's own furniture in the static site.
 			// They are seeded here so that every one of them has a page to be
 			// looked at on.
+			//
+			// The ticker asks for no spacing at either edge — the black bar
+			// butts straight against what sits above and below it. Said here
+			// rather than built into the block, so a ticker that does want
+			// air can have it.
 			section( "Practicalities", {
 				blocks: [
 					marquee( [
 						"Plant 13, Godrej Enterprises Group, Pirojshanagar, Vikhroli, Mumbai 400079",
 						"11 - 13 Dec 2025",
 						"9:00 AM - 10:00 PM",
-					] ),
+					], "none" ),
 				],
 				register_with_toc: false,
 			} ),

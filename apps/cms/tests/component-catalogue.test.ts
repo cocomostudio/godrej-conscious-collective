@@ -94,6 +94,33 @@ describe("the deepest legal path in the render tree", () => {
 	})
 })
 
+describe("spacing around a block", () => {
+	it("travels with the block that carries it", async () => {
+		const { body } = await cms.get( "/api/envelope?path=/home" )
+
+		const marquee = find_block(
+			body.data.entry.main_region,
+			"text.marquee-v1",
+		)
+
+		// A scalar on the component, not a rule the website infers from what
+		// kind of block this is. The home page's ticker asks for none, which
+		// is what has it butting against its neighbours.
+		expect( marquee.spacing_around ).toBe( "none" )
+	})
+
+	it("is what the schedule page's list uses to open flush", async () => {
+		const { body } = await cms.get( "/api/envelope?path=/schedule" )
+
+		const list = find_block(
+			body.data.entry.main_region,
+			"list.session-schedule-list-v1",
+		)
+
+		expect( list.spacing_around ).toBe( "below" )
+	})
+})
+
 describe("a repeatable component list", () => {
 	it("arrives as raw data, with no discriminator to mistake for a region", async () => {
 		const { body } = await cms.get( "/api/envelope?path=/home" )

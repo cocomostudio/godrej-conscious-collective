@@ -171,10 +171,15 @@ export async function write_pages (
 	// The note under the title is the static site's own, and it is the page's
 	// standfirst rather than a block, because it is a caveat about the page
 	// rather than about anything in it.
+	//
+	// The list asks for spacing below itself and none above: it opens the page,
+	// and its own sticky headers are what a visitor should meet at the top
+	// edge. That declines the section's top padding as well as the block's own
+	// margin — see `pads_at_top` on the website.
 	await create_entry( strapi, "api::page.page", {
 		main_region: [
 			section( "The schedule", {
-				blocks: [ session_schedule_list() ],
+				blocks: [ session_schedule_list( "below" ) ],
 			} ),
 		],
 		page_shell: page_shells.primary.documentId,

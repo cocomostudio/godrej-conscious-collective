@@ -41,7 +41,9 @@ import type {
 } from "../envelope.ts"
 import type { Schedule_Entry } from "./schedule-entries.ts"
 
-import { BLOCK_SPACING } from "./block-spacing.ts"
+import type { Spacing_Around } from "./block-spacing.ts"
+
+import { block_spacing } from "./block-spacing.ts"
 import { ROLE_TEXT } from "../context-colours.ts"
 import {
 	day_anchor,
@@ -89,6 +91,14 @@ type Session_Schedule_List_Props = {
 	sessions?: Session_Schedule_Row[]
 	/**
 	 |
+	 | The gap this block leaves above and below itself. The schedule page sets
+	 | it to "below": the list opens the page and its own sticky headers are
+	 | what a visitor should meet at the top edge, with nothing above them.
+	 |
+	 */
+	spacing_around?: Spacing_Around
+	/**
+	 |
 	 | The resolved event's schedule document, spliced onto this node by the
 	 | CMS. Null where the event has none, and the download link is not drawn
 	 | at all — a link to a document nobody uploaded is worse than no link.
@@ -98,9 +108,10 @@ type Session_Schedule_List_Props = {
 }
 
 export function Session_Schedule_List (
-	{ schedule = null, sessions = [] }: Session_Schedule_List_Props,
+	{ schedule = null, sessions = [], spacing_around }:
+		Session_Schedule_List_Props,
 ) {
-	return <div className={ BLOCK_SPACING }>
+	return <div className={ block_spacing( spacing_around ) }>
 		<Sessions sessions={ sessions }>
 			<Schedule schedule={ schedule } />
 		</Sessions>

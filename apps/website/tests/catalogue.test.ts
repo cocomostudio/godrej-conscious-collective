@@ -46,6 +46,7 @@ import {
 	responsive_image_block,
 	script,
 	section,
+	spaced,
 	sponsors_list,
 	vanilla_carousel,
 	wysiwyg,
@@ -193,6 +194,45 @@ beforeAll( async () => {
 				} ),
 			],
 			title: "Mapped",
+		} ),
+
+		// One block per section, so each section's own padding is decided by
+		// that one block at both of its edges.
+		"/spacing": envelope( {
+			main_region: [
+				section( "Normal", {
+					content: [ marquee( "Spaced both ways" ) ],
+				} ),
+				section( "Flush", {
+					content: [
+						spaced( marquee( "Flush both ways" ), "none" ),
+					],
+				} ),
+				section( "Below only", {
+					content: [
+						spaced( marquee( "Space below only" ), "below" ),
+					],
+				} ),
+				section( "Headed", {
+					content: [
+						spaced(
+							marquee( "Flush, under a heading" ),
+							"none",
+						),
+					],
+					heading: { content: "Words at the top", level: "h2" },
+				} ),
+				// What every entry saved before the attribute existed looks
+				// like: the column is there and nobody has written to it.
+				section( "Never set", {
+					content: [ spaced( marquee( "Saved before" ), null ) ],
+				} ),
+				section( "The section's own say", {
+					content: [ plain_string( "In a section that pads." ) ],
+					spacing_around: "above",
+				} ),
+			],
+			title: "Spacing",
 		} ),
 
 		"/injected": envelope( {
@@ -351,6 +391,66 @@ describe("a section", () => {
 	})
 })
 
+describe("spacing around a block", () => {
+	it("pads a section at both edges when nothing declines it", async () => {
+		const [ normal ] = await section_frames( "/spacing" )
+
+		expect( normal.padding ).toContain( "pt-6" )
+		expect( normal.padding ).toContain( "pb-6" )
+	})
+
+	it("lays down no padding at all where the block asked for none", async () => {
+		const [ , flush ] = await section_frames( "/spacing" )
+
+		// Not undone from inside the block — a negative margin on a child is
+		// clamped at the padding box — but never laid down.
+		expect( flush.padding ).not.toMatch( /\bp[tb]-/ )
+		expect( flush.outer ).not.toContain( "first-child" )
+		expect( flush.outer ).not.toContain( "last-child" )
+	})
+
+	it("keeps the bottom padding when only the top was declined", async () => {
+		const [ , , below ] = await section_frames( "/spacing" )
+
+		expect( below.padding ).not.toMatch( /\bpt-/ )
+		expect( below.padding ).toContain( "pb-6" )
+
+		// The outer edge of the column follows the same decision, so a first
+		// section that opens flush stays flush and a last one still closes.
+		// The class is an arbitrary variant, so its ampersand arrives escaped.
+		expect( below.outer ).not.toContain( "first-child" )
+		expect( below.outer ).toContain( "last-child" )
+	})
+
+	it("keeps the top padding where the section has words at that edge", async () => {
+		const [ , , , headed ] = await section_frames( "/spacing" )
+
+		// A heading sits above the block, so the block is not at the edge and
+		// has no say over it. The bottom is still the block's to decline.
+		expect( headed.padding ).toContain( "pt-6" )
+		expect( headed.padding ).not.toMatch( /\bpb-/ )
+	})
+
+	it("reads a value nobody ever set as the ordinary gap", async () => {
+		const frames = await section_frames( "/spacing" )
+		const never_set = frames[frames.length - 2]
+
+		// A schema default is written when a row is created, so an entry that
+		// predates the attribute comes back with `null` in it. Reading that as
+		// "no spacing" would collapse the padding on every page in the site.
+		expect( never_set.padding ).toContain( "pt-6" )
+		expect( never_set.padding ).toContain( "pb-6" )
+	})
+
+	it("lets the section decline the space on its own", async () => {
+		const frames = await section_frames( "/spacing" )
+		const own = frames[frames.length - 1]
+
+		expect( own.padding ).toContain( "pt-6" )
+		expect( own.padding ).not.toMatch( /\bpb-/ )
+	})
+})
+
 describe("the map", () => {
 	it("makes no third-party request when its image is set", async () => {
 		const { html } = await website.get( "/mapped" )
@@ -385,6 +485,27 @@ describe("the page shell's injected code", () => {
 		expect( html ).not.toContain( "window.__head" )
 	})
 })
+
+/**
+ |
+ | Every main-region section of a page, in order, as the two class attributes
+ | that carry its spacing: the `<section>`'s own — which holds the outer edges
+ | of the column — and the box inside it that does the padding.
+ |
+ */
+async function section_frames ( path: string ) {
+	const { html } = await website.get( path )
+
+	const frames = [
+		...html.matchAll(
+			/<section class="([^"]*scroll-mt-4[^"]*)"[^>]*>(?:<hr[^>]*\/?>)?<div class="([^"]*)"/g,
+		),
+	].map( ( [ , outer, padding ] ) => ( { outer, padding } ) )
+
+	expect( frames.length ).toBeGreaterThan( 0 )
+
+	return frames
+}
 
 /**
  |

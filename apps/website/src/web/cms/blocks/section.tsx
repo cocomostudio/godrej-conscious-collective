@@ -18,11 +18,13 @@
  | On a two-column page none of that applies: the main column is already the
  | container.
  |
- | **A section holding nothing but padding-free blocks lays down no padding**,
- | which is the ticker's case. That decision is here rather than in the block
- | because a negative margin on a child is clamped at the padding box: padding
- | can only be declined where it is laid down. `section-frame.tsx` names which
- | blocks ask for it.
+ | **Padding at each edge is a decision two parties can veto.** The section's
+ | own `spacing_around` is one; the `spacing_around` of the block at that edge
+ | is the other. Either can decline the space and neither can put it back, which
+ | is how the ticker butts against its neighbours and how the schedule list sits
+ | flush to the top of the page it opens. The decision is here rather than in
+ | the block because a negative margin on a child is clamped at the padding box:
+ | padding can only be declined where it is laid down. See `section-frame.tsx`.
  |
  | Its `title` is not shown. The title names the section in the table of
  | contents; the heading is what a reader sees.
@@ -46,6 +48,8 @@ import type {
 	Link as Link_Attribute,
 } from "../envelope.ts"
 
+import type { Spacing_Around } from "./block-spacing.ts"
+
 import { use_anchor } from "../anchors.tsx"
 import {
 	use_body_text_class,
@@ -55,9 +59,10 @@ import { section_background } from "../section-backgrounds.ts"
 import { Heading } from "./heading.tsx"
 import { Link_Block } from "./link.tsx"
 import {
+	pads_at_bottom,
+	pads_at_top,
 	SECTION_CONTAINER,
 	section_padding,
-	sheds_padding,
 } from "./section-frame.tsx"
 
 type Section_Heading = {
@@ -82,9 +87,9 @@ type Section_Props = Pick<Block, "__component" | "id"> & {
 	 | The section's own region, unrendered, alongside the rendered copy of it
 	 | that arrives as `children`.
 	 |
-	 | Read for one question and no other: whether everything in here is a block
-	 | that leaves no space around itself, which decides whether this section
-	 | pads at all. That cannot be asked of `children` — a rendered region is
+	 | Read for one question and no other: what the blocks at its two ends asked
+	 | for in `spacing_around`, which decides whether this section pads at each
+	 | edge. That cannot be asked of `children` — a rendered region is
 	 | nodes with no blocks behind them — and it cannot be asked from inside the
 	 | block either, because padding is undone where it is laid down.
 	 |
@@ -96,6 +101,16 @@ type Section_Props = Pick<Block, "__component" | "id"> & {
 	background_pattern?: string
 	background_position?: string
 	horizontal_rule?: boolean
+	/**
+	 |
+	 | Whether this section pads above itself, below itself, both or neither.
+	 |
+	 | The block sitting at either edge has the same say — see `pads_at_top` and
+	 | `pads_at_bottom` in `section-frame.tsx` — and the space goes if either of
+	 | them declines it.
+	 |
+	 */
+	spacing_around?: Spacing_Around
 	children: ReactNode
 }
 
@@ -112,6 +127,7 @@ export function Section (
 		id,
 		link,
 		opening_line,
+		spacing_around,
 	}: Section_Props,
 ) {
 	const anchor = use_anchor( { __component, id } )
@@ -129,23 +145,32 @@ export function Section (
 	// line's alone.
 	const section_link = heading?.link?.url ? heading.link : link
 
-	const sheds = sheds_padding( {
+	const edges = {
 		content,
 		has_words: Boolean( heading?.content || section_link ),
-	} )
+		spacing_around,
+	}
 
-	const padding = sheds
-		? ""
-		: section_padding( { horizontal_rule, one_column } )
+	const pad_top = pads_at_top( edges )
+	const pad_bottom = pads_at_bottom( edges )
+
+	const padding = section_padding( {
+		horizontal_rule,
+		one_column,
+		pad_bottom,
+		pad_top,
+	} )
 
 	// Sections own the outer spacing at the top and bottom of the main
 	// column now: the two-column main column carries no vertical padding
 	// of its own, so the first and last section absorb what the column
-	// used to lay down. A section that sheds all its padding — the ticker
-	// is the case — keeps butting against the edge.
-	const outer_edges = ( sheds || one_column )
-		? ""
-		: "[&:first-child]:md:pt-16 [&:last-child]:pb-8 [&:last-child]:md:pb-16"
+	// used to lay down. A section that declined its padding at an edge — the
+	// ticker is the case — declines this too and keeps butting against the
+	// edge of the page.
+	const outer_edges = one_column ? "" : [
+		pad_top ? "[&:first-child]:md:pt-16" : "",
+		pad_bottom ? "[&:last-child]:pb-8 [&:last-child]:md:pb-16" : "",
+	].filter( Boolean ).join( " " )
 
 	const opening_class = `mt-4 ${use_body_text_class()} text-black`
 

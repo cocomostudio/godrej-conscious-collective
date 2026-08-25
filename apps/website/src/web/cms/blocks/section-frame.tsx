@@ -11,21 +11,28 @@
  | main column is already the container, and a second one inside every section
  | would narrow the page a second time.
  |
- | Two ways out of the frame, because there are two frames:
+ | One way out of the frame:
  |
  |   • **`use_full_bleed`** takes a block back out to the section's full width.
  |     A listing drawn as a carousel needs it, because it loops and has to run
- |     off both edges rather than stop at a margin and show its own ends.
+ |     off both edges rather than stop at a margin and show its own ends. It is
+ |     a one-column page's alone: there, the section *is* the full width.
  |
- |   • **`sheds_padding`** is asked by the section itself, before it pads
- |     anything. The ticker butts straight against whatever sits above and
- |     below it, and a block cannot undo padding from inside it: a negative
- |     margin on the child is clamped at the padding box and leaves the space
- |     behind. So the section that holds nothing but such a block does not lay
- |     the padding down in the first place.
+ | And one question a section asks before it frames anything: **whether to pad
+ | at the top, and whether to pad at the bottom.** Padding is undone where it is
+ | laid down and nowhere else — a negative margin on a child is clamped at the
+ | padding box — so a block that means to sit flush against a section's edge
+ | cannot arrange it from inside. The section asks its own `spacing_around` and
+ | its edge blocks' first, and the space goes if either declines it.
  |
  */
 
+import type { Spacing_Around } from "./block-spacing.ts"
+
+import {
+	wants_space_above,
+	wants_space_below,
+} from "./block-spacing.ts"
 import { use_page_layout } from "../page-layout.tsx"
 
 import type { Block } from "../envelope.ts"
@@ -44,23 +51,11 @@ export const SECTION_CONTAINER = "cc mx-auto"
  */
 const FULL_BLEED = "-mx-1ccm"
 
-/**
- |
- | The blocks that leave no space around themselves at all.
- |
- | One entry, and it should stay short: a block belongs here only when the
- | design has it touching its neighbours on both edges, which is a statement
- | about the whole section rather than about the block.
- |
- */
-const PADDING_FREE = new Set( [
-	"text.marquee-v1",
-	"list.session-schedule-list-v1",
-] )
-
 type Section_Padding = {
 	horizontal_rule: boolean
 	one_column: boolean
+	pad_bottom: boolean
+	pad_top: boolean
 }
 
 /**
@@ -74,9 +69,15 @@ type Section_Padding = {
  |
  */
 export function section_padding (
-	{ horizontal_rule, one_column }: Section_Padding,
+	{ horizontal_rule, one_column, pad_bottom, pad_top }: Section_Padding,
 ) {
-	const bottom = one_column ? "pb-12 md:pb-16" : "pb-6 md:pb-8"
+	const bottom = pad_bottom
+		? ( one_column ? "pb-12 md:pb-16" : "pb-6 md:pb-8" )
+		: ""
+
+	if ( !pad_top ) {
+		return bottom
+	}
 
 	if ( horizontal_rule ) {
 		return `pt-3 md:pt-4 ${bottom}`
@@ -85,30 +86,69 @@ export function section_padding (
 	return `${one_column ? "pt-12 md:pt-16" : "pt-6 md:pt-8"} ${bottom}`
 }
 
+type Section_Edges = {
+	/**
+	 |
+	 | The section's own region, unrendered. Read for the `spacing_around` of
+	 | the blocks at its two ends, which a rendered region cannot answer — that
+	 | is an array of nodes with no blocks behind them.
+	 |
+	 */
+	content: unknown
+	/** Whether the section shows a heading, an opening line or a link. */
+	has_words: boolean
+	/** The section's own `spacing_around`. */
+	spacing_around?: Spacing_Around
+}
+
 /**
  |
- | Whether this section should lay down no padding at all.
+ | Whether this section lays down padding at its top.
  |
- | Only when **everything** in it is padding-free and it shows nothing of its
- | own above them. A section with a heading, an opening line or a link has words
- | that need the space, and a section holding a ticker beside anything else has
- | the other thing to keep off its neighbours.
- |
- | It is asked of the section's own attributes rather than of what came back
- | rendered, because a rendered region is opaque — an array of nodes with no
- | block behind them — and the question is about which blocks are there.
+ | Its own `spacing_around` first, and then its first block's — but the block's
+ | only counts where nothing of the section's own sits above it. A section with
+ | a heading has words at the top edge, and those need the space whatever the
+ | block beneath them asked for.
  |
  */
-export function sheds_padding (
-	{ content, has_words }: { content: unknown; has_words: boolean },
+export function pads_at_top (
+	{ content, has_words, spacing_around }: Section_Edges,
 ) {
-	if ( has_words || !Array.isArray( content ) || content.length === 0 ) {
+	if ( !wants_space_above( spacing_around ) ) {
 		return false
 	}
 
-	return content.every( ( block: Block ) =>
-		PADDING_FREE.has( block?.__component )
-	)
+	if ( has_words ) {
+		return true
+	}
+
+	return wants_space_above( edge_block( content, "first" )?.spacing_around )
+}
+
+/**
+ |
+ | Whether this section lays down padding at its bottom.
+ |
+ | Nothing of the section's own is ever drawn below its blocks, so there is no
+ | equivalent of the `has_words` reprieve here: the last block is at the edge.
+ |
+ */
+export function pads_at_bottom ( { content, spacing_around }: Section_Edges ) {
+	return wants_space_below( spacing_around )
+		&& wants_space_below( edge_block( content, "last" )?.spacing_around )
+}
+
+type Spaced_Block = Block & { spacing_around?: Spacing_Around }
+
+function edge_block (
+	content: unknown,
+	end: "first" | "last",
+): Spaced_Block | undefined {
+	if ( !Array.isArray( content ) || content.length === 0 ) {
+		return undefined
+	}
+
+	return end === "first" ? content[0] : content[content.length - 1]
 }
 
 /**

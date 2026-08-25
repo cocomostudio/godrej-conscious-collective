@@ -12,6 +12,17 @@
 			"repeatable": true,
 			"required": true,
 			"min": 1
+		},
+		"spacing_around": {
+			"type": "enumeration",
+			"enum": [
+				"normal",
+				"none",
+				"above",
+				"below"
+			],
+			"default": "normal",
+			"required": true
 		}
 	},
 
@@ -26,12 +37,24 @@
 				"list": {
 					"label": "Items"
 				}
+			},
+			"spacing_around": {
+				"edit": {
+					"label": "Spacing around",
+					"description": "The gap left above and below. \"normal\" leaves one on both sides, \"above\" and \"below\" on one side only, \"none\" on neither. Where this block opens or closes a section, what goes is the section’s own padding — so \"none\" sits it flush against the section’s edge."
+				},
+				"list": {
+					"label": "Spacing around"
+				}
 			}
 		},
 		"layouts": {
 			"edit": [
 				[
 					{ "name": "items", "size": 12 }
+				],
+				[
+					{ "name": "spacing_around", "size": 6 }
 				]
 			]
 		}

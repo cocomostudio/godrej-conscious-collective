@@ -5,13 +5,39 @@
 		"description": "The whole programme of this page's event, day by day, with a filtration widget and a link to download the schedule document. This is what the schedule page is made of."
 	},
 	"options": {},
-	"attributes": {},
+	"attributes": {
+		"spacing_around": {
+			"type": "enumeration",
+			"enum": [
+				"normal",
+				"none",
+				"above",
+				"below"
+			],
+			"default": "normal",
+			"required": true
+		}
+	},
 
 	"__": {
 		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
-		"metadatas": {},
+		"metadatas": {
+			"spacing_around": {
+				"edit": {
+					"label": "Spacing around",
+					"description": "The gap left above and below. \"normal\" leaves one on both sides, \"above\" and \"below\" on one side only, \"none\" on neither. Where this block opens or closes a section, what goes is the section’s own padding — so \"none\" sits it flush against the section’s edge."
+				},
+				"list": {
+					"label": "Spacing around"
+				}
+			}
+		},
 		"layouts": {
-			"edit": []
+			"edit": [
+				[
+					{ "name": "spacing_around", "size": 6 }
+				]
+			]
 		}
 	}
 }
