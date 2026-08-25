@@ -223,7 +223,14 @@ export function Filtration (
  |
  */
 function Facet_Field (
-	{ className = "", collapsible = true, committed, facet, on_change, reset_token }: {
+	{
+		className = "",
+		collapsible = true,
+		committed,
+		facet,
+		on_change,
+		reset_token,
+	}: {
 		className?: string
 		/**
 		 |

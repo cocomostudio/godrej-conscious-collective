@@ -159,11 +159,13 @@ async function recompute_events_of_contributor (
 		populate: { event: { select: [ "id" ] } },
 	} ) as { event: { id: number } | null }[]
 
-	const event_ids = [ ...new Set(
-		sessions
-			.map( ( session ) => session.event?.id )
-			.filter( ( id ): id is number => typeof id === "number" ),
-	) ]
+	const event_ids = [
+		...new Set(
+			sessions
+				.map( ( session ) => session.event?.id )
+				.filter( ( id ): id is number => typeof id === "number" ),
+		),
+	]
 
 	await strapi.db.query( CONTRIBUTOR_UID ).update( {
 		where: { id: contributor.id },

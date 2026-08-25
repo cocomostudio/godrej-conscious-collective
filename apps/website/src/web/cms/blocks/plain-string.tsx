@@ -17,7 +17,8 @@ export function Plain_String ( { content }: { content: string | null } ) {
 		return null
 	}
 
-	return <p className={ `mt-4 first:mt-0 ${use_body_text_class()} text-black` }>
+	return <p
+		className={ `mt-4 first:mt-0 ${use_body_text_class()} text-black` }>
 		{ content }
 	</p>
 }

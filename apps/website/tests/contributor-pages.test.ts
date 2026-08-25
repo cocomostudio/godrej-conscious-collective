@@ -44,9 +44,8 @@ beforeAll( async () => {
 				{
 					children: [
 						{
-							text:
-								"Debasmita Ghosh is an installation artist "
-									+ "working at the edge of craft and climate.",
+							text: "Debasmita Ghosh is an installation artist "
+								+ "working at the edge of craft and climate.",
 							type: "text",
 						},
 					],
@@ -55,9 +54,8 @@ beforeAll( async () => {
 				{
 					children: [
 						{
-							text:
-								"She spent three years with the Kondh community "
-									+ "in Odisha.",
+							text: "She spent three years with the Kondh community "
+								+ "in Odisha.",
 							type: "text",
 						},
 					],
@@ -136,7 +134,9 @@ describe("the profile", () => {
 	})
 
 	it("renders without an image", async () => {
-		const { html, status } = await website.get( "/collaborators/no-picture" )
+		const { html, status } = await website.get(
+			"/collaborators/no-picture",
+		)
 
 		expect( status ).toBe( 200 )
 

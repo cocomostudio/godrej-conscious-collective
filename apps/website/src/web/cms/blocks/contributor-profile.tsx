@@ -69,57 +69,62 @@ export function Contributor_Profile (
 					} } />
 			</figure> }
 
-		<div className="w-full">
-			<H className="text-h2 md:font-semibold text-context">
-				{ name }
-			</H>
+			<div className="w-full">
+				<H className="text-h2 md:font-semibold text-context">
+					{ name }
+				</H>
 
-			{ role
-				&& <p className="mt-2 md:mt-4 text-p text-black font-semibold">
-					{ role }
-				</p> }
+				{ role
+					&& <p className="mt-2 md:mt-4 text-p text-black font-semibold">
+						{ role }
+					</p> }
 
-			{ prose && <div className="mt-6 md:mt-8 [&>*:first-child]:mt-0">
-				<Level>
-					<BlocksRenderer
-						content={ prose }
-						blocks={ {
-							link: ( { children, url } ) =>
-								<Nav_Link
-									className="text-context underline underline-offset-3"
-									url={ url }>
-									{ children }
-								</Nav_Link>,
-							list: ( { children, format } ) =>
-								format === "ordered"
-									? <ol className="mt-4 pl-6 list-decimal text-p text-black">
-										{ children }
-									</ol>
-									: <ul className="mt-4 pl-6 list-disc text-p text-black">
-										{ children }
-									</ul>,
-							paragraph: ( { children } ) =>
-								<p className="mt-4 text-p text-black">
-									{ children }
-								</p>,
-							quote: ( { children } ) =>
-								<blockquote className="my-6 md:my-8 pl-4 border-l-2 border-context text-h4 text-black">
-									{ children }
-								</blockquote>,
-						} }
-						modifiers={ {
-							bold: ( { children } ) =>
-								<strong className="font-semibold">
-									{ children }
-								</strong>,
-							italic: ( { children } ) =>
-								<em className="italic">{ children }</em>,
-							strikethrough: ( { children } ) => <s>{ children }</s>,
-							underline: ( { children } ) => <u>{ children }</u>,
-						} } />
-				</Level>
-			</div> }
-		</div>
+				{ prose
+					&& <div className="mt-6 md:mt-8 [&>*:first-child]:mt-0">
+						<Level>
+							<BlocksRenderer
+								content={ prose }
+								blocks={ {
+									link: ( { children, url } ) =>
+										<Nav_Link
+											className="text-context underline underline-offset-3"
+											url={ url }>
+											{ children }
+										</Nav_Link>,
+									list: ( { children, format } ) =>
+										format === "ordered"
+											? <ol className="mt-4 pl-6 list-decimal text-p text-black">
+												{ children }
+											</ol>
+											: <ul className="mt-4 pl-6 list-disc text-p text-black">
+												{ children }
+											</ul>,
+									paragraph: ( { children } ) =>
+										<p className="mt-4 text-p text-black">
+											{ children }
+										</p>,
+									quote: ( { children } ) =>
+										<blockquote className="my-6 md:my-8 pl-4 border-l-2 border-context text-h4 text-black">
+											{ children }
+										</blockquote>,
+								} }
+								modifiers={ {
+									bold: ( { children } ) =>
+										<strong className="font-semibold">
+											{ children }
+										</strong>,
+									italic: ( { children } ) =>
+										<em className="italic">
+											{ children }
+										</em>,
+									strikethrough: ( { children } ) =>
+										<s>{ children }</s>,
+									underline: ( { children } ) =>
+										<u>{ children }</u>,
+								} } />
+						</Level>
+					</div> }
+			</div>
 		</article>
 	</div>
 }

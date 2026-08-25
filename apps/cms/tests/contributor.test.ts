@@ -83,7 +83,7 @@ describe("a collaborator's envelope", () => {
 		// full event payload for every edition the collaborator is in.
 		expect( body.data.entry.events ).toBeUndefined()
 	})
-} )
+})
 
 describe("a collaborator's derived events", () => {
 	it("include every event whose published sessions link to them", async () => {
@@ -111,7 +111,7 @@ describe("a collaborator's derived events", () => {
 
 		expect( events ).toEqual( [] )
 	})
-} )
+})
 
 describe("the middleware", () => {
 	it("adds the collaborator to the event when a session is published", async () => {
@@ -139,7 +139,9 @@ describe("the middleware", () => {
 		const collaborator = "Priya Iyer"
 		const session = await find_published_session_with( collaborator )
 
-		expect( ( await events_of( collaborator ) ).length ).toBeGreaterThan( 0 )
+		expect( ( await events_of( collaborator ) ).length ).toBeGreaterThan(
+			0,
+		)
 
 		await cms.strapi.documents( "api::session.session" ).unpublish( {
 			documentId: session.documentId,
@@ -158,7 +160,9 @@ describe("the middleware", () => {
 		const collaborator = "Rahul Verma"
 		const session = await find_published_session_with( collaborator )
 
-		expect( ( await events_of( collaborator ) ).length ).toBeGreaterThan( 0 )
+		expect( ( await events_of( collaborator ) ).length ).toBeGreaterThan(
+			0,
+		)
 
 		await cms.strapi.documents( "api::session.session" ).delete( {
 			documentId: session.documentId,
@@ -180,7 +184,9 @@ describe("the middleware", () => {
 		const collaborator = "Arthur Mamou-Mani"
 		const session = await find_published_session_with( collaborator )
 
-		expect( ( await events_of( collaborator ) ).length ).toBeGreaterThan( 0 )
+		expect( ( await events_of( collaborator ) ).length ).toBeGreaterThan(
+			0,
+		)
 
 		// The write leaves Debasmita on the session and takes Arthur off.
 		const remaining_ids = session.contributors
@@ -195,7 +201,7 @@ describe("the middleware", () => {
 
 		expect( await events_of( collaborator ) ).toEqual( [] )
 	})
-} )
+})
 
 async function events_of ( name: string ) {
 	const contributor = await cms.strapi

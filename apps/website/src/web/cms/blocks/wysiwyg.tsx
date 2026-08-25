@@ -56,7 +56,8 @@ export function Wysiwyg ( { rich_text }: { rich_text?: BlocksContent } ) {
 			content={ rich_text }
 			blocks={ {
 				code: ( { children } ) =>
-					<p className={ `mt-4 ${body_size} font-mono text-black` }>
+					<p
+						className={ `mt-4 ${body_size} font-mono text-black` }>
 						{ children }
 					</p>,
 				heading: ( { children, level } ) =>
@@ -92,10 +93,12 @@ export function Wysiwyg ( { rich_text }: { rich_text?: BlocksContent } ) {
 					</Nav_Link>,
 				list: ( { children, format } ) =>
 					format === "ordered"
-						? <ol className={ `mt-4 pl-6 list-decimal ${body_size} text-black` }>
+						? <ol
+							className={ `mt-4 pl-6 list-decimal ${body_size} text-black` }>
 							{ children }
 						</ol>
-						: <ul className={ `mt-4 pl-6 list-disc ${body_size} text-black` }>
+						: <ul
+							className={ `mt-4 pl-6 list-disc ${body_size} text-black` }>
 							{ children }
 						</ul>,
 				paragraph: ( { children } ) =>
