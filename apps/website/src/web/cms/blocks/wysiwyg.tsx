@@ -34,10 +34,10 @@ import { BLOCK_SPACING } from "./block-spacing.ts"
 
 const HEADING_SIZES: Record<number, string> = {
 	1: "text-h1",
-	2: "text-h3",
-	3: "text-h4",
-	4: "text-h5",
-	5: "text-h6",
+	2: "text-h2",
+	3: "text-h3",
+	4: "text-h4",
+	5: "text-h5",
 	6: "text-h6",
 }
 
