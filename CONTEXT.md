@@ -122,6 +122,32 @@ _Avoid_: "tile", "session block", "preview"
 How a contributor row is drawn — a round picture with a name and a role beneath it.
 _Avoid_: "avatar", "headshot", "collaborator card"
 
+### Filtration
+
+**Filtration**:
+Narrowing a listing down in the browser, over the rows the CMS already sent. Only the two listings that filter are uncapped, because a page that filters a set has to hold the set.
+_Avoid_: "filtering" as a name for the feature, "search", "faceted search"
+
+**Facet**:
+One question the filtration widget asks — the dates, the age groups, the admissions, the categories. A facet with nothing selected asks nothing; options within a facet widen the answer and facets narrow it.
+_Avoid_: "filter" for this meaning, "filter group", "criterion"
+
+**Committed filters**:
+What the listing is actually showing. Distinct from the **draft**, which is what a visitor has ticked but not yet applied — the draft never leaves the form, and below the medium breakpoint the Apply button is what turns one into the other.
+_Avoid_: "active filters", "applied filters", "selection"
+
+**Admission**:
+Whether a place has to be paid for: free, or ticketed. Derived from the price rather than stored, and a session with no price at all is neither.
+_Avoid_: "price filter", "event type" — the static site labels this facet "Event Types", which collides with the category facet
+
+**Schedule entry**:
+One sitting of one session on the schedule page — one per **instance**, so a session running on three days is three entries. It is why the schedule's count is larger than the number of sessions it holds.
+_Avoid_: "session" for this meaning, "row", "slot"
+
+**Channel**:
+A named destination content can be rendered into from elsewhere on the page, through the slot-and-fill tunnel. Two exist: the **sidebar**, which a listing's filtration widget fills, and the **screen**, which the filtration drawer fills. A fill with no slot mounted falls back to rendering where it stands, which is what a one-column page relies on.
+_Avoid_: "portal target", "slot" for the name itself, "outlet"
+
 ## How block and component relate
 
 Every component maps to exactly one block. Some blocks map to no component at all, because those blocks are built from an entry's top-level attributes instead. The Masthead on a session page is such a block, and the Masthead draws on the session's `name`, `standfirst` and `cover`.
