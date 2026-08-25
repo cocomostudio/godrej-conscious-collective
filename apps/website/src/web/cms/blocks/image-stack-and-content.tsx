@@ -83,6 +83,6 @@ export function Image_Stack_And_Content (
 				</div>
 			</div> }
 
-		<div className="md:ml-1c grow">{ children }</div>
+		<div className="max-md:mt-8 md:ml-1c grow">{ children }</div>
 	</div>
 }
