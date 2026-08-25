@@ -58,12 +58,12 @@ export async function write_home_page (
 				blocks: [
 					responsive_image_block( {
 						alt: "Conscious Collective at Plant 13",
-						large: IMAGES.art_direction_large,
-						medium: IMAGES.art_direction_medium,
-						small: IMAGES.art_direction_small,
+						small: IMAGES.promo_small,
+						medium: IMAGES.promo_medium,
 					} ),
 				],
 				register_with_toc: false,
+				spacing_around: "none",
 			} ),
 			// The marquee, the image stack, the Instagram strip and the
 			// sponsors are the home page's own furniture in the static site.
