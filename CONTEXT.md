@@ -35,8 +35,8 @@ A person who takes part in a session. The public label for a contributor is "Col
 _Avoid_: "collaborator" in code, "speaker", "participant", "fellow"
 
 **Lead**:
-A record created when a member of the public submits the registration form.
-_Avoid_: "registration", "signup", "RSVP", "submission"
+A record created when a member of the public submits the **registration form**. The record is always a Lead — "the Leads list", never "the registrations list" — while "registration" names the act and the form a visitor meets. The two words are not interchangeable, and the second never names the row.
+_Avoid_: "registration", "signup", "RSVP", "submission" **as the name of the record**
 
 ### The page domain
 
@@ -147,6 +147,32 @@ _Avoid_: "session" for this meaning, "row", "slot"
 **Channel**:
 A named destination content can be rendered into from elsewhere on the page, through the slot-and-fill tunnel. Two exist: the **sidebar**, which a listing's filtration widget fills, and the **screen**, which the filtration drawer fills. A fill with no slot mounted falls back to rendering where it stands, which is what a one-column page relies on.
 _Avoid_: "portal target", "slot" for the name itself, "outlet"
+
+### Registration
+
+**Registration form**:
+The overlay a visitor fills in to produce a **Lead**. It is not a route: Register Now opens it through the slot-and-fill tunnel's **screen** channel, so a visitor registers from wherever they already were.
+_Avoid_: "signup form", "RSVP form", "the modal"
+
+**Relay**:
+The website server's POST resource route, which parses a submission and forwards it to the CMS under an API token scoped to creating a Lead. The token never reaches a browser. The relay is also what stamps the **consent wording**, because it is the last party that knows what was rendered.
+_Avoid_: "proxy", "endpoint", "the API route"
+
+**Consent wording**:
+The exact sentences that were on screen beside the box a registrant ticked, stored on the Lead. It changes over time, and a record that cannot say which version it agreed to is not a record.
+_Avoid_: "consent text" in prose, "the terms", "the privacy copy"
+
+**Retention date**:
+When a Lead is due for deletion — the **main event**'s end date plus twelve months, computed once at submission so a later edit to that end date cannot move a window already promised in writing. **Nothing acts on it.** No deletion job is built; it is a record of a promise, not an enforcement of one.
+_Avoid_: "expiry", "TTL", "purge date"
+
+**Form token**:
+A signed value minted when the overlay opens, carrying an issue time, a nonce, a hash of the address and the **honeypot**'s field name. It proves the form was served here, supplies the timing check, and is single-use. It is **not** a CSRF token — the endpoint is unauthenticated, so there is no ambient credential to forge with.
+_Avoid_: "CSRF token", "nonce" for the whole thing, "session token"
+
+**Honeypot**:
+A field with a plausible name, rotated daily from a secret, that a person never sees and a scripted form-filler fills. A filled one is answered as though it had succeeded and nothing is recorded.
+_Avoid_: "trap field", "spam field", "bot check"
 
 ## How block and component relate
 
