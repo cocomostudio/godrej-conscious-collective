@@ -14,6 +14,7 @@ import { Button } from "#infra/lib/ui/react/buttons/button.tsx"
 import type { Link as Link_Attribute } from "../envelope.ts"
 
 import { Nav_Link } from "../nav-link.tsx"
+import { Chevron_Right } from "#infra/lib/ui/react/icons/chevron-right.tsx"
 
 export function Link_Block ( { label, style, url }: Partial<Link_Attribute> ) {
 	if ( !url ) {
@@ -34,11 +35,15 @@ export function Link_Block ( { label, style, url }: Partial<Link_Attribute> ) {
 		</p>
 	}
 
-	return <p className="mt-4 first:mt-0 text-p text-black">
+	// Plain style: a text link with a right chevron beside it, matching the
+	// static site's "View All" section links. Not a button — the button
+	// branch above is a separate call to action.
+	return <p className="mt-4 first:mt-0">
 		<Nav_Link
-			className="font-button uppercase text-context underline underline-offset-3"
+			className="inline-flex gap-1 items-center text-h6 underline underline-offset-4 whitespace-nowrap text-context"
 			url={ url }>
 			{ text }
+			<Chevron_Right className="size-4" />
 		</Nav_Link>
 	</p>
 }

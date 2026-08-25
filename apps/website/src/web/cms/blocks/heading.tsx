@@ -20,7 +20,7 @@ import type {
 
 import { use_anchor } from "../anchors.tsx"
 import { Nav_Link } from "../nav-link.tsx"
-import { Button } from "#infra/lib/ui/react/buttons/button.tsx"
+import { Chevron_Right } from "#infra/lib/ui/react/icons/chevron-right.tsx"
 
 const SIZES: Record<string, string> = {
 	h1: "text-h1",
@@ -56,11 +56,14 @@ export function Heading (
 	</div>
 }
 
+// Section links sit here — beside the heading — and read as inline
+// navigation with a chevron, not as a button. The static site uses the
+// same shape: underlined text and a right chevron, no button chrome.
 function Heading_Link ( { link }: { link: Link_Attribute } ) {
-	return <Button
-		emphasis="outline"
-		color="context"
-		render={ <Nav_Link url={ link.url } /> }>
+	return <Nav_Link
+		className="flex gap-1 items-center text-h6 underline underline-offset-4 whitespace-nowrap text-context"
+		url={ link.url }>
 		{ link.label ?? link.url }
-	</Button>
+		<Chevron_Right className="size-4" />
+	</Nav_Link>
 }
