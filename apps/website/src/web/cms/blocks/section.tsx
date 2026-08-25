@@ -134,7 +134,11 @@ export function Section (
 		: section_padding( { horizontal_rule, one_column } )
 
 	return <section
-		className={ `scroll-mt-4 ${background ? "" : "first:pt-0 last:pb-0"}` }
+		className={ `scroll-mt-4 ${
+			background
+				? ""
+				: "[&:first-child>div]:pt-0 [&:last-child>div]:pb-0"
+		}` }
 		id={ anchor }
 		style={ background }>
 		{ horizontal_rule
