@@ -54,9 +54,13 @@ export function Contributor_Profile (
 	// The outer container mirrors what the main column's own padded box gives
 	// every other content type. The block lives in the masthead slot — which
 	// sits above that padded box, so the padding has to be drawn here.
+	//
+	// **Portrait on top, then the name and role, then the prose** — the same
+	// stack at every width. The static site does exactly this on the single
+	// collaborator page: the picture leads, and the words fall below it.
 	return <div className="md:w-9c py-8 md:py-16 text-black">
-		<article className="cc mx-auto md:px-16 flex flex-col gap-6 md:gap-8 md:flex-row md:items-start">
-			{ picture && <figure className="w-full md:w-64 shrink-0">
+		<article className="cc mx-auto md:pl-16 flex flex-col gap-6 md:gap-8">
+			{ picture && <figure className="w-full max-w-64 shrink-0">
 				<Picture_Image
 					className="w-full aspect-square rounded-full object-cover grayscale"
 					picture={ {
@@ -65,7 +69,7 @@ export function Contributor_Profile (
 					} } />
 			</figure> }
 
-		<div className="grow">
+		<div className="w-full">
 			<H className="text-h2 md:font-semibold text-context">
 				{ name }
 			</H>
