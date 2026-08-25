@@ -217,22 +217,6 @@ export function Instagram_Feed (
 	// section's full width — and puts its own heading back inside the
 	// container, which is the one part of it that lines up with the grid.
 	return <div className={ `${BLOCK_SPACING} ${full_bleed}` }>
-		<div className="mx-auto cc md:px-1c text-black">
-			<div className="flex flex-wrap md:flex-nowrap gap-4 md:gap-0 justify-between items-center">
-				<H className="text-h1 font-semibold text-white">
-					Follow our Instagram
-				</H>
-
-				<Nav_Link
-					className="flex items-center gap-1 text-h4 underline text-white whitespace-nowrap"
-					url={ PROFILE_URL }
-					target="_blank">
-					{ HANDLE }
-					<Chevron_Right />
-				</Nav_Link>
-			</div>
-		</div>
-
 		<div
 			className="mt-8 py-6 md:py-11 overflow-hidden"
 			ref={ viewport_and_embla_ref }>
