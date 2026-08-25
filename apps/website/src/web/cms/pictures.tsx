@@ -62,14 +62,16 @@ export function Responsive_Picture (
 	const { large, medium, small } = pictures
 
 	return <picture>
-		<source
+		{ LARGE_FROM && <source
 			media={ `( min-width: ${LARGE_FROM}px )` }
 			srcSet={ large.src_set ?? large.src }
-			sizes={ large.src_set ? sizes : undefined } />
-		<source
+			sizes={ large.src_set ? sizes : undefined }
+		/> }
+		{ MEDIUM_FROM && <source
 			media={ `( min-width: ${MEDIUM_FROM}px )` }
 			srcSet={ medium.src_set ?? medium.src }
-			sizes={ medium.src_set ? sizes : undefined } />
+			sizes={ medium.src_set ? sizes : undefined }
+		/> }
 
 		<Picture_Image
 			className={ className }
