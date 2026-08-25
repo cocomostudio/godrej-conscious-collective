@@ -53,7 +53,10 @@ const FULL_BLEED = "-mx-1ccm"
  | about the whole section rather than about the block.
  |
  */
-const PADDING_FREE = new Set( [ "text.marquee-v1" ] )
+const PADDING_FREE = new Set( [
+	"text.marquee-v1",
+	"list.session-schedule-list-v1",
+] )
 
 type Section_Padding = {
 	horizontal_rule: boolean

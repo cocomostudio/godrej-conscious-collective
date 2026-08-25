@@ -291,8 +291,8 @@ function Main_Column (
 			</div> }
 
 		{ two_column
-			? <div className="md:w-9c pb-8 md:py-16 text-black">
-				<div className="cc mx-auto md:px-16">
+			? <div className="md:w-9c text-black">
+				<div className="cc mx-auto md:pl-16">
 					{ title && <div className="pb-6 md:pb-8">
 						<Page_Title
 							standfirst={ standfirst }

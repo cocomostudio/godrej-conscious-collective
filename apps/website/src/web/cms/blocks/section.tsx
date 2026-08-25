@@ -126,19 +126,26 @@ export function Section (
 	// line's alone.
 	const section_link = heading?.link?.url ? heading.link : link
 
-	const padding = sheds_padding( {
-			content,
-			has_words: Boolean( heading?.content || section_link ),
-		} )
+	const sheds = sheds_padding( {
+		content,
+		has_words: Boolean( heading?.content || section_link ),
+	} )
+
+	const padding = sheds
 		? ""
 		: section_padding( { horizontal_rule, one_column } )
 
+	// Sections own the outer spacing at the top and bottom of the main
+	// column now: the two-column main column carries no vertical padding
+	// of its own, so the first and last section absorb what the column
+	// used to lay down. A section that sheds all its padding — the ticker
+	// is the case — keeps butting against the edge.
+	const outer_edges = ( sheds || one_column )
+		? ""
+		: "[&:first-child]:md:pt-16 [&:last-child]:pb-8 [&:last-child]:md:pb-16"
+
 	return <section
-		className={ `scroll-mt-4 ${
-			background
-				? ""
-				: "[&:first-child>div]:pt-0 [&:last-child>div]:pb-0"
-		}` }
+		className={ `scroll-mt-4 ${outer_edges}` }
 		id={ anchor }
 		style={ background }>
 		{ horizontal_rule
