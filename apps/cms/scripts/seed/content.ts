@@ -376,20 +376,23 @@ async function write_pages (
 	// of contents to put in a sidebar.
 	await create_page( strapi, {
 		main_region: [
-			section( "This Year's Theme", {
-				heading: heading_component( "This Year’s Theme", "h2" ),
-				register_with_toc: true,
-				strings: [
-					"Architecture and design are part of a creative industry that’s constantly evolving. The last two decades, especially, have witnessed a major transition.",
-					"With the pandemic and the current climate crisis forcing us to question the way we live, eat, travel and consume things, design plays a central role in rethinking our future by helping us navigate spatially.",
+			// The Above-the-Fold image is the home page's opening frame in
+			// the static site — one photograph across three widths, portrait
+			// on a phone and landscape from the medium breakpoint. The
+			// responsive-image block does not (yet) render truly full-bleed
+			// here, so the block sits inside its section container; the
+			// intent is preserved, and a full-width rendering can be added
+			// to the block later without touching the seed.
+			section( "Above the Fold", {
+				blocks: [
+					responsive_image_block( {
+						alt: "Conscious Collective at Plant 13",
+						large: IMAGES.art_direction_large,
+						medium: IMAGES.art_direction_medium,
+						small: IMAGES.art_direction_small,
+					} ),
 				],
-			} ),
-			section( "What is on", {
-				heading: heading_component( "What is on", "h2" ),
-				register_with_toc: true,
-				strings: [
-					"Installations, concept designs, workshops, conversations and more, across three days.",
-				],
+				register_with_toc: false,
 			} ),
 			// The marquee, the image stack, the Instagram strip and the
 			// sponsors are the home page's own furniture in the static site.

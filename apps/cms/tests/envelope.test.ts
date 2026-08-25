@@ -44,20 +44,15 @@ describe("the deepest legal path in the render tree", () => {
 
 		expect( sections.length ).toBeGreaterThan( 0 )
 		expect( sections[0].__component ).toBe( "container.section-v1" )
-		expect( sections[0].title ).toBe( "This Year's Theme" )
+		expect( sections[0].title ).toBe( "Above the Fold" )
 
-		// The section's own heading is a component attribute, not a zone entry.
-		expect( sections[0].heading.content ).toBe( "This Year’s Theme" )
-		expect( sections[0].heading.level ).toBe( "h2" )
-
-		// One level deeper: the leaf inside the section's content zone.
+		// One level deeper: the leaf inside the section's content zone —
+		// a responsive image with three crops of the same photograph.
 		const leaves = sections[0].content
 
-		expect( leaves.length ).toBe( 2 )
-		expect( leaves[0].__component ).toBe( "text.plain-string-v1" )
-		expect( leaves[0].content ).toContain(
-			"Architecture and design are part of a creative industry",
-		)
+		expect( leaves.length ).toBe( 1 )
+		expect( leaves[0].__component ).toBe( "media.responsive-image-v1" )
+		expect( leaves[0].small.url ).toMatch( /^https?:\/\// )
 	})
 
 	it("populates the side region's two components", async () => {
