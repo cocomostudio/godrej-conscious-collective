@@ -8,6 +8,16 @@
 	"attributes": {
 		"content": {
 			"type": "string"
+		},
+		"text_color": {
+			"type": "enumeration",
+			"enum": [
+				"black",
+				"white",
+				"context"
+			],
+			"default": "black",
+			"required": true
 		}
 	},
 
@@ -22,12 +32,24 @@
 				"list": {
 					"label": "Content"
 				}
+			},
+			"text_color": {
+				"edit": {
+					"label": "Text colour",
+					"description": "The colour of the words. \"context\" is the page’s own colour, which follows the event it belongs to."
+				},
+				"list": {
+					"label": "Text colour"
+				}
 			}
 		},
 		"layouts": {
 			"edit": [
 				[
 					{ "name": "content", "size": 12 }
+				],
+				[
+					{ "name": "text_color", "size": 6 }
 				]
 			]
 		}

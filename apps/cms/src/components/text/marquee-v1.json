@@ -32,7 +32,7 @@
 			"items": {
 				"edit": {
 					"label": "Items",
-					"description": "Each one is separated from the next by a dot. Keep them short — the venue, the dates, the opening hours."
+					"description": "Each one is separated from the next by a dot. Keep them short — the venue, the dates, the opening hours. Each item offers a text colour because an item is a plain string and every plain string does; the ticker does not read it, and draws all of its words in one colour."
 				},
 				"list": {
 					"label": "Items"

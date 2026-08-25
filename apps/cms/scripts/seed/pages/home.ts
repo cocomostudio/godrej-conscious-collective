@@ -128,11 +128,20 @@ export async function write_home_page (
 			// The heading, the opening line and the "View All" link belong to
 			// the **section**, which already carries all three. A listing that
 			// held its own would be a second place for a heading to live.
+			//
+			// The colour of the words is said on the heading and the link
+			// rather than on the section, so it travels with the words and
+			// not with the background they happen to sit on.
 			section( "Showcases", {
 				background_gradient: "showcase-to-light",
 				blocks: [ session_listing( "Showcase", 6 ) ],
-				heading: heading_component( "Showcases", "h2" ),
-				link: link( "View All", "/showcases" ),
+				heading: heading_component(
+					"Showcases",
+					"h2",
+					false,
+					"white",
+				),
+				link: link( "View All", "/showcases", "plain", "white" ),
 				opening_line:
 					"Installations and concept designs, sited across the "
 					+ "grounds for all three days.",
@@ -141,8 +150,13 @@ export async function write_home_page (
 			section( "Experiences", {
 				background_gradient: "light",
 				blocks: [ session_listing( "Experience", 3 ) ],
-				heading: heading_component( "Experiences", "h2" ),
-				link: link( "View All", "/experiences" ),
+				heading: heading_component(
+					"Experiences",
+					"h2",
+					false,
+					"black",
+				),
+				link: link( "View All", "/experiences", "plain", "black" ),
 				opening_line:
 					"Things to walk through, touch and take part in.",
 				register_with_toc: true,
@@ -152,8 +166,13 @@ export async function write_home_page (
 				background_pattern: "spider-web-2",
 				background_position: "bottom-right",
 				blocks: [ session_listing( "Conversation", 5 ) ],
-				heading: heading_component( "Conversations", "h2" ),
-				link: link( "View All", "/conversations" ),
+				heading: heading_component(
+					"Conversations",
+					"h2",
+					false,
+					"white",
+				),
+				link: link( "View All", "/conversations", "plain", "white" ),
 				opening_line:
 					"Talks and panels with the people making the work.",
 				register_with_toc: true,
@@ -161,8 +180,13 @@ export async function write_home_page (
 			section( "Workshops", {
 				background_gradient: "light",
 				blocks: [ session_listing( "Workshop", 4 ) ],
-				heading: heading_component( "Workshops", "h2" ),
-				link: link( "View All", "/workshops" ),
+				heading: heading_component(
+					"Workshops",
+					"h2",
+					false,
+					"black",
+				),
+				link: link( "View All", "/workshops", "plain", "black" ),
 				opening_line: "Hands-on sessions, with places to book.",
 				register_with_toc: true,
 			} ),
@@ -174,8 +198,13 @@ export async function write_home_page (
 				background_pattern: "spider-web-3",
 				background_position: "left",
 				blocks: [ contributor_listing( "carousel", 10 ) ],
-				heading: heading_component( "Collaborators", "h2" ),
-				link: link( "View All", "/collaborators" ),
+				heading: heading_component(
+					"Collaborators",
+					"h2",
+					false,
+					"white",
+				),
+				link: link( "View All", "/collaborators", "plain", "white" ),
 				opening_line:
 					"The people who made this year\u2019s programme.",
 				register_with_toc: true,

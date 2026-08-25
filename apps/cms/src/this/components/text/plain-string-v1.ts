@@ -3,7 +3,7 @@
  |
  | Populate fragment for `text.plain-string-v1`.
  |
- | A leaf. One string attribute and nothing below it.
+ | A leaf. A string and an enumeration, and nothing below either of them.
  |
  */
 

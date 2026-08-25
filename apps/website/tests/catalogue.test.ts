@@ -24,6 +24,7 @@ import {
 	boot_website,
 } from "./support/boot-website.ts"
 import {
+	coloured,
 	envelope,
 	full_bleed_image_block,
 	gallery,
@@ -51,6 +52,7 @@ import {
 	sponsors_list,
 	vanilla_carousel,
 	wysiwyg,
+	wysiwyg_with_a_heading,
 } from "./support/envelopes.ts"
 
 const SLIDES = [
@@ -238,6 +240,67 @@ beforeAll( async () => {
 				} ),
 			],
 			title: "Spacing",
+		} ),
+
+		"/text-colour": envelope( {
+			main_region: [
+				section( "Asked for", {
+					content: [
+						coloured(
+							plain_string( "Prose in white" ),
+							"white",
+						),
+						coloured(
+							wysiwyg_with_a_heading(
+								"Rich heading",
+								"Rich prose in white",
+							),
+							"white",
+						),
+						coloured( heading( "Heading in black" ), "black" ),
+						coloured(
+							link( "/asked", "Link in black" ),
+							"black",
+						),
+						coloured(
+							link( "/cta", "Button in white", "button" ),
+							"white",
+						),
+					],
+				} ),
+				// What every entry saved before the attribute existed looks
+				// like: the column is there and nobody has written to it.
+				section( "Never set", {
+					content: [
+						coloured(
+							plain_string( "Prose saved before" ),
+							null,
+						),
+						coloured(
+							heading( "Heading saved before" ),
+							null,
+						),
+						coloured(
+							link( "/before", "Link saved before" ),
+							null,
+						),
+					],
+				} ),
+				section( "The section's own words", {
+					content: [ plain_string( "Body" ) ],
+					heading: {
+						content: "Section heading in white",
+						text_color: "white",
+					},
+					link: {
+						label: "Section link in white",
+						style: "plain",
+						text_color: "white",
+						url: "/all",
+					},
+				} ),
+			],
+			title: "Text colour",
 		} ),
 
 		"/injected": envelope( {
@@ -482,6 +545,68 @@ describe("the full-bleed image", () => {
 	})
 })
 
+describe("the colour of a block's words", () => {
+	it("is the one the editor picked, on every one of the four", async () => {
+		const { html } = await website.get( "/text-colour" )
+
+		expect( element_carrying( html, "Prose in white" ) )
+			.toContain( "text-white" )
+		expect( element_carrying( html, "Rich prose in white" ) )
+			.toContain( "text-white" )
+		expect( element_carrying( html, "Heading in black" ) )
+			.toContain( "text-black" )
+		expect( element_carrying( html, "Link in black" ) )
+			.toContain( "text-black" )
+	})
+
+	it("is the colour a block has always drawn where nobody set one", async () => {
+		const { html } = await website.get( "/text-colour" )
+
+		// A schema default is written when a row is created, so an entry that
+		// predates the attribute comes back with `null` in it. The four never
+		// shared a colour, so each falls back to its own rather than to one
+		// constant: prose in black, a heading and a link in the page's own.
+		expect( element_carrying( html, "Prose saved before" ) )
+			.toContain( "text-black" )
+		expect( element_carrying( html, "Heading saved before" ) )
+			.toContain( "text-context" )
+		expect( element_carrying( html, "Link saved before" ) )
+			.toContain( "text-context" )
+	})
+
+	it("leaves a heading inside rich text on the page's own colour", async () => {
+		const { html } = await website.get( "/text-colour" )
+
+		// The prose beside it is white. That colour is what marks a heading out
+		// as a heading rather than as a second body typeface, so it is not the
+		// prose's to take.
+		const rich_heading = element_carrying( html, "Rich heading" )
+
+		expect( rich_heading ).toContain( "text-context" )
+		expect( rich_heading ).not.toContain( "text-white" )
+	})
+
+	it("draws a link styled as a button in it, border and all", async () => {
+		const { html } = await website.get( "/text-colour" )
+
+		const button = element_carrying( html, `href="/cta"` )
+
+		expect( button ).toContain( "text-white" )
+		expect( button ).toContain( "border-white" )
+	})
+
+	it("is a section's own heading's and link's to make", async () => {
+		const { html } = await website.get( "/text-colour" )
+
+		// Neither is a block an editor placed — both are attributes of the
+		// section — and both still answer for themselves.
+		expect( element_carrying( html, "Section heading in white" ) )
+			.toContain( "text-white" )
+		expect( element_carrying( html, "Section link in white" ) )
+			.toContain( "text-white" )
+	})
+})
+
 describe("the map", () => {
 	it("makes no third-party request when its image is set", async () => {
 		const { html } = await website.get( "/mapped" )
@@ -552,6 +677,25 @@ function section_markup ( html: string ) {
 	expect( match ).not.toBeNull()
 
 	return match![0]
+}
+
+/**
+ |
+ | The element carrying a needle — a piece of text, or an attribute — from its
+ | opening angle bracket to the end of whatever tag closes it, which is where
+ | its classes are.
+ |
+ */
+function element_carrying ( html: string, needle: string ) {
+	const markup = rendered( html )
+	const at = markup.indexOf( needle )
+
+	expect( at ).toBeGreaterThan( -1 )
+
+	return markup.slice(
+		markup.lastIndexOf( "<", at ),
+		markup.indexOf( ">", at ) + 1,
+	)
 }
 
 /**

@@ -32,6 +32,16 @@
 			"type": "component",
 			"component": "navigation.link-v1",
 			"required": false
+		},
+		"text_color": {
+			"type": "enumeration",
+			"enum": [
+				"black",
+				"white",
+				"context"
+			],
+			"default": "context",
+			"required": true
 		}
 	},
 
@@ -73,6 +83,15 @@
 				"list": {
 					"label": "Link"
 				}
+			},
+			"text_color": {
+				"edit": {
+					"label": "Text colour",
+					"description": "The colour of the words. \"context\" is the page’s own colour, which follows the event it belongs to. A link beside the heading carries its own."
+				},
+				"list": {
+					"label": "Text colour"
+				}
 			}
 		},
 		"layouts": {
@@ -82,7 +101,8 @@
 					{ "name": "level", "size": 4 }
 				],
 				[
-					{ "name": "register_with_toc", "size": 6 }
+					{ "name": "register_with_toc", "size": 6 },
+					{ "name": "text_color", "size": 6 }
 				],
 				[
 					{ "name": "link", "size": 12 }

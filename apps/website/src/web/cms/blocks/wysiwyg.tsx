@@ -14,6 +14,24 @@
  | nested. Code blocks are rendered as monospaced paragraphs — the editor offers
  | them and the design has nowhere to put them.
  |
+ | **`text_color` is the colour of the prose** — paragraphs, lists, quotations
+ | and code. The headings and links inside keep the page's own colour, and so
+ | does the quotation's rule.
+ |
+ | The alternative was to colour the whole block, and it was rejected on the
+ | shape of the data rather than on taste: this block has drawn two colours
+ | since it was written, three enum values cannot say "mixed", and whichever
+ | single value became the default would repaint every WYSIWYG already saved —
+ | prose in the context colour, or every rich-text heading in black. Prose is
+ | the half the attribute governs because the context colour on a heading or a
+ | link is what marks it out as one.
+ |
+ | **The cost is real and worth naming**: a block set to `white` over a dark
+ | ground draws its subheadings in the context colour, and an editor cannot
+ | say otherwise. If that shows up in a design, the fix is the whole block
+ | following the attribute and a one-off migration writing `context` onto
+ | every WYSIWYG that predates it — not a second attribute.
+ |
  */
 
 import {
@@ -31,7 +49,10 @@ import { picture_of } from "../media.ts"
 import { Nav_Link } from "../nav-link.tsx"
 import { Picture_Image } from "../pictures.tsx"
 
+import type { Text_Color } from "./text-color.ts"
+
 import { BLOCK_SPACING } from "./block-spacing.ts"
+import { text_color_class } from "./text-color.ts"
 
 const HEADING_SIZES: Record<number, string> = {
 	1: "text-h1",
@@ -42,9 +63,15 @@ const HEADING_SIZES: Record<number, string> = {
 	6: "text-h6",
 }
 
-export function Wysiwyg ( { rich_text }: { rich_text?: BlocksContent } ) {
+type Wysiwyg_Props = {
+	rich_text?: BlocksContent
+	text_color?: Text_Color
+}
+
+export function Wysiwyg ( { rich_text, text_color }: Wysiwyg_Props ) {
 	const origin = use_media_origin()
 	const body_size = use_body_text_class()
+	const prose = text_color_class( text_color, "black" )
 
 	if ( !Array.isArray( rich_text ) || rich_text.length === 0 ) {
 		return null
@@ -57,7 +84,7 @@ export function Wysiwyg ( { rich_text }: { rich_text?: BlocksContent } ) {
 			blocks={ {
 				code: ( { children } ) =>
 					<p
-						className={ `mt-4 ${body_size} font-mono text-black` }>
+						className={ `mt-4 ${body_size} font-mono ${prose}` }>
 						{ children }
 					</p>,
 				heading: ( { children, level } ) =>
@@ -94,19 +121,20 @@ export function Wysiwyg ( { rich_text }: { rich_text?: BlocksContent } ) {
 				list: ( { children, format } ) =>
 					format === "ordered"
 						? <ol
-							className={ `mt-4 pl-6 list-decimal ${body_size} text-black` }>
+							className={ `mt-4 pl-6 list-decimal ${body_size} ${prose}` }>
 							{ children }
 						</ol>
 						: <ul
-							className={ `mt-4 pl-6 list-disc ${body_size} text-black` }>
+							className={ `mt-4 pl-6 list-disc ${body_size} ${prose}` }>
 							{ children }
 						</ul>,
 				paragraph: ( { children } ) =>
-					<p className={ `mt-4 ${body_size} text-black` }>
+					<p className={ `mt-4 ${body_size} ${prose}` }>
 						{ children }
 					</p>,
 				quote: ( { children } ) =>
-					<blockquote className="my-6 md:my-8 pl-4 border-l-2 border-context text-h4 text-black">
+					<blockquote
+						className={ `my-6 md:my-8 pl-4 border-l-2 border-context text-h4 ${prose}` }>
 						{ children }
 					</blockquote>,
 			} }

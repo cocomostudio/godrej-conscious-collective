@@ -90,6 +90,7 @@ const TEXT_CLASSES: Record<Emphasis, Partial<Record<Color, string>>> = {
 	outline: {
 		theme: "text-theme",
 		white: "text-white",
+		black: "text-black",
 		red: "text-red",
 	},
 	solid: {

@@ -54,6 +54,10 @@ function find_block ( blocks: any[], name: string ): any {
 	return undefined
 }
 
+function find_section ( blocks: any[], title: string ): any {
+	return ( blocks ?? [] ).find( ( block: any ) => block?.title === title )
+}
+
 describe("the deepest legal path in the render tree", () => {
 	it("arrives intact: entry region, section, composite, leaf", async () => {
 		const { body, status } = await cms.get( "/api/envelope?path=/home" )
@@ -129,6 +133,48 @@ describe("spacing around a block", () => {
 		)
 
 		expect( list.spacing_around ).toBe( "below" )
+	})
+})
+
+describe("the colour of a block's words", () => {
+	it("travels with the component that carries it", async () => {
+		const { body } = await cms.get( "/api/envelope?path=/home" )
+
+		const showcases = find_section(
+			body.data.entry.main_region,
+			"Showcases",
+		)
+
+		// The section's heading and its link each carry their own, because the
+		// colour belongs to the words rather than to the background behind
+		// them.
+		expect( showcases.heading.text_color ).toBe( "white" )
+		expect( showcases.link.text_color ).toBe( "white" )
+	})
+
+	it("is each component's own default where nobody picked one", async () => {
+		const { body } = await cms.get( "/api/envelope?path=/home" )
+
+		// The blocks inside the image stack and the site navigation's links,
+		// none of which names a colour. Not a section of the home page — every
+		// one of those names one now, so none of them is a witness to what an
+		// unset attribute does.
+		const heading = find_block(
+			body.data.entry.main_region,
+			"text.heading-v1",
+		)
+		const plain = find_block(
+			body.data.entry.main_region,
+			"text.plain-string-v1",
+		)
+
+		// The four never shared a colour, so the defaults do not either: a
+		// heading and a link have always drawn themselves in the page's own
+		// colour, and prose in black.
+		expect( heading.text_color ).toBe( "context" )
+		expect( plain.text_color ).toBe( "black" )
+		expect( body.data.page_shell.navigation_header[0].text_color )
+			.toBe( "context" )
 	})
 })
 

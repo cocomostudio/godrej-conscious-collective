@@ -8,6 +8,16 @@
 	"attributes": {
 		"rich_text": {
 			"type": "blocks"
+		},
+		"text_color": {
+			"type": "enumeration",
+			"enum": [
+				"black",
+				"white",
+				"context"
+			],
+			"default": "black",
+			"required": true
 		}
 	},
 
@@ -22,12 +32,24 @@
 				"list": {
 					"label": "Text"
 				}
+			},
+			"text_color": {
+				"edit": {
+					"label": "Text colour",
+					"description": "The colour of the prose — paragraphs, lists, quotations and code. Headings and links inside the text keep the page’s own colour, which is what marks them out as headings and links; \"context\" is that colour."
+				},
+				"list": {
+					"label": "Text colour"
+				}
 			}
 		},
 		"layouts": {
 			"edit": [
 				[
 					{ "name": "rich_text", "size": 12 }
+				],
+				[
+					{ "name": "text_color", "size": 6 }
 				]
 			]
 		}

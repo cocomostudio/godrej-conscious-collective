@@ -7,6 +7,10 @@
  | link an editor marked as a button is that button rendered as an anchor rather
  | than a second thing that looks like one.
  |
+ | `text_color` is the button's colour as well as the plain link's: an outline
+ | button draws its border in the same colour as its words, so the one choice
+ | answers for both and there is no second attribute for the border.
+ |
  */
 
 import { Button } from "#infra/lib/ui/react/buttons/button.tsx"
@@ -15,8 +19,14 @@ import type { Link as Link_Attribute } from "../envelope.ts"
 
 import { Nav_Link } from "../nav-link.tsx"
 import { Chevron_Right } from "#infra/lib/ui/react/icons/chevron-right.tsx"
+import {
+	text_color_class,
+	text_color_token,
+} from "./text-color.ts"
 
-export function Link_Block ( { label, style, url }: Partial<Link_Attribute> ) {
+export function Link_Block (
+	{ label, style, text_color, url }: Partial<Link_Attribute>,
+) {
 	if ( !url ) {
 		return null
 	}
@@ -27,7 +37,7 @@ export function Link_Block ( { label, style, url }: Partial<Link_Attribute> ) {
 		return <p className="mt-4 first:mt-0">
 			<Button
 				emphasis="outline"
-				color="context"
+				color={ text_color_token( text_color, "context" ) }
 				render={ <Nav_Link url={ url } /> }>
 				{ text }
 				<Button.Icon name="chevron-right" />
@@ -40,7 +50,9 @@ export function Link_Block ( { label, style, url }: Partial<Link_Attribute> ) {
 	// branch above is a separate call to action.
 	return <p className="mt-4 first:mt-0">
 		<Nav_Link
-			className="inline-flex gap-1 items-center text-h6 underline underline-offset-4 whitespace-nowrap text-context"
+			className={ `inline-flex gap-1 items-center text-h6 underline underline-offset-4 whitespace-nowrap ${
+				text_color_class( text_color, "context" )
+			}` }
 			url={ url }>
 			{ text }
 			<Chevron_Right className="size-4" />

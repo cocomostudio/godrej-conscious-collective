@@ -49,6 +49,7 @@ import type {
 } from "../envelope.ts"
 
 import type { Spacing_Around } from "./block-spacing.ts"
+import type { Text_Color } from "./text-color.ts"
 
 import { use_anchor } from "../anchors.tsx"
 import {
@@ -70,6 +71,7 @@ type Section_Heading = {
 	content: string
 	level?: string
 	link?: Link_Attribute | null
+	text_color?: Text_Color
 }
 
 type Section_Props = Pick<Block, "__component" | "id"> & {
@@ -188,18 +190,21 @@ export function Section (
 							id={ heading.id }
 							content={ heading.content }
 							level={ heading.level }
-							link={ section_link } />
-						: section_link && <Link_Block { ...section_link } /> }
-	
+							link={ section_link }
+							text_color={ heading.text_color } />
+						: section_link
+							&& <Link_Block { ...section_link } /> }
+
 					{ heading?.content && opening_line
 						&& <p className={ opening_class }>
 							{ opening_line }
 						</p> }
-	
+
 					<Level>{ children }</Level>
 				</div>
 			</div>
 		</section>
-		{ horizontal_rule && <hr className="border-0 border-t-2 border-gray-light" /> }
+		{ horizontal_rule
+			&& <hr className="border-0 border-t-2 border-gray-light" /> }
 	</>
 }

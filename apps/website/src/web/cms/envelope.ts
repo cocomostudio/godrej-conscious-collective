@@ -33,6 +33,15 @@ export type Link = {
 	label: string | null
 	url: string
 	style: "plain" | "button"
+	/**
+	 |
+	 | Null on every link written before the attribute existed — a schema
+	 | default is applied when a row is saved, not when one is read. The website
+	 | reads that as the colour the link has always drawn itself in. See
+	 | `blocks/text-color.ts`.
+	 |
+	 */
+	text_color?: "black" | "white" | "context" | null
 }
 
 export type Page_Shell = {

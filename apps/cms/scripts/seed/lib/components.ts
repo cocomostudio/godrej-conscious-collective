@@ -201,16 +201,30 @@ export function vanilla_carousel ( slides: Slide[] ) {
 	}
 }
 
+/**
+ |
+ | The colour a component draws its words in. Left off where it is not given, so
+ | the seed exercises each schema's own default rather than restating it — and
+ | the defaults differ, because the four components never shared a colour.
+ |
+ */
+export type Text_Color = "black" | "white" | "context"
+
 export function link (
 	label: string,
 	url: string,
 	style: "plain" | "button" = "plain",
+	text_color?: Text_Color,
 ) {
-	return { label, style, url }
+	return { label, style, url, ...( text_color ? { text_color } : {} ) }
 }
 
-export function plain_string ( content: string ) {
-	return { __component: "text.plain-string-v1", content }
+export function plain_string ( content: string, text_color?: Text_Color ) {
+	return {
+		__component: "text.plain-string-v1",
+		content,
+		...( text_color ? { text_color } : {} ),
+	}
 }
 
 export type Level = "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
@@ -226,8 +240,14 @@ export function heading_component (
 	content: string,
 	level: Level,
 	register_with_toc = false,
+	text_color?: Text_Color,
 ) {
-	return { content, level, register_with_toc }
+	return {
+		content,
+		level,
+		register_with_toc,
+		...( text_color ? { text_color } : {} ),
+	}
 }
 
 /**
@@ -240,10 +260,11 @@ export function heading (
 	content: string,
 	level: Level,
 	register_with_toc = false,
+	text_color?: Text_Color,
 ) {
 	return {
 		__component: "text.heading-v1",
-		...heading_component( content, level, register_with_toc ),
+		...heading_component( content, level, register_with_toc, text_color ),
 	}
 }
 
@@ -278,7 +299,7 @@ export function section (
 ) {
 	return {
 		__component: "container.section-v1",
-		content: [ ...strings.map( plain_string ), ...blocks ],
+		content: [ ...strings.map( s => plain_string( s ) ), ...blocks ],
 		// Present-but-undefined is not the same as absent here: the document
 		// service reads the key, builds an empty heading component from it, and
 		// then refuses the whole entry because that component's required

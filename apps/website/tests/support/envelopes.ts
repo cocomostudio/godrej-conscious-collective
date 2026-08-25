@@ -207,6 +207,7 @@ export function section (
 			level?: string
 			link?: Link_Attribute | null
 			register_with_toc?: boolean
+			text_color?: string | null
 		}
 		horizontal_rule?: boolean
 		link?: Link_Attribute | null
@@ -300,6 +301,23 @@ export function spaced (
 	return { ...block, spacing_around }
 }
 
+/**
+ |
+ | The same block, in the colour an editor picked for its words.
+ |
+ | One builder over all four of the components that carry `text_color`, for the
+ | same reason `spaced` is one over every component that carries
+ | `spacing_around`: it is one scalar and it means the same thing wherever it
+ | sits.
+ |
+ */
+export function coloured (
+	block: Block,
+	text_color: string | null,
+): Block {
+	return { ...block, text_color }
+}
+
 export function image_link (
 	url: string,
 	label: string,
@@ -320,6 +338,31 @@ export function wysiwyg ( ...paragraphs: string[] ): Block {
 			children: [ { text: paragraph, type: "text" } ],
 			type: "paragraph",
 		} ) ),
+	}
+}
+
+/**
+ |
+ | Rich text with a heading in it, which is where a WYSIWYG's two colours part
+ | company: the prose follows `text_color` and the heading inside does not.
+ |
+ */
+export function wysiwyg_with_a_heading (
+	heading_text: string,
+	...paragraphs: string[]
+): Block {
+	const block = wysiwyg( ...paragraphs )
+
+	return {
+		...block,
+		rich_text: [
+			{
+				children: [ { text: heading_text, type: "text" } ],
+				level: 2,
+				type: "heading",
+			},
+			...block.rich_text as unknown[],
+		],
 	}
 }
 

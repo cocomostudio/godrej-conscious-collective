@@ -10,6 +10,13 @@
  | Every repeat past the first is hidden from assistive technology — a screen
  | reader should hear the venue once, not four times.
  |
+ | **An item's own `text_color` is not read.** The items are plain strings, and
+ | a plain string carries the attribute — but the ticker is one black bar with
+ | one colour of words on it, and a bar whose items disagreed would not be the
+ | design. The field is visible in the admin because Strapi configures a
+ | component once for every place it is used; the schema's `items` description
+ | says so.
+ |
  | **The design has the ticker butting straight against whatever sits above and
  | below it**, which is what `spacing_around` says out loud: set it to "none"
  | and the block carries no margin and the section lays down no padding at that
