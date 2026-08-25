@@ -1,0 +1,233 @@
+{
+	"kind": "collectionType",
+	"collectionName": "leads",
+	"info": {
+		"singularName": "lead",
+		"pluralName": "leads",
+		"displayName": "Lead",
+		"description": "A record created when a member of the public submits the registration form. Written only by the registration relay, and never readable through the public API."
+	},
+	"options": {
+		"draftAndPublish": false
+	},
+	"attributes": {
+		"name_first": {
+			"type": "string",
+			"required": true,
+			"maxLength": 120
+		},
+		"name_last": {
+			"type": "string",
+			"required": true,
+			"maxLength": 120
+		},
+		"email_address": {
+			"type": "string",
+			"required": true,
+			"maxLength": 320
+		},
+		"phone_number": {
+			"type": "string",
+			"required": true,
+			"maxLength": 40
+		},
+		"institution": {
+			"type": "string",
+			"required": true,
+			"maxLength": 200
+		},
+		"occupation": {
+			"type": "string",
+			"required": true,
+			"maxLength": 80
+		},
+		"interests": {
+			"type": "text",
+			"required": false
+		},
+		"consent_given": {
+			"type": "boolean",
+			"required": true
+		},
+		"consent_at": {
+			"type": "datetime",
+			"required": true
+		},
+		"consent_text": {
+			"type": "text",
+			"required": true
+		},
+		"event": {
+			"type": "relation",
+			"relation": "manyToOne",
+			"target": "api::event.event",
+			"required": false
+		},
+		"retain_until": {
+			"type": "datetime",
+			"required": false
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"name_first": {
+				"edit": {
+					"label": "First name",
+					"description": "As the registrant typed it.",
+					"editable": false
+				},
+				"list": {
+					"label": "First name"
+				}
+			},
+			"name_last": {
+				"edit": {
+					"label": "Last name",
+					"description": "As the registrant typed it.",
+					"editable": false
+				},
+				"list": {
+					"label": "Last name"
+				}
+			},
+			"email_address": {
+				"edit": {
+					"label": "Email",
+					"description": "As the registrant typed it.",
+					"editable": false
+				},
+				"list": {
+					"label": "Email"
+				}
+			},
+			"phone_number": {
+				"edit": {
+					"label": "Mobile",
+					"description": "As the registrant typed it.",
+					"editable": false
+				},
+				"list": {
+					"label": "Mobile"
+				}
+			},
+			"institution": {
+				"edit": {
+					"label": "Company / School",
+					"description": "Where the registrant works or studies.",
+					"editable": false
+				},
+				"list": {
+					"label": "Company / School"
+				}
+			},
+			"occupation": {
+				"edit": {
+					"label": "Occupation",
+					"description": "Stored as the form's own slug rather than its label, so the wording can be revised without invalidating anything already submitted.",
+					"editable": false
+				},
+				"list": {
+					"label": "Occupation"
+				}
+			},
+			"interests": {
+				"edit": {
+					"label": "Interested in",
+					"description": "The programme strands the registrant ticked, comma separated.",
+					"editable": false
+				},
+				"list": {
+					"label": "Interested in"
+				}
+			},
+			"consent_given": {
+				"edit": {
+					"label": "Consent given",
+					"description": "Whether the registrant ticked the consent box. A submission without it is refused, so every stored record says yes.",
+					"editable": false
+				},
+				"list": {
+					"label": "Consent"
+				}
+			},
+			"consent_at": {
+				"edit": {
+					"label": "Consent given at",
+					"description": "Stamped by the server at submission, never by the browser.",
+					"editable": false
+				},
+				"list": {
+					"label": "Consent given at"
+				}
+			},
+			"consent_text": {
+				"edit": {
+					"label": "Consent wording",
+					"description": "The exact wording that was on screen when the box was ticked. The wording changes over time, and a consent record that cannot say what was consented to is not a record.",
+					"editable": false
+				},
+				"list": {
+					"label": "Consent wording"
+				}
+			},
+			"event": {
+				"edit": {
+					"label": "Event",
+					"description": "The event that was main when this registration arrived. Set by the server.",
+					"editable": false
+				},
+				"list": {
+					"label": "Event"
+				}
+			},
+			"retain_until": {
+				"edit": {
+					"label": "Retain until",
+					"description": "The date this record is due for deletion — the event's end date plus twelve months, computed once at submission. Nothing acts on it: it is a record of a promise, not an enforcement of it.",
+					"editable": false
+				},
+				"list": {
+					"label": "Retain until"
+				}
+			}
+		},
+		"layouts": {
+			"list": [
+				"name_first",
+				"name_last",
+				"email_address",
+				"createdAt"
+			],
+			"edit": [
+				[
+					{ "name": "name_first", "size": 6 },
+					{ "name": "name_last", "size": 6 }
+				],
+				[
+					{ "name": "email_address", "size": 6 },
+					{ "name": "phone_number", "size": 6 }
+				],
+				[
+					{ "name": "institution", "size": 6 },
+					{ "name": "occupation", "size": 6 }
+				],
+				[
+					{ "name": "interests", "size": 12 }
+				],
+				[
+					{ "name": "consent_given", "size": 3 },
+					{ "name": "consent_at", "size": 4 }
+				],
+				[
+					{ "name": "consent_text", "size": 12 }
+				],
+				[
+					{ "name": "event", "size": 6 },
+					{ "name": "retain_until", "size": 6 }
+				]
+			]
+		}
+	}
+}

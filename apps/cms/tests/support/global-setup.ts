@@ -71,7 +71,10 @@ export async function setup () {
 	const strapi = await createStrapi( context ).load()
 
 	try {
-		await write_seed_content( strapi )
+		// **No downloads.** The registration form's slideshow is the one part
+		// of the seed that leaves the machine, and nothing in this suite looks
+		// at those pictures. See `Seed_Options`.
+		await write_seed_content( strapi, { download_media: false } )
 	} finally {
 		// Destroyed rather than left listening: what the test files want is
 		// the database this wrote, and a second live instance is the one thing

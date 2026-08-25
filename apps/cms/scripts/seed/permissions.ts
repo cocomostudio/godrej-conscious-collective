@@ -9,6 +9,10 @@
  | 403 — which reads as a bug in the envelope route rather than as an empty
  | permissions grid.
  |
+ | The one route that is **not** here is Lead create, which the registration
+ | relay reaches with a scoped token instead. See
+ | `registration-relay-token.ts`.
+ |
  */
 
 import type { Strapi } from "./lib/strapi.ts"

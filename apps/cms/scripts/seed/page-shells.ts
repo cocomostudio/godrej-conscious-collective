@@ -12,6 +12,7 @@
 
 import { link } from "./lib/components.ts"
 import type { Strapi } from "./lib/strapi.ts"
+import { upload_slideshow } from "./lib/uploads.ts"
 
 export type Seeded_Page_Shells = {
 	archive: any
@@ -20,11 +21,23 @@ export type Seeded_Page_Shells = {
 
 export async function write_page_shells (
 	strapi: Strapi,
+	/**
+	 |
+	 | Whether to fetch the slideshow's pictures. False from the CMS test
+	 | harness — see `Seed_Options` in `content.ts`. A shell with no slideshow
+	 | is a shape the frontend already has, because it is what an editor who
+	 | uploads nothing gets.
+	 |
+	 */
+	download_media = true,
 ): Promise<Seeded_Page_Shells> {
 	const primary = await strapi.documents( "api::page-shell.page-shell" )
 		.create( {
 			data: {
 				default: true,
+				form_slideshow: download_media
+					? await upload_slideshow( strapi )
+					: [],
 				name: "Primary",
 				navigation_footer: [
 					link(
