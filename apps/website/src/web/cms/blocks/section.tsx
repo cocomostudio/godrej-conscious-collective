@@ -174,31 +174,32 @@ export function Section (
 
 	const opening_class = `mt-4 ${use_body_text_class()} text-black`
 
-	return <section
-		className={ `scroll-mt-4 ${outer_edges}` }
-		id={ anchor }
-		style={ background }>
-		{ horizontal_rule
-			&& <hr className="border-0 border-t-2 border-gray-light" /> }
-
-		<div className={ padding }>
-			<div className={ one_column ? SECTION_CONTAINER : "" }>
-				{ heading?.content
-					? <Heading
-						__component="text.heading-v1"
-						id={ heading.id }
-						content={ heading.content }
-						level={ heading.level }
-						link={ section_link } />
-					: section_link && <Link_Block { ...section_link } /> }
-
-				{ heading?.content && opening_line
-					&& <p className={ opening_class }>
-						{ opening_line }
-					</p> }
-
-				<Level>{ children }</Level>
+	return <>
+		<section
+			className={ `scroll-mt-4 ${outer_edges}` }
+			id={ anchor }
+			style={ background }
+		>
+			<div className={ padding }>
+				<div className={ one_column ? SECTION_CONTAINER : "" }>
+					{ heading?.content
+						? <Heading
+							__component="text.heading-v1"
+							id={ heading.id }
+							content={ heading.content }
+							level={ heading.level }
+							link={ section_link } />
+						: section_link && <Link_Block { ...section_link } /> }
+	
+					{ heading?.content && opening_line
+						&& <p className={ opening_class }>
+							{ opening_line }
+						</p> }
+	
+					<Level>{ children }</Level>
+				</div>
 			</div>
-		</div>
-	</section>
+		</section>
+		{ horizontal_rule && <hr className="border-0 border-t-2 border-gray-light" /> }
+	</>
 }

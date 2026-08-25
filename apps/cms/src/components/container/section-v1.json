@@ -196,11 +196,11 @@
 			},
 			"horizontal_rule": {
 				"edit": {
-					"label": "Rule above?",
-					"description": "Draws a line across the top of this section, separating it from the one before."
+					"label": "Horizontal Rule below",
+					"description": "Draws a line below this section, separating it from the one after."
 				},
 				"list": {
-					"label": "Rule above?"
+					"label": "Horizontal Rule below"
 				}
 			},
 			"spacing_around": {
