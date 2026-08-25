@@ -19,6 +19,7 @@ import {
 	heading_component,
 	image,
 	plain_string,
+	plain_string_component,
 	quote,
 	section,
 	vanilla_carousel,
@@ -47,8 +48,9 @@ export const sample_content_templates: Array<() => any[]> = [
 	() => [
 		section( "About the Work", {
 			heading: heading_component( "About the Work", "h2" ),
-			opening_line:
+			opening_line: plain_string_component(
 				"The making, the material and the reasons behind it.",
+			),
 			register_with_toc: true,
 			strings: [
 				"This piece began in conversation — long, unhurried and often circling back to the same three questions. What is worth keeping? What must change? What can be built with the little that is left?",
@@ -89,7 +91,9 @@ export const sample_content_templates: Array<() => any[]> = [
 	() => [
 		section( "What Happens", {
 			heading: heading_component( "What Happens", "h2" ),
-			opening_line: "The shape of the session, from arrival to close.",
+			opening_line: plain_string_component(
+				"The shape of the session, from arrival to close.",
+			),
 			register_with_toc: true,
 			strings: [
 				"The doors open twenty minutes before the start. Anything you need is at the desk on the way in, and there is somewhere to leave a bag if you have one.",
@@ -109,7 +113,9 @@ export const sample_content_templates: Array<() => any[]> = [
 	() => [
 		section( "Behind the Making", {
 			heading: heading_component( "Behind the Making", "h2" ),
-			opening_line: "The people, the place, and what led here.",
+			opening_line: plain_string_component(
+				"The people, the place, and what led here.",
+			),
 			register_with_toc: true,
 			blocks: [
 				{
@@ -141,8 +147,9 @@ export const sample_content_templates: Array<() => any[]> = [
 	() => [
 		section( "A Longer Read", {
 			heading: heading_component( "A Longer Read", "h2" ),
-			opening_line:
+			opening_line: plain_string_component(
 				"The context you might want before you come, or after you leave.",
+			),
 			register_with_toc: true,
 			blocks: [
 				wysiwyg( [

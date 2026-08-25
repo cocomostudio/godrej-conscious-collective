@@ -159,7 +159,9 @@ beforeAll( async () => {
 						style: "plain",
 						url: "/somewhere",
 					},
-					opening_line: "This opening line has nothing to open.",
+					opening_line: {
+						content: "This opening line has nothing to open.",
+					},
 				} ),
 				section( "Both links", {
 					heading: {
@@ -176,8 +178,10 @@ beforeAll( async () => {
 						style: "plain",
 						url: "/section",
 					},
-					opening_line:
-						"This opening line has a heading above it.",
+					opening_line: {
+						content:
+							"This opening line has a heading above it.",
+					},
 				} ),
 			],
 			title: "Cross-field rules",
@@ -297,6 +301,10 @@ beforeAll( async () => {
 						style: "plain",
 						text_color: "white",
 						url: "/all",
+					},
+					opening_line: {
+						content: "Section opening line in white",
+						text_color: "white",
 					},
 				} ),
 			],
@@ -603,6 +611,11 @@ describe("the colour of a block's words", () => {
 		expect( element_carrying( html, "Section heading in white" ) )
 			.toContain( "text-white" )
 		expect( element_carrying( html, "Section link in white" ) )
+			.toContain( "text-white" )
+
+		// The opening line is a plain string component rather than a bare line
+		// of text, which is the whole reason it can answer at all.
+		expect( element_carrying( html, "Section opening line in white" ) )
 			.toContain( "text-white" )
 	})
 })

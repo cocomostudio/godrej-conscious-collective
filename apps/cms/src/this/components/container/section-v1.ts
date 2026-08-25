@@ -83,4 +83,5 @@ export const populate_section_v1 = {
 	content: { on: SECTION_LIST },
 	heading: { populate: populate_heading_v1 },
 	link: { populate: populate_link_v1 },
+	opening_line: { populate: populate_plain_string_v1 },
 }

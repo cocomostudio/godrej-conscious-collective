@@ -211,7 +211,7 @@ export function section (
 		}
 		horizontal_rule?: boolean
 		link?: Link_Attribute | null
-		opening_line?: string
+		opening_line?: { content: string; text_color?: string | null }
 		register_with_toc?: boolean
 		spacing_around?: string
 	} = {},

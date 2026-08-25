@@ -29,6 +29,11 @@
  | Its `title` is not shown. The title names the section in the table of
  | contents; the heading is what a reader sees.
  |
+ | Its `opening_line` is a **plain string component**, not a bare line of text,
+ | so it answers for its own colour the way every other run of words in the
+ | catalogue does. It is rendered by the same block an editor would have placed
+ | by hand — there is one plain string on this site, not two.
+ |
  | **Two cross-field rules, neither enforced at save time.** An opening line
  | with no heading above it is not rendered, and where both this section and its
  | heading carry a link, the heading's is the one shown — it sits nearer the
@@ -52,13 +57,11 @@ import type { Spacing_Around } from "./block-spacing.ts"
 import type { Text_Color } from "./text-color.ts"
 
 import { use_anchor } from "../anchors.tsx"
-import {
-	use_body_text_class,
-	use_page_layout,
-} from "../page-layout.tsx"
+import { use_page_layout } from "../page-layout.tsx"
 import { section_background } from "../section-backgrounds.ts"
 import { Heading } from "./heading.tsx"
 import { Link_Block } from "./link.tsx"
+import { Plain_String } from "./plain-string.tsx"
 import {
 	pads_at_bottom,
 	pads_at_top,
@@ -71,6 +74,19 @@ type Section_Heading = {
 	content: string
 	level?: string
 	link?: Link_Attribute | null
+	text_color?: Text_Color
+}
+
+/**
+ |
+ | The section's opening line, as the plain string component it now is.
+ |
+ | An ordinary component attribute, so it arrives without a `__component` — the
+ | schema already says what it is, and nothing here invents one for it.
+ |
+ */
+type Section_Opening_Line = {
+	content?: string | null
 	text_color?: Text_Color
 }
 
@@ -97,7 +113,7 @@ type Section_Props = Pick<Block, "__component" | "id"> & {
 	 |
 	 */
 	content?: unknown
-	opening_line?: string | null
+	opening_line?: Section_Opening_Line | null
 	link?: Link_Attribute | null
 	background_gradient?: string
 	background_pattern?: string
@@ -174,8 +190,6 @@ export function Section (
 		pad_bottom ? "[&:last-child]:pb-8 [&:last-child]:md:pb-16" : "",
 	].filter( Boolean ).join( " " )
 
-	const opening_class = `mt-4 ${use_body_text_class()} text-black`
-
 	return <>
 		<section
 			className={ `scroll-mt-4 ${outer_edges}` }
@@ -195,10 +209,10 @@ export function Section (
 						: section_link
 							&& <Link_Block { ...section_link } /> }
 
-					{ heading?.content && opening_line
-						&& <p className={ opening_class }>
-							{ opening_line }
-						</p> }
+					{ heading?.content && opening_line?.content
+						&& <Plain_String
+							content={ opening_line.content }
+							text_color={ opening_line.text_color } /> }
 
 					<Level>{ children }</Level>
 				</div>

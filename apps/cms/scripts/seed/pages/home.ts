@@ -22,6 +22,7 @@ import {
 	link,
 	marquee,
 	plain_string,
+	plain_string_component,
 	responsive_image,
 	section,
 } from "../lib/components.ts"
@@ -142,9 +143,11 @@ export async function write_home_page (
 					"white",
 				),
 				link: link( "View All", "/showcases", "plain", "white" ),
-				opening_line:
+				opening_line: plain_string_component(
 					"Installations and concept designs, sited across the "
-					+ "grounds for all three days.",
+						+ "grounds for all three days.",
+					"white",
+				),
 				register_with_toc: true,
 			} ),
 			section( "Experiences", {
@@ -157,8 +160,9 @@ export async function write_home_page (
 					"black",
 				),
 				link: link( "View All", "/experiences", "plain", "black" ),
-				opening_line:
+				opening_line: plain_string_component(
 					"Things to walk through, touch and take part in.",
+				),
 				register_with_toc: true,
 			} ),
 			section( "Conversations", {
@@ -173,8 +177,10 @@ export async function write_home_page (
 					"white",
 				),
 				link: link( "View All", "/conversations", "plain", "white" ),
-				opening_line:
+				opening_line: plain_string_component(
 					"Talks and panels with the people making the work.",
+					"white",
+				),
 				register_with_toc: true,
 			} ),
 			section( "Workshops", {
@@ -187,7 +193,9 @@ export async function write_home_page (
 					"black",
 				),
 				link: link( "View All", "/workshops", "plain", "black" ),
-				opening_line: "Hands-on sessions, with places to book.",
+				opening_line: plain_string_component(
+					"Hands-on sessions, with places to book.",
+				),
 				register_with_toc: true,
 			} ),
 			// Left empty on purpose, so that the home page is the automatic
@@ -205,8 +213,10 @@ export async function write_home_page (
 					"white",
 				),
 				link: link( "View All", "/collaborators", "plain", "white" ),
-				opening_line:
+				opening_line: plain_string_component(
 					"The people who made this year\u2019s programme.",
+					"white",
+				),
 				register_with_toc: true,
 			} ),
 			section( "Follow our Instagram", {

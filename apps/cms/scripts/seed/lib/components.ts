@@ -219,11 +219,30 @@ export function link (
 	return { label, style, url, ...( text_color ? { text_color } : {} ) }
 }
 
+/**
+ |
+ | A plain string as an ordinary component attribute — a section's opening
+ | line. It carries no `__component`, for the same reason the heading beside it
+ | does not: it is not a choice an editor made from a dynamic zone.
+ |
+ */
+export function plain_string_component (
+	content: string,
+	text_color?: Text_Color,
+) {
+	return { content, ...( text_color ? { text_color } : {} ) }
+}
+
+/**
+ |
+ | The same component as an entry in a dynamic zone, where the discriminator is
+ | what tells Strapi which component was chosen.
+ |
+ */
 export function plain_string ( content: string, text_color?: Text_Color ) {
 	return {
 		__component: "text.plain-string-v1",
-		content,
-		...( text_color ? { text_color } : {} ),
+		...plain_string_component( content, text_color ),
 	}
 }
 
@@ -291,7 +310,7 @@ export function section (
 		heading?: ReturnType<typeof heading_component>
 		horizontal_rule?: boolean
 		link?: ReturnType<typeof link>
-		opening_line?: string
+		opening_line?: ReturnType<typeof plain_string_component>
 		register_with_toc?: boolean
 		spacing_around?: string
 		strings?: string[]

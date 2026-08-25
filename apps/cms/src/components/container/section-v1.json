@@ -21,7 +21,8 @@
 			"required": false
 		},
 		"opening_line": {
-			"type": "text",
+			"type": "component",
+			"component": "text.plain-string-v1",
 			"required": false
 		},
 		"link": {
@@ -152,7 +153,7 @@
 			"opening_line": {
 				"edit": {
 					"label": "Opening line",
-					"description": "A line beneath the heading. It is not shown at all when there is no heading above it."
+					"description": "A line beneath the heading. It is not shown at all when there is no heading above it. It is a plain string rather than a bare line of text, so that it answers for its own colour like every other run of words in the catalogue."
 				},
 				"list": {
 					"label": "Opening line"

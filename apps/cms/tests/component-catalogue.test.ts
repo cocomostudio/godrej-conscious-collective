@@ -224,7 +224,9 @@ describe("a section", () => {
 			block: any,
 		) => block.title === "About Godrej Design Lab" )
 
-		expect( section.opening_line ).toContain( "How the Lab supports" )
+		expect( section.opening_line.content ).toContain(
+			"How the Lab supports",
+		)
 		expect( section.horizontal_rule ).toBe( true )
 		expect( section.background_gradient ).toBe( "none" )
 		expect( section.background_pattern ).toBe( "none" )

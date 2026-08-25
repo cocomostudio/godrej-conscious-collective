@@ -21,6 +21,7 @@ import {
 	image,
 	image_block,
 	plain_string,
+	plain_string_component,
 	quote,
 	responsive_image_block,
 	section,
@@ -111,8 +112,9 @@ export async function write_about_page (
 					"h2",
 				),
 				horizontal_rule: true,
-				opening_line:
+				opening_line: plain_string_component(
 					"How the Lab supports Conscious Collective, and who is behind it.",
+				),
 				register_with_toc: true,
 			} ),
 			// The three media leaves that no composite carries for them: an
@@ -157,8 +159,9 @@ export async function write_about_page (
 					}, "above" ),
 				],
 				heading: heading_component( "Inside the Lab", "h2" ),
-				opening_line:
+				opening_line: plain_string_component(
 					"Where the work is made, and where it is shown.",
+				),
 				register_with_toc: true,
 			} ),
 			section( "The Core Team", {
