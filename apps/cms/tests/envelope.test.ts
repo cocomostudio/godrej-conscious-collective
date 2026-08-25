@@ -46,13 +46,17 @@ describe("the deepest legal path in the render tree", () => {
 		expect( sections[0].__component ).toBe( "container.section-v1" )
 		expect( sections[0].title ).toBe( "Above the Fold" )
 
-		// One level deeper: the leaf inside the section's content zone —
-		// a responsive image with three crops of the same photograph.
+		// One level deeper: the leaf inside the section's content zone — a
+		// full-bleed image with three crops of the same photograph. It holds
+		// what a responsive image holds and shares that component's populate
+		// fragment, so reaching `small.url` through it is the same proof at
+		// the same depth.
 		const leaves = sections[0].content
 
 		expect( leaves.length ).toBe( 1 )
-		expect( leaves[0].__component ).toBe( "media.responsive-image-v1" )
+		expect( leaves[0].__component ).toBe( "media.full-bleed-image-v1" )
 		expect( leaves[0].small.url ).toMatch( /^https?:\/\// )
+		expect( leaves[0].spacing_around ).toBe( "normal" )
 	})
 
 	it("populates the side region's two components", async () => {

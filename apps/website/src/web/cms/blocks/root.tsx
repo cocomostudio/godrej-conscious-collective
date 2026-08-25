@@ -298,16 +298,7 @@ function Main_Column (
 		two_column: boolean
 	},
 ) {
-	return <div
-		className={ two_column
-			? "layout__1-4__col-2 bg-white"
-			// A one-column page's sections run edge to edge, and the blocks
-			// that have to run off those edges do it with margins measured
-			// from `100vw`. Where a browser draws a classic scrollbar that is
-			// a few pixels wider than the column actually is, so the overflow
-			// is clipped rather than left to put a second scrollbar along the
-			// bottom of every page.
-			: "w-full overflow-x-hidden bg-white" }>
+	const body = <>
 		{
 			/* On mobile, the sidebar stacks above the main column and the two
 		     were separated by a white strip of the main column's own top
@@ -341,6 +332,32 @@ function Main_Column (
 			: <div className="text-black">
 				<Level>{ children }</Level>
 			</div> }
+	</>
+
+	return <div
+		className={ two_column
+			// Grey, not white — the white is the box inside. The two are the
+			// same width until the viewport passes the design width, where the
+			// content container re-centres and its margin grows past four
+			// rems; from there this track is wider than the box it holds, and
+			// what shows down the right of the page is this grey.
+			? "layout__1-4__col-2 bg-gray-light"
+			// A one-column page's sections run edge to edge, and the blocks
+			// that have to run off those edges do it with margins measured
+			// from `100vw`. Where a browser draws a classic scrollbar that is
+			// a few pixels wider than the column actually is, so the overflow
+			// is clipped rather than left to put a second scrollbar along the
+			// bottom of every page.
+			: "w-full overflow-x-hidden bg-white" }>
+		{ two_column
+			// The white box, and everything the column holds is inside it.
+			// Nine columns and two gutters — two gutters wider than the
+			// `md:w-9c` container below it, all of that on the right, because
+			// a block is laid out from the left. Those two gutters are what a
+			// full-bleed block runs out into. See `use_column_bleed` in
+			// `section-frame.tsx`.
+			? <div className="md:w-9c2g bg-white">{ body }</div>
+			: body }
 	</div>
 }
 

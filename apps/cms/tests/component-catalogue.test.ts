@@ -109,6 +109,17 @@ describe("spacing around a block", () => {
 		expect( marquee.spacing_around ).toBe( "none" )
 	})
 
+	it("falls back to the schema's own default where nobody set it", async () => {
+		const { body } = await cms.get( "/api/envelope?path=/home" )
+
+		const bled = find_block(
+			body.data.entry.main_region,
+			"media.full-bleed-image-v1",
+		)
+
+		expect( bled.spacing_around ).toBe( "normal" )
+	})
+
 	it("is what the schedule page's list uses to open flush", async () => {
 		const { body } = await cms.get( "/api/envelope?path=/schedule" )
 

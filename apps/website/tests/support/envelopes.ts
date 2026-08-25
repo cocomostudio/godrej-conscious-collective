@@ -273,13 +273,24 @@ export function responsive_image_block ( url: string ): Block {
 	}
 }
 
+export function full_bleed_image_block (
+	url: string,
+	over: Record<string, unknown> = {},
+): Block {
+	return {
+		__component: "media.full-bleed-image-v1",
+		id: id(),
+		...responsive_image( url, over ),
+	}
+}
+
 /**
  |
  | The same block, with an editor's `spacing_around` on it.
  |
- | Every component that carries the attribute takes one builder over all of
- | them rather than a spacing argument each — it is one scalar and it means the
- | same thing wherever it sits.
+ | Three components in the catalogue carry the attribute and one builder over
+ | all of them keeps the tests from growing a spacing argument each — it is one
+ | scalar and it means the same thing wherever it sits.
  |
  */
 export function spaced (

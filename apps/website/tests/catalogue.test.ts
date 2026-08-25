@@ -25,6 +25,7 @@ import {
 } from "./support/boot-website.ts"
 import {
 	envelope,
+	full_bleed_image_block,
 	gallery,
 	google_map,
 	google_map_block,
@@ -81,6 +82,10 @@ beforeAll( async () => {
 						responsive_image_block(
 							"/uploads/responsive.png",
 						),
+						full_bleed_image_block( "/uploads/bled.png", {
+							alt: "Edge to edge",
+							caption: "A caption nobody sees.",
+						} ),
 						gallery(
 							"wide-first",
 							"/uploads/left.png",
@@ -448,6 +453,32 @@ describe("spacing around a block", () => {
 
 		expect( own.padding ).toContain( "pt-6" )
 		expect( own.padding ).not.toMatch( /\bpb-/ )
+	})
+})
+
+describe("the full-bleed image", () => {
+	it("breaks out of the column it was placed in", async () => {
+		const { html } = await website.get( "/everything" )
+
+		// Two-column here: out of the main column's own inset on the left, and
+		// across the white box's two gutters on the right.
+		expect( html ).toContain( "md:-ml-16" )
+		expect( html ).toContain( "md:-mr-2g" )
+	})
+
+	it("carries no rounded corners and no visible caption", async () => {
+		const { html } = await website.get( "/everything" )
+
+		const figure = html.slice( html.indexOf( "md:-ml-16" ) )
+			.slice(
+				0,
+				html.slice( html.indexOf( "md:-ml-16" ) )
+					.indexOf( "</figure>" ),
+			)
+
+		expect( figure ).not.toContain( "rounded-lg" )
+		expect( figure ).toContain( "sr-only" )
+		expect( figure ).toContain( "A caption nobody sees." )
 	})
 })
 

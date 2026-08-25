@@ -11,12 +11,19 @@
  | main column is already the container, and a second one inside every section
  | would narrow the page a second time.
  |
- | One way out of the frame:
+ | Two ways out of the frame, because there are two frames:
  |
  |   • **`use_full_bleed`** takes a block back out to the section's full width.
  |     A listing drawn as a carousel needs it, because it loops and has to run
  |     off both edges rather than stop at a margin and show its own ends. It is
  |     a one-column page's alone: there, the section *is* the full width.
+ |
+ |   • **`use_column_bleed`** takes a block out to the edges of the white
+ |     column, whichever arrangement the page is in. On a one-column page that
+ |     is the same answer — the window's edges. On a two-column page it is the
+ |     main column's own edges: out of the `md:pl-16` inset on the left, and
+ |     across the two gutters the white box holds beyond the container on the
+ |     right. The full-bleed image is what asks.
  |
  | And one question a section asks before it frames anything: **whether to pad
  | at the top, and whether to pad at the bottom.** Padding is undone where it is
@@ -50,6 +57,19 @@ export const SECTION_CONTAINER = "cc mx-auto"
  |
  */
 const FULL_BLEED = "-mx-1ccm"
+
+/**
+ |
+ | Out to the edges of the white column on a two-column page.
+ |
+ | Below the medium breakpoint the column is the window, so it is the same
+ | margin the one-column answer uses. From there up the main column is inset by
+ | `md:pl-16` on the left, which `-ml-16` gives back, and the white box around
+ | it runs two gutters wider than the container, which `-mr-2g` reaches. See
+ | `root.tsx`, where that box is drawn.
+ |
+ */
+const COLUMN_BLEED = "-ml-1ccm md:-ml-16 -mr-1ccm md:-mr-2g"
 
 type Section_Padding = {
 	horizontal_rule: boolean
@@ -161,4 +181,17 @@ function edge_block (
  */
 export function use_full_bleed () {
 	return use_page_layout() === "one-column" ? FULL_BLEED : ""
+}
+
+/**
+ |
+ | The class that takes a block out to the edges of the column it is in.
+ |
+ | Unlike `use_full_bleed` this answers on both arrangements, because both have
+ | a column with edges — the window on a one-column page, and the white box in
+ | the second column on a two-column one.
+ |
+ */
+export function use_column_bleed () {
+	return use_page_layout() === "one-column" ? FULL_BLEED : COLUMN_BLEED
 }

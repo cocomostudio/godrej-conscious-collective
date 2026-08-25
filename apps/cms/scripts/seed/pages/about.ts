@@ -13,6 +13,7 @@
  */
 
 import {
+	full_bleed_image_block,
 	gallery,
 	google_map,
 	heading,
@@ -114,10 +115,19 @@ export async function write_about_page (
 					"How the Lab supports Conscious Collective, and who is behind it.",
 				register_with_toc: true,
 			} ),
-			// The two media leaves that no composite carries for them: an image
-			// on its own, and a responsive image on its own. Both are in the
-			// catalogue and both were reachable only through a container until
-			// now, so neither had a page to be looked at on.
+			// The three media leaves that no composite carries for them: an
+			// image on its own, a responsive image on its own, and the
+			// full-bleed image. All three are in the catalogue and the first
+			// two were reachable only through a container until they were
+			// seeded here, so none had a page to be looked at on.
+			//
+			// The full-bleed one is here rather than only on the home page
+			// because this is a **two-column** page, which is the arrangement
+			// where breaking out means something other than reaching the
+			// window: it comes out of the main column's own inset on the left
+			// and across the white box's two gutters on the right. It asks for
+			// spacing above and none below, so it closes the section flush
+			// against the next one.
 			section( "Inside the Lab", {
 				blocks: [
 					image_block( {
@@ -136,6 +146,15 @@ export async function write_about_page (
 						small: IMAGES.art_direction_small,
 						title: "The courtyard",
 					} ),
+					full_bleed_image_block( {
+						alt: "The grounds, seen from the water tower",
+						caption:
+							"Drawn to the edges of the column rather than to the words beside it. This caption is read out rather than shown.",
+						large: IMAGES.gallery_one,
+						medium: IMAGES.gallery_one,
+						small: IMAGES.gallery_two,
+						title: "The grounds",
+					}, "above" ),
 				],
 				heading: heading_component( "Inside the Lab", "h2" ),
 				opening_line:

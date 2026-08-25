@@ -14,6 +14,7 @@
  */
 
 import {
+	full_bleed_image_block,
 	heading,
 	heading_component,
 	image,
@@ -22,7 +23,6 @@ import {
 	marquee,
 	plain_string,
 	responsive_image,
-	responsive_image_block,
 	section,
 } from "../lib/components.ts"
 import {
@@ -49,14 +49,14 @@ export async function write_home_page (
 		main_region: [
 			// The Above-the-Fold image is the home page's opening frame in
 			// the static site — one photograph across three widths, portrait
-			// on a phone and landscape from the medium breakpoint. The
-			// responsive-image block does not (yet) render truly full-bleed
-			// here, so the block sits inside its section container; the
-			// intent is preserved, and a full-width rendering can be added
-			// to the block later without touching the seed.
+			// on a phone and landscape from the medium breakpoint. It is the
+			// full-bleed block now that there is one: on a one-column page
+			// that takes it out of the section's container and to the two
+			// edges of the window, which is what the static site draws and
+			// what the responsive-image block here could not do.
 			section( "Above the Fold", {
 				blocks: [
-					responsive_image_block( {
+					full_bleed_image_block( {
 						alt: "Conscious Collective at Plant 13",
 						small: IMAGES.promo_small,
 						medium: IMAGES.promo_medium,

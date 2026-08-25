@@ -89,6 +89,25 @@ export function responsive_image_block (
 	}
 }
 
+/**
+ |
+ | The same three crops, drawn edge to edge.
+ |
+ | `spacing_around` is left off where it is not given, so the seed exercises the
+ | schema's own default rather than restating it.
+ |
+ */
+export function full_bleed_image_block (
+	fields: Parameters<typeof art_directed_image>[0],
+	spacing_around?: string,
+) {
+	return {
+		__component: "media.full-bleed-image-v1",
+		...art_directed_image( fields ),
+		...( spacing_around ? { spacing_around } : {} ),
+	}
+}
+
 export function image_link ( url: string, label: string, image_url: string ) {
 	return {
 		image: responsive_image( { alt: label, url: image_url } ),

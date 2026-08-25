@@ -1,0 +1,94 @@
+{
+	"collectionName": "components_media_full_bleed_image_v1",
+	"info": {
+		"displayName": "Full-bleed image",
+		"description": "The same three art-directed pictures a Responsive image holds, drawn edge to edge. It breaks out of the container it is placed in, so it touches the edges of the column rather than lining up with the words."
+	},
+	"options": {},
+	"attributes": {
+		"small": {
+			"type": "component",
+			"component": "media.image-v1",
+			"required": false
+		},
+		"medium": {
+			"type": "component",
+			"component": "media.image-v1",
+			"required": false
+		},
+		"large": {
+			"type": "component",
+			"component": "media.image-v1",
+			"required": false
+		},
+		"spacing_around": {
+			"type": "enumeration",
+			"enum": [
+				"normal",
+				"none",
+				"above",
+				"below"
+			],
+			"default": "normal",
+			"required": true
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"small": {
+				"edit": {
+					"label": "Small screens",
+					"description": "Shown on phones. Where only one of the three is filled in, it is used at every width."
+				},
+				"list": {
+					"label": "Small screens"
+				}
+			},
+			"medium": {
+				"edit": {
+					"label": "Medium screens",
+					"description": "Shown from 1024 pixels wide."
+				},
+				"list": {
+					"label": "Medium screens"
+				}
+			},
+			"large": {
+				"edit": {
+					"label": "Large screens",
+					"description": "Shown from 1440 pixels wide."
+				},
+				"list": {
+					"label": "Large screens"
+				}
+			},
+			"spacing_around": {
+				"edit": {
+					"label": "Spacing around",
+					"description": "The gap left above and below. \"normal\" leaves one on both sides, \"above\" and \"below\" on one side only, \"none\" on neither. Where this block opens or closes a section, what goes is the section's own padding — so \"none\" sits it flush against the section's edge."
+				},
+				"list": {
+					"label": "Spacing around"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "small", "size": 12 }
+				],
+				[
+					{ "name": "medium", "size": 12 }
+				],
+				[
+					{ "name": "large", "size": 12 }
+				],
+				[
+					{ "name": "spacing_around", "size": 6 }
+				]
+			]
+		}
+	}
+}

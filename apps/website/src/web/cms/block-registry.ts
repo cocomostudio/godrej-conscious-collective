@@ -21,6 +21,7 @@ import { Add_To_Calendar } from "./blocks/add-to-calendar.tsx"
 import { Back_Link } from "./blocks/back-link.tsx"
 import { Contributor_Listing } from "./blocks/contributor-listing.tsx"
 import { Contributor_Profile } from "./blocks/contributor-profile.tsx"
+import { Full_Bleed_Image } from "./blocks/full-bleed-image.tsx"
 import { Gallery } from "./blocks/gallery.tsx"
 import { Google_Map } from "./blocks/google-map.tsx"
 import { Heading } from "./blocks/heading.tsx"
@@ -112,6 +113,7 @@ export const BLOCK_REGISTRY: Record<string, Registered> = {
 	},
 	"list.session-schedule-list-v1": { Renderer: Session_Schedule_List },
 	"list.sponsors-list-v1": { Renderer: Sponsors_List },
+	"media.full-bleed-image-v1": { Renderer: Full_Bleed_Image },
 	"media.gallery-v1": { Renderer: Gallery },
 	"media.google-map-v1": { Renderer: Google_Map },
 	"media.image-v1": { Renderer: Image },

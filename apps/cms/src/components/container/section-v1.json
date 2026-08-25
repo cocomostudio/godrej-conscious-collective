@@ -99,6 +99,7 @@
 				"navigation.image-link-v1",
 				"media.image-v1",
 				"media.responsive-image-v1",
+				"media.full-bleed-image-v1",
 				"media.gallery-v1",
 				"media.google-map-v1",
 				"media.vanilla-carousel-v1",
