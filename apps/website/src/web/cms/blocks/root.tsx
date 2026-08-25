@@ -268,6 +268,21 @@ function Main_Column (
 			// is clipped rather than left to put a second scrollbar along the
 			// bottom of every page.
 			: "w-full overflow-x-hidden bg-white" }>
+		{
+			/* On mobile, the sidebar stacks above the main column and the two
+		     were separated by a white strip of the main column's own top
+		     padding. That padding is gone; this line takes its place so the
+		     grey sidebar and whatever the main column opens with — a listing
+		     header, a section — have a clear break between them rather than
+		     one running straight into the other. Two-column pages that show
+		     their sidebar on mobile are the ones that see it, which is what
+		     `sidebar_repeat` being empty means. */
+		}
+		{ two_column && !has_blocks( sidebar_repeat )
+			&& <div className="bg-gray-light">
+				<hr className="md:hidden cc mx-auto border-black opacity-10" />
+			</div> }
+
 		{ masthead }
 
 		{ has_blocks( sidebar_repeat )
@@ -276,7 +291,7 @@ function Main_Column (
 			</div> }
 
 		{ two_column
-			? <div className="md:w-9c py-8 md:py-16 text-black">
+			? <div className="md:w-9c pb-8 md:py-16 text-black">
 				<div className="cc mx-auto md:px-16">
 					{ title && <div className="pb-6 md:pb-8">
 						<Page_Title
