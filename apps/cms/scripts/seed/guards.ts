@@ -1,12 +1,13 @@
 
 /**
  |
- | The two refusals.
+ | The two refusals, which are what make `index.ts` safe to run.
  |
- | The seed deletes the database. That is its whole design — schema iteration is
- | cheap only when a rebuild is one command — and it means the difference
- | between "development" and "anything else" has to be a wall rather than a
- | warning. Both checks exit the process. Neither prompts, because a prompt is
+ | The seed deletes the database before it rebuilds it. That is its whole
+ | design — schema iteration is cheap only when a rebuild is one command — and
+ | it means the difference between a developer's own machine and anything else
+ | has to be a wall rather than a warning. Both checks run before anything is
+ | deleted and both exit the process. Neither prompts, because a prompt is
  | something a tired person answers wrongly at eleven at night.
  |
  */
