@@ -17,6 +17,7 @@
 import type {
 	Age_Group,
 	Category,
+	Session_Card,
 	Session_Entry,
 	Session_Instance,
 } from "./envelope.ts"
@@ -200,6 +201,32 @@ export function age_group_label ( age_group: Age_Group ): string | null {
 
 /**
  |
+ | Who a session is by, who it is for and what it costs — the three points a
+ | listing sets beside each other, separated by middots wherever they are drawn.
+ |
+ | It takes a **row** rather than an entry, because both readers have one: a
+ | listing card and a schedule entry. The two draw them at different sizes and
+ | in different colours, and they say the same three things — which is the whole
+ | reason this is here rather than in either of them.
+ |
+ | The first point is the one allowed to run out of room, because it is the only
+ | one whose length an editor controls.
+ |
+ */
+export function session_points ( session: Session_Card ): string[] {
+	const by = ( session.contributors ?? [] )
+		.map( ( person ) => person?.name )
+		.filter( ( name ): name is string => Boolean( name ) )
+
+	return [
+		by.length > 0 ? `by ${by.join( " X " )}` : null,
+		age_group_label( session.age_group ),
+		price_label( session.price ),
+	].filter( ( point ): point is string => Boolean( point ) )
+}
+
+/**
+ |
  | The days the session runs, as one range. Both ends are derived by the CMS
  | from the instances, so this reads what the editor's instances already said.
  |
@@ -321,6 +348,46 @@ const DAY = new Intl.DateTimeFormat( "en-GB", {
 	day: "numeric",
 	month: "short",
 	timeZone: EVENT_TIMEZONE,
+} )
+
+/**
+ |
+ | The hour an instance starts or ends, where the event is.
+ |
+ | The schedule draws these against every entry, and the sidebar's details list
+ | already did — one formatter for both, so a time cannot read one way on a
+ | session's page and another on the schedule.
+ |
+ */
+export function time_of_day ( value: unknown ): string | null {
+	const moment = as_a_moment( value )
+
+	return moment ? TIME_OF_DAY.format( moment ) : null
+}
+
+/**
+ |
+ | Which day an instant falls on, where the event is — `2025-12-11`.
+ |
+ | The schedule groups its entries by this and its day tabs are named from it,
+ | so an instance at half past ten at night in Mumbai has to land on the Mumbai
+ | day rather than on whatever day it is wherever the page is being rendered.
+ |
+ | `en-CA` is the formatter that spells a date `YYYY-MM-DD`, which is the shape
+ | every other day in this build is written in.
+ |
+ */
+export function day_key ( value: unknown ): string | null {
+	const moment = as_a_moment( value )
+
+	return moment ? DAY_KEY.format( moment ) : null
+}
+
+const DAY_KEY = new Intl.DateTimeFormat( "en-CA", {
+	day: "2-digit",
+	month: "2-digit",
+	timeZone: EVENT_TIMEZONE,
+	year: "numeric",
 } )
 
 function when (

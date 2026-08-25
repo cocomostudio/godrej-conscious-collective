@@ -230,6 +230,25 @@ export type Session_Card = {
 	contributors: { name: string }[]
 }
 
+/**
+ |
+ | What the schedule draws — a card's row, and the hours.
+ |
+ | The schedule is the one listing read hour by hour: it lists one entry per
+ | **instance**, so a session running on three days appears three times with a
+ | different time against each. A card shows days and never hours, which is why
+ | neither of these is on the row above.
+ |
+ | `all_day_event` comes with them because a session that carries it keeps its
+ | stored hours — a calendar entry still needs them — and the schedule has to
+ | know to write "All day" instead of drawing them.
+ |
+ */
+export type Session_Schedule_Row = Session_Card & {
+	all_day_event: boolean
+	instances: Session_Instance[]
+}
+
 export type Contributor_Card = {
 	documentId: string
 	path: string | null

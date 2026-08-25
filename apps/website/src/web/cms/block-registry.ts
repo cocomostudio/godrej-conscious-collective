@@ -49,6 +49,8 @@ import { Section } from "./blocks/section.tsx"
 import { Session_Details } from "./blocks/session-details.tsx"
 import { Session_List } from "./blocks/session-list.tsx"
 import { Session_Listing } from "./blocks/session-listing.tsx"
+import { Session_Listing_With_Filtration } from "./blocks/session-listing-with-filtration.tsx"
+import { Session_Schedule_List } from "./blocks/session-schedule-list.tsx"
 import { Sponsors_List } from "./blocks/sponsors-list.tsx"
 import { Table_Of_Contents } from "./blocks/table-of-contents.tsx"
 import { Vanilla_Carousel } from "./blocks/vanilla-carousel.tsx"
@@ -105,6 +107,10 @@ export const BLOCK_REGISTRY: Record<string, Registered> = {
 	"list.profile-list-v1": { Renderer: Profile_List },
 	"list.session-list-v1": { Renderer: Session_List },
 	"list.session-listing-v1": { Renderer: Session_Listing },
+	"list.session-listing-with-filtration-v1": {
+		Renderer: Session_Listing_With_Filtration,
+	},
+	"list.session-schedule-list-v1": { Renderer: Session_Schedule_List },
 	"list.sponsors-list-v1": { Renderer: Sponsors_List },
 	"media.gallery-v1": { Renderer: Gallery },
 	"media.google-map-v1": { Renderer: Google_Map },

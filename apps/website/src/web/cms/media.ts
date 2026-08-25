@@ -57,7 +57,7 @@ export function picture_of (
 		return null
 	}
 
-	const src = absolute( image.file?.url ?? image.url, origin )
+	const src = media_url( image.file?.url ?? image.url, origin )
 
 	if ( !src ) {
 		return null
@@ -118,7 +118,22 @@ export function responsive_picture_of (
  | left exactly as it arrived.
  |
  */
-function absolute (
+/**
+ |
+ | A stored file's URL, resolved against the CMS's origin.
+ |
+ | Strapi's own upload provider writes a relative path and the website is a
+ | different origin, so something has to put the CMS's back in front of it — and
+ | anything that already carries a scheme, or is protocol-relative, is left
+ | alone.
+ |
+ | Exported because not every file the CMS holds is a picture: the schedule
+ | document is a PDF behind a download link, and it is served from the same
+ | place under the same rule. A second copy of that rule would be a second
+ | answer to what `//host/file.pdf` means.
+ |
+ */
+export function media_url (
 	url: string | null | undefined,
 	origin: string,
 ): string | null {
@@ -158,7 +173,7 @@ function src_set_of (
 
 	const entries = Object.values( formats )
 		.map( ( format ) => ( {
-			url: absolute( format?.url, origin ),
+			url: media_url( format?.url, origin ),
 			width: format?.width,
 		} ) )
 		.filter( ( entry ) => entry.url && entry.width )

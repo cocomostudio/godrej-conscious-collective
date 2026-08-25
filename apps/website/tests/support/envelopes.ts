@@ -21,6 +21,7 @@ import type {
 	Page_Shell,
 	Session_Card,
 	Session_Entry,
+	Session_Schedule_Row,
 } from "../../src/web/cms/envelope.ts"
 
 let next_id = 1
@@ -347,6 +348,26 @@ export function session_card (
 	}
 }
 
+/**
+ |
+ | A schedule row: a card's row plus the hours.
+ |
+ | Its own builder rather than an override on the card's, because the two are
+ | genuinely different shapes — the schedule is the one listing read hour by
+ | hour, and the instances are why.
+ |
+ */
+export function session_schedule_row (
+	over: Partial<Session_Schedule_Row> = {},
+): Session_Schedule_Row {
+	return {
+		...session_card(),
+		all_day_event: false,
+		instances: [ instance( "2025-12-11", "10:00", "12:30" ) ],
+		...over,
+	}
+}
+
 export function contributor_card (
 	over: Partial<Contributor_Card> = {},
 ): Contributor_Card {
@@ -370,6 +391,43 @@ export function session_listing (
 		category,
 		count,
 		id: id(),
+		sessions,
+	}
+}
+
+/**
+ |
+ | The category listing pages' listing. **No count** — it holds the whole of
+ | its category, which is what makes it the one uncapped listing.
+ |
+ */
+export function session_listing_with_filtration (
+	category: string,
+	sessions: Session_Card[],
+): Block {
+	return {
+		__component: "list.session-listing-with-filtration-v1",
+		category,
+		id: id(),
+		sessions,
+	}
+}
+
+/**
+ |
+ | The schedule page's list. The schedule document is spliced onto the node by
+ | the CMS beside the rows, so it is a property of the component here rather
+ | than something the block reads off the event.
+ |
+ */
+export function session_schedule_list (
+	sessions: Session_Schedule_Row[],
+	schedule: Record<string, unknown> | null = null,
+): Block {
+	return {
+		__component: "list.session-schedule-list-v1",
+		id: id(),
+		schedule,
 		sessions,
 	}
 }

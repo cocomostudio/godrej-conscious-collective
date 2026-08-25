@@ -68,6 +68,48 @@ export type Role = keyof typeof ROLES
 
 /**
  |
+ | **A role becomes a class here and nowhere else.**
+ |
+ | Every one of the six is an alias the resolved event sets, so a class naming a
+ | role paints in that event's colour with nothing in the drawing changing.
+ | Three prefixes, because three things are coloured by role: the words on a
+ | card, the rule under a featured card's standfirst, and the dot beside a
+ | category in the filtration widget.
+ |
+ | They are written out rather than composed from the role name, because
+ | Tailwind scans for whole class names in the source: `text-${role}` is a class
+ | that never gets compiled.
+ |
+ */
+export const ROLE_TEXT: Record<Role, string> = {
+	contributor: "text-collaborator",
+	conversation: "text-conversation",
+	experience: "text-experience",
+	showcase: "text-showcase",
+	theme: "text-theme",
+	workshop: "text-workshop",
+}
+
+export const ROLE_BORDER: Record<Role, string> = {
+	contributor: "border-collaborator",
+	conversation: "border-conversation",
+	experience: "border-experience",
+	showcase: "border-showcase",
+	theme: "border-theme",
+	workshop: "border-workshop",
+}
+
+export const ROLE_BACKGROUND: Record<Role, string> = {
+	contributor: "bg-collaborator",
+	conversation: "bg-conversation",
+	experience: "bg-experience",
+	showcase: "bg-showcase",
+	theme: "bg-theme",
+	workshop: "bg-workshop",
+}
+
+/**
+ |
  | The palette a page wears when nothing else answers. These are the six
  | literals the static site inlined on every route, and the theme colour is the
  | one the spec names.

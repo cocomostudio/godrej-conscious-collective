@@ -1,0 +1,17 @@
+{
+	"collectionName": "components_list_session_schedule_list_v1",
+	"info": {
+		"displayName": "Session schedule list",
+		"description": "The whole programme of this page's event, day by day, with a filtration widget and a link to download the schedule document. This is what the schedule page is made of."
+	},
+	"options": {},
+	"attributes": {},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {},
+		"layouts": {
+			"edit": []
+		}
+	}
+}

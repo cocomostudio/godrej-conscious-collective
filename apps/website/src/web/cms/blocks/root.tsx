@@ -33,6 +33,10 @@ import type {
 } from "../envelope.ts"
 
 import { ONE_COLUMN } from "../assemble-root.ts"
+import {
+	SCREEN,
+	SIDEBAR,
+} from "../channels.ts"
 import { Site_Footer } from "../chrome/site-footer.tsx"
 import { Site_Header } from "../chrome/site-header.tsx"
 
@@ -40,6 +44,10 @@ import {
 	H,
 	Level,
 } from "#infra/lib/ui/react/headings.tsx"
+import {
+	Slot,
+	Slot_Provider,
+} from "#infra/lib/ui/react/slot-and-fill.tsx"
 
 type Root_Props = {
 	page_layout: Page_Layout
@@ -100,36 +108,51 @@ export function Root (
 	// Custom properties are not part of React's `CSSProperties`, and widening
 	// the type is the whole of what the cast buys. The keys are this project's
 	// own, produced one line away in `context-colours.ts`.
-	return <div className="h-full bg-white" style={ colours as CSSProperties }>
-		<div className="min-h-full flex flex-col bg-black">
-			<Site_Header
-				main_event={ main_event }
-				page_shell={ page_shell } />
+	//
+	// **The tunnel's provider wraps the whole page**, because both of its
+	// channels are on it: the screen channel here, above everything, and the
+	// sidebar channel below. One provider per page, so nothing leaks between
+	// two independently mounted trees.
+	return <Slot_Provider>
+		<div className="h-full bg-white" style={ colours as CSSProperties }>
+			{
+				/* Anything that has to escape the layout entirely — the
+			     filtration drawer, and the registration overlay after it.
+			     It sits outside the column flow and above the chrome, so
+			     nothing sticky, scrolled or stacked can clip it. */
+			}
+			<Slot name={ SCREEN } />
 
-			<main className="grow md:flex">
-				{ two_column && <Sidebar
-					at_every_width={ sidebar_at_every_width }
-					back_link={ back_link }
-					standfirst={ standfirst }
-					title={ title }>
-					{ sidebar }
-				</Sidebar> }
+			<div className="min-h-full flex flex-col bg-black">
+				<Site_Header
+					main_event={ main_event }
+					page_shell={ page_shell } />
 
-				<Main_Column
-					masthead={ masthead }
-					sidebar_repeat={ sidebar_repeat }
-					standfirst={ two_column ? null : standfirst }
-					title={ two_column ? null : title }
-					two_column={ two_column }>
-					{ main }
-				</Main_Column>
-			</main>
+				<main className="grow md:flex">
+					{ two_column && <Sidebar
+						at_every_width={ sidebar_at_every_width }
+						back_link={ back_link }
+						standfirst={ standfirst }
+						title={ title }>
+						{ sidebar }
+					</Sidebar> }
 
-			<Site_Footer
-				main_event={ main_event }
-				page_shell={ page_shell } />
+					<Main_Column
+						masthead={ masthead }
+						sidebar_repeat={ sidebar_repeat }
+						standfirst={ two_column ? null : standfirst }
+						title={ two_column ? null : title }
+						two_column={ two_column }>
+						{ main }
+					</Main_Column>
+				</main>
+
+				<Site_Footer
+					main_event={ main_event }
+					page_shell={ page_shell } />
+			</div>
 		</div>
-	</div>
+	</Slot_Provider>
 }
 
 /**
@@ -141,6 +164,16 @@ export function Root (
  | type and the components contributed. The title is the document's first
  | heading — the sidebar sits outside the main column's nesting, so it comes out
  | as the `h1` — and everything after it is one level down.
+ |
+ | **The content type always precedes the component**, and the slot at the
+ | bottom is the whole of how that is enforced: what the content type
+ | contributed is rendered above it as its sibling, and a component's
+ | contribution can only arrive inside it. A listing's filtration widget is the
+ | first thing to use it.
+ |
+ | A one-column page renders no sidebar at all, so there is no slot there — and
+ | a widget with nowhere to go falls back to rendering where it stands, which
+ | the tunnel answers on its own.
  |
  */
 function Sidebar (
@@ -161,7 +194,11 @@ function Sidebar (
 
 			<Page_Title standfirst={ standfirst } title={ title } />
 
-			<Level>{ children }</Level>
+			<Level>
+				{ children }
+
+				<Slot name={ SIDEBAR } />
+			</Level>
 		</div>
 	</div>
 }

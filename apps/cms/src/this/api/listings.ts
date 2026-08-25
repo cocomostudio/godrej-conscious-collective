@@ -3,15 +3,21 @@
  |
  | Listings, resolved server-side and spliced into the component's own node.
  |
- | Three components hold a listing. One is curated — an editor drags sessions
+ | Five components hold a listing. One is curated — an editor drags sessions
  | into the order they should read in. One holds a category and a count and
  | fills itself from the event the page resolved to. One does either, depending
- | on whether its relation was left empty.
+ | on whether its relation was left empty. Two hold no count at all and answer
+ | with everything, because they filter in the browser.
  |
- | All three leave here holding **rows**, under the same attribute name, in the
- | same narrowed shape, capped in the same place, each carrying its own URL. A
- | block that renders a listing therefore has one code path rather than two, and
- | cannot tell — and must not care — how the rows were chosen.
+ | All five leave here holding **rows**, under the same attribute name, each
+ | carrying its own URL, and a block that renders a listing therefore has one
+ | code path rather than two and cannot tell — and must not care — how the rows
+ | were chosen.
+ |
+ | Two things do differ between them, and both are deliberate. The two
+ | filtration listings are **not capped**, because a page that filters a set
+ | client-side has to hold the set. And the schedule's rows carry the hours,
+ | because the schedule is the one listing read hour by hour.
  |
  | # Why this is not a populate branch
  |
@@ -38,7 +44,9 @@
  | One query per listing, plus that query's own populate branches. Row count is
  | bounded at ten by the schema and again here, so the cap holds even for a
  | curated list an editor over-filled: the eleventh session is never fetched
- | rather than being fetched and then not drawn.
+ | rather than being fetched and then not drawn. The two filtration listings
+ | are the stated exception and are bounded only by how much programme an
+ | event has.
  |
  | **Every field is narrowed.** A listing card wants a name, a category, a
  | price, an age group, two dates, a line of standfirst, a cover and the names
@@ -67,6 +75,24 @@ const MAXIMUM_ROWS = 10
 
 /**
  |
+ | What the two filtration listings ask for instead: the lot.
+ |
+ | The document service pages by default, so "all of them" has to be said rather
+ | than left out — an omitted limit is a limit of whatever `config/api.ts` sets
+ | as its default, which is a cap nobody chose and nobody would see until the
+ | twenty-sixth session went missing from a page of Showcases.
+ |
+ | It is a number rather than `-1` so that a runaway is bounded by something. It
+ | is deliberately far above any real programme: a festival with five hundred
+ | sessions in one category is a content problem long before it is a payload
+ | one, and a page that hit this ceiling would be wrong in a way no filter could
+ | hide.
+ |
+ */
+const WHOLE_PROGRAMME = 500
+
+/**
+ |
  | What a session card is built from, and nothing else.
  |
  | `standfirst` is here because the featured workshop card shows a line of it;
@@ -88,6 +114,30 @@ const SESSION_ROW = {
 		contributors: { fields: [ "name" ] },
 		cover: { populate: populate_responsive_image_v1 },
 		url_alias: { fields: [ "url_path" ] },
+	},
+}
+
+/**
+ |
+ | What a schedule entry is built from — a card's row, plus the hours.
+ |
+ | A card shows days and never hours, which is why `instances` and
+ | `all_day_event` are out of the row above. The schedule is read hour by hour:
+ | it lists one entry per **instance**, so a session running on three days
+ | appears three times, and the flag that replaces the hours with "All day"
+ | has to travel with them or a session that carries it would be drawn with
+ | times it does not keep.
+ |
+ | Everything else stays narrowed. Forty sessions with their region trees
+ | attached is the largest payload this build could ship by accident, and the
+ | schedule is the page that would ship it.
+ |
+ */
+const SCHEDULE_ROW = {
+	fields: [ ...SESSION_ROW.fields, "all_day_event" ],
+	populate: {
+		...SESSION_ROW.populate,
+		instances: { fields: [ "time_start", "time_end" ] },
 	},
 }
 
@@ -123,8 +173,15 @@ export type Listing_Context = {
 	 | of its own, a page shows what there is rather than showing nothing,
 	 | which is how the rest of event resolution degrades.
 	 |
+	 | It is the event as the database holds it rather than a sanitised
+	 | copy — the envelope route sanitises its own before answering — so
+	 | anything read off it here is narrowed by hand before it reaches a
+	 | node. The schedule document is the one thing that is.
+	 |
 	 */
-	resolved_event: { documentId?: string } | null
+	resolved_event:
+		| { documentId?: string; schedule?: Uploaded_File | null }
+		| null
 	status: "draft" | "published"
 }
 
@@ -242,6 +299,86 @@ const RESOLVERS: Record<
 			context,
 		)
 	},
+
+	// **The one listing with no cap on it**, and the reason the cap is a
+	// number rather than a rule: a category listing page filters client-side,
+	// so a visitor narrowing by day and age group is narrowing the set already
+	// in the browser. Handing them the first ten and calling it the category
+	// would make every filter a lie about what it searched.
+	"list.session-listing-with-filtration-v1": async ( node, context ) => {
+		node.sessions = await read(
+			SESSION_UID,
+			SESSION_ROW,
+			{
+				filters: {
+					category: node.category,
+					...for_the_event( "event", context ),
+				},
+				limit: WHOLE_PROGRAMME,
+				sort: SESSION_ORDER,
+			},
+			context,
+		)
+	},
+
+	// The schedule. Unbounded for the same reason, and unfiltered by category
+	// because reading across the four is the whole of what a schedule is for.
+	//
+	// **The schedule document is spliced on beside the rows.** It belongs to
+	// the resolved event rather than to the component, and handing it to the
+	// node here is what lets the block that draws the download link hold
+	// everything it draws — the alternative is threading an event down through
+	// the render tree to one leaf that wants one attribute of it.
+	"list.session-schedule-list-v1": async ( node, context ) => {
+		node.schedule = schedule_document( context )
+		node.sessions = await read(
+			SESSION_UID,
+			SCHEDULE_ROW,
+			{
+				filters: { ...for_the_event( "event", context ) },
+				limit: WHOLE_PROGRAMME,
+				sort: SESSION_ORDER,
+			},
+			context,
+		)
+	},
+}
+
+/**
+ |
+ | The few attributes of an uploaded file anything outside the CMS reads.
+ |
+ | An upload row carries a great deal more — provider metadata, every generated
+ | format, the folder it sits in — and none of it belongs in a page's payload.
+ |
+ */
+type Uploaded_File = {
+	name?: string | null
+	url?: string | null
+}
+
+/**
+ |
+ | The resolved event's schedule document: where the file is, and what to call
+ | it once it has been downloaded.
+ |
+ | Narrowed rather than passed through because the event this reads is the
+ | **unsanitised** one — the envelope route sanitises its own copy separately.
+ | Both attributes have a reader: the url is the link's target, and the name is
+ | what the `download` attribute saves the file as, which is otherwise the
+ | hashed name the upload provider gave it.
+ |
+ */
+function schedule_document (
+	{ resolved_event }: Listing_Context,
+): Uploaded_File | null {
+	const schedule = resolved_event?.schedule
+
+	if ( !schedule?.url ) {
+		return null
+	}
+
+	return { name: schedule.name ?? null, url: schedule.url }
 }
 
 function has_rows ( relation: unknown ): boolean {

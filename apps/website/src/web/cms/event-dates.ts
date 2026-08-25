@@ -71,6 +71,46 @@ export function day_parts (
 		: null
 }
 
+/**
+ |
+ | One bare day, as a day tab and a day filter name it: "11th Dec".
+ |
+ | The ordinal is the design's — the schedule's day tabs and the filtration
+ | widget's date facet both read this way, and both are naming the same days, so
+ | they say it the same way from one place.
+ |
+ | Split rather than parsed, like everything else here.
+ |
+ */
+export function ordinal_day ( value: string | null | undefined ): string | null {
+	const parsed = parse( value )
+
+	return parsed
+		? `${parsed.day}${ordinal_suffix( parsed.day )} ${
+			MONTHS[parsed.month]
+		}`
+		: null
+}
+
+function ordinal_suffix ( day: number ): string {
+	// The teens are the exception every ordinal table has: 11, 12 and 13 take
+	// "th" although 1, 2 and 3 do not.
+	if ( day > 3 && day < 21 ) {
+		return "th"
+	}
+
+	switch ( day % 10 ) {
+		case 1:
+			return "st"
+		case 2:
+			return "nd"
+		case 3:
+			return "rd"
+		default:
+			return "th"
+	}
+}
+
 export function event_dates ( event: Event | null ): Event_Dates | null {
 	return date_range( event?.date_start, event?.date_end )
 }

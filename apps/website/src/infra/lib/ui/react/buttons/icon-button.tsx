@@ -16,9 +16,8 @@
  |
  */
 
-import type {
-	ComponentProps,
-} from "react"
+import { useRender } from "@base-ui/react/use-render"
+import { mergeProps } from "@base-ui/react/merge-props"
 
 type Emphasis = "solid" | "outline" | "none"
 type Colour = "theme" | "context" | "white" | "black"
@@ -30,8 +29,13 @@ type Icon_Button_Own_Props = {
 
 // The native HTML `color` attribute is omitted so that this component's own
 // colour prop can carry the name without colliding with it.
+//
+// `useRender.ComponentProps` is what adds `render`, exactly as `Button` takes
+// it: a link that looks like an icon button is a link, and the schedule's
+// download control is one — an anchor works with a middle click, with a
+// right-click and without JavaScript, and a button does none of those.
 type Icon_Button_Props =
-	& Omit<ComponentProps<"button">, "color">
+	& Omit<useRender.ComponentProps<"button">, "color">
 	& Icon_Button_Own_Props
 
 const BASE_CLASS =
@@ -90,19 +94,33 @@ export function Icon_Button ( props: Icon_Button_Props ) {
 		)
 	}
 
-	return <button
-		type="button"
-		disabled={ disabled }
-		data-emphasis={ emphasis }
-		data-colour={ colour }
-		className={ [
+	const { render, ...attributes } = rest
+
+	// `disabled` is not an attribute on anything but a `<button>`, so a
+	// disabled control rendered as something else says so through ARIA
+	// instead — the same translation `Button` makes.
+	const defaults: useRender.ElementProps<"button"> = {
+		"aria-disabled": disabled || undefined,
+		children,
+		className: [
 			BASE_CLASS,
 			COLOUR_CLASSES[emphasis][colour],
 			className,
-		].filter( Boolean ).join( " " ) }
-		{ ...rest }>
-		{ children }
-	</button>
+		].filter( Boolean ).join( " " ),
+		disabled,
+		type: "button",
+	}
+
+	// The state object is what emits `data-colour`, `data-emphasis` and
+	// `data-disabled`, which is how `Button` does it too — a data attribute
+	// written into the props directly is not part of React's button element
+	// type, and `useRender` is the thing that knows how to add them.
+	return useRender( {
+		defaultTagName: "button",
+		props: mergeProps<"button">( defaults, attributes ),
+		render,
+		state: { colour, disabled, emphasis },
+	} )
 }
 
 export type { Icon_Button_Props }

@@ -1,0 +1,42 @@
+{
+	"collectionName": "components_list_session_listing_with_filtration_v1",
+	"info": {
+		"displayName": "Session listing with filtration",
+		"description": "Every session of one category belonging to this page's event, with a filtration widget beside it. This is what a category listing page is made of."
+	},
+	"options": {},
+	"attributes": {
+		"category": {
+			"type": "enumeration",
+			"enum": [
+				"Showcase",
+				"Experience",
+				"Conversation",
+				"Workshop"
+			],
+			"required": true
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"category": {
+				"edit": {
+					"label": "Category",
+					"description": "Which kind of session this page lists. Every one of them belonging to this page's event is shown — there is no count, because a visitor narrows the list down with the filters rather than being handed a shortened one."
+				},
+				"list": {
+					"label": "Category"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "category", "size": 6 }
+				]
+			]
+		}
+	}
+}

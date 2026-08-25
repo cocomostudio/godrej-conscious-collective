@@ -96,6 +96,8 @@
 				"list.profile-list-v1",
 				"list.session-list-v1",
 				"list.session-listing-v1",
+				"list.session-listing-with-filtration-v1",
+				"list.session-schedule-list-v1",
 				"list.contributor-listing-v1",
 				"miscellaneous.horizontal-rule-v1",
 				"container.image-and-content-v1",

@@ -22,6 +22,10 @@
  |
  */
 
+import fs from "node:fs/promises"
+import os from "node:os"
+import path from "node:path"
+
 type Strapi = any
 
 export async function write_seed_content ( strapi: Strapi ) {
@@ -71,6 +75,11 @@ async function write_events ( strapi: Strapi ) {
 			is_archived: false,
 			main: true,
 			name: "Conscious Collective 2025",
+			schedule: await upload_schedule_document(
+				strapi,
+				"conscious-collective-2025-schedule.pdf",
+				"Conscious Collective 2025",
+			),
 		},
 	} )
 
@@ -87,10 +96,117 @@ async function write_events ( strapi: Strapi ) {
 			is_archived: false,
 			main: false,
 			name: "Conscious Collective 2027",
+			schedule: await upload_schedule_document(
+				strapi,
+				"conscious-collective-2027-schedule.pdf",
+				"Conscious Collective 2027",
+			),
 		},
 	} )
 
 	return { main, other }
+}
+
+/**
+ |
+ | The schedule document, uploaded rather than linked.
+ |
+ | It is the one piece of media in this seed that is not a bare url, and it has
+ | to be: `Event.schedule` is a media attribute with no url sibling beside it,
+ | because a schedule is a file an organiser hands over rather than a picture
+ | hosted somewhere else. The spec's rule for such media is a temporary file,
+ | uploaded, and deleted once the upload has succeeded, which is what this does.
+ |
+ | The PDF is **written here rather than downloaded**. The seed makes no network
+ | calls at all today and the CMS test harness runs it on every boot, so a fetch
+ | would put someone else's uptime between this project and its own test suite.
+ | What is written is a valid single-page PDF carrying the event's name — enough
+ | that a browser opens it, which is the whole of what the download link claims.
+ | Its one line of text is deliberately ASCII: the file is assembled as bytes
+ | and its cross-reference table holds byte offsets, so a character that is one
+ | byte in one encoding and three in another would put every offset out.
+ |
+ */
+async function upload_schedule_document (
+	strapi: Strapi,
+	filename: string,
+	title: string,
+) {
+	const directory = await fs.mkdtemp(
+		path.join( os.tmpdir(), "conscious-collective-seed-" ),
+	)
+	const file = path.join( directory, filename )
+
+	try {
+		const pdf = one_page_pdf( `${title} - schedule` )
+		await fs.writeFile( file, pdf )
+
+		const [ uploaded ] = await strapi
+			.plugin( "upload" )
+			.service( "upload" )
+			.upload( {
+				data: {},
+				files: {
+					filepath: file,
+					mimetype: "application/pdf",
+					originalFilename: filename,
+					size: pdf.length,
+				},
+			} )
+
+		return uploaded.id
+	} finally {
+		await fs.rm( directory, { force: true, recursive: true } )
+	}
+}
+
+/**
+ |
+ | A one-page PDF holding a single line of text, built by hand.
+ |
+ | Four objects, a cross-reference table and a trailer, which is the smallest
+ | thing a PDF reader will open. The offsets in the table have to be the byte
+ | positions of the objects, so the body is assembled first and measured rather
+ | than written with the numbers guessed.
+ |
+ */
+function one_page_pdf ( line: string ): Buffer {
+	const escaped = line.replace( /([\\()])/g, "\\$1" )
+	const stream = `BT /F1 24 Tf 72 720 Td (${escaped}) Tj ET`
+
+	const objects = [
+		"<< /Type /Catalog /Pages 2 0 R >>",
+		"<< /Type /Pages /Kids [ 3 0 R ] /Count 1 >>",
+		"<< /Type /Page /Parent 2 0 R /MediaBox [ 0 0 595 842 ] "
+		+ "/Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>",
+		"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+		`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`,
+	]
+
+	let body = "%PDF-1.4\n"
+	const offsets: number[] = []
+
+	objects.forEach( ( object, index ) => {
+		offsets.push( Buffer.byteLength( body ) )
+		body += `${index + 1} 0 obj\n${object}\nendobj\n`
+	} )
+
+	const start_of_table = Buffer.byteLength( body )
+	const table = [
+		"xref",
+		`0 ${objects.length + 1}`,
+		"0000000000 65535 f ",
+		...offsets.map( ( offset ) =>
+			`${String( offset ).padStart( 10, "0" )} 00000 n `
+		),
+		"trailer",
+		`<< /Size ${objects.length + 1} /Root 1 0 R >>`,
+		"startxref",
+		String( start_of_table ),
+		"%%EOF",
+	].join( "\n" )
+
+	return Buffer.from( `${body}${table}\n`, "latin1" )
 }
 
 /**
@@ -206,28 +322,45 @@ async function write_page_shells ( strapi: Strapi ) {
  */
 const REMAINING_ROUTE_TABLE = [
 	{
+		standfirst: "How we collect, use and protect your personal data.",
+		title: "Privacy Policy",
+	},
+]
+
+/**
+ |
+ | The four category listing pages.
+ |
+ | Each is one section holding one filtration listing, and the listing holds
+ | nothing but the category — every session of it belonging to this page's event
+ | is shown, and a visitor narrows the set down with the widget rather than
+ | being handed a shortened one.
+ |
+ | The titles are what the URLs are derived from, so "Showcases" is `/showcases`
+ | and is what `back_link_to_category` on the website already points a session
+ | at.
+ |
+ */
+const CATEGORY_LISTING_PAGES = [
+	{
+		category: "Showcase",
 		standfirst: "Installations and concept designs across all four days.",
 		title: "Showcases",
 	},
 	{
+		category: "Experience",
 		standfirst: "Things to walk through, touch and take part in.",
 		title: "Experiences",
 	},
 	{
+		category: "Conversation",
 		standfirst: "Talks and panels with the people making the work.",
 		title: "Conversations",
 	},
 	{
+		category: "Workshop",
 		standfirst: "Hands-on sessions, with places to book.",
 		title: "Workshops",
-	},
-	{
-		standfirst: "Everything that is on, day by day.",
-		title: "Schedule",
-	},
-	{
-		standfirst: "How we collect, use and protect your personal data.",
-		title: "Privacy Policy",
 	},
 ]
 
@@ -656,13 +789,52 @@ async function write_pages (
 		title: "Collaborators",
 	} )
 
+	// The four category listing pages, each holding the whole of its category.
+	//
+	// No heading on the section and no title on it that a reader sees: the
+	// page's own name is already at the top of the sidebar, and a section
+	// headed "Showcases" underneath a page headed "Showcases" says it twice.
+	// The section's `title` is the editor's label for the row in the admin,
+	// which is what that attribute is for.
+	for ( const { category, standfirst, title } of CATEGORY_LISTING_PAGES ) {
+		await create_page( strapi, {
+			main_region: [
+				section( `${title} — the listing`, {
+					blocks: [ session_listing_with_filtration( category ) ],
+				} ),
+			],
+			page_shell: page_shells.primary.documentId,
+			standfirst,
+			title,
+		} )
+	}
+
+	// The schedule page: one section holding one schedule list, which fills
+	// itself with the whole of this page's event and carries that event's
+	// schedule document for the download link.
+	//
+	// The note under the title is the static site's own, and it is the page's
+	// standfirst rather than a block, because it is a caveat about the page
+	// rather than about anything in it.
+	await create_page( strapi, {
+		main_region: [
+			section( "The schedule", {
+				blocks: [ session_schedule_list() ],
+			} ),
+		],
+		page_shell: page_shells.primary.documentId,
+		standfirst:
+			"Everything that is on, day by day. This programming schedule is "
+			+ "subject to changes.",
+		title: "Schedule",
+	} )
+
 	// The rest of the route table.
 	//
 	// Every one of these is linked from the page shell's navigation, so
-	// leaving them out would have the site chrome advertising seven URLs that
-	// answer 404. They are thin on purpose: each becomes a real page when the
-	// ticket that owns it arrives — the four category pages and the schedule
-	// get the filtration listings that ticket 09 builds.
+	// leaving them out would have the site chrome advertising a URL that
+	// answers 404. They are thin on purpose: each becomes a real page when the
+	// ticket that owns it arrives.
 	for ( const { standfirst, title } of REMAINING_ROUTE_TABLE ) {
 		await create_page( strapi, {
 			main_region: [
@@ -702,6 +874,16 @@ async function write_pages (
 			section( "Showcases in 2027", {
 				blocks: [ session_listing( "Showcase", 10 ) ],
 				heading: heading_component( "Showcases in 2027", "h2" ),
+				register_with_toc: true,
+			} ),
+			// The schedule list, on the one page in the seed that belongs to
+			// the event that is **not** main. It answers with 2027's thirteen
+			// sessions rather than 2025's forty, and its download link points
+			// at 2027's schedule document — the resolution rule reaching two
+			// different things through one component.
+			section( "The 2027 schedule", {
+				blocks: [ session_schedule_list() ],
+				heading: heading_component( "What is planned", "h2" ),
 				register_with_toc: true,
 			} ),
 		],
@@ -2345,6 +2527,30 @@ function session_list ( sessions: any[] ) {
 		__component: "list.session-list-v1",
 		sessions: sessions.map( ( session ) => session.documentId ),
 	}
+}
+
+/**
+ |
+ | The category listing pages' listing. A category and nothing else: there is no
+ | count, because the page shows every session of the category and the visitor
+ | narrows it down themselves.
+ |
+ */
+function session_listing_with_filtration ( category: string ) {
+	return {
+		__component: "list.session-listing-with-filtration-v1",
+		category,
+	}
+}
+
+/**
+ |
+ | The schedule page's list. **It stores nothing**: which sessions it holds and
+ | which document it links to both follow from the event the page resolved to.
+ |
+ */
+function session_schedule_list () {
+	return { __component: "list.session-schedule-list-v1" }
 }
 
 function contributor_listing (

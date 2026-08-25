@@ -31,7 +31,10 @@ import type {
 	Contributor_Card,
 	Session_Card,
 } from "./envelope.ts"
-import type { Role } from "./context-colours.ts"
+import {
+	ROLE_BORDER,
+	ROLE_TEXT,
+} from "./context-colours.ts"
 
 import { day_parts } from "./event-dates.ts"
 import { use_media_origin } from "./media-origin.tsx"
@@ -45,37 +48,9 @@ import {
 	Responsive_Picture,
 } from "./pictures.tsx"
 import {
-	age_group_label,
-	price_label,
 	role_of_category,
+	session_points,
 } from "./sessions.ts"
-
-/**
- |
- | The colour a card wears, which is its category's.
- |
- | Every one of the five is an **alias** the resolved event sets, so this is the
- | one place a role becomes a class and nothing below it knows which category it
- | is drawing.
- |
- */
-const ROLE_TEXT: Record<Role, string> = {
-	contributor: "text-collaborator",
-	conversation: "text-conversation",
-	experience: "text-experience",
-	showcase: "text-showcase",
-	theme: "text-theme",
-	workshop: "text-workshop",
-}
-
-const ROLE_BORDER: Record<Role, string> = {
-	contributor: "border-collaborator",
-	conversation: "border-conversation",
-	experience: "border-experience",
-	showcase: "border-showcase",
-	theme: "border-theme",
-	workshop: "border-workshop",
-}
 
 /**
  |
@@ -135,7 +110,7 @@ export function Card (
 
 			<Points
 				className={ `font-semibold ${ROLE_TEXT[role]}` }
-				points={ points_of( session ) } />
+				points={ session_points( session ) } />
 
 			{
 				/* Shown only by `card--featured`, which the workshops listing
@@ -177,26 +152,6 @@ function Card_Link (
 	return <Nav_Link className={ className } style={ style } url={ path }>
 		{ children }
 	</Nav_Link>
-}
-
-/**
- |
- | Who it is by, who it is for, and what it costs — separated by middots.
- |
- | The first point is the one allowed to run out of room, because it is the
- | only one whose length an editor controls.
- |
- */
-function points_of ( session: Session_Card ): string[] {
-	const by = ( session.contributors ?? [] )
-		.map( ( person ) => person?.name )
-		.filter( ( name ): name is string => Boolean( name ) )
-
-	return [
-		by.length > 0 ? `by ${by.join( " X " )}` : null,
-		age_group_label( session.age_group ),
-		price_label( session.price ),
-	].filter( ( point ): point is string => Boolean( point ) )
 }
 
 function Points (
