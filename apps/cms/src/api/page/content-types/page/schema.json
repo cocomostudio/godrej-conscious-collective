@@ -100,7 +100,7 @@
 			"standfirst": {
 				"edit": {
 					"label": "Standfirst",
-					"description": "A short introductory line shown beneath the title."
+					"description": "A short introductory line shown beneath the title. Not rendered when the page uses the one-column layout."
 				},
 				"list": {
 					"label": "Standfirst"

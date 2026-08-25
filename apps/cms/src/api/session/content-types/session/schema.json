@@ -131,7 +131,7 @@
 			"standfirst": {
 				"edit": {
 					"label": "Standfirst",
-					"description": "A short introductory line, shown beneath the name in the masthead."
+					"description": "A short introductory line, shown beneath the name in the masthead. Not rendered when the page uses the one-column layout."
 				},
 				"list": {
 					"label": "Standfirst"

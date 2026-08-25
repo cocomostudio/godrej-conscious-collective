@@ -39,6 +39,7 @@ import {
 } from "../channels.ts"
 import { Site_Footer } from "../chrome/site-footer.tsx"
 import { Site_Header } from "../chrome/site-header.tsx"
+import { use_page_layout } from "../page-layout.tsx"
 
 import {
 	H,
@@ -140,7 +141,6 @@ export function Root (
 					<Main_Column
 						masthead={ masthead }
 						sidebar_repeat={ sidebar_repeat }
-						standfirst={ two_column ? null : standfirst }
 						title={ two_column ? null : title }
 						two_column={ two_column }>
 						{ main }
@@ -226,10 +226,16 @@ function Page_Title (
 		return null
 	}
 
+	const one_column = use_page_layout() === "one-column"
+
+	// Standfirst is skipped on a one-column layout. See the standfirst
+	// attribute's description on the Page and Session content types.
+	const show_standfirst = !one_column && standfirst
+
 	return <div>
 		<H className="text-h2 md:font-semibold text-theme">{ title }</H>
 
-		{ standfirst
+		{ show_standfirst
 			&& <p className="mt-4 text-p text-black">{ standfirst }</p> }
 	</div>
 }
@@ -253,11 +259,10 @@ function Page_Title (
  |
  */
 function Main_Column (
-	{ children, masthead, sidebar_repeat, standfirst, title, two_column }: {
+	{ children, masthead, sidebar_repeat, title, two_column }: {
 		children: ReactNode
 		masthead: ReactNode
 		sidebar_repeat: ReactNode
-		standfirst?: string | null
 		title?: string | null
 		two_column: boolean
 	},
@@ -298,9 +303,7 @@ function Main_Column (
 			? <div className="md:w-9c text-black">
 				<div className="cc mx-auto md:pl-16">
 					{ title && <div className="pb-6 md:pb-8">
-						<Page_Title
-							standfirst={ standfirst }
-							title={ title } />
+						<Page_Title title={ title } />
 					</div> }
 
 					<Level>{ children }</Level>
@@ -312,7 +315,7 @@ function Main_Column (
 			// them rather than inside it.
 			: <div className="text-black">
 				{ title && <div className="cc mx-auto pt-8 md:pt-16">
-					<Page_Title standfirst={ standfirst } title={ title } />
+					<Page_Title title={ title } />
 				</div> }
 
 				<Level>{ children }</Level>
