@@ -39,10 +39,6 @@ import {
 } from "../channels.ts"
 import { Site_Footer } from "../chrome/site-footer.tsx"
 import { Site_Header } from "../chrome/site-header.tsx"
-import {
-	use_page_layout,
-	use_page_title_class,
-} from "../page-layout.tsx"
 import { Registration_Form_Trigger } from "../registration/registration-form-trigger.tsx"
 import { Registration_Provider } from "../registration/registration-provider.tsx"
 
@@ -165,7 +161,6 @@ export function Root (
 						<Main_Column
 							masthead={ masthead }
 							sidebar_repeat={ sidebar_repeat }
-							title={ two_column ? null : title }
 							two_column={ two_column }>
 							{ main }
 						</Main_Column>
@@ -256,9 +251,8 @@ function Sidebar (
  |
  | The page's own name, and the line under it.
  |
- | One component for the two places it can appear — the sidebar of a two-column
- | page, and the main column of a one-column page, which has no sidebar to put
- | it in. It is the same heading either way, and the two must not drift.
+ | The sidebar is the one place it appears, which makes it a two-column page's
+ | alone: a one-column page renders no sidebar and no title with it.
  |
  */
 function Page_Title (
@@ -271,16 +265,10 @@ function Page_Title (
 		return null
 	}
 
-	const one_column = use_page_layout() === "one-column"
-
-	// Standfirst is skipped on a one-column layout. See the standfirst
-	// attribute's description on the Page and Session content types.
-	const show_standfirst = !one_column && standfirst
-
 	return <div>
-		<H className={ use_page_title_class() }>{ title }</H>
+		<H className="text-h2 font-semibold text-context">{ title }</H>
 
-		{ show_standfirst
+		{ standfirst
 			&& <p className="mt-4 text-p text-black">{ standfirst }</p> }
 	</div>
 }
@@ -296,19 +284,17 @@ function Page_Title (
  | container inside cannot be, and it carries the document's `h1`, which a
  | heading one level down could not be.
  |
- | A one-column page has no sidebar to carry its title, so the title comes here
- | instead. It has to go somewhere: the sidebar is where a two-column page shows
- | it, but "no sidebar" is a rule about the back link, the table of contents and
- | the side region — not licence for a page to lose its own name and start its
- | document at `h2` with no `h1` above it.
+ | **The page's own title is never rendered here.** A two-column page shows it
+ | in the sidebar; a one-column page shows it nowhere at all — the column opens
+ | with whatever the editor put first, and a page that wants its name at the
+ | top says so in a block of its own.
  |
  */
 function Main_Column (
-	{ children, masthead, sidebar_repeat, title, two_column }: {
+	{ children, masthead, sidebar_repeat, two_column }: {
 		children: ReactNode
 		masthead: ReactNode
 		sidebar_repeat: ReactNode
-		title?: string | null
 		two_column: boolean
 	},
 ) {
@@ -347,23 +333,12 @@ function Main_Column (
 		{ two_column
 			? <div className="md:w-9c text-black">
 				<div className="cc mx-auto md:pl-16">
-					{ title && <div className="pb-6 md:pb-8">
-						<Page_Title
-							title={ title } />
-					</div> }
-
 					<Level>{ children }</Level>
 				</div>
 			</div>
 			// Nothing wraps the blocks on a one-column page: each section is
 			// full-width and brings its own padding and its own container.
-			// Only the title needs either, because it sits above the first of
-			// them rather than inside it.
 			: <div className="text-black">
-				{ title && <div className="cc mx-auto pt-8 md:pt-16">
-					<Page_Title title={ title } />
-				</div> }
-
 				<Level>{ children }</Level>
 			</div> }
 	</div>

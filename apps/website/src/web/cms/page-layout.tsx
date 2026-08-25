@@ -11,8 +11,7 @@
  | — the same reason the anchors and the media origin do.
  |
  | Body text uses `text-h4` on a one-column page and `text-p` on a two-column
- | one; the page title uses `text-h1` and `text-h2` at the same split. Both
- | are exposed as helpers below, so a block that renders prose or a heading
+ | one, and that is exposed as a helper below, so a block that renders prose
  | asks one question and gets the class the design agrees on rather than
  | inlining the rule.
  |
@@ -52,20 +51,4 @@ export function use_page_layout () {
  */
 export function use_body_text_class () {
 	return use_page_layout() === "one-column" ? "text-h4" : "text-p"
-}
-
-/**
- |
- | The page-title size class for the current page's arrangement.
- |
- | A one-column page carries the h1 in its main column and wears `text-h1`
- | on it; a two-column page's title lives in the sidebar and wears `text-h2`
- | in the context colour. Both include their weight because the design uses
- | one weight either way.
- |
- */
-export function use_page_title_class () {
-	return use_page_layout() === "one-column"
-		? "text-h1 font-semibold"
-		: "text-h2 font-semibold text-context"
 }

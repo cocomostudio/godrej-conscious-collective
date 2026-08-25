@@ -239,11 +239,15 @@ describe("a one-column page", () => {
 		expect( html ).toContain( "One column." )
 	})
 
-	it("still shows its own title, at the top of the main column", async () => {
+	it("shows no title of its own, and no standfirst under it", async () => {
 		const { html } = await website.get( "/one-column" )
 
-		expect( html ).toContain( "Still has a standfirst." )
-		expect( headings( html ) ).toEqual( [ "h1:One Column", "h2:Body" ] )
+		expect( body_of( html ) ).not.toContain( "One Column" )
+		expect( body_of( html ) ).not.toContain( "Still has a standfirst." )
+
+		// The document's headings are the blocks' own, and start where the
+		// editor's first one does rather than under a title the page injected.
+		expect( headings( html ) ).toEqual( [ "h2:Body" ] )
 	})
 })
 
@@ -302,6 +306,19 @@ function first_column ( html: string ) {
 	const end = html.indexOf( "layout__1-4__col-2" )
 
 	return html.slice( start, end === -1 ? undefined : end )
+}
+
+/**
+ |
+ | React Router streams the loader's data back down as a script, and the head
+ | carries the document's own `<title>`, so every string the CMS sent is in the
+ | response whether the page rendered it or not. An assertion that something was
+ | left out has to be made against the body's markup alone.
+ |
+ */
+function body_of ( html: string ) {
+	return html.slice( html.indexOf( "<body" ) )
+		.replace( /<script[\s\S]*?<\/script>/g, "" )
 }
 
 function headings ( html: string ) {
