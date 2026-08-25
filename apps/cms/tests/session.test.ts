@@ -64,7 +64,8 @@ describe("a session's envelope", () => {
 		expect( entry.venue.label ).toBe( "Outdoor Pergola" )
 		expect( entry.venue.url ).toBe( "https://example.com/maps/pergola" )
 
-		expect( entry.instances.length ).toBe( 4 )
+		// The showcase runs across three days and carries one instance each.
+		expect( entry.instances.length ).toBe( 3 )
 
 		for ( const instance of entry.instances ) {
 			expect( typeof instance.time_start ).toBe( "string" )
