@@ -110,8 +110,22 @@ export type Detail = {
 	icon: Detail_Icon
 	/** Null where the row is nothing but its link — a price-less booking. */
 	label: string | null
-	link?: { label: string; url: string } | null
+	link?: { label: string; url: string; emphasis?: Link_Emphasis } | null
 }
+
+/**
+ |
+ | How a detail's link presents itself.
+ |
+ | `plain` reads as an inline label — the venue link is one of these, because
+ | it names a place rather than an action. `call_to_action` wears the button
+ | typography and the slanted arrow: it is what the booking link asks a
+ | visitor to click. The choice is owned here, beside the rest of the
+ | detail's data, rather than inferred from an icon in the block that draws
+ | it.
+ |
+ */
+export type Link_Emphasis = "plain" | "call_to_action"
 
 /**
  |
@@ -268,6 +282,7 @@ function venue_detail ( session: Session_Entry ): Detail | null {
 			icon: "location-pin",
 			label: null,
 			link: {
+				emphasis: "plain",
 				label,
 				url: session.venue.url,
 			},
@@ -304,7 +319,9 @@ function price_detail ( session: Session_Entry ): Detail | null {
 	return {
 		icon: "ticket",
 		label,
-		link: booking ? { label: BOOKING, url: booking } : null,
+		link: booking
+			? { emphasis: "call_to_action", label: BOOKING, url: booking }
+			: null,
 	}
 }
 

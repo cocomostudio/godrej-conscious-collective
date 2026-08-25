@@ -91,12 +91,37 @@ function Row ( { detail }: { detail: Detail } ) {
 				{ detail.label }
 			</span> }
 
-		{ detail.link && <Link
+		{ detail.link && <Detail_Link link={ detail.link } /> }
+	</li>
+}
+
+/**
+ |
+ | A detail's link, in one of two emphases.
+ |
+ | The booking link asks a visitor to click and wears the uppercase button
+ | typography and the slanted arrow. The venue link reads as a plain label —
+ | its emphasis is on where it goes, not on being followed — and inherits
+ | the row's own type styles so the label sits inline with the icon rather
+ | than shouting out of it.
+ |
+ */
+function Detail_Link ( { link }: { link: NonNullable<Detail["link"]> } ) {
+	if ( link.emphasis === "call_to_action" ) {
+		return <Link
 			className="text-button uppercase text-context underline underline-offset-[3px]"
-			to={ detail.link.url }
+			to={ link.url }
 			target="_blank"
 			rel="noreferrer">
-			{ detail.link.label } ↗
-		</Link> }
-	</li>
+			{ link.label } ↗
+		</Link>
+	}
+
+	return <Link
+		className="text-small font-semibold text-black"
+		to={ link.url }
+		target="_blank"
+		rel="noreferrer">
+		{ link.label }
+	</Link>
 }
