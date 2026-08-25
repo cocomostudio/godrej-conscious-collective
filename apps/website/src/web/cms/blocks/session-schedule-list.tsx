@@ -387,7 +387,7 @@ function Entry (
 			className="md:order-last md:w-44 shrink-0 uppercase text-small font-semibold md:font-medium text-black md:text-right"
 			instance={ instance } />
 
-		<div className="grow">
+		<div className="grow min-w-0">
 			<p
 				className={ `mt-2 md:mt-0 text-h4 ${
 					ROLE_TEXT[role]
@@ -398,7 +398,7 @@ function Entry (
 			</p>
 
 			<div className="max-md:flex justify-between gap-4 md:mt-2">
-				<div>
+				<div className="min-w-0">
 					{ session.standfirst
 						&& <p className="mt-2 md:mt-0 text-h6 md:font-light line-clamp-1 md:line-clamp-2">
 							{ session.standfirst }
@@ -489,7 +489,7 @@ function Points ( { session }: { session: Session_Schedule_Row } ) {
 		return null
 	}
 
-	return <ul className="mt-3.5 md:mt-2 flex gap-1 *:text-h6 font-medium md:font-semibold text-black/65 *:shrink-0 [&>*:first-child]:shrink [&>*:first-child]:whitespace-nowrap [&>*:first-child]:overflow-hidden [&>*:first-child]:text-ellipsis">
+	return <ul className="mt-3.5 md:mt-2 flex gap-1 *:text-h6 font-medium md:font-semibold text-black/65 *:shrink-0 [&>*:first-child]:shrink [&>*:first-child]:min-w-0 [&>*:first-child]:whitespace-nowrap [&>*:first-child]:overflow-hidden [&>*:first-child]:text-ellipsis">
 		{ points.map( ( point, index ) =>
 			<Fragment key={ index }>
 				<li>{ point }</li>
