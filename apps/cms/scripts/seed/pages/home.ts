@@ -233,6 +233,18 @@ export async function write_home_page (
 						),
 					},
 				],
+				heading: heading_component(
+					"Follow our Instagram",
+					"h2",
+					false,
+					"white",
+				),
+				link: link(
+					"@godrejdesignlab",
+					"https://www.instagram.com/godrejdesignlab",
+					"plain",
+					"white",
+				),
 				register_with_toc: false,
 			} ),
 			section( "Sponsors", {
