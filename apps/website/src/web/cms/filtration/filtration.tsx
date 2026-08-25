@@ -61,7 +61,6 @@ import type { Role } from "../context-colours.ts"
 
 import { FROM_THE_MEDIUM_BREAKPOINT } from "./breakpoint.ts"
 import { role_of_category } from "../sessions.ts"
-import { use_apply_filters } from "./sessions.tsx"
 
 import { Button } from "#infra/lib/ui/react/buttons/button.tsx"
 import { Check_Mark } from "#infra/lib/ui/react/icons/check-mark.tsx"
@@ -87,6 +86,15 @@ type Filtration_Props = {
 	committed: Filters
 	/**
 	 |
+	 | Commit the draft. Passed in from the widget, which reads it while it is
+	 | still inside the Sessions provider — the form itself renders through the
+	 | tunnel and would otherwise resolve `use_apply_filters` at the tunnel's
+	 | destination, where no provider sits above it.
+	 |
+	 */
+	apply: ( filters: Filters ) => void
+	/**
+	 |
 	 | Changing this resets the draft and the inputs. Pass something stable to
 	 | turn resets off.
 	 |
@@ -102,10 +110,9 @@ type Filtration_Props = {
 }
 
 export function Filtration (
-	{ className = "", committed, facets, on_dismiss, reset_token }:
+	{ apply, className = "", committed, facets, on_dismiss, reset_token }:
 		Filtration_Props,
 ) {
-	const apply = use_apply_filters()
 	const draft = useRef<Filters>( committed )
 
 	// Reset on a changed token. Comparing the previous value during render is

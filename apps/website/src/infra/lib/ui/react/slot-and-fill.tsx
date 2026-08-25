@@ -12,9 +12,14 @@
  | its owner cannot reach. A listing component sits in the main column and its
  | filtration widget belongs in the sidebar, which is the main column's sibling
  | and is rendered before it. The registration overlay belongs at the top of the
- | screen, above everything, and is opened from a button anywhere on the page. A
- | React portal moves DOM but not React context; this moves the element itself,
- | so what arrives is still inside every provider it was written inside.
+ | screen, above everything, and is opened from a button anywhere on the page.
+ |
+ | **React context is not carried across.** The Fill hands the element to the
+ | store as data; the Slot renders it at its own fiber position, so `useContext`
+ | resolves against the Slot's ancestors, not the Fill's. A tunnelled subtree
+ | that needs context from where it was written must have those values captured
+ | by the component that owns the Fill and passed in as props — the filtration
+ | widget does this with `use_apply_filters` for exactly this reason.
  |
  | # What it guarantees
  |

@@ -42,7 +42,10 @@ import {
 	SIDEBAR,
 } from "../channels.ts"
 import { Filtration } from "./filtration.tsx"
-import { use_filters } from "./sessions.tsx"
+import {
+	use_apply_filters,
+	use_filters,
+} from "./sessions.tsx"
 
 import { Fill } from "#infra/lib/ui/react/slot-and-fill.tsx"
 
@@ -63,6 +66,11 @@ export function Filtration_Widget (
 	},
 ) {
 	const committed = use_filters()
+	// Captured here, where this widget sits inside the Sessions provider. Both
+	// copies of the form render through the tunnel — the sidebar's slot and the
+	// screen-level drawer — and neither could resolve the context at its own
+	// destination.
+	const apply = use_apply_filters()
 
 	// The drawer's container has to exist before the portal can be told to use
 	// it, so the element is held in state rather than in a ref — a ref would
@@ -76,6 +84,7 @@ export function Filtration_Widget (
 	return <>
 		<Fill into={ SIDEBAR } when_absent="inline">
 			<Filtration
+				apply={ apply }
 				className="max-md:hidden w-full"
 				committed={ committed }
 				facets={ facets }
@@ -100,6 +109,7 @@ export function Filtration_Widget (
 								     fieldsets a visitor opened survives. */
 								}
 								<Filtration
+									apply={ apply }
 									className="after:absolute after:top-full after:size-full after:bg-white"
 									committed={ committed }
 									facets={ facets }
