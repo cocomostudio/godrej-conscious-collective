@@ -995,7 +995,7 @@ async function write_contributors (
 			),
 			image: image( {
 				alt: "Arthur Mamou-Mani",
-				url: IMAGES.portrait_two,
+				url: IMAGES.portrait_four,
 			} ),
 			name: "Arthur Mamou-Mani",
 			page_shell: shell,
@@ -1009,7 +1009,7 @@ async function write_contributors (
 				"Priya Iyer is a workshop facilitator who has taught block "
 					+ "printing to two decades of children across Mumbai.",
 			),
-			image: image( { alt: "Priya Iyer", url: IMAGES.portrait_one } ),
+			image: image( { alt: "Priya Iyer", url: IMAGES.portrait_two } ),
 			name: "Priya Iyer",
 			page_shell: shell,
 			role: "Workshop facilitator",
@@ -1022,7 +1022,10 @@ async function write_contributors (
 				"Rahul Verma is an urban ecologist writing about the design "
 					+ "choices that decide who a city stays cool for.",
 			),
-			image: image( { alt: "Rahul Verma", url: IMAGES.portrait_two } ),
+			image: image( {
+				alt: "Rahul Verma",
+				url: IMAGES.portrait_three,
+			} ),
 			name: "Rahul Verma",
 			page_shell: shell,
 			role: "Urban ecologist",
@@ -1055,7 +1058,7 @@ async function write_contributors (
 					+ "list for this row is empty because the one session "
 					+ "that links them is a draft.",
 			),
-			image: image( { alt: "Iris Han", url: IMAGES.portrait_two } ),
+			image: image( { alt: "Iris Han", url: IMAGES.portrait_three } ),
 			name: "Iris Han",
 			page_shell: shell,
 			role: "Guest programmer",
@@ -1117,10 +1120,7 @@ async function write_sessions (
 			contributors.debasmita.documentId,
 			contributors.arthur.documentId,
 		],
-		cover: responsive_image( {
-			alt: "A Kondh house, half rebuilt",
-			url: IMAGES.stack_two,
-		} ),
+		cover: COVERS_BY_NAME.living_with_the_land,
 		event: main,
 		instances: instances_daily(
 			"2025-12-11",
@@ -1190,6 +1190,7 @@ async function write_sessions (
 		category: "Workshop",
 		checkout_url: "https://example.com/cc/block-printing",
 		contributors: [ contributors.priya.documentId ],
+		cover: COVERS_BY_NAME.block_printing,
 		event: main,
 		instances: [
 			instance( "2025-12-12", "10:00", "12:30" ),
@@ -1219,6 +1220,7 @@ async function write_sessions (
 	const designing_for_heat = await create_session( strapi, {
 		category: "Conversation",
 		contributors: [ contributors.rahul.documentId ],
+		cover: COVERS_BY_NAME.designing_for_heat,
 		event: main,
 		instances: [ instance( "2025-12-13", "17:00", "18:30" ) ],
 		main_region: [
@@ -1242,6 +1244,7 @@ async function write_sessions (
 	await create_session( strapi, {
 		age_group: "Adults",
 		category: "Experience",
+		cover: COVERS_BY_NAME.cooling_pergola,
 		event: main,
 		instances: instances_daily(
 			"2025-12-11",
@@ -1269,6 +1272,7 @@ async function write_sessions (
 	await create_session( strapi, {
 		category: "Conversation",
 		contributors: [ contributors.kaveri.documentId ],
+		cover: COVERS_BY_NAME.notes_for_2027,
 		event: events.other.documentId,
 		instances: [ instance( "2027-12-03", "16:00", "17:00" ) ],
 		main_region: [
@@ -1289,6 +1293,7 @@ async function write_sessions (
 	// which is the whole of user story 31 in one row.
 	await create_session( strapi, {
 		category: "Workshop",
+		cover: COVERS_BY_NAME.repairing_what_you_own,
 		instances: [ instance( "2025-12-14", "10:00", "11:30" ) ],
 		main_region: [
 			section( "Repairing What You Own", {
@@ -1331,6 +1336,7 @@ async function write_sessions (
 	await create_session( strapi, {
 		category: "Showcase",
 		contributors: [ contributors.iris.documentId ],
+		cover: COVERS_BY_NAME.unannounced,
 		event: main,
 		instances: [ instance( "2025-12-13", "12:00", "13:00" ) ],
 		main_region: [
@@ -1351,6 +1357,7 @@ async function write_sessions (
 	// draft is what makes this one the third.
 	await create_session( strapi, {
 		category: "Showcase",
+		cover: COVERS_BY_NAME.still_being_written,
 		event: events.other.documentId,
 		instances: [ instance( "2027-12-03", "10:00", "18:00" ) ],
 		main_region: [
@@ -1369,11 +1376,20 @@ async function write_sessions (
 	// The rest of the programme. Thin, and deliberately so: what these are for
 	// is filling the category listings and the schedule page, which are tickets
 	// 08 and 09.
+	//
+	// One cover counter per category, so each category deals its own pool from
+	// the top rather than all four sharing a position nobody can predict.
+	const covers_dealt: Record<string, number> = {}
+
 	for ( const filler of PROGRAMME ) {
+		const position = covers_dealt[filler.category] ?? 0
+		covers_dealt[filler.category] = position + 1
+
 		await create_session( strapi, {
 			age_group: filler.age_group,
 			category: filler.category,
 			checkout_url: filler.checkout_url,
+			cover: cover_for( filler.category, position ),
 			event: filler.year === 2027 ? events.other.documentId : main,
 			instances: [
 				instance( filler.day, filler.from, filler.to ),
@@ -2147,8 +2163,12 @@ const IMAGES = {
 		"https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=720&auto=format&fit=crop",
 	gallery_two:
 		"https://images.unsplash.com/photo-1591299177061-2151e53fcaea?q=80&w=720&auto=format&fit=crop",
+	portrait_four:
+		"https://media.cocomo.199101991.xyz/2025/godrej-design-lab/cc-collaborator__04.png",
 	portrait_one:
 		"https://media.cocomo.199101991.xyz/2025/godrej-design-lab/cc-collaborator__01.png",
+	portrait_three:
+		"https://media.cocomo.199101991.xyz/2025/godrej-design-lab/cc-collaborator__03.png",
 	portrait_two:
 		"https://media.cocomo.199101991.xyz/2025/godrej-design-lab/cc-collaborator__02.png",
 	sketch_map:
@@ -2161,9 +2181,175 @@ const IMAGES = {
 		"https://media.cocomo.199101991.xyz/2025/godrej-design-lab/arthur-mamou-mani.jpg",
 }
 
+/* _____
+ | Session covers, filed the way the static site files them.
+ |
+ | The static site's programme carries one photograph per session, and every one
+ | of them sits under that session's own type. Keeping the same filing here is
+ | what lets a session this seed invents land on a picture that suits its
+ | category, rather than on whichever url came next.
+ |
+ | There are more sessions here than there are photographs there, so each pool
+ | is dealt round and repeats. The static site repeats them too — the same set
+ | fills its listing, its archive and its social strip.
+ |
+ | Asked for at the width the large art-directed crop uses, because a cover is
+ | drawn masthead-wide behind a session's name rather than card-wide.
+ |
+ | **No alternative text travels with any of them.** A cover is drawn beside
+ | the session's own name in both places it appears — the masthead and the
+ | card — so the picture is decoration there, and an empty alt is the correct
+ | one. The seed knows the static site's session these came from; it does not
+ | know what the photograph shows.
+ |
+ | The keys name the subject of the static site's session rather than the
+ | photograph, which is the most that can honestly be said about a stock
+ | picture chosen for a sample programme.
+ |
+ */
+const COVERS = {
+	Conversation: {
+		air_quality:
+			"https://images.unsplash.com/photo-1597738755960-aeab75744b5e?q=80&w=1600&auto=format&fit=crop",
+		bamboo_building:
+			"https://images.unsplash.com/photo-1739713908506-aff1394c41d9?q=80&w=1600&auto=format&fit=crop",
+		cities_in_balance:
+			"https://images.unsplash.com/photo-1683062409353-28e0515dcc0e?q=80&w=1600&auto=format&fit=crop",
+		composting:
+			"https://images.unsplash.com/photo-1483366774565-c783b9f70e2c?q=80&w=1600&auto=format&fit=crop",
+		embodied_carbon:
+			"https://images.unsplash.com/photo-1767286795458-32a88bdefbe5?q=80&w=1600&auto=format&fit=crop",
+		living_infrastructure:
+			"https://images.unsplash.com/photo-1760436446540-d22739f0e3c4?q=80&w=1600&auto=format&fit=crop",
+	},
+	Experience: {
+		animation:
+			"https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1600&auto=format&fit=crop",
+		drift:
+			"https://images.unsplash.com/photo-1519862337475-9a05735f4519?q=80&w=1600&auto=format&fit=crop",
+		listening:
+			"https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?q=80&w=1600&auto=format&fit=crop",
+		permaculture:
+			"https://images.unsplash.com/photo-1710871398930-c2967d93196f?q=80&w=1600&auto=format&fit=crop",
+		rock_balancing:
+			"https://images.unsplash.com/photo-1763426294947-9ff31811820a?q=80&w=1600&auto=format&fit=crop",
+		sacred_groves:
+			"https://images.unsplash.com/photo-1525286335722-c30c6b5df541?q=80&w=1600&auto=format&fit=crop",
+		shoreline:
+			"https://images.unsplash.com/photo-1645217923157-5aff743c9de7?q=80&w=1600&auto=format&fit=crop",
+		water_stories:
+			"https://images.unsplash.com/photo-1770355302457-10d2b94c2220?q=80&w=1600&auto=format&fit=crop",
+	},
+	Showcase: {
+		courtyards:
+			"https://images.unsplash.com/photo-1523217582562-09d0def993a6?q=80&w=1600&auto=format&fit=crop",
+		eco_typography:
+			"https://images.unsplash.com/photo-1489058535093-8f530d789c3b?q=80&w=1600&auto=format&fit=crop",
+		flow: "https://images.unsplash.com/photo-1514306191717-452ec28c7814?q=80&w=1600&auto=format&fit=crop",
+		heat_resilient_shade:
+			"https://images.unsplash.com/photo-1777303799010-d062e096c5ff?q=80&w=1600&auto=format&fit=crop",
+		native_cotton:
+			"https://images.unsplash.com/photo-1763365716252-b34f6e500bdc?q=80&w=1600&auto=format&fit=crop",
+		supercool:
+			"https://images.unsplash.com/photo-1641255122178-a5aa1f828ca7?q=80&w=1600&auto=format&fit=crop",
+		textiles:
+			"https://images.unsplash.com/photo-1486272812091-a9bf3c6376c5?q=80&w=1600&auto=format&fit=crop",
+		urban_forest:
+			"https://images.unsplash.com/photo-1777353245243-831faded69f8?q=80&w=1600&auto=format&fit=crop",
+	},
+	Workshop: {
+		bamboo_joints:
+			"https://images.unsplash.com/photo-1522517779552-6cf4c1f31ee3?q=80&w=1600&auto=format&fit=crop",
+		brickwork:
+			"https://images.unsplash.com/photo-1552240390-5aec540311b4?q=80&w=1600&auto=format&fit=crop",
+		charpai_weaving:
+			"https://images.unsplash.com/photo-1643026063352-9af8ef302b81?q=80&w=1600&auto=format&fit=crop",
+		clay_moulding:
+			"https://images.unsplash.com/photo-1753164725860-ffcd260b7b32?q=80&w=1600&auto=format&fit=crop",
+		earthen_materials:
+			"https://images.unsplash.com/photo-1764351661280-bda9c2a653ff?q=80&w=1600&auto=format&fit=crop",
+		gardening_basics:
+			"https://images.unsplash.com/photo-1567943183748-3a7542120c90?q=80&w=1600&auto=format&fit=crop",
+		kids_eco_homes:
+			"https://images.unsplash.com/photo-1776684012353-787d693dda8f?q=80&w=1600&auto=format&fit=crop",
+		mangrove_restoration:
+			"https://images.unsplash.com/photo-1520587393050-c5298e1a8486?q=80&w=1600&auto=format&fit=crop",
+		natural_dye:
+			"https://images.unsplash.com/photo-1538153126577-dcd6a3cf614e?q=80&w=1600&auto=format&fit=crop",
+		nature_craft:
+			"https://images.unsplash.com/photo-1748803798842-f179b4b61c90?q=80&w=1600&auto=format&fit=crop",
+		passive_cooling:
+			"https://images.unsplash.com/photo-1479839672679-a46483c0e7c8?q=80&w=1600&auto=format&fit=crop",
+		potpourri:
+			"https://images.unsplash.com/photo-1483137140003-ae073b395549?q=80&w=1600&auto=format&fit=crop",
+		upcycling:
+			"https://images.unsplash.com/photo-1486718448742-163732cd1544?q=80&w=1600&auto=format&fit=crop",
+		waste_and_knots:
+			"https://images.unsplash.com/photo-1633594308237-3dcfa56b4e69?q=80&w=1600&auto=format&fit=crop",
+	},
+}
+
+/**
+ |
+ | The covers of the sessions written out longhand above, picked for their
+ | subject rather than dealt.
+ |
+ | The eight of them are the only sessions in this seed that say anything, so
+ | they are the only ones where a picture can be matched to what is said. The
+ | rest take whatever their category deals them.
+ |
+ | `Living with the Land` is the one pairing the static site makes itself: the
+ | session of that name there carries this photograph, and the standfirst here
+ | is about the same native cotton.
+ |
+ */
+const COVERS_BY_NAME = {
+	block_printing: responsive_image( { url: COVERS.Workshop.natural_dye } ),
+	cooling_pergola: responsive_image( {
+		url: COVERS.Experience.sacred_groves,
+	} ),
+	designing_for_heat: responsive_image( {
+		url: COVERS.Conversation.air_quality,
+	} ),
+	living_with_the_land: responsive_image( {
+		url: COVERS.Showcase.native_cotton,
+	} ),
+	notes_for_2027: responsive_image( {
+		url: COVERS.Conversation.living_infrastructure,
+	} ),
+	repairing_what_you_own: responsive_image( {
+		url: COVERS.Workshop.upcycling,
+	} ),
+	still_being_written: responsive_image( {
+		url: COVERS.Showcase.eco_typography,
+	} ),
+	unannounced: responsive_image( { url: COVERS.Showcase.flow } ),
+}
+
+/**
+ |
+ | The nth cover of a category, wrapping when that category's pool runs out.
+ |
+ | Dealt by position rather than chosen by name, so that a session added to the
+ | programme below takes the next picture instead of needing one picked for it.
+ |
+ */
+function cover_for ( category: string, position: number ) {
+	const pool = Object.values(
+		COVERS[category as keyof typeof COVERS] ?? COVERS.Showcase,
+	)
+
+	return responsive_image( { url: pool[position % pool.length] } )
+}
+
 /**
  |
  | The Instagram strip's slides, and the About page's carousel's.
+ |
+ | The static site's own strip, in its own order and to the last picture. It
+ | is drawn from Unsplash rather than from Instagram, and so is this: the
+ | component does not call Instagram, and the pictures are whatever an editor
+ | adds.
  |
  | The two components hold the same attributes and render nothing like each
  | other, so seeding both from one list is the clearest way to show that the
@@ -2199,6 +2385,12 @@ const INSTAGRAM_SLIDES = [
 		image:
 			"https://images.unsplash.com/photo-1776684012353-787d693dda8f?q=80&w=720&auto=format&fit=crop",
 		label: "Closing the last day",
+		url: "https://www.instagram.com/godrejdesignlab",
+	},
+	{
+		image:
+			"https://images.unsplash.com/photo-1770355302457-10d2b94c2220?q=80&w=720&auto=format&fit=crop",
+		label: "Tracing the buried river",
 		url: "https://www.instagram.com/godrejdesignlab",
 	},
 ]
@@ -2522,13 +2714,6 @@ function session_listing ( category: string, count: number ) {
 	return { __component: "list.session-listing-v1", category, count }
 }
 
-function session_list ( sessions: any[] ) {
-	return {
-		__component: "list.session-list-v1",
-		sessions: sessions.map( ( session ) => session.documentId ),
-	}
-}
-
 /**
  |
  | The category listing pages' listing. A category and nothing else: there is no
@@ -2551,6 +2736,13 @@ function session_listing_with_filtration ( category: string ) {
  */
 function session_schedule_list () {
 	return { __component: "list.session-schedule-list-v1" }
+}
+
+function session_list ( sessions: any[] ) {
+	return {
+		__component: "list.session-list-v1",
+		sessions: sessions.map( ( session ) => session.documentId ),
+	}
 }
 
 function contributor_listing (
