@@ -58,7 +58,7 @@ describe("the site chrome", () => {
 
 		expect( body.data.main_event.name ).toBe( MAIN_EVENT_NAME )
 		expect( body.data.main_event.date_start ).toBe( "2025-12-11" )
-		expect( body.data.main_event.date_end ).toBe( "2025-12-14" )
+		expect( body.data.main_event.date_end ).toBe( "2025-12-13" )
 	})
 
 	it("reads the main event on an archived page", async () => {

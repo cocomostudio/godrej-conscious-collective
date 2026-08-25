@@ -151,7 +151,7 @@ describe("every row a listing pulls", () => {
 		expect( showcase.age_group ).toBe( "All" )
 		expect( showcase.price ).toBe( 1599 )
 		expect( showcase.session_date_first ).toBe( "2025-12-11" )
-		expect( showcase.session_date_last ).toBe( "2025-12-14" )
+		expect( showcase.session_date_last ).toBe( "2025-12-13" )
 		expect( showcase.standfirst ).toContain( "A two-part showcase" )
 		expect( showcase.cover?.small?.url ).toBeTruthy()
 		expect( showcase.contributors.map( ( person: any ) => person.name ) )

@@ -70,7 +70,7 @@ async function write_events ( strapi: Strapi ) {
 			colour_showcase: "#F0503D",
 			colour_theme: "#0055E6",
 			colour_workshop: "#FABC1D",
-			date_end: "2025-12-14",
+			date_end: "2025-12-13",
 			date_start: "2025-12-11",
 			is_archived: false,
 			main: true,
@@ -344,7 +344,7 @@ const REMAINING_ROUTE_TABLE = [
 const CATEGORY_LISTING_PAGES = [
 	{
 		category: "Showcase",
-		standfirst: "Installations and concept designs across all four days.",
+		standfirst: "Installations and concept designs across all three days.",
 		title: "Showcases",
 	},
 	{
@@ -391,7 +391,7 @@ async function write_pages (
 				heading: heading_component( "What is on", "h2" ),
 				register_with_toc: true,
 				strings: [
-					"Installations, concept designs, workshops, conversations and more, across four days.",
+					"Installations, concept designs, workshops, conversations and more, across three days.",
 				],
 			} ),
 			// The marquee, the image stack, the Instagram strip and the
@@ -402,7 +402,7 @@ async function write_pages (
 				blocks: [
 					marquee( [
 						"Plant 13, Godrej Enterprises Group, Pirojshanagar, Vikhroli, Mumbai 400079",
-						"11 - 14 Dec 2025",
+						"11 - 13 Dec 2025",
 						"9:00 AM - 10:00 PM",
 					] ),
 				],
@@ -459,7 +459,7 @@ async function write_pages (
 				link: link( "View All", "/showcases" ),
 				opening_line:
 					"Installations and concept designs, sited across the "
-					+ "grounds for all four days.",
+					+ "grounds for all three days.",
 				register_with_toc: true,
 			} ),
 			section( "Experiences", {
@@ -1124,7 +1124,7 @@ async function write_sessions (
 		event: main,
 		instances: instances_daily(
 			"2025-12-11",
-			"2025-12-14",
+			"2025-12-13",
 			"09:00",
 			"22:00",
 		),
@@ -1248,7 +1248,7 @@ async function write_sessions (
 		event: main,
 		instances: instances_daily(
 			"2025-12-11",
-			"2025-12-14",
+			"2025-12-13",
 			"11:00",
 			"19:00",
 		),
@@ -1294,7 +1294,7 @@ async function write_sessions (
 	await create_session( strapi, {
 		category: "Workshop",
 		cover: COVERS_BY_NAME.repairing_what_you_own,
-		instances: [ instance( "2025-12-14", "10:00", "11:30" ) ],
+		instances: [ instance( "2025-12-13", "10:00", "11:30" ) ],
 		main_region: [
 			section( "Repairing What You Own", {
 				heading: heading_component(
@@ -1555,7 +1555,7 @@ const PROGRAMME = [
 		age_group: "Adults",
 		category: "Conversation",
 		checkout_url: undefined,
-		day: "2025-12-14",
+		day: "2025-12-13",
 		from: "15:00",
 		name: "Building with What Is Already There",
 		price: undefined,
@@ -1662,7 +1662,7 @@ const PROGRAMME = [
 		age_group: "All",
 		category: "Showcase",
 		checkout_url: undefined,
-		day: "2025-12-14",
+		day: "2025-12-11",
 		from: "10:00",
 		name: "Threads of the Deccan",
 		price: 1599,
@@ -1714,7 +1714,7 @@ const PROGRAMME = [
 		age_group: "All",
 		category: "Showcase",
 		checkout_url: undefined,
-		day: "2025-12-14",
+		day: "2025-12-12",
 		from: "10:00",
 		name: "Common Ground",
 		price: 0,
@@ -1766,7 +1766,7 @@ const PROGRAMME = [
 		age_group: "All",
 		category: "Experience",
 		checkout_url: "https://example.com/cc/long-table",
-		day: "2025-12-14",
+		day: "2025-12-11",
 		from: "12:00",
 		name: "The Long Table",
 		price: 450,
@@ -1857,7 +1857,7 @@ const PROGRAMME = [
 		age_group: "Adults",
 		category: "Conversation",
 		checkout_url: undefined,
-		day: "2025-12-14",
+		day: "2025-12-11",
 		from: "11:00",
 		name: "Heat and the Working Day",
 		price: undefined,
@@ -1870,7 +1870,7 @@ const PROGRAMME = [
 		age_group: "All",
 		category: "Conversation",
 		checkout_url: undefined,
-		day: "2025-12-14",
+		day: "2025-12-13",
 		from: "17:00",
 		name: "Twenty Years of the Lab",
 		price: undefined,
@@ -1909,7 +1909,7 @@ const PROGRAMME = [
 		age_group: "Children",
 		category: "Workshop",
 		checkout_url: "https://example.com/cc/natural-dye",
-		day: "2025-12-14",
+		day: "2025-12-12",
 		from: "09:30",
 		name: "Natural Dye from the Kitchen",
 		price: 0,
@@ -1948,7 +1948,7 @@ const PROGRAMME = [
 		age_group: "All",
 		category: "Workshop",
 		checkout_url: "https://example.com/cc/your-street",
-		day: "2025-12-14",
+		day: "2025-12-12",
 		from: "14:00",
 		name: "Measuring Your Own Street",
 		price: undefined,

@@ -118,7 +118,7 @@ describe("a session's derived dates", () => {
 		const { body } = await cms.get( SHOWCASE )
 
 		expect( body.data.entry.session_date_first ).toBe( "2025-12-11" )
-		expect( body.data.entry.session_date_last ).toBe( "2025-12-14" )
+		expect( body.data.entry.session_date_last ).toBe( "2025-12-13" )
 	})
 
 	it("follow a change to those instances", async () => {
