@@ -25,6 +25,17 @@
 
 @layer components {
 	/* _____
+	 | additional-details (all cards)
+	 |
+	 | The extra prose that only the featured card shows. Hidden by default
+	 | on every card, and turned back on in `.card--featured` below. The
+	 | render tree writes no `hidden` utility for this — a utility lives in a
+	 | later cascade layer than this component partial, and the featured
+	 | rule could never override it from here.
+	 */
+	.additional-details { display: none; }
+
+	/* _____
 	 | card--featured (md+)
 	 */
 	@media (min-width: 1024px) {

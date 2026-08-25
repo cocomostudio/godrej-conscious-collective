@@ -114,10 +114,14 @@ export function Card (
 
 			{
 				/* Shown only by `card--featured`, which the workshops listing
-			     puts on its first card from the medium breakpoint upward. */
+			     puts on its first card from the medium breakpoint upward.
+			     `additional-details` is hidden by default in the card CSS
+			     partial and revealed by `.card--featured` — the utility
+			     `hidden` would land in a later cascade layer than the
+			     component partial and could not be overridden by it. */
 			}
 			{ session.standfirst
-				&& <div className="additional-details hidden mt-8">
+				&& <div className="additional-details mt-8">
 					<hr className={ `w-16 ${ROLE_BORDER[role]}` } />
 					<p className="mt-8 text-h5 text-black">
 						{ session.standfirst }
