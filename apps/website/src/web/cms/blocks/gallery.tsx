@@ -28,6 +28,15 @@ const LAYOUTS: Record<string, string> = {
 	"wide-first": "md:grid-cols-[57fr_43fr]",
 }
 
+// The static site's single-entry gallery renders wide-first as a 4:3
+// crop beside a square, so the two figures land at close-to-equal
+// heights despite the differing column widths. The equal layout keeps
+// both at 4:3 — same column widths, same height falls out naturally.
+const IMAGE_ASPECTS: Record<string, string[]> = {
+	"equal": [ "aspect-[4/3]", "aspect-[4/3]" ],
+	"wide-first": [ "aspect-[4/3]", "md:aspect-square" ],
+}
+
 export function Gallery (
 	{ images = [], layout = "equal" }: {
 		images?: Image_Attribute[]
@@ -43,14 +52,18 @@ export function Gallery (
 		return null
 	}
 
+	const aspects = IMAGE_ASPECTS[layout] ?? IMAGE_ASPECTS.equal
+
 	return <div
-		className={ `${BLOCK_SPACING} grid gap-5.5 md:gap-8 ${
+		className={ `${BLOCK_SPACING} grid gap-5.5 md:gap-8 items-stretch ${
 			LAYOUTS[layout] ?? LAYOUTS.equal
 		}` }>
 		{ pictures.map( ( picture, index ) =>
-			<figure key={ index }>
+			<figure key={ index } className="flex flex-col">
 				<Picture_Image
-					className="w-full aspect-[4/3] rounded-lg object-cover"
+					className={ `w-full ${
+						aspects[index] ?? aspects[0]
+					} rounded-lg object-cover` }
 					picture={ picture } />
 
 				<Picture_Caption className="mt-4" picture={ picture } />
