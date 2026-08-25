@@ -24,6 +24,8 @@ export const IMAGES = {
 	// framed for the shape of the space it lands in. Anything cropped this way
 	// has to be one subject at three widths, which is why all three carry the
 	// same photograph's id and differ only in the box asked for.
+	promo_small: "https://media.cocomo.199101991.xyz/2025/godrej-design-lab/above-the-fold__small.jpg",
+	promo_medium: "https://media.cocomo.199101991.xyz/2025/godrej-design-lab/above-the-fold__large.png",
 	art_direction_large:
 		"https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1600&h=600&auto=format&fit=crop",
 	art_direction_medium:
