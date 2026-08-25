@@ -55,6 +55,7 @@ import type {
 
 import { Event_Date_Range } from "./event-date-range.tsx"
 import { Nav_Link } from "../nav-link.tsx"
+import { use_registration_actions } from "../registration/registration-context.ts"
 
 import { Button } from "#infra/lib/ui/react/buttons/button.tsx"
 import { Arrow_Right } from "#infra/lib/ui/react/icons/arrow-right.tsx"
@@ -358,11 +359,20 @@ export function Site_Header ( { main_event, page_shell }: Site_Header_Props ) {
  | event running there is nothing to register for, so the button is absent
  | rather than present and inert.
  |
- | The overlay it opens is the registration form, which is a later ticket. Until
- | then this is the button and nothing behind it.
+ | The overlay it opens is the registration form, which is not a route: it is
+ | portaled through the slot-and-fill tunnel into the screen channel, so a
+ | visitor registers from wherever they already were rather than being sent
+ | somewhere to do it.
+ |
+ | `aria-haspopup="dialog"` rather than `aria-expanded`, which is why this
+ | reads the actions context and not the open one — a modal announces that it
+ | opens something, not whether it is currently open, so the button has no
+ | reason to re-render when the form opens.
  |
  */
 function Register_Now ( { event }: { event: Event | null } ) {
+	const { open } = use_registration_actions()
+
 	if ( !event ) {
 		return null
 	}
@@ -371,6 +381,7 @@ function Register_Now ( { event }: { event: Event | null } ) {
 		size="lg"
 		color="theme"
 		emphasis="solid"
+		onClick={ open }
 		aria-haspopup="dialog">
 		Register Now
 	</Button>

@@ -33,6 +33,38 @@ const MONTHS = [
 	"Dec",
 ]
 
+/**
+ |
+ | The same twelve, unabbreviated.
+ |
+ | One place says the range in full and it is the registration form's headline —
+ | "RSVP for 11-14 December 2025" — which is how the design has it and which is
+ | a different sentence from the header's "11–14 Dec 2025".
+ |
+ | The two differ in three ways at once: the month table, the separator (a
+ | hyphen against an en dash), and the shape of the result — `event_range_in_full`
+ | answers one string, because it sits INSIDE a sentence, where `date_range`
+ | answers two labelled ends because each needs its own `<time>` element. Only
+ | the "shortest that still reads" rule is shared, and it is four lines. That
+ | is why there are two functions rather than one with a bag of options: the
+ | options would outnumber what they configure.
+ |
+ */
+const MONTHS_IN_FULL = [
+	"January",
+	"February",
+	"March",
+	"April",
+	"May",
+	"June",
+	"July",
+	"August",
+	"September",
+	"October",
+	"November",
+	"December",
+]
+
 /** One end of the range: the machine-readable day and what a reader sees. */
 export type Event_Day = {
 	value: string
@@ -113,6 +145,48 @@ function ordinal_suffix ( day: number ): string {
 
 export function event_dates ( event: Event | null ): Event_Dates | null {
 	return date_range( event?.date_start, event?.date_end )
+}
+
+/**
+ |
+ | An event's range as one string, with the month written out: "11-14 December
+ | 2025", or "11 December 2025" for an event running a single day.
+ |
+ | The registration form's headline, and only that. It is one string rather than
+ | two `<time>` elements because it sits inside a sentence — "RSVP for …" —
+ | rather than standing on its own as the header's does.
+ |
+ | Null when the event carries no dates, which is what lets the headline fall
+ | back to a line that promises nothing.
+ |
+ */
+export function event_range_in_full ( event: Event | null ): string | null {
+	const start = parse( event?.date_start )
+	const end = parse( event?.date_end )
+
+	if ( !start ) {
+		return null
+	}
+
+	const in_full = ( date: Parsed ) =>
+		`${date.day} ${MONTHS_IN_FULL[date.month]} ${date.year}`
+
+	if ( !end || same_day( start, end ) ) {
+		return in_full( start )
+	}
+
+	// The same rule as the abbreviated range: the opening half carries only
+	// what the closing half cannot say for it.
+	const opening = start.year !== end.year
+		? in_full( start )
+		: start.month !== end.month
+		? `${start.day} ${MONTHS_IN_FULL[start.month]}`
+		: String( start.day )
+
+	// A hyphen with no spaces, which is what the design has for this line —
+	// unlike the header's en dash. The two are different typographic
+	// decisions about different sentences, not an inconsistency.
+	return `${opening}-${in_full( end )}`
 }
 
 /**

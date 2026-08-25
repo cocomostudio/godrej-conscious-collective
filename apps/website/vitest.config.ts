@@ -24,6 +24,24 @@ import { defineConfig } from "vitest/config"
 
 export default defineConfig( {
 	test: {
+		/**
+		 |
+		 | Set here rather than in a test, because the environment module reads
+		 | `process.env` once at module evaluation and a test file's own
+		 | assignment would land after its imports had already run.
+		 |
+		 | `TRUST_PROXY` is what lets a test present an address of its own in
+		 | `X-Forwarded-For`, exactly as a reverse proxy does. Without it every
+		 | request in a file is the same visitor and the registration form's
+		 | rate limiter refuses the sixth test rather than the sixth
+		 | submission.
+		 |
+		 */
+		env: {
+			CMS_API_TOKEN: "test-registration-relay-token",
+			REGISTRATION_TOKEN_SECRET: "test-registration-token-secret",
+			TRUST_PROXY: "true",
+		},
 		fileParallelism: false,
 		hookTimeout: 60_000,
 		include: [ "tests/**/*.test.ts" ],

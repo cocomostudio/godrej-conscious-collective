@@ -43,6 +43,8 @@ import {
 	use_page_layout,
 	use_page_title_class,
 } from "../page-layout.tsx"
+import { Registration_Form_Trigger } from "../registration/registration-form-trigger.tsx"
+import { Registration_Provider } from "../registration/registration-provider.tsx"
 
 import {
 	H,
@@ -117,44 +119,74 @@ export function Root (
 	// channels are on it: the screen channel here, above everything, and the
 	// sidebar channel below. One provider per page, so nothing leaks between
 	// two independently mounted trees.
+	/**
+	 |
+	 | **The registration provider wraps the whole page, inside the tunnel's
+	 | provider.** Inside, because the overlay it owns travels through the
+	 | screen channel and the fill needs a provider above it. Wrapping the page,
+	 | because the form is not a route — a visitor registers from wherever they
+	 | happen to be, so the overlay has to be mounted on every page there is.
+	 |
+	 | The page's own markup is handed to it as `children`, which is what keeps
+	 | opening the form from re-rendering the page: the element is referentially
+	 | unchanged when the provider's state moves, so React bails out of the
+	 | whole subtree. See the provider.
+	 |
+	 */
 	return <Slot_Provider>
-		<div className="h-full bg-white" style={ colours as CSSProperties }>
-			{
-				/* Anything that has to escape the layout entirely — the
-			     filtration drawer, and the registration overlay after it.
-			     It sits outside the column flow and above the chrome, so
-			     nothing sticky, scrolled or stacked can clip it. */
-			}
-			<Slot name={ SCREEN } />
+		<Registration_Provider
+			main_event={ main_event }
+			page_shell={ page_shell }>
+			<div
+				className="h-full bg-white"
+				style={ colours as CSSProperties }>
+				{
+					/* Anything that has to escape the layout entirely — the
+				     filtration drawer, and the registration overlay. It sits
+				     outside the column flow and above the chrome, so nothing
+				     sticky, scrolled or stacked can clip it. */
+				}
+				<Slot name={ SCREEN } />
 
-			<div className="min-h-full flex flex-col bg-black">
-				<Site_Header
-					main_event={ main_event }
-					page_shell={ page_shell } />
+				<div className="min-h-full flex flex-col bg-black">
+					<Site_Header
+						main_event={ main_event }
+						page_shell={ page_shell } />
 
-				<main className="grow md:flex">
-					{ two_column && <Sidebar
-						at_every_width={ sidebar_at_every_width }
-						back_link={ back_link }
-						standfirst={ standfirst }
-						title={ title }>
-						{ sidebar }
-					</Sidebar> }
+					<main className="grow md:flex">
+						{ two_column && <Sidebar
+							at_every_width={ sidebar_at_every_width }
+							back_link={ back_link }
+							standfirst={ standfirst }
+							title={ title }>
+							{ sidebar }
+						</Sidebar> }
 
-					<Main_Column
-						masthead={ masthead }
-						sidebar_repeat={ sidebar_repeat }
-						title={ two_column ? null : title }
-						two_column={ two_column }>
-						{ main }
-					</Main_Column>
-				</main>
+						<Main_Column
+							masthead={ masthead }
+							sidebar_repeat={ sidebar_repeat }
+							title={ two_column ? null : title }
+							two_column={ two_column }>
+							{ main }
+						</Main_Column>
+					</main>
 
-				<Site_Footer
-					main_event={ main_event }
-					page_shell={ page_shell } />
+					<Site_Footer
+						main_event={ main_event }
+						page_shell={ page_shell } />
+
+					{
+						/* Register Now below the medium breakpoint, where the
+					     header's button is not there. In flow rather than fixed,
+					     so it holds the page's bottom 4rem open — which is what
+					     the drawer rests on when it is closed. */
+					}
+					<Registration_Form_Trigger
+						className="sticky bottom-0 md:hidden"
+						main_event={ main_event } />
+				</div>
 			</div>
-		</div>
+		</Registration_Provider>
 	</Slot_Provider>
 }
 

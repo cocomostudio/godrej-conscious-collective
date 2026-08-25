@@ -42,7 +42,8 @@
 		"react-accessible-headings": "4.2.0",
 		"react-dom": "19.2.8",
 		"react-intersection-observer": "10.0.3",
-		"react-router": "8.3.0"
+		"react-router": "8.3.0",
+		"valibot": "1.2.0"
 	},
 	"devDependencies": {
 		"@react-router/dev": "8.3.0",

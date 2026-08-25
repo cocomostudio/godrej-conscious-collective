@@ -15,6 +15,12 @@ function build_express_server () {
 function configure_express_server ( express_app: Express.Application ) {
 	express_app.disable( "x-powered-by" )
 	// ↑ remove the custom X-Powered-By header
+
+	express_app.set( "trust proxy", Environment.get( "TRUST_PROXY" ) )
+	// ↑ Whether `X-Forwarded-For` is believed, and therefore whether `req.ip`
+	// 	is the client or the proxy. False unless a deployment says otherwise —
+	// 	see the note on `TRUST_PROXY` in the environment module. The registration
+	// 	form's rate limiter is what depends on the answer.
 }
 
 async function build_vite_server () {
