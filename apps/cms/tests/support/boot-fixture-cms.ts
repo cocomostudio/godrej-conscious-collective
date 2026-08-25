@@ -5,6 +5,7 @@ import os from "node:os"
 import path from "node:path"
 
 import strapi_app from "../../src/index"
+import { destroy_strapi } from "./strapi-lifecycle.ts"
 
 /**
  |
@@ -61,8 +62,7 @@ export async function boot_fixture_cms (
 
 	const destroy = async () => {
 		delete ( globalThis as any )[BOOTSTRAP_HANDLE]
-		await with_process_listeners_preserved( () => strapi.destroy() )
-			.catch( () => {} )
+		await destroy_strapi( strapi )
 		fs.rmSync( app_dir, { force: true, recursive: true } )
 	}
 
@@ -168,34 +168,4 @@ function write ( app_dir: string, relative_path: string, contents: string ) {
 	const file = path.join( app_dir, relative_path )
 	fs.mkdirSync( path.dirname( file ), { recursive: true } )
 	fs.writeFileSync( file, contents )
-}
-
-/**
- |
- | `strapi.destroy()` ends with a bare `process.removeAllListeners()`, which
- | takes the test runner's own IPC listeners with it and leaves the worker
- | looking as though it crashed. The listeners are captured before and put back
- | after.
- |
- */
-async function with_process_listeners_preserved ( run: () => Promise<unknown> ) {
-	const captured = process.eventNames().map( ( event ) => ( {
-		event,
-		listeners: process.rawListeners( event ),
-	} ) )
-
-	try {
-		await run()
-	} finally {
-		for ( const { event, listeners } of captured ) {
-			for ( const listener of listeners ) {
-				if ( !process.rawListeners( event ).includes( listener ) ) {
-					process.on(
-						event,
-						listener as ( ...args: any[] ) => void,
-					)
-				}
-			}
-		}
-	}
 }

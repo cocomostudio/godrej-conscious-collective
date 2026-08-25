@@ -15,9 +15,11 @@
  | The one exception, `boot-fixture-cms.ts`, exists because boot-time behaviour
  | cannot be observed over HTTP: a refused boot serves nothing.
  |
- | Each file that uses this pays one boot, and one boot is tens of seconds.
- | Vitest runs the CMS files one at a time (`fileParallelism: false`), because
- | Strapi keeps global state and two live instances collide.
+ | Each file that uses this pays one boot. It no longer pays a compile or a
+ | seed: `global-setup.ts` does both once for the whole run, and this copies
+ | the database it left. Vitest runs the CMS files one at a time
+ | (`fileParallelism: false`), because Strapi keeps global state and two live
+ | instances collide.
  |
  */
 
@@ -25,7 +27,14 @@ import fs from "node:fs"
 import { createRequire } from "node:module"
 import path from "node:path"
 
-import { write_seed_content } from "../../scripts/seed/content.ts"
+import {
+	CMS_DIR,
+	copy_database,
+	destroy_strapi,
+	DIST_DIR,
+	remove_database,
+	TEMPLATE_DATABASE,
+} from "./strapi-lifecycle.ts"
 
 /**
  |
@@ -34,11 +43,7 @@ import { write_seed_content } from "../../scripts/seed/content.ts"
  | half.
  |
  */
-const { compileStrapi, createStrapi } = createRequire( import.meta.url )(
-	"@strapi/strapi",
-)
-
-const CMS_DIR = path.resolve( import.meta.dirname, "..", ".." )
+const { createStrapi } = createRequire( import.meta.url )( "@strapi/strapi" )
 
 export type Seeded_Cms = {
 	/** Absolute base URL of the running instance, e.g. `http://127.0.0.1:53211`. */
@@ -50,8 +55,6 @@ export type Seeded_Cms = {
 }
 
 export async function boot_seeded_cms (): Promise<Seeded_Cms> {
-	require_dotenv()
-
 	// A database of its own, so a test run neither reads nor destroys whatever
 	// the developer has in `.tmp/data.db`. The path is relative to the CMS
 	// directory because that is how `config/database.ts` resolves it.
@@ -60,6 +63,7 @@ export async function boot_seeded_cms (): Promise<Seeded_Cms> {
 
 	remove_database( database_path )
 	fs.mkdirSync( path.dirname( database_path ), { recursive: true } )
+	copy_database( seeded_template(), database_path )
 
 	process.env.DATABASE_CLIENT = "sqlite"
 	process.env.DATABASE_FILENAME = database
@@ -67,10 +71,14 @@ export async function boot_seeded_cms (): Promise<Seeded_Cms> {
 	// the CMS on 1337 can run the tests at the same time.
 	process.env.PORT = "0"
 
-	const context = await compileStrapi( { appDir: CMS_DIR } )
-	const strapi = await createStrapi( context ).load()
+	// `compileStrapi` is not called here. It returns nothing but
+	// `{ appDir, distDir }`, and the global setup has already run it — so this
+	// names the same two directories and skips a repeat of the build.
+	const strapi = await createStrapi( {
+		appDir: CMS_DIR,
+		distDir: DIST_DIR,
+	} ).load()
 
-	await write_seed_content( strapi )
 	await strapi.listen()
 
 	const { port } = strapi.server.httpServer.address()
@@ -78,8 +86,7 @@ export async function boot_seeded_cms (): Promise<Seeded_Cms> {
 
 	return {
 		async destroy () {
-			await with_process_listeners_preserved( () => strapi.destroy() )
-				.catch( () => {} )
+			await destroy_strapi( strapi )
 			remove_database( database_path )
 		},
 		async get ( path: string ) {
@@ -96,58 +103,35 @@ export async function boot_seeded_cms (): Promise<Seeded_Cms> {
 	}
 }
 
+/**
+ |
+ | The seeded database the global setup left, or a refusal naming the reason
+ | there isn't one.
+ |
+ | The failure this guards against is a test file run without the global setup
+ | — through an editor's test runner, say. Booting anyway would give an empty
+ | database and a wall of assertions failing on missing content, which reads as
+ | the seed being broken rather than as never having run.
+ |
+ */
+function seeded_template () {
+	const template = path.join( CMS_DIR, TEMPLATE_DATABASE )
+
+	if ( !fs.existsSync( template ) ) {
+		throw new Error(
+			`${TEMPLATE_DATABASE} is missing, so there is no seeded database to `
+				+ `copy. It is written by tests/support/global-setup.ts, which `
+				+ `vitest runs once per "vitest run" — so this is a test booted `
+				+ `outside the suite's own runner.`,
+		)
+	}
+
+	return template
+}
+
 let boots = 0
 
 function counter () {
 	boots += 1
 	return boots
-}
-
-function require_dotenv () {
-	if ( fs.existsSync( path.join( CMS_DIR, ".env" ) ) ) {
-		return
-	}
-
-	throw new Error(
-		`apps/cms/.env is missing, so Strapi has no application keys and cannot `
-			+ `boot. Run "node scripts/ensure-local-env.js" from the repository `
-			+ `root, which copies each app's .env.example across without ever `
-			+ `overwriting.`,
-	)
-}
-
-function remove_database ( file: string ) {
-	for ( const suffix of [ "", "-shm", "-wal" ] ) {
-		fs.rmSync( `${file}${suffix}`, { force: true } )
-	}
-}
-
-/**
- |
- | `strapi.destroy()` ends with a bare `process.removeAllListeners()`, which
- | takes the test runner's own IPC listeners with it and leaves the worker
- | looking as though it crashed. The listeners are captured before and put back
- | after.
- |
- */
-async function with_process_listeners_preserved ( run: () => Promise<unknown> ) {
-	const captured = process.eventNames().map( ( event ) => ( {
-		event,
-		listeners: process.rawListeners( event ),
-	} ) )
-
-	try {
-		await run()
-	} finally {
-		for ( const { event, listeners } of captured ) {
-			for ( const listener of listeners ) {
-				if ( !process.rawListeners( event ).includes( listener ) ) {
-					process.on(
-						event,
-						listener as ( ...args: any[] ) => void,
-					)
-				}
-			}
-		}
-	}
 }
