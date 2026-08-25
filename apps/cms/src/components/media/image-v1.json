@@ -31,7 +31,7 @@
 	},
 
 	"__": {
-		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot. The `url` field is hidden by default and shown again by `metadatas_outside_production`, which is merged over `metadatas` only when NODE_ENV is not \"production\": the field exists for the seed script, which fills it so that a fresh clone needs no uploads, and an editor has the file field beside it and never wants this one.",
 		"metadatas": {
 			"file": {
 				"edit": {
@@ -77,6 +77,13 @@
 				},
 				"list": {
 					"label": "Alternative text"
+				}
+			}
+		},
+		"metadatas_outside_production": {
+			"url": {
+				"edit": {
+					"visible": true
 				}
 			}
 		},

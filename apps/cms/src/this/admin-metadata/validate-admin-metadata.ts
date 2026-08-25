@@ -13,7 +13,7 @@
  |
  |   • the keys of the `"__"` declaration itself, so that a `metadata` that
  |     should have been `metadatas` is a boot failure rather than a no-op;
- |   • every key of `metadatas`;
+ |   • every key of `metadatas` and of `metadatas_outside_production`;
  |   • every entry of `layouts.list`; and
  |   • every `name` in every row of `layouts.edit`.
  |
@@ -29,6 +29,9 @@ const RECOGNISED_KEYS = new Set( [
 	// Merged into the content manager's stored configuration.
 	"metadatas",
 	"layouts",
+	// Merged over `metadatas` first, and only when the environment is not
+	// production. See `configure-admin-metadata.ts`.
+	"metadatas_outside_production",
 	// Free text for whoever opens the file next. Ignored.
 	"note",
 ] )
@@ -64,10 +67,21 @@ export function validate_admin_metadata ( uid: string, schema ) {
 	] )
 
 	validate_metadatas( uid, declaration.metadatas, attributes )
+	validate_metadatas(
+		uid,
+		declaration.metadatas_outside_production,
+		attributes,
+		"metadatas_outside_production",
+	)
 	validate_layouts( uid, declaration.layouts, attributes )
 }
 
-function validate_metadatas ( uid: string, metadatas, attributes: Set<string> ) {
+function validate_metadatas (
+	uid: string,
+	metadatas,
+	attributes: Set<string>,
+	key = "metadatas",
+) {
 	if ( metadatas === undefined ) {
 		return
 	}
@@ -75,7 +89,7 @@ function validate_metadatas ( uid: string, metadatas, attributes: Set<string> ) 
 	if ( !is_object( metadatas ) ) {
 		throw invalid(
 			uid,
-			`${ADMIN_METADATA_KEY}.metadatas`,
+			`${ADMIN_METADATA_KEY}.${key}`,
 			`is not an object.`,
 		)
 	}
@@ -84,7 +98,7 @@ function validate_metadatas ( uid: string, metadatas, attributes: Set<string> ) 
 		if ( !attributes.has( name ) ) {
 			throw unknown_attribute(
 				uid,
-				`${ADMIN_METADATA_KEY}.metadatas.${name}`,
+				`${ADMIN_METADATA_KEY}.${key}.${name}`,
 				name,
 				attributes,
 			)

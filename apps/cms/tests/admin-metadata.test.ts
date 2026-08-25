@@ -243,3 +243,124 @@ describe("metadata naming an attribute that does not exist prevents boot", () =>
 		expect( refusal?.message ).toContain( "titel" )
 	})
 })
+
+/**
+ |
+ | The development-only half of a declaration.
+ |
+ | The case this exists for is `media.image-v1`'s `url`: a field the seed script
+ | fills and an editor should never see. Hiding it outright hides it from the
+ | developer reading the seed too, so the file states it hidden and states it
+ | visible again for anything that is not production.
+ |
+ | Both directions are asserted, because the failure that matters is not the
+ | field staying hidden in production — it is a key set on a development boot
+ | and never set again, which would leak the field into the next production
+ | boot against a store that had already been written to.
+ |
+ */
+describe("metadata declared for outside production only", () => {
+	let cms: Awaited<ReturnType<typeof boot_fixture_cms>>
+	let store: any
+
+	const in_environment = async ( environment: string | undefined ) => {
+		const before = process.env.NODE_ENV
+
+		if ( environment === undefined ) {
+			delete process.env.NODE_ENV
+		} else {
+			process.env.NODE_ENV = environment
+		}
+
+		try {
+			await configure_admin_metadata( cms.strapi )
+		} finally {
+			if ( before === undefined ) {
+				delete process.env.NODE_ENV
+			} else {
+				process.env.NODE_ENV = before
+			}
+		}
+
+		return await store.get( { key: CONTENT_TYPE_KEY } )
+	}
+
+	beforeAll( async () => {
+		cms = await boot_fixture_cms( {
+			content_types: {
+				thing: thing_schema( {
+					metadatas: {
+						name: { edit: { label: "Name" } },
+						summary: {
+							edit: { label: "Summary", visible: false },
+						},
+					},
+					metadatas_outside_production: {
+						summary: { edit: { visible: true } },
+					},
+				} ),
+			},
+		} )
+
+		store = cms.strapi.store( { type: "plugin", name: "content_manager" } )
+	} )
+
+	afterAll( async () => {
+		await cms?.destroy()
+	} )
+
+	test("is applied in development", async () => {
+		const stored = await in_environment( "development" )
+
+		expect( stored.metadatas.summary.edit.visible ).toBe( true )
+	})
+
+	test("is applied when the environment is not named at all", async () => {
+		const stored = await in_environment( undefined )
+
+		expect( stored.metadatas.summary.edit.visible ).toBe( true )
+	})
+
+	test("is applied under the test runner, so a test sees what a developer sees", async () => {
+		const stored = await in_environment( "test" )
+
+		expect( stored.metadatas.summary.edit.visible ).toBe( true )
+	})
+
+	test("is not applied in production", async () => {
+		const stored = await in_environment( "production" )
+
+		expect( stored.metadatas.summary.edit.visible ).toBe( false )
+	})
+
+	test("leaves the rest of the declaration alone either way", async () => {
+		const stored = await in_environment( "production" )
+
+		expect( stored.metadatas.name.edit.label ).toBe( "Name" )
+		expect( stored.metadatas.summary.edit.label ).toBe( "Summary" )
+	})
+
+	test("names the schema and the key when it names no attribute", async () => {
+		const schema = cms.strapi.contentTypes["api::thing.thing"]
+		const original = schema.__
+
+		schema.__ = {
+			metadatas_outside_production: {
+				summry: { edit: { visible: true } },
+			},
+		}
+
+		let refusal: Error | undefined
+
+		try {
+			await configure_admin_metadata( cms.strapi )
+		} catch ( error ) {
+			refusal = error as Error
+		} finally {
+			schema.__ = original
+		}
+
+		expect( refusal?.message ).toContain( "metadatas_outside_production" )
+		expect( refusal?.message ).toContain( "summry" )
+	})
+})

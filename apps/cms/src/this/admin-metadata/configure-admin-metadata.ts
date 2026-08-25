@@ -28,6 +28,11 @@ import {
  | configuration for any schema the store had never seen, which is the value
  | being merged over.
  |
+ | A schema may also carry `metadatas_outside_production`, which is merged over
+ | `metadatas` before any of that happens and only when the environment is not
+ | production. It is how a field is shown to a developer and hidden from an
+ | editor — see `outside_production` below.
+ |
  | Every key is checked against the schema's actual attributes first, and a
  | mismatch throws — see `validate-admin-metadata.ts` for why a boot failure is
  | the right answer there.
@@ -92,10 +97,9 @@ async function apply_declared_metadata (
 	validate_admin_metadata( uid, schema )
 
 	const declaration = schema?.[ADMIN_METADATA_KEY]
+	const metadatas = metadatas_for_this_environment( declaration )
 	const declared = {
-		...( declaration?.metadatas
-			? { metadatas: declaration.metadatas }
-			: {} ),
+		...( metadatas ? { metadatas } : {} ),
 		...( declaration?.layouts ? { layouts: declaration.layouts } : {} ),
 	}
 
@@ -110,4 +114,41 @@ async function apply_declared_metadata (
 		key,
 		value: deep_merge_replacing_arrays( stored, declared ),
 	} )
+}
+
+/**
+ |
+ | The `metadatas` this environment gets: the declared ones outright, or the
+ | declared ones with `metadatas_outside_production` merged over them.
+ |
+ | **Both halves state the same keys, and the base half states the production
+ | value.** That is what makes the switch travel in both directions: a boot in
+ | production writes the production value back over whatever a development boot
+ | left in the store, rather than leaving a key nobody sets again.
+ |
+ */
+function metadatas_for_this_environment ( declaration ) {
+	const declared = declaration?.metadatas
+	const outside = declaration?.metadatas_outside_production
+
+	if ( !outside || !outside_production() ) {
+		return declared
+	}
+
+	return deep_merge_replacing_arrays( declared ?? {}, outside )
+}
+
+/**
+ |
+ | Whether this is anything other than a production environment.
+ |
+ | An unset `NODE_ENV` is a developer's shell, so it counts as development —
+ | the same reading `scripts/seed/guards.ts` takes. The test is for production
+ | rather than for development because `strapi develop`, `vitest` and a bare
+ | `node` each name themselves differently, and only one name has to be right
+ | for a field to stay hidden from an editor.
+ |
+ */
+function outside_production () {
+	return ( process.env.NODE_ENV ?? "development" ) !== "production"
 }
