@@ -189,16 +189,20 @@ function Sidebar (
 		className={ `${
 			at_every_width ? "" : "max-md:hidden "
 		}layout__1-4__col-1 md:pl-1ccm pb-6 bg-gray-light` }>
-		<div className="cc mx-auto sticky top-0 flex flex-col items-start gap-6 pt-6 md:pt-8 md:pb-6">
+		<div className="cc mx-auto sticky top-0 flex flex-col items-start pt-6 md:pt-8 md:pb-6">
 			{ back_link }
 
-			<Page_Title standfirst={ standfirst } title={ title } />
+			<div className="mt-4">
+				<Page_Title standfirst={ standfirst } title={ title } />
+			</div>
 
-			<Level>
-				{ children }
+			<div className="mt-6">
+				<Level>
+					{ children }
 
-				<Slot name={ SIDEBAR } />
-			</Level>
+					<Slot name={ SIDEBAR } />
+				</Level>
+			</div>
 		</div>
 	</div>
 }
