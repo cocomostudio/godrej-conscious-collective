@@ -26,6 +26,7 @@ import { H } from "#infra/lib/ui/react/headings.tsx"
 import type { Media } from "../envelope.ts"
 
 import { use_media_origin } from "../media-origin.tsx"
+import { use_body_text_class } from "../page-layout.tsx"
 import { picture_of } from "../media.ts"
 import { Nav_Link } from "../nav-link.tsx"
 import { Picture_Image } from "../pictures.tsx"
@@ -43,6 +44,7 @@ const HEADING_SIZES: Record<number, string> = {
 
 export function Wysiwyg ( { rich_text }: { rich_text?: BlocksContent } ) {
 	const origin = use_media_origin()
+	const body_size = use_body_text_class()
 
 	if ( !Array.isArray( rich_text ) || rich_text.length === 0 ) {
 		return null
@@ -54,7 +56,7 @@ export function Wysiwyg ( { rich_text }: { rich_text?: BlocksContent } ) {
 			content={ rich_text }
 			blocks={ {
 				code: ( { children } ) =>
-					<p className="mt-4 text-p font-mono text-black">
+					<p className={ `mt-4 ${body_size} font-mono text-black` }>
 						{ children }
 					</p>,
 				heading: ( { children, level } ) =>
@@ -90,14 +92,14 @@ export function Wysiwyg ( { rich_text }: { rich_text?: BlocksContent } ) {
 					</Nav_Link>,
 				list: ( { children, format } ) =>
 					format === "ordered"
-						? <ol className="mt-4 pl-6 list-decimal text-p text-black">
+						? <ol className={ `mt-4 pl-6 list-decimal ${body_size} text-black` }>
 							{ children }
 						</ol>
-						: <ul className="mt-4 pl-6 list-disc text-p text-black">
+						: <ul className={ `mt-4 pl-6 list-disc ${body_size} text-black` }>
 							{ children }
 						</ul>,
 				paragraph: ( { children } ) =>
-					<p className="mt-4 text-p text-black">
+					<p className={ `mt-4 ${body_size} text-black` }>
 						{ children }
 					</p>,
 				quote: ( { children } ) =>

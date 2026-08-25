@@ -39,7 +39,10 @@ import {
 } from "../channels.ts"
 import { Site_Footer } from "../chrome/site-footer.tsx"
 import { Site_Header } from "../chrome/site-header.tsx"
-import { use_page_layout } from "../page-layout.tsx"
+import {
+	use_page_layout,
+	use_page_title_class,
+} from "../page-layout.tsx"
 
 import {
 	H,
@@ -233,7 +236,7 @@ function Page_Title (
 	const show_standfirst = !one_column && standfirst
 
 	return <div>
-		<H className="text-h2 md:font-semibold text-theme">{ title }</H>
+		<H className={ use_page_title_class() }>{ title }</H>
 
 		{ show_standfirst
 			&& <p className="mt-4 text-p text-black">{ standfirst }</p> }
@@ -303,7 +306,8 @@ function Main_Column (
 			? <div className="md:w-9c text-black">
 				<div className="cc mx-auto md:pl-16">
 					{ title && <div className="pb-6 md:pb-8">
-						<Page_Title title={ title } />
+						<Page_Title
+							title={ title } />
 					</div> }
 
 					<Level>{ children }</Level>
