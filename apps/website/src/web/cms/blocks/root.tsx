@@ -231,7 +231,17 @@ function Sidebar (
 				<Page_Title standfirst={ standfirst } title={ title } />
 			</div>
 
-			<div className="mt-6">
+			{
+				/* `self-stretch` because the column is `items-start`, which
+			     is there to keep the back link at its own width. Until this
+			     region was wrapped for its spacing, everything below the
+			     title was a flex item in its own right and could ask for the
+			     column's width with `w-full` — the filtration widget does.
+			     The wrapper made that `w-full` resolve against a
+			     shrink-to-fit box instead, and the widget collapsed to its
+			     widest row. */
+			}
+			<div className="mt-6 self-stretch">
 				<Level>
 					{ children }
 
