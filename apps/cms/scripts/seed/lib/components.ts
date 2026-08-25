@@ -59,7 +59,7 @@ export function responsive_image ( fields: Image_Fields ) {
 export function art_directed_image (
 	{ alt, caption, large, medium, small, title }:
 		& Omit<Image_Fields, "url">
-		& { small: string; medium: string; large: string },
+		& { small: string; medium?: string; large?: string },
 ) {
 	const words = { alt, caption, title }
 
