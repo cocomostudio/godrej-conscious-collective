@@ -167,7 +167,12 @@ export function Filtration (
 			{
 				/* The first facet opens with the widget; the rest start
 			     closed. `Accordion.Root` holds its open state in React, so it
-			     has to stay outside anything the reset remounts. */
+			     has to stay outside anything the reset remounts.
+
+			     With a single facet the accordion is skipped altogether — a
+			     collapsible pane whose only job is to hide the one question
+			     the widget is asking is a control worth nothing. The facet
+			     renders permanently open instead. */
 			}
 			<Accordion.Root
 				className="max-md:max-h-[60vh] overflow-auto [&>*:last-child]:border-none"
@@ -176,6 +181,7 @@ export function Filtration (
 					<Facet_Field
 						key={ facet.name }
 						className="[&:not(:first-child)]:mt-6 [&:not(:last-child)]:pb-2 border-b-2 border-black/5 md:border-black/10"
+						collapsible={ facets.length > 1 }
 						committed={ committed[facet.name] }
 						facet={ facet }
 						on_change={ ( selected ) => {
@@ -217,8 +223,15 @@ export function Filtration (
  |
  */
 function Facet_Field (
-	{ className = "", committed, facet, on_change, reset_token }: {
+	{ className = "", collapsible = true, committed, facet, on_change, reset_token }: {
 		className?: string
+		/**
+		 |
+		 | Whether this facet may be hidden behind a trigger. False when it is
+		 | the widget's only facet — see `Filtration`'s note.
+		 |
+		 */
+		collapsible?: boolean
 		committed: string[]
 		facet: Facet
 		on_change: ( selected: string[] ) => void
@@ -236,6 +249,35 @@ function Facet_Field (
 	if ( last_token.current !== reset_token ) {
 		last_token.current = reset_token
 		captured.current = committed
+	}
+
+	const options = <Fieldset.Root className={ collapsible ? "-mt-4" : "" }>
+		<Fieldset.Legend className="sr-only">
+			{ facet.heading }
+		</Fieldset.Legend>
+
+		<CheckboxGroup
+			defaultValue={ captured.current }
+			key={ String( reset_token ) }
+			onValueChange={ on_change }>
+			{ facet.options.map( ( option ) =>
+				<Facet_Option
+					key={ option.value }
+					option={ option } />
+			) }
+		</CheckboxGroup>
+	</Fieldset.Root>
+
+	if ( !collapsible ) {
+		return <Field.Root className={ className } name={ facet.name }>
+			{
+				/* A `p` rather than a heading, for the reason the collapsible
+			     branch below gives. */
+			}
+			<p className="pb-4 text-p text-black">{ facet.heading }</p>
+
+			{ options }
+		</Field.Root>
 	}
 
 	return <Field.Root className={ className } name={ facet.name }>
@@ -258,22 +300,7 @@ function Facet_Field (
 				className="overflow-hidden transition-[height] duration-200 ease-out h-[var(--accordion-panel-height)] data-[starting-style]:h-0 data-[ending-style]:h-0"
 				hiddenUntilFound
 				keepMounted>
-				<Fieldset.Root className="-mt-4">
-					<Fieldset.Legend className="sr-only">
-						{ facet.heading }
-					</Fieldset.Legend>
-
-					<CheckboxGroup
-						defaultValue={ captured.current }
-						key={ String( reset_token ) }
-						onValueChange={ on_change }>
-						{ facet.options.map( ( option ) =>
-							<Facet_Option
-								key={ option.value }
-								option={ option } />
-						) }
-					</CheckboxGroup>
-				</Fieldset.Root>
+				{ options }
 			</Accordion.Panel>
 		</Accordion.Item>
 	</Field.Root>
