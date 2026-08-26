@@ -24,7 +24,9 @@
 import type {
 	CSSProperties,
 	ReactNode,
+	RefObject,
 } from "react"
+import { useRef } from "react"
 
 import type {
 	Event,
@@ -39,6 +41,7 @@ import {
 } from "../channels.ts"
 import { Site_Footer } from "../chrome/site-footer.tsx"
 import { Site_Header } from "../chrome/site-header.tsx"
+import { When_And_Where_On_Sidebar } from "../chrome/when-and-where-on-sidebar.tsx"
 import { Registration_Form_Trigger } from "../registration/registration-form-trigger.tsx"
 import { Registration_Provider } from "../registration/registration-provider.tsx"
 
@@ -107,6 +110,12 @@ export function Root (
 ) {
 	const two_column = page_layout !== ONE_COLUMN
 
+	// Shared with the sidebar's <When_And_Where_On_Sidebar />, which watches the
+	// footer to hide its copy as the footer's own copy approaches. A ref keeps
+	// that wiring out of this component's render path: scrolling re-renders the
+	// leaf that owns the fade and nothing above it.
+	const footer_ref = useRef<HTMLElement>( null )
+
 	// Custom properties are not part of React's `CSSProperties`, and widening
 	// the type is the whole of what the cast buys. The keys are this project's
 	// own, produced one line away in `context-colours.ts`.
@@ -153,6 +162,8 @@ export function Root (
 						{ two_column && <Sidebar
 							at_every_width={ sidebar_at_every_width }
 							back_link={ back_link }
+							footer_ref={ footer_ref }
+							main_event={ main_event }
 							standfirst={ standfirst }
 							title={ title }>
 							{ sidebar }
@@ -167,6 +178,7 @@ export function Root (
 					</main>
 
 					<Site_Footer
+						ref={ footer_ref }
 						main_event={ main_event }
 						page_shell={ page_shell } />
 
@@ -205,12 +217,33 @@ export function Root (
  | a widget with nowhere to go falls back to rendering where it stands, which
  | the tunnel answers on its own.
  |
+ | **When and Where sits at the foot of it, pinned to the bottom of the visible
+ | area.** That is why the column itself is the flex container from the medium
+ | breakpoint up rather than the box inside it: the pinned copy needs a
+ | containing block as tall as the column, and the box inside is only as tall as
+ | what it holds. A `sticky bottom-0` inside that box could never leave it.
+ |
+ | The column's height comes from the main column beside it, so making it the
+ | flex container costs the page nothing. Giving the inner box a viewport height
+ | instead would have forced every short page a full screen taller than its own
+ | content.
+ |
  */
 function Sidebar (
-	{ at_every_width, back_link, children, standfirst, title }: {
+	{
+		at_every_width,
+		back_link,
+		children,
+		footer_ref,
+		main_event,
+		standfirst,
+		title,
+	}: {
 		at_every_width: boolean
 		back_link: ReactNode
 		children: ReactNode
+		footer_ref: RefObject<HTMLElement | null>
+		main_event: Event | null
 		standfirst?: string | null
 		title: string | null
 	},
@@ -218,7 +251,7 @@ function Sidebar (
 	return <div
 		className={ `${
 			at_every_width ? "" : "max-md:hidden "
-		}layout__1-4__col-1 md:pl-1ccm pb-6 bg-gray-light` }>
+		}layout__1-4__col-1 md:pl-1ccm pb-6 bg-gray-light md:flex md:flex-col md:justify-between` }>
 		<div className="cc mx-auto sticky top-0 flex flex-col items-start pt-6 md:pt-8 md:pb-6">
 			{ back_link }
 
@@ -243,6 +276,28 @@ function Sidebar (
 					<Slot name={ SIDEBAR } />
 				</Level>
 			</div>
+		</div>
+
+		{
+			/* The footer carries a copy of the same lines, and this one takes
+		     itself off the screen before the two can meet — which is what it
+		     needs the footer's element for. Below the medium breakpoint
+		     neither copy is drawn: the footer hides its own with the same
+		     `max-md:hidden`, so there is nothing here to get out of the way
+		     of and the observation never starts. */
+		}
+		<div className="max-md:hidden cc mx-auto md:sticky bottom-0">
+			{
+				/* The padding is inside the collapsing box rather than on the
+			     sticky one, so it goes with the content: `bottom-0` pins the
+			     border box to the viewport's edge and takes no notice of the
+			     column's own padding, so without this the last line would sit
+			     against the bottom of the screen. */
+			}
+			<When_And_Where_On_Sidebar
+				className="max-w-68 pb-8"
+				event={ main_event }
+				footer_ref={ footer_ref } />
 		</div>
 	</div>
 }

@@ -14,6 +14,8 @@
  |
  */
 
+import type { Ref } from "react"
+
 import { Link } from "react-router"
 
 import type {
@@ -50,15 +52,27 @@ const SOCIAL_LINKS = [
 type Site_Footer_Props = {
 	main_event: Event | null
 	page_shell: Page_Shell | null
+	/**
+	 |
+	 | Handed down so the sidebar's copy of <When_And_Where /> can watch this
+	 | element and hide itself before the two are on screen together. Nothing
+	 | else reads it, and the footer itself does nothing with it.
+	 |
+	 */
+	ref?: Ref<HTMLElement>
 }
 
-export function Site_Footer ( { main_event, page_shell }: Site_Footer_Props ) {
+export function Site_Footer (
+	{ main_event, page_shell, ref }: Site_Footer_Props,
+) {
 	const links = page_shell?.navigation_footer ?? []
 
 	// The footer is dark, on every page. The static site's own footer took a
 	// colour scheme, but nothing in this build has ever wanted the light one,
 	// so the choice is not offered until something asks for it.
-	return <footer className="grow-0 shrink-0 py-8 cs-dark bg-black text-white">
+	return <footer
+		ref={ ref }
+		className="grow-0 shrink-0 py-8 cs-dark bg-black text-white">
 		<div className="cc mx-auto flex justify-between">
 			<When_And_Where
 				className="max-md:hidden max-w-68"
