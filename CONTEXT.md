@@ -99,7 +99,7 @@ _Avoid_: "blocks", "rich content", "WYSIWYG content"
 ### Listings
 
 **Listing**:
-A component that shows a group of sessions or of contributors. A listing stores no rows of its own: it stores either the identities an editor chose or a description of what to fetch, and the CMS turns whichever it is into rows before answering.
+A component that shows a group of things rather than a single one. Every listing over sessions or contributors stores no rows of its own: it stores either the identities an editor chose or a description of what to fetch, and the CMS turns whichever it is into rows before answering. **The Archive's two listings are the exception** — nothing in the CMS holds a past edition, so those two hold what they show, and the word covers them because what makes something a listing is that it draws a group.
 _Avoid_: "collection", "feed", "carousel" as a name for the data
 
 **Curated**:
@@ -121,6 +121,24 @@ _Avoid_: "tile", "session block", "preview"
 **Portrait**:
 How a contributor row is drawn — a round picture with a name and a role beneath it.
 _Avoid_: "avatar", "headshot", "collaborator card"
+
+### The Archive
+
+**Archive entry**:
+One past edition of the festival, as an editor writes it: a name, a year, a description, three featured pictures and a region of snapshots. It is not an **Event** — no past edition has a row in the CMS, and an entry is content an editor types rather than a record anything resolves to.
+_Avoid_: "archive slide" — a slide is what one *item inside* an entry becomes; "past event", "archived event"
+
+**Snapshot**:
+One block inside an archive entry's region. On a large, tall screen each snapshot is a slide of its own, side by side; anywhere else the same blocks are one column a visitor scrolls.
+_Avoid_: "section", "panel", "card"
+
+**Archive entry list**:
+The set of components an editor may place inside an archive entry — the third named list, after the **section list** and the **inner list**. Every member of it can stand alone as a slide, which is why a bare link and a lone heading are in the inner list and not this one.
+_Avoid_: "snapshot list", "the archive zone"
+
+**Dark surface**:
+A ground the catalogue's blocks are being drawn over that is dark rather than white. The snapshot dialog is the only one. It travels as context rather than as a prop, because a block can sit at any depth and the dialog does not know what an editor put in it.
+_Avoid_: "dark mode" — the site has no theme switch and never draws a page this way
 
 ### Filtration
 
