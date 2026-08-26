@@ -177,7 +177,7 @@ export function Root (
 					     the drawer rests on when it is closed. */
 					}
 					<Registration_Form_Trigger
-						className="sticky bottom-0 md:hidden"
+						className="sticky bottom-0 md:hidden z-30"
 						main_event={ main_event } />
 				</div>
 			</div>
