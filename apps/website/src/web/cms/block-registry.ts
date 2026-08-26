@@ -18,6 +18,8 @@
 import type { ComponentType } from "react"
 
 import { Add_To_Calendar } from "./blocks/add-to-calendar.tsx"
+import { Archive_Carousel_Listing } from "./blocks/archive-carousel-listing.tsx"
+import { Archive_Timeline_Listing } from "./blocks/archive-timeline-listing.tsx"
 import { Back_Link } from "./blocks/back-link.tsx"
 import { Contributor_Listing } from "./blocks/contributor-listing.tsx"
 import { Contributor_Profile } from "./blocks/contributor-profile.tsx"
@@ -104,6 +106,8 @@ export const BLOCK_REGISTRY: Record<string, Registered> = {
 	},
 	"container.map-and-content-v1": { Renderer: Map_And_Content },
 	"container.section-v1": { Renderer: Section },
+	"list.archive-carousel-listing-v1": { Renderer: Archive_Carousel_Listing },
+	"list.archive-timeline-listing-v1": { Renderer: Archive_Timeline_Listing },
 	"list.contributor-listing-v1": { Renderer: Contributor_Listing },
 	"list.profile-list-v1": { Renderer: Profile_List },
 	"list.session-list-v1": { Renderer: Session_List },

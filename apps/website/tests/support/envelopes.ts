@@ -692,3 +692,66 @@ export function heading (
 export function unknown_component (): Block {
 	return { __component: "media.something-not-built-yet-v1", id: id() }
 }
+
+/* _____
+ | The Archive.
+ |
+ | Its two listings are the only components in the catalogue whose builders are
+ | not one line: the carousel takes image links like both of the other rings,
+ | and the timeline takes **entries**, which are a repeatable component that
+ | carries a region of its own. Nothing else in the catalogue does that, so the
+ | shape is written out here rather than borrowed.
+ |
+ */
+
+export function archive_carousel_listing (
+	...slides: ReturnType<typeof image_link>[]
+): Block {
+	return {
+		__component: "list.archive-carousel-listing-v1",
+		id: id(),
+		slides,
+	}
+}
+
+/**
+ |
+ | One past edition.
+ |
+ | **It carries no `__component`**, exactly as the CMS sends it: an entry is a
+ | member of a repeatable list, not of a dynamic zone, and a builder that added
+ | a discriminator would be testing a shape the renderer never sees.
+ |
+ | `content` defaults to empty, because that is the ordinary state of an edition
+ | nobody has written up yet and the branch most likely to be forgotten.
+ |
+ */
+export function archive_entry (
+	{ content = [], description, images = [], name, year }: {
+		name: string
+		year: string
+		description?: string
+		/** Exactly three in the design; the builder does not enforce it. */
+		images?: string[]
+		content?: Block[]
+	},
+): Record<string, unknown> {
+	return {
+		content,
+		description: description ?? null,
+		featured_images: images.map( ( url ) => image( url ) ),
+		id: id(),
+		name,
+		year,
+	}
+}
+
+export function archive_timeline_listing (
+	...entries: ReturnType<typeof archive_entry>[]
+): Block {
+	return {
+		__component: "list.archive-timeline-listing-v1",
+		entries,
+		id: id(),
+	}
+}

@@ -24,6 +24,9 @@ import {
 	boot_website,
 } from "./support/boot-website.ts"
 import {
+	archive_carousel_listing,
+	archive_entry,
+	archive_timeline_listing,
 	coloured,
 	envelope,
 	full_bleed_image_block,
@@ -96,6 +99,19 @@ beforeAll( async () => {
 						google_map_block( { image: null } ),
 						vanilla_carousel( ...SLIDES ),
 						instagram_feed( ...SLIDES ),
+						archive_carousel_listing( ...SLIDES ),
+						archive_timeline_listing(
+							archive_entry( {
+								description: "A past edition.",
+								images: [
+									"/uploads/one.png",
+									"/uploads/two.png",
+									"/uploads/three.png",
+								],
+								name: "An Edition",
+								year: "2021",
+							} ),
+						),
 						sponsors_list( {
 							name: "Laika",
 							url: "/uploads/laika.svg",
@@ -363,6 +379,8 @@ describe("the catalogue", () => {
 				"Beside the picture.",
 				"Beside the stack.",
 				"Beside the map.",
+				"An Edition",
+				"A past edition.",
 			]
 		) {
 			expect( html ).toContain( expected )
