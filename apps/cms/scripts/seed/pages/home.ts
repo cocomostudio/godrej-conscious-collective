@@ -144,7 +144,7 @@ export async function write_home_page (
 				blocks: [ session_listing( "Showcase", 6 ) ],
 				heading: heading_component(
 					"Showcases",
-					"h2",
+					"h1",
 					false,
 					"white",
 				),
@@ -161,7 +161,7 @@ export async function write_home_page (
 				blocks: [ session_listing( "Experience", 3 ) ],
 				heading: heading_component(
 					"Experiences",
-					"h2",
+					"h1",
 					false,
 					"black",
 				),
@@ -178,7 +178,7 @@ export async function write_home_page (
 				blocks: [ session_listing( "Conversation", 5 ) ],
 				heading: heading_component(
 					"Conversations",
-					"h2",
+					"h1",
 					false,
 					"white",
 				),
@@ -194,7 +194,7 @@ export async function write_home_page (
 				blocks: [ session_listing( "Workshop", 4 ) ],
 				heading: heading_component(
 					"Workshops",
-					"h2",
+					"h1",
 					false,
 					"black",
 				),
@@ -214,7 +214,7 @@ export async function write_home_page (
 				blocks: [ contributor_listing( "carousel", 10 ) ],
 				heading: heading_component(
 					"Collaborators",
-					"h2",
+					"h1",
 					false,
 					"white",
 				),
@@ -242,7 +242,7 @@ export async function write_home_page (
 				blocks: [ archive_carousel_listing( ARCHIVE_SLIDES ) ],
 				heading: heading_component(
 					"The Archives",
-					"h2",
+					"h1",
 					false,
 					"black",
 				),
@@ -268,7 +268,7 @@ export async function write_home_page (
 				],
 				heading: heading_component(
 					"Follow our Instagram",
-					"h2",
+					"h1",
 					false,
 					"white",
 				),
