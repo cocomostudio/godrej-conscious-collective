@@ -363,7 +363,6 @@ describe("the catalogue", () => {
 				"Beside the picture.",
 				"Beside the stack.",
 				"Beside the map.",
-				"Follow our Instagram",
 			]
 		) {
 			expect( html ).toContain( expected )
@@ -400,11 +399,13 @@ describe("the two carousels", () => {
 	it("hold the same slides and render differently", async () => {
 		const { html } = await website.get( "/everything" )
 
-		// The Instagram feed is a tweened strip under a heading; the vanilla
-		// one is a plain scrolling row of links and nothing else.
+		// The Instagram feed is a tweened strip; the vanilla one is a plain
+		// scrolling row of links and nothing else. Neither carries a heading
+		// or a link of its own any more — those are the section's, like every
+		// other listing in the catalogue.
 		expect( html ).toContain( "js_slide__inner" )
 		expect( html ).toContain( "scrollbar-none" )
-		expect( html ).toContain( "@godrejdesignlab" )
+		expect( html ).not.toContain( "@godrejdesignlab" )
 	})
 })
 
