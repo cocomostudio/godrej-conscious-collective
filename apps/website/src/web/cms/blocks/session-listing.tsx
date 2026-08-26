@@ -136,7 +136,7 @@ function Wrapping ( { sessions }: Rendering_Props ) {
 				key={ session.documentId }>
 				<Card
 					className={ `${
-						index === 0 ? "card--featured" : ""
+						index === 0 ? "card--featured !flex" : ""
 					} select-none` }
 					session={ session } />
 			</li>
