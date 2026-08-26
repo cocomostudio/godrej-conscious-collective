@@ -12,6 +12,7 @@
 
 import type { Picture } from "./media.ts"
 
+import { use_dark_surface } from "./dark-surface.tsx"
 import {
 	LARGE_FROM,
 	MEDIUM_FROM,
@@ -87,15 +88,23 @@ export function Responsive_Picture (
  | Renders nothing at all when neither is filled in, so a decorative picture
  | does not carry an empty `<figcaption>` around.
  |
+ | **A caption follows the ground it is drawn on**, with no editor choice in
+ | between: unlike the words a `text_color` attribute governs, a caption belongs
+ | to the picture rather than to a component an editor coloured, so there is
+ | nothing here to override. See `dark-surface.tsx`.
+ |
  */
 export function Picture_Caption (
 	{ className = "", picture }: { className?: string; picture: Picture },
 ) {
+	const dark = use_dark_surface()
+
 	if ( !picture.title && !picture.caption ) {
 		return null
 	}
 
-	return <figcaption className={ `text-black ${className}` }>
+	return <figcaption
+		className={ `${dark ? "text-white" : "text-black"} ${className}` }>
 		{ picture.title && <p className="text-p">{ picture.title }</p> }
 		{ picture.caption
 			&& <p className="mt-1 md:mt-2 text-caption">

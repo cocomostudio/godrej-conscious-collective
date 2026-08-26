@@ -23,6 +23,7 @@ import type { ReactNode } from "react"
 
 import type { Image_Attribute } from "../media.ts"
 
+import { use_dark_surface } from "../dark-surface.tsx"
 import { use_media_origin } from "../media-origin.tsx"
 import { picture_of } from "../media.ts"
 import {
@@ -54,6 +55,10 @@ export function Image_And_Content (
 ) {
 	const picture = picture_of( image, use_media_origin() )
 	const float = FLOATS[layout] ?? FLOATS["image-left"]
+	// The floated caption is positioned over the column of words rather than
+	// flowing in it, so it paints its own ground to stay legible against
+	// whatever ran underneath. That ground is the page's, not the block's.
+	const caption_ground = use_dark_surface() ? "bg-black" : "bg-white"
 
 	return <div className={ `flow-root ${BLOCK_SPACING}` }>
 		{ picture && <>
@@ -64,7 +69,7 @@ export function Image_And_Content (
 					picture={ picture } />
 
 				<Picture_Caption
-					className={ `absolute bottom-0 ${float.caption} w-5c bg-white` }
+					className={ `absolute bottom-0 ${float.caption} w-5c ${caption_ground}` }
 					picture={ picture } />
 			</figure>
 

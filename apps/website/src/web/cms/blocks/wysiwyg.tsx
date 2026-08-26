@@ -43,6 +43,10 @@ import { H } from "#infra/lib/ui/react/headings.tsx"
 
 import type { Media } from "../envelope.ts"
 
+import {
+	use_dark_surface,
+	use_text_colour_class,
+} from "../dark-surface.tsx"
 import { use_media_origin } from "../media-origin.tsx"
 import { use_body_text_class } from "../page-layout.tsx"
 import { picture_of } from "../media.ts"
@@ -52,7 +56,6 @@ import { Picture_Image } from "../pictures.tsx"
 import type { Text_Color } from "./text-color.ts"
 
 import { BLOCK_SPACING } from "./block-spacing.ts"
-import { text_color_class } from "./text-color.ts"
 
 const HEADING_SIZES: Record<number, string> = {
 	1: "text-h1",
@@ -71,7 +74,15 @@ type Wysiwyg_Props = {
 export function Wysiwyg ( { rich_text, text_color }: Wysiwyg_Props ) {
 	const origin = use_media_origin()
 	const body_size = use_body_text_class()
-	const prose = text_color_class( text_color, "black" )
+	// Over a dark ground the default flips to white, and so does a stored
+	// `black` — see the note in `dark-surface.tsx` for why that one is not a
+	// choice being overridden.
+	const prose = use_text_colour_class( text_color, "black" )
+	// The headings inside rich text are the context colour on a white page,
+	// which is what marks them out as headings. The dialog is black and the
+	// context colour is the event’s own, so they stay legible — except that a
+	// heading there opens a slide, and the design draws that in plain white.
+	const headings = use_dark_surface() ? "text-white" : "text-context"
 
 	if ( !Array.isArray( rich_text ) || rich_text.length === 0 ) {
 		return null
@@ -91,7 +102,7 @@ export function Wysiwyg ( { rich_text, text_color }: Wysiwyg_Props ) {
 					<H
 						className={ `mt-6 md:mt-8 ${
 							HEADING_SIZES[level] ?? HEADING_SIZES[2]
-						} md:font-semibold text-context` }>
+						} md:font-semibold ${headings}` }>
 						{ children }
 					</H>,
 				image: ( { image } ) => {

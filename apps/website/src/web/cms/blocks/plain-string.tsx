@@ -8,13 +8,19 @@
  | renderer only walks into a `content` that is an array of blocks, which is
  | what keeps the two apart.
  |
+ | **Both hooks are read before the empty check, not inside the markup.** An
+ | editor can clear this block's one attribute without removing the block, so
+ | `content` genuinely flips between empty and filled on a live entry — and a
+ | hook called only on the filled branch changes this component's hook count
+ | between two renders, which is the "rendered more hooks than during the
+ | previous render" crash rather than a style point.
+ |
  */
 
+import { use_text_colour_class } from "../dark-surface.tsx"
 import { use_body_text_class } from "../page-layout.tsx"
 
 import type { Text_Color } from "./text-color.ts"
-
-import { text_color_class } from "./text-color.ts"
 
 type Plain_String_Props = {
 	content: string | null
@@ -22,14 +28,14 @@ type Plain_String_Props = {
 }
 
 export function Plain_String ( { content, text_color }: Plain_String_Props ) {
+	const body_size = use_body_text_class()
+	const prose = use_text_colour_class( text_color, "black" )
+
 	if ( !content ) {
 		return null
 	}
 
-	return <p
-		className={ `mt-4 first:mt-0 ${use_body_text_class()} ${
-			text_color_class( text_color, "black" )
-		}` }>
+	return <p className={ `mt-4 first:mt-0 ${body_size} ${prose}` }>
 		{ content }
 	</p>
 }

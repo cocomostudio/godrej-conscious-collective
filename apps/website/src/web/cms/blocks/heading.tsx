@@ -26,9 +26,9 @@ import type {
 import type { Text_Color } from "./text-color.ts"
 
 import { use_anchor } from "../anchors.tsx"
+import { use_text_colour_class } from "../dark-surface.tsx"
 import { Nav_Link } from "../nav-link.tsx"
 import { Chevron_Right } from "#infra/lib/ui/react/icons/chevron-right.tsx"
-import { text_color_class } from "./text-color.ts"
 
 const SIZES: Record<string, string> = {
 	h1: "text-h1",
@@ -50,14 +50,15 @@ export function Heading (
 	{ __component, content, id, level = "h2", link, text_color }: Heading_Props,
 ) {
 	const anchor = use_anchor( { __component, id } )
+	const colour = use_text_colour_class( text_color, "context" )
 
 	return <div
 		className="flex flex-wrap items-baseline justify-between gap-4 scroll-mt-4"
 		id={ anchor }>
 		<H
-			className={ `${SIZES[level] ?? SIZES.h2} md:font-semibold ${
-				text_color_class( text_color, "context" )
-			}` }>
+			className={ `${
+				SIZES[level] ?? SIZES.h2
+			} md:font-semibold ${colour}` }>
 			{ content }
 		</H>
 
@@ -71,7 +72,7 @@ export function Heading (
 function Heading_Link ( { link }: { link: Link_Attribute } ) {
 	return <Nav_Link
 		className={ `flex gap-1 items-center text-h6 underline underline-offset-4 whitespace-nowrap ${
-			text_color_class( link.text_color, "context" )
+			use_text_colour_class( link.text_color, "context" )
 		}` }
 		url={ link.url }>
 		{ link.label ?? link.url }
