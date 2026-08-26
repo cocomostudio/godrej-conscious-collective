@@ -214,7 +214,22 @@ export function Section (
 							content={ opening_line.content }
 							text_color={ opening_line.text_color } /> }
 
-					<Level>{ children }</Level>
+					{
+						/* **A level is opened only where a heading was
+					     actually drawn.** A level exists because a heading
+					     divides the document, and a section with no heading
+					     divides nothing — opening one there pushes everything
+					     inside down a rank with no heading at the rank above,
+					     which is a skipped level and a real accessibility
+					     defect rather than a tidiness one.
+
+					     It went unnoticed until the Archive, because a
+					     heading-less section had until then only ever held
+					     blocks that draw no headings of their own. */
+					}
+					{ heading?.content
+						? <Level>{ children }</Level>
+						: children }
 				</div>
 			</div>
 		</section>
