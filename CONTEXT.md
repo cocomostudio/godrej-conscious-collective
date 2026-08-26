@@ -11,7 +11,7 @@ A festival edition, such as "Conscious Collective 2025". An event owns a date ra
 _Avoid_: "festival", "edition"
 
 **Main event**:
-The single event currently marked as live. Exactly one event carries that mark at any time. The main event supplies the site chrome, meaning the header and the footer.
+The single event currently marked as live. Exactly one event carries that mark at any time. The main event supplies the site chrome, meaning the header, the footer, and the When and Where at the foot of a two-column page's sidebar.
 _Avoid_: "current event", "active event", "featured event"
 
 **Resolved event**:
@@ -55,7 +55,7 @@ The stored values spell the numbers out because Strapi refuses an enumeration va
 _Avoid_: "layout" unqualified, "page type"
 
 **Sidebar**:
-The narrow first column of a two-column page layout. The sidebar holds the back link, and the sidebar receives content from both the content type and from components.
+The narrow first column of a two-column page layout. The sidebar holds the back link, and the sidebar receives content from both the content type and from components. It also holds one piece of chrome — the **When and Where** — which is the one thing in it that follows the main event rather than the page.
 _Avoid_: "side region", "aside", "left column"
 
 ### The render tree
