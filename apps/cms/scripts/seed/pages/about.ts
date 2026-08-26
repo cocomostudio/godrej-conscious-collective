@@ -205,7 +205,7 @@ export async function write_about_page (
 						__component: "miscellaneous.horizontal-rule-v1",
 						shade: "light",
 					},
-					vanilla_carousel( INSTAGRAM_SLIDES.slice( 0, 4 ) ),
+					vanilla_carousel( INSTAGRAM_SLIDES.concat( INSTAGRAM_SLIDES, INSTAGRAM_SLIDES ) ),
 				],
 				heading: heading_component( "Location", "h2" ),
 				horizontal_rule: true,
