@@ -236,7 +236,7 @@ function Sidebar (
 			     shrink-to-fit box instead, and the widget collapsed to its
 			     widest row. */
 			}
-			<div className="mt-6 self-stretch">
+			<div className="empty:hidden mt-6 self-stretch">
 				<Level>
 					{ children }
 
