@@ -29,6 +29,9 @@ const LIGHT = "rgb( var( --color-gray-light ) )"
 function fades_to_light ( colour: string ) {
 	return `linear-gradient( to bottom, ${colour}, ${colour} 25%, ${LIGHT} )`
 }
+function fades_into_colour ( colour: string ) {
+	return `linear-gradient( to bottom, ${LIGHT}, ${LIGHT} 25%, ${colour} )`
+}
 
 function role ( name: string ) {
 	return `rgb( var( --ctx-${name}-color ) )`
@@ -38,24 +41,68 @@ const GRADIENTS: Record<
 	string,
 	{ image?: string; colour?: string }
 > = {
-	"collaborator-to-light": {
-		image: fades_to_light( role( "collaborator" ) ),
+	"none": {},
+	"light": { colour: LIGHT },
+	"white-to-light": {
+		colour: "#FFFFFF",
+		image: `linear-gradient( to bottom, transparent, transparent 50%, ${LIGHT} )`,
 	},
-	"context-to-light": { image: fades_to_light( role( "context" ) ) },
+
+	"showcase": { colour: role( "showcase" ) },
+	"showcase-to-light": {
+		image: fades_to_light( role( "showcase" ) )
+	},
+	"light-to-showcase": {
+		image: fades_into_colour( role( "showcase" ) )
+	},
+
+	"conversation": { colour: role( "conversation" ) },
 	"conversation-to-light": {
 		image: fades_to_light( role( "conversation" ) ),
 	},
-	"experience-to-light": { image: fades_to_light( role( "experience" ) ) },
-	"light": { colour: LIGHT },
-	"none": {},
-	"showcase-to-light": { image: fades_to_light( role( "showcase" ) ) },
-	"theme-to-light": { image: fades_to_light( role( "theme" ) ) },
-	"white-to-light": {
-		colour: "#FFFFFF",
-		image:
-			`linear-gradient( to bottom, transparent, transparent 50%, ${LIGHT} )`,
+	"light-to-conversation": {
+		image: fades_into_colour( role( "conversation" ) ),
 	},
-	"workshop-to-light": { image: fades_to_light( role( "workshop" ) ) },
+
+	"experience": { colour: role( "experience" ) },
+	"experience-to-light": {
+		image: fades_to_light( role( "experience" ) )
+	},
+	"light-to-experience": {
+		image: fades_into_colour( role( "experience" ) ),
+	},
+
+	"workshop": { colour: role( "workshop" ) },
+	"workshop-to-light": {
+		image: fades_to_light( role( "workshop" ) )
+	},
+	"light-to-workshop": {
+		image: fades_into_colour( role( "workshop" ) )
+	},
+
+	"collaborator": { colour: role( "collaborator" ) },
+	"collaborator-to-light": {
+		image: fades_to_light( role( "collaborator" ) ),
+	},
+	"light-to-collaborator": {
+		image: fades_into_colour( role( "collaborator" ) ),
+	},
+
+	"theme": { colour: role( "theme" ) },
+	"theme-to-light": {
+		image: fades_to_light( role( "theme" ) )
+	},
+	"light-to-theme": {
+		image: fades_into_colour( role( "theme" ) )
+	},
+
+	"context": { colour: role( "context" ) },
+	"light-to-context": {
+		image: fades_into_colour( role( "context" ) )
+	},
+	"context-to-light": {
+		image: fades_into_colour( role( "context" ) )
+	},
 }
 
 const PATTERNS: Record<string, string> = {
