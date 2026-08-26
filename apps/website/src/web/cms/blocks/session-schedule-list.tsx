@@ -35,6 +35,7 @@ import {
 	useRef,
 } from "react"
 
+import type { Calendar_Link } from "../calendar-links.ts"
 import type {
 	Media,
 	Session_Schedule_Row,
@@ -44,6 +45,7 @@ import type { Schedule_Entry } from "./schedule-entries.ts"
 import type { Spacing_Around } from "./block-spacing.ts"
 
 import { block_spacing } from "./block-spacing.ts"
+import { is_over } from "../calendar-links.ts"
 import { ROLE_TEXT } from "../context-colours.ts"
 import {
 	day_anchor,
@@ -82,6 +84,7 @@ import { Button } from "#infra/lib/ui/react/buttons/button.tsx"
 import { Calendar } from "#infra/lib/ui/react/icons/calendar.tsx"
 import { Download } from "#infra/lib/ui/react/icons/download.tsx"
 import { Icon_Button } from "#infra/lib/ui/react/buttons/icon-button.tsx"
+import { use_client_now } from "#infra/lib/ui/react/use-client-now.ts"
 import { use_height_as_custom_property } from "#infra/lib/ui/react/use-height-as-custom-property.ts"
 
 /** What the list header publishes for the day tabs to sit beneath. */
@@ -363,7 +366,7 @@ function Entries ( { entries }: { entries: Schedule_Entry[] } ) {
 
 /**
  |
- | One sitting of one session: a picture, the hours, the name, and the three
+ | One instance of one session: a picture, the hours, the name, and the three
  | points a card carries.
  |
  | `data-day` is what `use_day_scroll_progress` measures the day boundaries
@@ -418,22 +421,43 @@ function Entry (
 					<Points session={ session } />
 				</div>
 
-				{
-					/* The Add to Calendar stub, as it is on a session's own
-				     page: the design draws the control and the ticket that
-				     fills it in has not arrived. */
-				}
-				<Icon_Button
-					aria-label="Add to calendar"
-					className="md:hidden self-end"
-					colour="black"
-					disabled
-					emphasis="outline">
-					<Calendar />
-				</Icon_Button>
+				<Add_The_Entry_To_Calendar link={ entry.link } />
 			</div>
 		</div>
 	</li>
+}
+
+/**
+ |
+ | Add to Calendar, for one schedule entry.
+ |
+ | The one thing here that is not already said in `blocks/add-to-calendar.tsx`
+ | — which this is otherwise the icon-sized twin of, down to reading the clock
+ | in the browser and to the deliberate absence of `download`:
+ |
+ | **A schedule entry is one instance**, so this offers *that* instance rather
+ | than the session's earliest. It is why the schedule holds more entries than
+ | the CMS sent sessions, and why the session's own page and this cannot share
+ | one answer.
+ |
+ */
+function Add_The_Entry_To_Calendar (
+	{ link }: { link: Calendar_Link | null },
+) {
+	const now = use_client_now()
+
+	if ( !link || is_over( link, now ) ) {
+		return null
+	}
+
+	return <Icon_Button
+		aria-label="Add to calendar"
+		className="md:hidden self-end"
+		colour="black"
+		emphasis="outline"
+		render={ <a href={ link.href } /> }>
+		<Calendar />
+	</Icon_Button>
 }
 
 function Entry_Link (
@@ -448,7 +472,7 @@ function Entry_Link (
 
 /**
  |
- | The hours this sitting runs, or "All day" where the session says so.
+ | The hours this instance runs, or "All day" where the session says so.
  |
  | The stored instance keeps its hours either way — a calendar entry still needs
  | them — and showing a start time that does not mean anything misleads a

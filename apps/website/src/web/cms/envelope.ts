@@ -9,6 +9,7 @@
  |
  */
 
+import type { Calendar_Link } from "./calendar-links.ts"
 import type {
 	Image_Attribute,
 	Responsive_Image_Attribute,
@@ -256,6 +257,16 @@ export type Session_Card = {
 export type Session_Schedule_Row = Session_Card & {
 	all_day_event: boolean
 	instances: Session_Instance[]
+	/**
+	 |
+	 | **Not from the CMS.** One signed Add to Calendar address per instance,
+	 | positional, written onto the row while the page was rendered — the secret
+	 | that signs them may not reach the browser, so a row cannot build its own.
+	 | Null where an instance has no start to build one from. See
+	 | `calendar-signing.server.ts`.
+	 |
+	 */
+	calendar_links?: (Calendar_Link | null)[]
 }
 
 export type Contributor_Card = {
@@ -270,8 +281,7 @@ export type Contributor_Card = {
  |
  | One time a session runs. **Both ends are datetimes**, even when the session
  | is an all-day one: the website hides the times in that case and the stored
- | shape does not change, which is what the eventual Add to Calendar output
- | needs.
+ | shape does not change, which is what the Add to Calendar output reads.
  |
  */
 export type Session_Instance = {

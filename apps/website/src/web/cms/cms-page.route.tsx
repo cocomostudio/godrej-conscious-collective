@@ -32,6 +32,7 @@ import {
 
 import { Anchors } from "./anchors.tsx"
 import { assemble_root } from "./assemble-root.ts"
+import { with_calendar_links } from "./calendar-signing.server.ts"
 import { name_of } from "./envelope.ts"
 import {
 	fetch_envelope,
@@ -63,7 +64,10 @@ export async function loader ( { params, request }: Route.LoaderArgs ) {
 	}
 
 	const { entry, page_shell } = fetched.envelope
-	const { root, table_of_contents } = assemble_root( fetched.envelope )
+	const { root, table_of_contents } = assemble_root(
+		fetched.envelope,
+		{ path: pathname },
+	)
 
 	return {
 		anchors: table_of_contents.anchors,
@@ -75,7 +79,15 @@ export async function loader ( { params, request }: Route.LoaderArgs ) {
 		// configuration, so it travels in the loader's data rather than being
 		// read again in the browser.
 		media_origin: media_origin(),
-		root,
+		/**
+		 |
+		 | Signed here rather than during assembly, because the secret behind
+		 | an Add to Calendar link may not reach the browser and root assembly
+		 | is imported by the block registry, which does. See
+		 | `calendar-signing.server.ts`.
+		 |
+		 */
+		root: with_calendar_links( root ),
 		site_title: page_shell?.site_title ?? null,
 		title: name_of( entry ),
 	}

@@ -38,6 +38,7 @@ import {
 } from "./envelope.ts"
 import {
 	back_link_to_category,
+	calendar_instances_of_session,
 	role_of,
 	session_details,
 } from "./sessions.ts"
@@ -147,10 +148,21 @@ export type Assembled = {
 	table_of_contents: Table_Of_Contents
 }
 
-export function assemble_root ( envelope: Envelope ): Assembled {
+/**
+ |
+ | `path` is the address this page was resolved at, and only a session reads
+ | it: its Add to Calendar links point back at the session, and an entry
+ | carries no path of its own — the alias table is what knows, and the route is
+ | what asked it.
+ |
+ */
+export function assemble_root (
+	envelope: Envelope,
+	{ path }: { path: string },
+): Assembled {
 	const { entry, main_event, page_shell, resolved_event } = envelope
 	const contribution = is_session( entry )
-		? of_a_session( entry )
+		? of_a_session( entry, path )
 		: is_contributor( entry )
 		? of_a_contributor( entry )
 		: of_a_page( entry )
@@ -354,9 +366,13 @@ function of_a_page ( entry: Page_Entry ): Content_Type_Contribution {
  | came from.
  |
  */
-function of_a_session ( entry: Session_Entry ): Content_Type_Contribution {
+function of_a_session (
+	entry: Session_Entry,
+	path: string,
+): Content_Type_Contribution {
 	const back_link = back_link_to_category( entry )
 	const details = session_details( entry )
+	const instances = calendar_instances_of_session( entry, path )
 
 	return {
 		back_link,
@@ -374,7 +390,7 @@ function of_a_session ( entry: Session_Entry ): Content_Type_Contribution {
 		page_layout: TWO_COLUMN,
 		sidebar: [
 			{ __component: SESSION_DETAILS, details },
-			{ __component: ADD_TO_CALENDAR },
+			{ __component: ADD_TO_CALENDAR, instances },
 		],
 		sidebar_at_every_width: false,
 		// The same two blocks again, for the main column on a phone. The
@@ -382,7 +398,7 @@ function of_a_session ( entry: Session_Entry ): Content_Type_Contribution {
 		// this is a second block rather than the first one moved.
 		sidebar_repeat: [
 			{ __component: SESSION_DETAILS, columns: 2, details },
-			{ __component: ADD_TO_CALENDAR },
+			{ __component: ADD_TO_CALENDAR, instances },
 		],
 		// Both are in the masthead, and a name or a line said twice is worse
 		// than a sidebar that is quieter than a Page's.

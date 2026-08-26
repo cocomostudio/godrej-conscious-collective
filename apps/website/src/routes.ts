@@ -43,6 +43,15 @@ export default [
 	route( "registration/token", "web/cms/registration/token.route.ts" ),
 	route( "registration", "web/cms/registration/submit.route.ts" ),
 
+	/**
+	 |
+	 | Add to Calendar's own resource route, out here for the same two reasons:
+	 | there is nothing to lay out around an iCalendar document, and `*` would
+	 | otherwise match it first and try to resolve `/calendar.ics` as a page.
+	 |
+	 */
+	route( "calendar.ics", "web/cms/calendar.route.ts" ),
+
 	layout( "infra/lib/ui/app-shells/primary/layout.tsx", {
 		id: "primary-layout",
 	}, [

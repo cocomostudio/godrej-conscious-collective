@@ -20,6 +20,7 @@ type Env = {
 	CMS_URL: string
 	CMS_API_TOKEN: string
 	REGISTRATION_TOKEN_SECRET: string
+	CALENDAR_LINK_SECRET: string
 	TRUST_PROXY: string | number | boolean
 	HTTP_SERVER_PORT: number
 	SERVER_BUILD_DIR: string
@@ -57,6 +58,23 @@ const _env: Env = {
 	 |
 	 */
 	REGISTRATION_TOKEN_SECRET: process.env.REGISTRATION_TOKEN_SECRET ?? "",
+	/**
+	 |
+	 | Signs the Add to Calendar links. No default, for the same reason again.
+	 |
+	 | This one is **visible when it is missing**, unlike the other two: the
+	 | endpoint behind those links honours only what it signed, so without a
+	 | secret there are no links to mint and the button is not drawn at all.
+	 | That is deliberate — a button that 404s on press is worse than one that
+	 | is not there — but it does mean a deployment that forgets this loses a
+	 | feature rather than degrading quietly.
+	 |
+	 | Rotating it invalidates every link already in a rendered page. The cost
+	 | is one refresh: the links are rebuilt on every render, and nobody holds
+	 | one for long.
+	 |
+	 */
+	CALENDAR_LINK_SECRET: process.env.CALENDAR_LINK_SECRET ?? "",
 	/**
 	 |
 	 | Express's `trust proxy` setting, and **false unless a deployment says

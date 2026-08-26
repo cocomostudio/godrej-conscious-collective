@@ -195,7 +195,7 @@ describe("the sidebar", () => {
 		expect( body ).toContain( "12 Dec, 2:00 pm – 4:30 pm" )
 	})
 
-	it("ends with the Add to Calendar stub", async () => {
+	it("ends with the Add to Calendar control", async () => {
 		const body = body_of(
 			( await website.get( "/sessions/living-with-the-land" ) ).html,
 		)
@@ -230,7 +230,7 @@ describe("the sidebar", () => {
  |
  */
 describe("the sidebar's second rendering, for a phone", () => {
-	it("repeats the details list and the stub inside the main column", async () => {
+	it("repeats the details list and the control inside the main column", async () => {
 		const body = body_of(
 			( await website.get( "/sessions/living-with-the-land" ) ).html,
 		)

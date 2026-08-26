@@ -18,6 +18,7 @@
  |
  */
 
+import type { Calendar_Link } from "../calendar-links.ts"
 import type {
 	Session_Instance,
 	Session_Schedule_Row,
@@ -37,6 +38,19 @@ export type Schedule_Entry = {
 	instance: Session_Instance
 	/** `2025-12-11`, where the event is. Null where the instance has no start. */
 	day: string | null
+	/**
+	 |
+	 | The address that adds **this** instance, minted and signed while the page
+	 | was rendered — see `calendar-signing.server.ts`. Null where there is none to
+	 | offer: an unlinked session, an instance with no start, or a deployment
+	 | with no signing secret.
+	 |
+	 | It is paired to the instance by position, which is why the signing pass
+	 | writes one entry per instance and leaves nulls in place rather than
+	 | filtering them out.
+	 |
+	 */
+	link: Calendar_Link | null
 }
 
 export function schedule_entries (
@@ -49,6 +63,7 @@ export function schedule_entries (
 					day: day_key( instance?.time_start ),
 					instance,
 					key: `${session.documentId}/${index}`,
+					link: session.calendar_links?.[index] ?? null,
 					session,
 				} ) )
 		)

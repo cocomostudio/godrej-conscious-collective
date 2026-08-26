@@ -172,7 +172,7 @@ export function contributor_envelope (
  |
  | One instance, with the event's own offset spelled out. Both ends are
  | datetimes even for an all-day session — the stored shape does not change,
- | which is what the eventual Add to Calendar output needs.
+ | which is what the Add to Calendar output reads.
  |
  */
 export function instance ( day: string, from: string, to: string ) {

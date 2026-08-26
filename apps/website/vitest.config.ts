@@ -38,6 +38,7 @@ export default defineConfig( {
 		 |
 		 */
 		env: {
+			CALENDAR_LINK_SECRET: "test-calendar-link-secret",
 			CMS_API_TOKEN: "test-registration-relay-token",
 			REGISTRATION_TOKEN_SECRET: "test-registration-token-secret",
 			TRUST_PROXY: "true",

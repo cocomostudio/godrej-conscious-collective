@@ -20,7 +20,9 @@ import type {
 	Session_Card,
 	Session_Entry,
 	Session_Instance,
+	Session_Schedule_Row,
 } from "./envelope.ts"
+import type { Calendar_Instance } from "./calendar-links.ts"
 import type { Role } from "./context-colours.ts"
 
 import { date_range } from "./event-dates.ts"
@@ -340,6 +342,108 @@ export function price_label ( price: number | null ): string | null {
 	}
 
 	return price === 0 ? "Free" : `${CURRENCY} ${price}`
+}
+
+/* _____
+ | What a calendar entry is made of.
+ |
+ | A **instance** is one instance seen as something to put in a diary, rather
+ | than as a row in the details list. Both readers of a session derive them —
+ | its own page, from the entry, and the schedule, from a row — so both live
+ | here beside the rest of what a session is derived into.
+ |
+ | **An all-day session keeps its stored hours.** The website reads "All day"
+ | because a start time that does not mean anything misleads a visitor deciding
+ | when to come; a calendar has to place the entry somewhere, and the hours the
+ | editor stored are the only honest answer available. That is the whole reason
+ | the stored shape does not change for one.
+ |
+ */
+
+/**
+ |
+ | Every instance of a session, in the order the CMS listed its instances.
+ |
+ | Order is preserved rather than sorted: choosing between instances happens in
+ | the browser, against a clock this cannot read, and sorting here would only
+ | be sorting the same set twice. See `upcoming_link`.
+ |
+ */
+export function calendar_instances_of_session (
+	session: Session_Entry,
+	path: string,
+): Calendar_Instance[] {
+	const instances = Array.isArray( session.instances )
+		? session.instances
+		: []
+
+	return instances
+		.map( ( instance ) =>
+			calendar_instance( {
+				at: session.venue?.label ?? null,
+				instance,
+				note: session.standfirst,
+				path,
+				title: session.name,
+			} )
+		)
+		.filter( ( one ): one is Calendar_Instance => one !== null )
+}
+
+/**
+ |
+ | The same for a schedule row, positionally — one entry per instance, null
+ | where an instance has no start to build one from, so that the result lines
+ | up with `instances` and a row can find its own by index.
+ |
+ | A row carries no venue, because a listing does not fetch one: a card never
+ | draws it. The entry a schedule row produces therefore has no LOCATION, and
+ | the session's own page is where a visitor finds where to go.
+ |
+ */
+export function calendar_instances_of_row (
+	row: Session_Schedule_Row,
+): (Calendar_Instance | null)[] {
+	const instances = Array.isArray( row.instances ) ? row.instances : []
+
+	return instances.map( ( instance ) =>
+		calendar_instance( {
+			at: null,
+			instance,
+			note: row.standfirst,
+			path: row.path,
+			title: row.name,
+		} )
+	)
+}
+
+function calendar_instance (
+	{ at, instance, note, path, title }: {
+		at: string | null
+		instance: Session_Instance
+		note: string | null
+		path: string | null
+		title: string
+	},
+): Calendar_Instance | null {
+	const start = as_a_moment( instance?.time_start )
+
+	// Nothing to put in a diary. An instance with no start cannot be placed, and
+	// an entry at an invented hour is worse than no entry.
+	if ( !start || !title ) {
+		return null
+	}
+
+	const end = as_a_moment( instance?.time_end )
+
+	return {
+		at,
+		end: end ? end.toISOString() : null,
+		note,
+		path,
+		start: start.toISOString(),
+		title,
+	}
 }
 
 /* _____
