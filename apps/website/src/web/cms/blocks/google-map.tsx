@@ -49,27 +49,8 @@ export function Google_Map (
 						pictures={ pictures } />
 				</Nav_Link>
 			</figure>
-			: <Embedded_Map address={ address } map_url={ map_url } /> }
-
-		{ address
-			&& <address className="mt-4 text-p font-medium not-italic text-black">
-				{ address.split( "\n" ).map( ( line, index ) =>
-					<span key={ index }>
-						{ index > 0 && <br /> }
-						{ line }
-					</span>
-				) }
-			</address> }
-
-		{ map_url && <p className="mt-4">
-			<Button
-				emphasis="outline"
-				color="context"
-				render={ <Nav_Link url={ map_url } target="_blank" /> }>
-				{ label || "View on Maps" }
-				<Button.Icon name="chevron-right" />
-			</Button>
-		</p> }
+			: <Embedded_Map address={ address } map_url={ map_url } />
+		}
 	</div>
 }
 
