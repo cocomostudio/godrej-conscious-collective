@@ -230,7 +230,7 @@ export async function write_about_page (
 			section( "Colophon", {
 				register_with_toc: false,
 				strings: [
-					"This page came from a database.",
+					"That is all there is to know.",
 				],
 			} ),
 		],
