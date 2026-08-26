@@ -255,15 +255,24 @@ describe("the control a session's page serves", () => {
  |
  */
 describe("the control a schedule row serves", () => {
+	// **Two controls per entry, not one.** A glyph at the foot of the words on
+	// a phone and a labelled button under the hours from the medium breakpoint
+	// up; each is drawn only at its own width, and both offer the same
+	// instance. So two entries are four links over two distinct starts, and
+	// the distinct ones in the order the entries are in are what this is
+	// about.
 	it("gives each row the instance that row is about", async () => {
 		const links = await calendar_links_on( "/schedule" )
 		const starts = links.map( ( link ) =>
 			new URL( link, website.url ).searchParams.get( "start" )
 		)
 
-		expect( links.length ).toBe( 2 )
-		expect( starts[0] ).toContain( "2025-12-11" )
-		expect( starts[1] ).toContain( "2025-12-12" )
+		const [ first, second, ...rest ] = [ ...new Set( starts ) ]
+
+		expect( links.length ).toBe( 4 )
+		expect( rest ).toEqual( [] )
+		expect( first ).toContain( "2025-12-11" )
+		expect( second ).toContain( "2025-12-12" )
 	})
 })
 

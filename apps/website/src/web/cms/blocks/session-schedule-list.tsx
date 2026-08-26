@@ -376,6 +376,13 @@ function Entries ( { entries }: { entries: Schedule_Entry[] } ) {
  | is a link to a different document, and forty of them in the heading outline
  | would bury the sections of the page a reader is navigating.
  |
+ | **What it does under a pointer is not an editor's choice**, which is the one
+ | place it parts company with a listing card. There is one schedule and it is
+ | drawn one way; an attribute that let an editor change this could only let
+ | them make it disagree with the cards. The name takes the category's colour
+ | and Add to Calendar surfaces beside the hours, and the whole entry is the
+ | target — one of forty is easier to point at than any word inside it.
+ |
  */
 function Entry (
 	{ anchor, entry }: { anchor?: string; entry: Schedule_Entry },
@@ -386,9 +393,10 @@ function Entry (
 	const role = role_of_category( session.category )
 
 	return <li
-		// The context colour is re-pointed here because a schedule reads
+		// `group` is what the two `group-hover:` targets below hang off, and
+		// the context colour is re-pointed here because a schedule reads
 		// across all four categories. See `context_colour_of`.
-		className="py-6 md:py-8 md:flex items-start gap-8 border-gray-light"
+		className="group py-6 md:py-8 md:flex items-start gap-8 border-gray-light"
 		data-day={ day ?? undefined }
 		id={ anchor }
 		style={ context_colour_of( role ) }>
@@ -399,13 +407,25 @@ function Entry (
 				sizes="10.25rem" /> }
 		</figure>
 
-		<When
-			all_day={ session.all_day_event }
-			className="md:order-last md:w-44 shrink-0 uppercase text-small font-semibold md:font-medium text-black md:text-right"
-			instance={ instance } />
+		{
+			/* The hours and the way to keep them, in one column. They were
+		     siblings in the entry's row until Add to Calendar moved up here:
+		     the button offers *these* hours, so it belongs under them rather
+		     than somewhere else in the row. */
+		}
+		<div className="md:order-last shrink-0 md:w-44 md:text-right">
+			<When
+				all_day={ session.all_day_event }
+				className="uppercase text-small font-semibold md:font-medium text-black"
+				instance={ instance } />
+
+			<Add_The_Entry_To_Calendar
+				link={ entry.link }
+				variant="labelled" />
+		</div>
 
 		<div className="grow min-w-0">
-			<p className="mt-2 md:mt-0 text-h4 text-context md:text-black">
+			<p className="mt-2 md:mt-0 text-h4 text-context md:text-black md:group-hover:text-context transition-colors duration-300 ease-out">
 				<Entry_Link path={ session.path }>
 					{ session.name }
 				</Entry_Link>
@@ -421,7 +441,9 @@ function Entry (
 					<Points session={ session } />
 				</div>
 
-				<Add_The_Entry_To_Calendar link={ entry.link } />
+				<Add_The_Entry_To_Calendar
+					link={ entry.link }
+					variant="glyph" />
 			</div>
 		</div>
 	</li>
@@ -432,17 +454,27 @@ function Entry (
  | Add to Calendar, for one schedule entry.
  |
  | The one thing here that is not already said in `blocks/add-to-calendar.tsx`
- | — which this is otherwise the icon-sized twin of, down to reading the clock
- | in the browser and to the deliberate absence of `download`:
+ | — which this is otherwise the twin of, down to reading the clock in the
+ | browser and to the deliberate absence of `download`:
  |
  | **A schedule entry is one instance**, so this offers *that* instance rather
  | than the session's earliest. It is why the schedule holds more entries than
  | the CMS sent sessions, and why the session's own page and this cannot share
  | one answer.
  |
+ | **Two drawings, two places, one clock.** The glyph sits at the foot of the
+ | entry's words on a phone, where a labelled button would take room the points
+ | need; the labelled one sits under the hours from the medium breakpoint up,
+ | where there is a pointer to reveal it. One component rather than two, so that
+ | whether the instance has already happened is answered once — the two cannot
+ | disagree about an entry that is over.
+ |
  */
 function Add_The_Entry_To_Calendar (
-	{ link }: { link: Calendar_Link | null },
+	{ link, variant }: {
+		link: Calendar_Link | null
+		variant: "glyph" | "labelled"
+	},
 ) {
 	const now = use_client_now()
 
@@ -450,14 +482,35 @@ function Add_The_Entry_To_Calendar (
 		return null
 	}
 
-	return <Icon_Button
-		aria-label="Add to calendar"
-		className="md:hidden self-end"
-		colour="black"
+	if ( variant === "glyph" ) {
+		return <Icon_Button
+			aria-label="Add to calendar"
+			className="md:hidden self-end"
+			colour="black"
+			emphasis="outline"
+			render={ <a href={ link.href } /> }>
+			<Calendar />
+		</Icon_Button>
+	}
+
+	// **It hides only where there is a pointer to bring it back.** A tablet
+	// past the medium breakpoint has taken the glyph away — that one is
+	// `md:hidden` — and has no hover to reveal this one, so an unconditional
+	// `opacity-0` would leave the entry with a control nobody can see and a
+	// tap target where nothing appears to be. `(hover: hover)` is the question
+	// that separates the two, and where the answer is no it simply stays out.
+	//
+	// **Its own focus reveals it too**, for the same kind of reason: a control
+	// a keyboard can reach and an eye cannot is worse than no control, and
+	// `group-hover` says nothing about anyone tabbing down the schedule.
+	return <Button
+		className="max-md:hidden mt-4 [@media(hover:hover)]:opacity-0 group-hover:opacity-100 focus-visible:opacity-100 group-hover:text-context group-hover:border-context transition duration-300 ease-out"
+		color="black"
 		emphasis="outline"
 		render={ <a href={ link.href } /> }>
 		<Calendar />
-	</Icon_Button>
+		Add to Calendar
+	</Button>
 }
 
 function Entry_Link (

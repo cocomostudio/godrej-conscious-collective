@@ -1,13 +1,20 @@
 
 /**
  |
- | How a card answers a pointer.
+ | How a card and a schedule entry answer a pointer.
  |
- | `style_and_transition` is an attribute on all three card listings, and the
- | two values are the two ways the design lets a card react: the details panel
- | floods with the category's colour and the points go black, or the points
- | alone take the colour up. Nothing else about the card differs, which is why
- | one attribute rather than two components.
+ | Two things are under test, and they are here together because they are one
+ | design decision drawn twice.
+ |
+ | **A card's hover is an editor's choice.** `style_and_transition` is an
+ | attribute on all three card listings, and the two values are the two ways the
+ | design lets a card react: the details panel floods with the category's colour
+ | and the points go black, or the points alone take the colour up. Nothing else
+ | about the card differs, which is why one attribute rather than two components.
+ |
+ | **A schedule entry's hover is not.** There is one schedule, it is drawn one
+ | way, and an editor who could make it react differently would only be able to
+ | make it disagree with the cards.
  |
  | The assertions are on class names, which is unusual for this suite and is the
  | only seam a hover has: it is a `:hover` rule and there is no such thing as a
@@ -39,6 +46,8 @@ import {
 	session_list,
 	session_listing,
 	session_listing_with_filtration,
+	session_schedule_list,
+	session_schedule_row,
 } from "./support/envelopes.ts"
 
 let website: Website
@@ -100,6 +109,25 @@ beforeAll( async () => {
 				} ),
 			],
 			title: "Mixed",
+		} ),
+
+		"/schedule": envelope( {
+			main_region: [
+				session_schedule_list( [
+					session_schedule_row( {
+						category: "Conversation",
+						name: "Who Pays for Cool",
+						path: "/sessions/who-pays-for-cool",
+					} ),
+					session_schedule_row( {
+						all_day_event: true,
+						category: "Workshop",
+						name: "Cooling Pots in Clay",
+						path: "/sessions/cooling-pots-in-clay",
+					} ),
+				] ),
+			],
+			title: "Schedule",
 		} ),
 
 		"/stroking": envelope( {
@@ -219,6 +247,27 @@ describe("change-stroke-on-hover", () => {
 	})
 })
 
+describe("a schedule entry", () => {
+	it("takes its title and its Add to Calendar up to the category colour", async () => {
+		const body = body_of( ( await website.get( "/schedule" ) ).html )
+
+		expect( body ).toContain(
+			"--ctx-context-color:var(--ctx-conversation-color)",
+		)
+		expect( body ).toContain( "md:group-hover:text-context" )
+		expect( add_to_calendar_of( body ) )
+			.toContain( "group-hover:text-context" )
+	})
+
+	// An entry that runs all day says so rather than showing hours that mean
+	// nothing, exactly as the sidebar's details list does.
+	it("still says All day where the session does", async () => {
+		const body = body_of( ( await website.get( "/schedule" ) ).html )
+
+		expect( body ).toContain( "All day" )
+	})
+})
+
 /**
  |
  | The card's points list, on its own. The classes under test are the ones on
@@ -228,6 +277,19 @@ describe("change-stroke-on-hover", () => {
  */
 function points_of ( body: string ) {
 	const found = body.match( /class="points[^"]*"/ )
+
+	return found ? found[0] : ""
+}
+
+/**
+ |
+ | The schedule's labelled Add to Calendar, on its own, for the reason
+ | `points_of` is scoped: `group-hover:text-context` is on the entry's name as
+ | well, so a whole-body assertion would pass with the control left black.
+ |
+ */
+function add_to_calendar_of ( body: string ) {
+	const found = body.match( /class="[^"]*hover:hover\)\]:opacity-0[^"]*"/ )
 
 	return found ? found[0] : ""
 }
