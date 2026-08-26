@@ -15,6 +15,15 @@
 				"Workshop"
 			],
 			"required": true
+		},
+		"style_and_transition": {
+			"type": "enumeration",
+			"enum": [
+				"change-fill-on-hover",
+				"change-stroke-on-hover"
+			],
+			"default": "change-stroke-on-hover",
+			"required": true
 		}
 	},
 
@@ -29,12 +38,22 @@
 				"list": {
 					"label": "Category"
 				}
+			},
+			"style_and_transition": {
+				"edit": {
+					"label": "Style and transition",
+					"description": "What a card does when it is pointed at. \"change-stroke-on-hover\" leaves the card's lower half white and takes the words beneath the title up to the session's category colour; \"change-fill-on-hover\" floods that half with the colour instead and drops those words to black. Either way the picture grows a little."
+				},
+				"list": {
+					"label": "Style and transition"
+				}
 			}
 		},
 		"layouts": {
 			"edit": [
 				[
-					{ "name": "category", "size": 6 }
+					{ "name": "category", "size": 6 },
+					{ "name": "style_and_transition", "size": 6 }
 				]
 			]
 		}

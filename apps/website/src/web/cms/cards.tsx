@@ -20,6 +20,13 @@
  | and those rules do the rest, which is why the figure and the details box are
  | direct children of the card's own element and must stay that way.
  |
+ | **What a card does when it is pointed at varies too, and it is the one thing
+ | here an editor chooses.** It arrives as `style_and_transition` on each of the
+ | three listings and is passed straight down to every card in them, because it
+ | is a property of the listing rather than of the track or of any one card — a
+ | rendering that overrode it would let two cards in one listing disagree about
+ | what a hover means.
+ |
  */
 
 import {
@@ -31,10 +38,7 @@ import type {
 	Contributor_Card,
 	Session_Card,
 } from "./envelope.ts"
-import {
-	ROLE_BORDER,
-	ROLE_TEXT,
-} from "./context-colours.ts"
+import { context_colour_of } from "./context-colours.ts"
 
 import { day_parts } from "./event-dates.ts"
 import { use_media_origin } from "./media-origin.tsx"
@@ -52,6 +56,66 @@ import {
 	session_points,
 } from "./sessions.ts"
 
+export type Style_And_Transition = string | null | undefined
+
+/**
+ |
+ | The one value that moves the card's fill. Named rather than both of them,
+ | because only one of the two has to be recognised: **anything else is the
+ | stroke treatment**, and that includes `null`.
+ |
+ | It has to include `null`, and that is the whole reason this is a comparison
+ | rather than a lookup. A schema default is written when a row is written, not
+ | when one is read, so every listing saved before the attribute existed comes
+ | back with nothing in it — and reading nothing as anything other than the
+ | default would give those listings a treatment the admin says they have not
+ | got. `block-spacing.ts` reads its own attribute the same way, for the same
+ | reason.
+ |
+ */
+const CHANGE_FILL_ON_HOVER = "change-fill-on-hover"
+
+/**
+ |
+ | The two treatments, as the two classes that differ between them.
+ |
+ | Both leave the card white and its points in the category's colour *or* black
+ | at rest, and both move on `group-hover` — the group being the card's own
+ | element, so the whole card is the target rather than the words a pointer
+ | happens to be over.
+ |
+ |   • **fill** floods the details panel with the category's colour and drops
+ |     the points to black, because points in the category's colour on a ground
+ |     of the same colour are points nobody can read. **The featured card's
+ |     rule goes with them**, and for exactly the same reason — it is drawn in
+ |     the category's colour too, and a rule the same colour as the panel
+ |     behind it is a rule that is not there.
+ |
+ |   • **stroke** leaves the panel white and takes the points up to the colour
+ |     instead. Nothing is inverted, so nothing needs a second colour to stay
+ |     legible against, and the rule keeps the category's colour throughout.
+ |     **This is the default**, and therefore what an unset attribute draws as.
+ |
+ | The title stays black in both. It is the one thing on the card that has to be
+ | readable before a visitor has decided to look, and a title that changed
+ | colour under the pointer would be the loudest part of a movement meant to be
+ | small.
+ |
+ */
+function treatment_of ( style_and_transition: Style_And_Transition ) {
+	const stroke = style_and_transition !== CHANGE_FILL_ON_HOVER
+
+	return {
+		details: stroke ? "bg-white" : "bg-white group-hover:bg-context",
+		points: stroke
+			? "text-black group-hover:text-context"
+			: "text-context group-hover:text-black",
+		rule: stroke
+			? "border-context"
+			: "border-context group-hover:border-black",
+	}
+}
+
 /**
  |
  | One session, as a listing draws it.
@@ -61,19 +125,28 @@ import {
  |
  */
 export function Card (
-	{ className = "", session }: {
+	{ className = "", session, style_and_transition }: {
 		className?: string
 		session: Session_Card
+		style_and_transition?: Style_And_Transition
 	},
 ) {
 	const origin = use_media_origin()
 	const cover = responsive_picture_of( session.cover, origin )
 	const role = role_of_category( session.category )
+	const treatment = treatment_of( style_and_transition )
 
 	return <Card_Link
-		className={ `relative block rounded-lg overflow-hidden ${className}` }
+		// `group` is what every `group-hover:` below hangs off, and the
+		// context colour is re-pointed here rather than on the page, because
+		// ten cards side by side can be ten cards of four categories. See
+		// `context_colour_of`.
+		className={ `group relative block rounded-lg overflow-hidden ${className}` }
 		path={ session.path }
-		style={ { boxShadow: "0 4px 32px 0 rgba( 0, 0, 0, 0.10 )" } }>
+		style={ {
+			...context_colour_of( role ),
+			boxShadow: "0 4px 32px 0 rgba( 0, 0, 0, 0.10 )",
+		} }>
 		{
 			/* **A session with no cover shows an empty frame**, not a decorative
 		     one. The static site fills the gap with a random mesh gradient; a
@@ -81,9 +154,20 @@ export function Card (
 		     the session it is standing in for, and the frame keeps its shape
 		     either way so the row does not go ragged. */
 		}
-		<figure className="relative image aspect-4/3">
+		{
+			/* **The picture grows a little under a pointer, whichever
+		     treatment the card wears** — the one part of the movement that is
+		     not an editor's choice, because it is what says the card is
+		     pressable rather than what says which category it is in.
+
+		     The clip is the figure's own rather than the card's: in
+		     `card--featured` the figure is a side panel with the details box
+		     beside it, and a picture growing out of an unclipped figure would
+		     paint over the words. */
+		}
+		<figure className="relative image aspect-4/3 overflow-hidden">
 			{ cover && <Responsive_Picture
-				className="size-full object-cover"
+				className="size-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
 				pictures={ cover }
 				sizes="( min-width: 1024px ) 24rem, 18rem" /> }
 
@@ -103,13 +187,14 @@ export function Card (
 		     the link, so it is part of the link's accessible name, and both
 		     list navigation and a links list still reach it. */
 		}
-		<div className="details h-full p-4 md:p-6 bg-white">
+		<div
+			className={ `details h-full p-4 md:p-6 transition-colors duration-300 ease-out ${treatment.details}` }>
 			<p className="text-h4 text-black line-clamp-2">
 				{ session.name }
 			</p>
 
 			<Points
-				className={ `font-semibold ${ROLE_TEXT[role]}` }
+				className={ `font-semibold transition-colors duration-300 ease-out ${treatment.points}` }
 				points={ session_points( session ) } />
 
 			{
@@ -122,7 +207,8 @@ export function Card (
 			}
 			{ session.standfirst
 				&& <div className="additional-details mt-8">
-					<hr className={ `w-16 ${ROLE_BORDER[role]}` } />
+					<hr
+						className={ `w-16 transition-colors duration-300 ease-out ${treatment.rule}` } />
 					<p className="mt-8 text-h5 text-black">
 						{ session.standfirst }
 					</p>

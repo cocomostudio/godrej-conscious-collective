@@ -30,6 +30,7 @@ import type {
 	Category,
 	Session_Card,
 } from "../envelope.ts"
+import type { Style_And_Transition } from "../cards.tsx"
 
 import { Card } from "../cards.tsx"
 
@@ -40,10 +41,11 @@ import { use_full_bleed } from "./section-frame.tsx"
 type Session_Listing_Props = {
 	category?: Category
 	sessions?: Session_Card[]
+	style_and_transition?: Style_And_Transition
 }
 
 export function Session_Listing (
-	{ category, sessions = [] }: Session_Listing_Props,
+	{ category, sessions = [], style_and_transition }: Session_Listing_Props,
 ) {
 	if ( sessions.length === 0 ) {
 		return null
@@ -56,7 +58,9 @@ export function Session_Listing (
 	const Rendering = RENDERINGS[category as Category] ?? Rows
 
 	return <div className={ BLOCK_SPACING }>
-		<Rendering sessions={ sessions } />
+		<Rendering
+			sessions={ sessions }
+			style_and_transition={ style_and_transition } />
 	</div>
 }
 
@@ -64,6 +68,14 @@ type Rendering_Props = {
 	/** The track's own spacing, which is what the two looping rows differ in. */
 	className?: string
 	sessions: Session_Card[]
+	/**
+	 |
+	 | Passed through all four renderings untouched. What a card does under a
+	 | pointer is the card's, and a rendering that overrode it would be a fifth
+	 | answer to a question the editor has already been asked.
+	 |
+	 */
+	style_and_transition?: Style_And_Transition
 }
 
 /**
@@ -83,7 +95,9 @@ type Rendering_Props = {
  | and stay inside the container with everything else.
  |
  */
-function Turning ( { className = "", sessions }: Rendering_Props ) {
+function Turning (
+	{ className = "", sessions, style_and_transition }: Rendering_Props,
+) {
 	return <Looping_Track
 		className={ `${use_full_bleed()} ${className}` }
 		slide_className="w-73.5 md:w-5c">
@@ -91,7 +105,8 @@ function Turning ( { className = "", sessions }: Rendering_Props ) {
 			<Card
 				key={ session.documentId }
 				className="select-none"
-				session={ session } />
+				session={ session }
+				style_and_transition={ style_and_transition } />
 		) }
 	</Looping_Track>
 }
@@ -103,11 +118,14 @@ function Turning ( { className = "", sessions }: Rendering_Props ) {
  | it.
  |
  */
-function Rows ( { sessions }: Rendering_Props ) {
+function Rows ( { sessions, style_and_transition }: Rendering_Props ) {
 	return <ul className="mt-8 flex flex-col md:flex-row *:shrink-0 *:w-3c gap-4 md:*:w-4c md:gap-1g">
 		{ sessions.map( ( session ) =>
 			<li key={ session.documentId }>
-				<Card className="select-none" session={ session } />
+				<Card
+					className="select-none"
+					session={ session }
+					style_and_transition={ style_and_transition } />
 			</li>
 		) }
 	</ul>
@@ -121,7 +139,7 @@ function Rows ( { sessions }: Rendering_Props ) {
  | `tailwind-v3/components/card.css` and is already behind that breakpoint.
  |
  */
-function Wrapping ( { sessions }: Rendering_Props ) {
+function Wrapping ( { sessions, style_and_transition }: Rendering_Props ) {
 	return <ul className="mt-8 flex flex-col md:flex-row flex-wrap *:shrink-0 *:w-3c gap-4 md:*:w-4c md:gap-1g">
 		{ sessions.map( ( session, index ) =>
 			<li
@@ -138,7 +156,8 @@ function Wrapping ( { sessions }: Rendering_Props ) {
 					className={ `${
 						index === 0 ? "card--featured !flex" : ""
 					} select-none` }
-					session={ session } />
+					session={ session }
+					style_and_transition={ style_and_transition } />
 			</li>
 		) }
 	</ul>

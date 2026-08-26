@@ -85,7 +85,7 @@ export async function write_home_page (
 				blocks: [
 					marquee( [
 						"Plant 13, Godrej Enterprises Group, Pirojshanagar, Vikhroli, Mumbai 400079",
-						"11 - 13 Dec 2025",
+						"11 - 13 Dec 2027",
 						"9:00 AM - 10:00 PM",
 					], "none" ),
 				],
@@ -102,7 +102,7 @@ export async function write_home_page (
 						content: [
 							heading( "Reclaiming Cool", "h1" ),
 							plain_string(
-								"Our theme for Conscious Collective 2025 is a movement for heat-resilient design, equitable futures, and climate-responsive living.",
+								"Our theme for Conscious Collective 2027 is a movement for heat-resilient design, equitable futures, and climate-responsive living.",
 							),
 							plain_string(
 								"As temperatures rise and cities become heat traps, “cool” is no longer a comfort, it’s a right.",
@@ -175,7 +175,16 @@ export async function write_home_page (
 				background_gradient: "conversation-to-light",
 				background_pattern: "spider-web-2",
 				background_position: "bottom-right",
-				blocks: [ session_listing( "Conversation", 5 ) ],
+				// The one row seeded onto the other treatment, so that both
+				// branches of `style_and_transition` are on a page somebody
+				// can look at rather than only one of them.
+				blocks: [
+					session_listing(
+						"Conversation",
+						5,
+						"change-fill-on-hover",
+					),
+				],
 				heading: heading_component(
 					"Conversations",
 					"h1",

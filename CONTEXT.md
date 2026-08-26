@@ -118,6 +118,10 @@ _Avoid_: "item", "result", "record", "entry" for this meaning
 How a session row is drawn — a picture, a day badge, a name, and a line saying who it is by, who it is for and what it costs.
 _Avoid_: "tile", "session block", "preview"
 
+**Treatment**:
+What a card does while a pointer is over it, as one of two named answers an editor picks from — the stroke, which leaves the card's details box white and takes the words beneath the title up to the category's colour, and the fill, which floods that box with the colour instead and drops those words to black. The stroke is the default and is therefore what a listing nobody has answered for draws as. The picture grows a little under either, and that part is not a treatment because nobody chooses it. The editor meets the choice as `style_and_transition`, which is the attribute's name and not a second word for this.
+_Avoid_: "hover style", "variant", "mode"
+
 **Portrait**:
 How a contributor row is drawn — a round picture with a name and a role beneath it.
 _Avoid_: "avatar", "headshot", "collaborator card"

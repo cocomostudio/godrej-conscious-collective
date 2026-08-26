@@ -22,6 +22,8 @@
  |
  */
 
+import type { CSSProperties } from "react"
+
 import type { Event } from "./envelope.ts"
 
 /**
@@ -70,35 +72,17 @@ export type Role = keyof typeof ROLES
  |
  | **A role becomes a class here and nowhere else.**
  |
- | Every one of the six is an alias the resolved event sets, so a class naming a
- | role paints in that event's colour with nothing in the drawing changing.
- | Three prefixes, because three things are coloured by role: the words on a
- | card, the rule under a featured card's standfirst, and the dot beside a
- | category in the filtration widget.
+ | One prefix is left, and it is the dot beside a category in the filtration
+ | widget: four options in four colours, all four on screen at once, so there is
+ | no single thing for the context colour to be pointed at. Everywhere else that
+ | used to name a role by class re-points the alias instead — see
+ | `context_colour_of` below.
  |
- | They are written out rather than composed from the role name, because
- | Tailwind scans for whole class names in the source: `text-${role}` is a class
+ | The classes are written out rather than composed from the role name, because
+ | Tailwind scans for whole class names in the source: `bg-${role}` is a class
  | that never gets compiled.
  |
  */
-export const ROLE_TEXT: Record<Role, string> = {
-	contributor: "text-collaborator",
-	conversation: "text-conversation",
-	experience: "text-experience",
-	showcase: "text-showcase",
-	theme: "text-theme",
-	workshop: "text-workshop",
-}
-
-export const ROLE_BORDER: Record<Role, string> = {
-	contributor: "border-collaborator",
-	conversation: "border-conversation",
-	experience: "border-experience",
-	showcase: "border-showcase",
-	theme: "border-theme",
-	workshop: "border-workshop",
-}
-
 export const ROLE_BACKGROUND: Record<Role, string> = {
 	contributor: "bg-collaborator",
 	conversation: "bg-conversation",
@@ -150,9 +134,41 @@ export function context_colours (
 			?? FALLBACK_PALETTE[role as Role]
 	}
 
-	declarations["--ctx-context-color"] = `var(${ROLES[context_role].variable})`
+	declarations[CONTEXT] = alias_to( context_role )
 
 	return declarations
+}
+
+/** The one custom property both writers of the alias set. */
+const CONTEXT = "--ctx-context-color"
+
+function alias_to ( role: Role ) {
+	return `var(${ROLES[role].variable})`
+}
+
+/**
+ |
+ | **The same alias, re-pointed part-way down a page.**
+ |
+ | `context_colours` sets the alias once, on the page's outermost element, and
+ | that answers for a page which *is* one thing. A listing is not: ten cards of
+ | four categories, each of which has to draw itself in its own colour, and a
+ | page-wide alias would draw all ten in the page's.
+ |
+ | So a card re-points it on its own element. Everything below inherits the new
+ | value and nothing above sees it, which means one class — `text-context`,
+ | `group-hover:bg-context` — paints in four colours down a single page. That is
+ | what the alias is for; this is only the second place it is aimed.
+ |
+ | Returned as a style object rather than a class because there is no class for
+ | it: the value is a custom property, and Tailwind compiles classes it can find
+ | in the source. The cast is React's — `CSSProperties` has no index signature
+ | for custom properties, which every caller of this in the codebase already
+ | works around the same way.
+ |
+ */
+export function context_colour_of ( role: Role ): CSSProperties {
+	return { [CONTEXT]: alias_to( role ) } as CSSProperties
 }
 
 /**

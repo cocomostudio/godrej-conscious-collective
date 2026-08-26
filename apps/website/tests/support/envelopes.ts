@@ -454,10 +454,19 @@ export function contributor_card (
 	}
 }
 
+/**
+ |
+ | The three card listings all take `style_and_transition` last, and all three
+ | leave it undefined by default — which is the state every entry saved before
+ | the attribute existed comes back in, and the state the fill treatment has to
+ | answer for.
+ |
+ */
 export function session_listing (
 	category: string,
 	sessions: Session_Card[],
 	count = sessions.length,
+	style_and_transition?: string,
 ): Block {
 	return {
 		__component: "list.session-listing-v1",
@@ -465,6 +474,7 @@ export function session_listing (
 		count,
 		id: id(),
 		sessions,
+		style_and_transition,
 	}
 }
 
@@ -477,12 +487,14 @@ export function session_listing (
 export function session_listing_with_filtration (
 	category: string,
 	sessions: Session_Card[],
+	style_and_transition?: string,
 ): Block {
 	return {
 		__component: "list.session-listing-with-filtration-v1",
 		category,
 		id: id(),
 		sessions,
+		style_and_transition,
 	}
 }
 
@@ -505,11 +517,15 @@ export function session_schedule_list (
 	}
 }
 
-export function session_list ( sessions: Session_Card[] ): Block {
+export function session_list (
+	sessions: Session_Card[],
+	style_and_transition?: string,
+): Block {
 	return {
 		__component: "list.session-list-v1",
 		id: id(),
 		sessions,
+		style_and_transition,
 	}
 }
 

@@ -57,9 +57,9 @@ import type {
 	Option,
 } from "./facets.ts"
 import type { Filters } from "./filter-sessions.ts"
-import type { Role } from "../context-colours.ts"
 
 import { FROM_THE_MEDIUM_BREAKPOINT } from "./breakpoint.ts"
+import { ROLE_BACKGROUND } from "../context-colours.ts"
 import { role_of_category } from "../sessions.ts"
 
 import { Button } from "#infra/lib/ui/react/buttons/button.tsx"
@@ -68,16 +68,6 @@ import { Chevron_Up } from "#infra/lib/ui/react/icons/chevron-up.tsx"
 import { Icon_Button } from "#infra/lib/ui/react/buttons/icon-button.tsx"
 import { use_media_query_event } from "#infra/lib/ui/react/use-media-query-event.tsx"
 import { X_Mark } from "#infra/lib/ui/react/icons/x-mark.tsx"
-
-/** The dot beside a category's name, in that category's own colour. */
-const ROLE_BACKGROUND: Record<Role, string> = {
-	contributor: "bg-collaborator",
-	conversation: "bg-conversation",
-	experience: "bg-experience",
-	showcase: "bg-showcase",
-	theme: "bg-theme",
-	workshop: "bg-workshop",
-}
 
 type Filtration_Props = {
 	className?: string

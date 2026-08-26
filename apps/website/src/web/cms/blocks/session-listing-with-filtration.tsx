@@ -27,6 +27,7 @@ import type {
 	Category,
 	Session_Card,
 } from "../envelope.ts"
+import type { Style_And_Transition } from "../cards.tsx"
 
 import { BLOCK_SPACING } from "./block-spacing.ts"
 import { Card } from "../cards.tsx"
@@ -60,14 +61,16 @@ type Session_Listing_With_Filtration_Props = {
 	 */
 	category?: Category
 	sessions?: Session_Card[]
+	style_and_transition?: Style_And_Transition
 }
 
 export function Session_Listing_With_Filtration (
-	{ sessions = [] }: Session_Listing_With_Filtration_Props,
+	{ sessions = [], style_and_transition }:
+		Session_Listing_With_Filtration_Props,
 ) {
 	return <div className={ BLOCK_SPACING }>
 		<Sessions sessions={ sessions }>
-			<Listing />
+			<Listing style_and_transition={ style_and_transition } />
 		</Sessions>
 	</div>
 }
@@ -83,7 +86,10 @@ export function Session_Listing_With_Filtration (
  | row it would be a form squeezed between a count and a button.
  |
  */
-function Listing () {
+/** What both inner parts need of the node, and the only thing either takes. */
+type Treatment_Props = { style_and_transition?: Style_And_Transition }
+
+function Listing ( { style_and_transition }: Treatment_Props ) {
 	const loaded = use_loaded_sessions()
 	const filtration = use_filtration_visibility()
 
@@ -100,7 +106,7 @@ function Listing () {
 			on_dismiss={ filtration.hide }
 			visible={ filtration.visible } />
 
-		<Cards />
+		<Cards style_and_transition={ style_and_transition } />
 	</>
 }
 
@@ -151,7 +157,7 @@ function Header (
  | marked up as holding.
  |
  */
-function Cards () {
+function Cards ( { style_and_transition }: Treatment_Props ) {
 	const showing = use_filtered_sessions()
 
 	if ( showing.length === 0 ) {
@@ -161,7 +167,9 @@ function Cards () {
 	return <ul className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
 		{ showing.map( ( session ) =>
 			<li key={ session.documentId }>
-				<Card session={ session } />
+				<Card
+					session={ session }
+					style_and_transition={ style_and_transition } />
 			</li>
 		) }
 	</ul>

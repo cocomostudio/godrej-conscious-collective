@@ -23,13 +23,17 @@
  */
 
 import type { Session_Card } from "../envelope.ts"
+import type { Style_And_Transition } from "../cards.tsx"
 
 import { Card } from "../cards.tsx"
 
 import { BLOCK_SPACING } from "./block-spacing.ts"
 
 export function Session_List (
-	{ sessions = [] }: { sessions?: Session_Card[] },
+	{ sessions = [], style_and_transition }: {
+		sessions?: Session_Card[]
+		style_and_transition?: Style_And_Transition
+	},
 ) {
 	if ( sessions.length === 0 ) {
 		return null
@@ -39,7 +43,9 @@ export function Session_List (
 		className={ `${BLOCK_SPACING} grid grid-cols-1 gap-8 md:grid-cols-2` }>
 		{ sessions.map( ( session ) =>
 			<li key={ session.documentId }>
-				<Card session={ session } />
+				<Card
+					session={ session }
+					style_and_transition={ style_and_transition } />
 			</li>
 		) }
 	</ul>

@@ -334,15 +334,19 @@ describe("the four category renderings", () => {
 		expect( body ).toContain( "additional-details" )
 	})
 
+	// **By re-pointing the context colour, not by naming the category.** Every
+	// card on the page carries the same handful of classes and aims the alias
+	// at its own category on its own element, which is what lets four
+	// categories side by side draw four colours. See `context_colour_of`.
 	it("paint every card in its own category's colour", async () => {
 		const body = body_of( ( await website.get( "/" ) ).html )
 
 		for (
 			const colour of [
-				"text-showcase",
-				"text-experience",
-				"text-conversation",
-				"text-workshop",
+				"--ctx-context-color:var(--ctx-showcase-color)",
+				"--ctx-context-color:var(--ctx-experience-color)",
+				"--ctx-context-color:var(--ctx-conversation-color)",
+				"--ctx-context-color:var(--ctx-workshop-color)",
 			]
 		) {
 			expect( body ).toContain( colour )

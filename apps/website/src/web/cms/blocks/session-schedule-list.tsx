@@ -46,7 +46,7 @@ import type { Spacing_Around } from "./block-spacing.ts"
 
 import { block_spacing } from "./block-spacing.ts"
 import { is_over } from "../calendar-links.ts"
-import { ROLE_TEXT } from "../context-colours.ts"
+import { context_colour_of } from "../context-colours.ts"
 import {
 	day_anchor,
 	schedule_days,
@@ -386,9 +386,12 @@ function Entry (
 	const role = role_of_category( session.category )
 
 	return <li
+		// The context colour is re-pointed here because a schedule reads
+		// across all four categories. See `context_colour_of`.
 		className="py-6 md:py-8 md:flex items-start gap-8 border-gray-light"
 		data-day={ day ?? undefined }
-		id={ anchor }>
+		id={ anchor }
+		style={ context_colour_of( role ) }>
 		<figure className="max-md:hidden w-41 shrink-0 aspect-4/3 rounded-lg overflow-hidden">
 			{ cover && <Responsive_Picture
 				className="size-full object-cover"
@@ -402,10 +405,7 @@ function Entry (
 			instance={ instance } />
 
 		<div className="grow min-w-0">
-			<p
-				className={ `mt-2 md:mt-0 text-h4 ${
-					ROLE_TEXT[role]
-				} md:text-black` }>
+			<p className="mt-2 md:mt-0 text-h4 text-context md:text-black">
 				<Entry_Link path={ session.path }>
 					{ session.name }
 				</Entry_Link>

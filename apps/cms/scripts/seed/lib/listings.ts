@@ -27,8 +27,25 @@ import {
 	image_link,
 } from "./components.ts"
 
-export function session_listing ( category: string, count: number ) {
-	return { __component: "list.session-listing-v1", category, count }
+/**
+ |
+ | `style_and_transition` is left off wherever the default treatment is wanted,
+ | rather than spelled out: an omitted attribute is what the schema default is
+ | for, and seeding the default everywhere would hide the one branch worth
+ | seeing — a listing that asked for the other one.
+ |
+ */
+export function session_listing (
+	category: string,
+	count: number,
+	style_and_transition?: string,
+) {
+	return {
+		__component: "list.session-listing-v1",
+		category,
+		count,
+		...( style_and_transition ? { style_and_transition } : {} ),
+	}
 }
 
 /**

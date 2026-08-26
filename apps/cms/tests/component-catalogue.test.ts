@@ -252,6 +252,71 @@ describe("spacing around a block", () => {
 	})
 })
 
+describe("what a card does when it is pointed at", () => {
+	it("travels with the listing that carries it", async () => {
+		const { body } = await cms.get( "/api/envelope?path=/home" )
+
+		const conversations = find_section(
+			body.data.entry.main_region,
+			"Conversations",
+		)
+
+		// A scalar on the listing, not something the website infers from the
+		// category. The home page's conversations row is the one seeded onto
+		// the treatment that is not the default.
+		expect(
+			find_block( conversations.content, "list.session-listing-v1" )
+				.style_and_transition,
+		)
+			.toBe( "change-fill-on-hover" )
+	})
+
+	it("falls back to the schema's own default where nobody chose", async () => {
+		const { body } = await cms.get( "/api/envelope?path=/home" )
+
+		const showcases = find_section(
+			body.data.entry.main_region,
+			"Showcases",
+		)
+
+		expect(
+			find_block( showcases.content, "list.session-listing-v1" )
+				.style_and_transition,
+		)
+			.toBe( "change-stroke-on-hover" )
+	})
+
+	// The three card listings share one attribute, and the way that goes wrong
+	// is that two of them get it and the third quietly does not. So all three
+	// are named here, and the other two by the component an editor would have
+	// to place to meet them.
+	it("is on the category listing page's listing too", async () => {
+		const { body } = await cms.get( "/api/envelope?path=/showcases" )
+
+		const listing = find_block(
+			body.data.entry.main_region,
+			"list.session-listing-with-filtration-v1",
+		)
+
+		expect( listing.style_and_transition ).toBe(
+			"change-stroke-on-hover",
+		)
+	})
+
+	it("is on the curated list at the foot of a session too", async () => {
+		const { body } = await cms.get(
+			"/api/envelope?path=/sessions/repairing-what-you-own",
+		)
+
+		const list = find_block(
+			body.data.entry.main_region,
+			"list.session-list-v1",
+		)
+
+		expect( list.style_and_transition ).toBe( "change-stroke-on-hover" )
+	})
+})
+
 describe("the colour of a block's words", () => {
 	it("travels with the component that carries it", async () => {
 		const { body } = await cms.get( "/api/envelope?path=/home" )
