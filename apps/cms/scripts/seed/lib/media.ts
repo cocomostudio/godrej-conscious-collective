@@ -16,6 +16,7 @@
  */
 
 import { type Slide, responsive_image } from "./components.ts"
+import type { Archive_Entry } from "./listings.ts"
 
 export const IMAGES = {
 	// Three crops of one photograph, for the responsive image: tall on a
@@ -24,8 +25,10 @@ export const IMAGES = {
 	// framed for the shape of the space it lands in. Anything cropped this way
 	// has to be one subject at three widths, which is why all three carry the
 	// same photograph's id and differ only in the box asked for.
-	promo_small: "https://media.cocomo.199101991.xyz/2025/godrej-design-lab/above-the-fold__small.jpg",
-	promo_medium: "https://media.cocomo.199101991.xyz/2025/godrej-design-lab/above-the-fold__large.png",
+	promo_small:
+		"https://media.cocomo.199101991.xyz/2025/godrej-design-lab/above-the-fold__small.jpg",
+	promo_medium:
+		"https://media.cocomo.199101991.xyz/2025/godrej-design-lab/above-the-fold__large.png",
 	art_direction_large:
 		"https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1600&h=600&auto=format&fit=crop",
 	art_direction_medium:
@@ -417,5 +420,140 @@ export const TEAM = [
 		image: IMAGES.portrait_two,
 		name: "Arjun Menon",
 		role: "Fellowship lead",
+	},
+]
+
+/* _____
+ | The Archive — five past editions, and the six the home page's ring turns
+ | through.
+ |
+ | Both lists are the static site's own, kept as they are found there,
+ | **including the fact that the two disagree**: the timeline holds five
+ | editions and the ring holds six, and only the ring knows about 2019. That is
+ | not a mistake to tidy up here. Each of the two is content an editor fills in
+ | separately, and a seed that quietly reconciled them would be asserting a
+ | relationship between the two components that neither of them has.
+ |
+ */
+
+export const ARCHIVE_ENTRIES: Archive_Entry[] = [
+	{
+		description:
+			"Designers, architects, artists, and thinkers explored innovative "
+			+ "approaches to building and living more responsibly, blending "
+			+ "creativity with environmental awareness. Through dialogue, "
+			+ "experimentation, and shared experiences, the event highlighted "
+			+ "how thoughtful design can shape a more sustainable future.",
+		featured_images: [
+			"https://images.unsplash.com/photo-1770355302457-10d2b94c2220?q=80&w=720&auto=format&fit=crop",
+			"https://images.unsplash.com/photo-1763365716252-b34f6e500bdc?q=80&w=720&auto=format&fit=crop",
+			"https://images.unsplash.com/photo-1764351661280-bda9c2a653ff?q=80&w=720&auto=format&fit=crop",
+		],
+		name: "Reclaiming Cool",
+		year: "2025",
+	},
+	{
+		description:
+			"Makers and researchers turned to living materials — mycelium, "
+			+ "algae, bamboo, and bio-based textiles — as alternatives to "
+			+ "extraction and synthesis. Workshops and prototypes asked what "
+			+ "changes when a material is cultivated rather than manufactured.",
+		featured_images: [
+			"https://images.unsplash.com/photo-1776684012353-787d693dda8f?q=80&w=720&auto=format&fit=crop",
+			"https://images.unsplash.com/photo-1479839672679-a46483c0e7c8?q=80&w=720&auto=format&fit=crop",
+			"https://images.unsplash.com/photo-1486718448742-163732cd1544?q=80&w=720&auto=format&fit=crop",
+		],
+		name: "Grown, Not Made",
+		year: "2024",
+	},
+	{
+		description:
+			"A programme built around reuse, repair, and the quiet value of "
+			+ "what already exists. Architects, furniture makers, and clothing "
+			+ "designers shared salvage-led projects and made the case for "
+			+ "keeping materials in circulation instead of starting over.",
+		featured_images: [
+			"https://images.unsplash.com/photo-1525286335722-c30c6b5df541?q=80&w=720&auto=format&fit=crop",
+			"https://images.unsplash.com/photo-1777303799010-d062e096c5ff?q=80&w=720&auto=format&fit=crop",
+			"https://images.unsplash.com/photo-1522517779552-6cf4c1f31ee3?q=80&w=720&auto=format&fit=crop",
+		],
+		name: "Second Lives",
+		year: "2023",
+	},
+	{
+		description:
+			"Textiles, membranes, and lightweight assemblies took centre "
+			+ "stage, from adaptive interiors to garments designed for "
+			+ "disassembly. The gathering explored how flexibility and "
+			+ "lightness can reduce material load without giving up comfort "
+			+ "or beauty.",
+		featured_images: [
+			"https://images.unsplash.com/photo-1483366774565-c783b9f70e2c?q=80&w=720&auto=format&fit=crop",
+			"https://images.unsplash.com/photo-1523217582562-09d0def993a6?q=80&w=720&auto=format&fit=crop",
+			"https://images.unsplash.com/photo-1489058535093-8f530d789c3b?q=80&w=720&auto=format&fit=crop",
+		],
+		name: "Soft Structures",
+		year: "2022",
+	},
+	{
+		description:
+			"Conversations centred on transparency: where materials come "
+			+ "from, who makes them, and what they cost beyond price. "
+			+ "Designers, sourcing specialists, and researchers examined how "
+			+ "openness about supply chains changes the things we build and "
+			+ "wear.",
+		featured_images: [
+			"https://images.unsplash.com/photo-1777353245243-831faded69f8?q=80&w=720&auto=format&fit=crop",
+			"https://images.unsplash.com/photo-1520587393050-c5298e1a8486?q=80&w=720&auto=format&fit=crop",
+			"https://images.unsplash.com/photo-1567943183748-3a7542120c90?q=80&w=720&auto=format&fit=crop",
+		],
+		name: "Material Honesty",
+		year: "2021",
+	},
+]
+
+/**
+ |
+ | The home page's ring. Every slide links to the Archives page, because that
+ | is where a past edition is actually read — the ring is an invitation rather
+ | than a destination.
+ |
+ */
+export const ARCHIVE_SLIDES: Slide[] = [
+	{
+		image:
+			"https://images.unsplash.com/photo-1770355302457-10d2b94c2220?q=80&w=1600&auto=format&fit=crop",
+		label: "Conscious Collective 2025",
+		url: "/archives",
+	},
+	{
+		image:
+			"https://images.unsplash.com/photo-1776684012353-787d693dda8f?q=80&w=1600&auto=format&fit=crop",
+		label: "Conscious Collective 2024",
+		url: "/archives",
+	},
+	{
+		image:
+			"https://images.unsplash.com/photo-1525286335722-c30c6b5df541?q=80&w=1600&auto=format&fit=crop",
+		label: "Conscious Collective 2023",
+		url: "/archives",
+	},
+	{
+		image:
+			"https://images.unsplash.com/photo-1483366774565-c783b9f70e2c?q=80&w=1600&auto=format&fit=crop",
+		label: "Conscious Collective 2022",
+		url: "/archives",
+	},
+	{
+		image:
+			"https://images.unsplash.com/photo-1777353245243-831faded69f8?q=80&w=1600&auto=format&fit=crop",
+		label: "Conscious Collective 2021",
+		url: "/archives",
+	},
+	{
+		image:
+			"https://images.unsplash.com/photo-1576437148148-65bda16ad7fc?q=80&w=1600&auto=format&fit=crop",
+		label: "Conscious Collective 2019",
+		url: "/archives",
 	},
 ]

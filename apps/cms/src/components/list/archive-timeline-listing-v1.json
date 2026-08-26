@@ -1,0 +1,39 @@
+{
+	"collectionName": "components_list_archive_timeline_listing_v1",
+	"info": {
+		"displayName": "Archive timeline listing",
+		"description": "Every past edition on a spine, newest first. A strip a visitor scrolls sideways on a phone, and a stack of rows from 1024 pixels wide."
+	},
+	"options": {},
+	"attributes": {
+		"entries": {
+			"type": "component",
+			"component": "list.archive-entry-v1",
+			"repeatable": true,
+			"required": true,
+			"min": 1
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"entries": {
+				"edit": {
+					"label": "Entries",
+					"description": "One past edition each, in the order they are shown. The count above the timeline counts these, so an edition removed here stops being counted."
+				},
+				"list": {
+					"label": "Entries"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "entries", "size": 12 }
+				]
+			]
+		}
+	}
+}

@@ -27,10 +27,16 @@ import {
 	section,
 } from "../lib/components.ts"
 import {
+	archive_carousel_listing,
 	contributor_listing,
 	session_listing,
 } from "../lib/listings.ts"
-import { IMAGES, INSTAGRAM_SLIDES, SPONSORS } from "../lib/media.ts"
+import {
+	ARCHIVE_SLIDES,
+	IMAGES,
+	INSTAGRAM_SLIDES,
+	SPONSORS,
+} from "../lib/media.ts"
 import { create_entry } from "../lib/strapi.ts"
 import type { Strapi } from "../lib/strapi.ts"
 import type { Seeded_Page_Shells } from "../page-shells.ts"
@@ -216,6 +222,33 @@ export async function write_home_page (
 				opening_line: plain_string_component(
 					"The people who made this year\u2019s programme.",
 					"white",
+				),
+				register_with_toc: true,
+			} ),
+			// The Archives.
+			//
+			// The heading, the line under it and the View All link are the
+			// section's, not the ring's — the ring holds slides and nothing
+			// else, which is what makes it the same kind of component as the
+			// carousel and the Instagram feed rather than a section that
+			// happens to turn.
+			//
+			// **This ring and the Archives page's timeline are separate
+			// content**, and they disagree about how many editions there have
+			// been. That is the static site's own state of affairs, kept —
+			// see `ARCHIVE_SLIDES`.
+			section( "The Archives", {
+				background_gradient: "light-to-conversation",
+				blocks: [ archive_carousel_listing( ARCHIVE_SLIDES ) ],
+				heading: heading_component(
+					"The Archives",
+					"h2",
+					false,
+					"black",
+				),
+				link: link( "View All", "/archives", "plain", "black" ),
+				opening_line: plain_string_component(
+					"Take a stroll back memory lane.",
 				),
 				register_with_toc: true,
 			} ),

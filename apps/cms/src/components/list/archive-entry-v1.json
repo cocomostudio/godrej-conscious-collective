@@ -1,0 +1,108 @@
+{
+	"collectionName": "components_list_archive_entry_v1",
+	"info": {
+		"displayName": "Archive entry",
+		"description": "One past edition on the timeline: what it was called, when it was, and the snapshots a visitor opens from it."
+	},
+	"options": {},
+	"attributes": {
+		"name": {
+			"type": "string",
+			"required": true
+		},
+		"year": {
+			"type": "string",
+			"required": true
+		},
+		"description": {
+			"type": "text",
+			"required": false
+		},
+		"featured_images": {
+			"type": "component",
+			"component": "media.image-v1",
+			"repeatable": true,
+			"required": true,
+			"min": 3,
+			"max": 3
+		},
+		"content": {
+			"type": "dynamiczone",
+			"components": [
+				"text.wysiwyg-v1",
+				"text.quote-v1",
+				"media.responsive-image-v1",
+				"media.gallery-v1",
+				"container.image-and-content-v1"
+			]
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"name": {
+				"edit": {
+					"label": "Name",
+					"description": "What that edition was called, such as \"Reclaiming Cool\"."
+				},
+				"list": {
+					"label": "Name"
+				}
+			},
+			"year": {
+				"edit": {
+					"label": "Year",
+					"description": "Shown at the head of the row. A year rather than a date, and a word rather than a number, so that \"2019–20\" is sayable."
+				},
+				"list": {
+					"label": "Year"
+				}
+			},
+			"description": {
+				"edit": {
+					"label": "Description",
+					"description": "A sentence or three about that edition, shown on the timeline beside the pictures."
+				},
+				"list": {
+					"label": "Description"
+				}
+			},
+			"featured_images": {
+				"edit": {
+					"label": "Featured images",
+					"description": "Exactly three, fanned out on the timeline and spread apart when a visitor points at the row. The first sits in front. They are decoration for the row, not the snapshots — those are below."
+				},
+				"list": {
+					"label": "Featured images"
+				}
+			},
+			"content": {
+				"edit": {
+					"label": "Snapshots",
+					"description": "What a visitor sees after pressing \"See Snapshots\". On a large, tall screen each one of these is a slide of its own, side by side; anywhere else they are a single column the visitor scrolls."
+				},
+				"list": {
+					"label": "Snapshots"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "name", "size": 6 },
+					{ "name": "year", "size": 6 }
+				],
+				[
+					{ "name": "description", "size": 12 }
+				],
+				[
+					{ "name": "featured_images", "size": 12 }
+				],
+				[
+					{ "name": "content", "size": 12 }
+				]
+			]
+		}
+	}
+}

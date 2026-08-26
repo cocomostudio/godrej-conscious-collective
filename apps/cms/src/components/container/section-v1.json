@@ -106,6 +106,8 @@
 				"media.vanilla-carousel-v1",
 				"media.instagram-feed-v1",
 				"list.sponsors-list-v1",
+				"list.archive-carousel-listing-v1",
+				"list.archive-timeline-listing-v1",
 				"list.profile-list-v1",
 				"list.session-list-v1",
 				"list.session-listing-v1",

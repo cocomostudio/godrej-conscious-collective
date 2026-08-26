@@ -21,6 +21,12 @@
  |
  */
 
+import {
+	type Slide,
+	image,
+	image_link,
+} from "./components.ts"
+
 export function session_listing ( category: string, count: number ) {
 	return { __component: "list.session-listing-v1", category, count }
 }
@@ -70,5 +76,68 @@ export function contributor_listing (
 		contributors: curated.map( ( person ) => person.documentId ),
 		count,
 		layout,
+	}
+}
+
+/* _____
+ | The Archive's two listings.
+ |
+ | Neither fills itself — they hold what they show, the way the rest of the
+ | catalogue does. They are called listings because they are what the design
+ | calls them, and because both of them show a group of past editions rather
+ | than a single thing.
+ |
+ */
+
+/**
+ |
+ | The home page's turning ring. Its slides are image links, exactly as the
+ | carousel's and the Instagram feed's are, and the label under the middle one
+ | is the link's label.
+ |
+ */
+export function archive_carousel_listing ( slides: Slide[] ) {
+	return {
+		__component: "list.archive-carousel-listing-v1",
+		slides: slides.map( ( slide ) =>
+			image_link( slide.url, slide.label, slide.image )
+		),
+	}
+}
+
+export type Archive_Entry = {
+	name: string
+	year: string
+	description: string
+	/** Exactly three, fanned out on the timeline. */
+	featured_images: string[]
+	/** The snapshots, in the archive entry list. Each one becomes a slide. */
+	content?: any[]
+}
+
+/**
+ |
+ | The Archives page's timeline. Its entries are a **repeatable component that
+ | holds a region of its own**, which nothing else in this seed is: everything
+ | inside an entry's `content` is a catalogue component and goes in exactly as
+ | it would in a section.
+ |
+ */
+export function archive_timeline_listing ( entries: Archive_Entry[] ) {
+	return {
+		__component: "list.archive-timeline-listing-v1",
+		entries: entries.map( (
+			{ content = [], description, featured_images, name, year },
+		) => ( {
+			content,
+			description,
+			// Decoration beside the edition's own name, so no alternative
+			// text — the same rule the session covers follow.
+			featured_images: featured_images.map( ( url ) =>
+				image( { url } )
+			),
+			name,
+			year,
+		} ) ),
 	}
 }

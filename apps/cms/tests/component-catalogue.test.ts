@@ -98,6 +98,122 @@ describe("the deepest legal path in the render tree", () => {
 	})
 })
 
+/**
+ |
+ | The Archive's timeline is the deepest thing in the catalogue, and it is deep
+ | in a way nothing else is: a **repeatable component that carries a region**.
+ |
+ | The repeatable half is invisible to the renderer's region rules — an entry
+ | carries no `__component` and arrives as raw data — while the region inside it
+ | is walked like any other. So the path down is entry region, section, listing,
+ | entry, region, composite, leaf, and two of those hops are not zones at all.
+ | A populate object that missed one of them would answer with an entry that has
+ | a name and a year and no snapshots, which reads as an edition nobody has
+ | written up rather than as a failure.
+ |
+ */
+describe("the archive timeline", () => {
+	it("arrives with its entries, their pictures and their snapshots", async () => {
+		const { body, status } = await cms.get(
+			"/api/envelope?path=/archives",
+		)
+
+		expect( status ).toBe( 200 )
+
+		const timeline = find_block(
+			body.data.entry.main_region,
+			"list.archive-timeline-listing-v1",
+		)
+
+		expect( timeline ).toBeDefined()
+		expect( timeline.entries.length ).toBeGreaterThan( 1 )
+
+		const newest = timeline.entries[0]
+
+		expect( newest.name ).toBe( "Reclaiming Cool" )
+		expect( newest.year ).toBe( "2025" )
+		expect( newest.description ).toEqual( expect.any( String ) )
+
+		// Exactly three, because the fan on the timeline is three and the
+		// schema says so. A shorter list is a gap in the design.
+		expect( newest.featured_images ).toHaveLength( 3 )
+		expect( newest.featured_images[0].url ).toMatch( /^https:\/\// )
+
+		// An entry carries no discriminator of its own — it is a repeatable
+		// component, not a member of a zone — while everything in its region
+		// does.
+		expect( newest.__component ).toBeUndefined()
+		expect( newest.content.map( ( block: any ) => block.__component ) )
+			.toEqual( [
+				"text.wysiwyg-v1",
+				"media.responsive-image-v1",
+				"container.image-and-content-v1",
+				"media.responsive-image-v1",
+				"container.image-and-content-v1",
+				"media.gallery-v1",
+				"text.quote-v1",
+			] )
+	})
+
+	it("reaches the fourth zone, inside a composite inside an entry", async () => {
+		const { body } = await cms.get( "/api/envelope?path=/archives" )
+
+		const timeline = find_block(
+			body.data.entry.main_region,
+			"list.archive-timeline-listing-v1",
+		)
+
+		const composite = timeline.entries[0].content.find( (
+			block: any,
+		) => block.__component === "container.image-and-content-v1" )
+
+		// Zone four. Its own region is the inner list, whose members carry no
+		// region at all, which is what stops the walk here.
+		expect( composite.image.url ).toMatch( /^https:\/\// )
+		expect( composite.content.map( ( block: any ) => block.__component ) )
+			.toEqual( [ "text.wysiwyg-v1" ] )
+		expect( composite.content[0].rich_text.length ).toBeGreaterThan( 0 )
+	})
+
+	it("leaves an entry nobody has written up with an empty region", async () => {
+		const { body } = await cms.get( "/api/envelope?path=/archives" )
+
+		const timeline = find_block(
+			body.data.entry.main_region,
+			"list.archive-timeline-listing-v1",
+		)
+
+		// Every entry but the newest. An empty region is the ordinary state of
+		// a past edition, not an error, and the block that draws the timeline
+		// has to answer for it — no button, and nothing to open.
+		for ( const entry of timeline.entries.slice( 1 ) ) {
+			expect( entry.content ).toEqual( [] )
+			expect( entry.featured_images ).toHaveLength( 3 )
+		}
+	})
+})
+
+describe("the archive carousel", () => {
+	it("arrives with its slides, each one an image link", async () => {
+		const { body } = await cms.get( "/api/envelope?path=/home" )
+
+		const ring = find_block(
+			body.data.entry.main_region,
+			"list.archive-carousel-listing-v1",
+		)
+
+		expect( ring ).toBeDefined()
+		expect( ring.slides.length ).toBeGreaterThan( 0 )
+
+		// Ring → slide → responsive image → image → url, the same four hops
+		// the Instagram feed makes. The label is what is written under the
+		// slide in the middle, so it is not decoration here.
+		expect( ring.slides[0].label ).toEqual( expect.any( String ) )
+		expect( ring.slides[0].url ).toBe( "/archives" )
+		expect( ring.slides[0].image.small.url ).toMatch( /^https:\/\// )
+	})
+})
+
 describe("spacing around a block", () => {
 	it("travels with the block that carries it", async () => {
 		const { body } = await cms.get( "/api/envelope?path=/home" )

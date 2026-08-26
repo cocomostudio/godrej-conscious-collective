@@ -1,0 +1,39 @@
+{
+	"collectionName": "components_list_archive_carousel_listing_v1",
+	"info": {
+		"displayName": "Archive carousel listing",
+		"description": "A turning ring of past editions. The one in the middle swells and names itself, and the ring never runs out."
+	},
+	"options": {},
+	"attributes": {
+		"slides": {
+			"type": "component",
+			"component": "navigation.image-link-v1",
+			"repeatable": true,
+			"required": true,
+			"min": 1
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"metadatas": {
+			"slides": {
+				"edit": {
+					"label": "Slides",
+					"description": "One past edition each, in the order they are shown. The label is the name written under the middle slide, so give every one of them a label. Wide pictures work best."
+				},
+				"list": {
+					"label": "Slides"
+				}
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "slides", "size": 12 }
+				]
+			]
+		}
+	}
+}

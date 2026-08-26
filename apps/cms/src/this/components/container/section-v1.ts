@@ -16,6 +16,8 @@
 import { populate_image_and_content_v1 } from "./image-and-content-v1"
 import { populate_image_stack_and_content_v1 } from "./image-stack-and-content-v1"
 import { populate_map_and_content_v1 } from "./map-and-content-v1"
+import { populate_archive_carousel_listing_v1 } from "../list/archive-carousel-listing-v1"
+import { populate_archive_timeline_listing_v1 } from "../list/archive-timeline-listing-v1"
 import { populate_contributor_listing_v1 } from "../list/contributor-listing-v1"
 import { populate_profile_list_v1 } from "../list/profile-list-v1"
 import { populate_session_list_v1 } from "../list/session-list-v1"
@@ -47,6 +49,12 @@ export const SECTION_LIST = {
 		populate: populate_image_stack_and_content_v1,
 	},
 	"container.map-and-content-v1": { populate: populate_map_and_content_v1 },
+	"list.archive-carousel-listing-v1": {
+		populate: populate_archive_carousel_listing_v1,
+	},
+	"list.archive-timeline-listing-v1": {
+		populate: populate_archive_timeline_listing_v1,
+	},
 	"list.contributor-listing-v1": {
 		populate: populate_contributor_listing_v1,
 	},

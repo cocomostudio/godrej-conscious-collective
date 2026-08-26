@@ -8,6 +8,8 @@
  | of their own beside this; everything written here is either thin, derived
  | from a table, or exists to prove one branch of the arrangement:
  |
+ |   • the **Archives** page, whose timeline is the one repeatable component in
+ |     the catalogue that holds a region of its own;
  |   • the **category listing** pages, one per session category;
  |   • the **schedule** page, whose one component fills itself;
  |   • a page belonging to the event that is **not** main;
@@ -37,6 +39,7 @@ import type { Seeded_Contributors } from "../contributors.ts"
 import type { Seeded_Events } from "../events.ts"
 import type { Seeded_Page_Shells } from "../page-shells.ts"
 import { write_about_page } from "./about.ts"
+import { write_archives_page } from "./archives.ts"
 import { write_home_page } from "./home.ts"
 
 /**
@@ -97,6 +100,7 @@ export async function write_pages (
 ) {
 	await write_home_page( strapi, page_shells )
 	await write_about_page( strapi, page_shells, contributors )
+	await write_archives_page( strapi, page_shells )
 
 	// Two columns, stated rather than left to the default, because this is the
 	// page the arrangement is easiest to read off: a short document with a back
