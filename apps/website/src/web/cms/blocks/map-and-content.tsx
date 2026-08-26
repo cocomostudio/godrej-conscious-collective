@@ -38,7 +38,7 @@ export function Map_And_Content (
 		{ map && <div
 			className={ `${
 				FLOATS[layout] ?? FLOATS["map-left"]
-			} md:max-w-110 md:[&+*]:mt-0` }>
+			} w-full md:max-w-110 md:[&+*]:mt-0` }>
 			<Google_Map { ...map } />
 		</div> }
 
