@@ -20,6 +20,11 @@
 			],
 			"default": "change-stroke-on-hover",
 			"required": true
+		},
+		"normalise_colors": {
+			"type": "boolean",
+			"default": true,
+			"required": true
 		}
 	},
 
@@ -33,6 +38,15 @@
 				},
 				"list": {
 					"label": "Sessions"
+				}
+			},
+			"normalise_colors": {
+				"edit": {
+					"label": "Keep the card details legible?",
+					"description": "Draws the line beneath a card's title, and the short rule on a featured card, in black rather than in the session's category colour. Leave it on unless the design wants the category colour there. With \"change-stroke-on-hover\" both still take the colour up when a card is pointed at."
+				},
+				"list": {
+					"label": "Keep the card details legible?"
 				}
 			},
 			"style_and_transition": {
@@ -51,7 +65,8 @@
 					{ "name": "sessions", "size": 12 }
 				],
 				[
-					{ "name": "style_and_transition", "size": 6 }
+					{ "name": "style_and_transition", "size": 6 },
+					{ "name": "normalise_colors", "size": 6 }
 				]
 			]
 		}

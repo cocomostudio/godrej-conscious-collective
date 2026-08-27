@@ -66,6 +66,19 @@ const WORKSHOP = session_card( {
 	path: "/sessions/cooling-pots-in-clay",
 } )
 
+/**
+ |
+ | A session with a standfirst, which is the only kind of card that draws the
+ | featured card's short rule at all.
+ |
+ */
+const FEATURED = session_card( {
+	category: "Showcase",
+	name: "Living with the Land",
+	path: "/sessions/living-with-the-land",
+	standfirst: "Four days in the fields behind the campus.",
+} )
+
 beforeAll( async () => {
 	website = await boot_website( {
 		"/filling": envelope( {
@@ -102,13 +115,85 @@ beforeAll( async () => {
 			title: "Filtered",
 		} ),
 
+		// The curated strip with its own attribute turned off, so a card in it
+		// draws exactly what a card in any other listing draws.
 		"/mixed": envelope( {
 			main_region: [
 				section( "You might also like", {
-					content: [ session_list( [ SHOWCASE, WORKSHOP ] ) ],
+					content: [
+						session_list(
+							[ SHOWCASE, WORKSHOP ],
+							undefined,
+							false,
+						),
+					],
 				} ),
 			],
 			title: "Mixed",
+		} ),
+
+		/* _____
+		 | `normalise_colors`, against both treatments and against the state
+		 | every list saved before it existed comes back in.
+		 |
+		 | The featured card's rule is only drawn where a session carries a
+		 | standfirst, which is why every card in these three carries one.
+		 */
+
+		"/normalised-fill": envelope( {
+			main_region: [
+				section( "You might also like", {
+					content: [
+						session_list(
+							[ FEATURED ],
+							"change-fill-on-hover",
+							true,
+						),
+					],
+				} ),
+			],
+			title: "Normalised, filling",
+		} ),
+
+		"/normalised-stroke": envelope( {
+			main_region: [
+				section( "You might also like", {
+					content: [
+						session_list(
+							[ FEATURED ],
+							"change-stroke-on-hover",
+							true,
+						),
+					],
+				} ),
+			],
+			title: "Normalised, stroking",
+		} ),
+
+		"/normalised-unset": envelope( {
+			main_region: [
+				section( "You might also like", {
+					content: [ session_list( [ FEATURED ] ) ],
+				} ),
+			],
+			title: "Normalised, unset",
+		} ),
+
+		// The same session in the two listings that were deliberately not
+		// given the attribute, which have to go on drawing what they drew.
+		"/unnormalised-listings": envelope( {
+			main_region: [
+				section( "Showcases", {
+					content: [
+						session_listing( "Showcase", [ FEATURED ], 1 ),
+						session_listing_with_filtration(
+							"Showcase",
+							[ FEATURED ],
+						),
+					],
+				} ),
+			],
+			title: "Listings",
 		} ),
 
 		"/schedule": envelope( {
@@ -270,6 +355,92 @@ describe("a schedule entry", () => {
 
 /**
  |
+ | The curated strip's own attribute, which forces the two things beneath a
+ | card's title to black so a strip of mixed categories stays readable.
+ |
+ | Asserted on classes for the reason the file's header gives, and scoped to the
+ | two elements that carry them: `text-black` is on the card's title as well,
+ | and `border-black` is nowhere else, but a whole-body assertion on either
+ | would say nothing about where it landed.
+ |
+ */
+describe("normalise_colors", () => {
+	// The default, and therefore what a list saved before the attribute
+	// existed draws as — a schema default is written when a row is written
+	// rather than read when one is read.
+	it("is on where a list records no answer", async () => {
+		const body = body_of(
+			( await website.get( "/normalised-unset" ) ).html,
+		)
+
+		expect( points_of( body ) ).toContain( "text-black" )
+		expect( rule_of( body ) ).toContain( "border-black" )
+	})
+
+	it("leaves both moving on hover under the stroke", async () => {
+		const body = body_of(
+			( await website.get( "/normalised-stroke" ) ).html,
+		)
+
+		expect( points_of( body ) ).toContain( "text-black" )
+		expect( points_of( body ) ).toContain( "group-hover:text-context" )
+
+		// The rule has no hover state at all without this, and honouring the
+		// stroke treatment is what gives it one.
+		expect( rule_of( body ) ).toContain( "border-black" )
+		expect( rule_of( body ) ).toContain( "group-hover:border-context" )
+	})
+
+	it("holds both at black throughout under the fill", async () => {
+		const body = body_of(
+			( await website.get( "/normalised-fill" ) ).html,
+		)
+
+		expect( points_of( body ) ).toContain( "text-black" )
+		expect( points_of( body ) ).not.toContain( "group-hover:text" )
+
+		expect( rule_of( body ) ).toContain( "border-black" )
+		expect( rule_of( body ) ).not.toContain( "group-hover:border" )
+
+		// The panel behind them is the only thing that moves, which is what
+		// makes black legible at both ends of the transition.
+		expect( body ).toContain( "group-hover:bg-context" )
+	})
+
+	it("draws the strip as any other listing does when it is turned off", async () => {
+		const body = body_of( ( await website.get( "/mixed" ) ).html )
+
+		expect( points_of( body ) ).toContain( "group-hover:text-context" )
+		expect( rule_of( body ) ).not.toContain( "border-black" )
+	})
+
+	// **The attribute is the curated strip's alone.** The way an attribute one
+	// listing has goes wrong is that a card starts drawing it for every
+	// listing, which would repaint two components nobody gave the choice to.
+	it("is not on the session listing or the listing that filters", async () => {
+		const body = body_of(
+			( await website.get( "/unnormalised-listings" ) ).html,
+		)
+
+		const rules = every_rule_in( body )
+
+		// A sweep over nothing is otherwise a pass, and both of the sweeps
+		// below are over what a card drew.
+		expect( rules.length > 0 && every_points_in( body ).length > 0 )
+			.toBe( true )
+
+		for ( const rule of rules ) {
+			expect( rule ).not.toContain( "border-black" )
+		}
+
+		for ( const points of every_points_in( body ) ) {
+			expect( points ).toContain( "group-hover:text-context" )
+		}
+	})
+})
+
+/**
+ |
  | The card's points list, on its own. The classes under test are the ones on
  | this element, and `text-black` appears all over a card — the title is one —
  | so a whole-body assertion would pass without the points having moved at all.
@@ -292,6 +463,27 @@ function add_to_calendar_of ( body: string ) {
 	const found = body.match( /class="[^"]*hover:hover\)\]:opacity-0[^"]*"/ )
 
 	return found ? found[0] : ""
+}
+
+function every_points_in ( body: string ) {
+	return body.match( /class="points[^"]*"/g ) ?? []
+}
+
+/**
+ |
+ | The featured card's short rule, on its own — scoped through
+ | `additional-details`, the class hook it sits inside, because a section draws
+ | an `<hr>` of its own and a whole-body match finds that one first.
+ |
+ */
+function every_rule_in ( body: string ) {
+	return ( body.match( /additional-details[\s\S]*?<hr class="([^"]*)"/g )
+		?? [] )
+		.map( ( found ) => /<hr class="([^"]*)"/.exec( found )?.[1] ?? "" )
+}
+
+function rule_of ( body: string ) {
+	return every_rule_in( body )[0] ?? ""
 }
 
 function body_of ( html: string ) {

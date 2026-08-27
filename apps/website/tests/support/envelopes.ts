@@ -517,13 +517,23 @@ export function session_schedule_list (
 	}
 }
 
+/**
+ |
+ | The curated strip. It carries one attribute the other listings do not —
+ | `normalise_colors` — and it is left undefined by default here, which is both
+ | the state of every list saved before it existed and the state its own default
+ | has to answer for.
+ |
+ */
 export function session_list (
 	sessions: Session_Card[],
 	style_and_transition?: string,
+	normalise_colors?: boolean,
 ): Block {
 	return {
 		__component: "list.session-list-v1",
 		id: id(),
+		normalise_colors,
 		sessions,
 		style_and_transition,
 	}

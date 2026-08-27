@@ -502,6 +502,42 @@ function admin_translations (): Record<string, string> {
 
 /**
  |
+ | `normalise_colors` — **the one listing attribute that is not shared.** The
+ | curated strip has it and the two other card listings deliberately do not, so
+ | the invariant is as much about where it is absent as where it is.
+ |
+ */
+describe("normalising a card's colours", () => {
+	const session_list = component( "list.session-list-v1" )
+
+	it("is on the curated strip, on by default", () => {
+		expect( session_list.attributes.normalise_colors ).toMatchObject( {
+			default: true,
+			required: true,
+			type: "boolean",
+		} )
+	})
+
+	it("declares its own admin metadata and a place in the form", () => {
+		expect( session_list.__.metadatas.normalise_colors.edit.label )
+			.toBeTruthy()
+		expect( session_list.__.metadatas.normalise_colors.edit.description )
+			.toBeTruthy()
+		expect( named_in_the_edit_layout( session_list, "normalise_colors" ) )
+			.toBe( true )
+	})
+
+	it("is on no other listing", () => {
+		const others = components
+			.filter( ( found ) => found.uid !== "list.session-list-v1" )
+			.filter( ( found ) => found.schema.attributes.normalise_colors )
+
+		expect( others.map( ( found ) => found.uid ) ).toEqual( [] )
+	})
+})
+
+/**
+ |
  | The Archive entry says, where an editor meets it, that the dialog its
  | snapshots open in forces its own colours. It is the one place in the
  | catalogue where a colour an editor picks does not apply, so it is the one

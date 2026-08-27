@@ -315,6 +315,22 @@ describe("what a card does when it is pointed at", () => {
 
 		expect( list.style_and_transition ).toBe( "change-stroke-on-hover" )
 	})
+
+	// **The curated strip carries one thing the other two do not**, and the
+	// envelope is where that has to show: an attribute the route drops is an
+	// attribute the website can never read, whatever the schema says.
+	it("says whether the curated list's card details are forced legible", async () => {
+		const { body } = await cms.get(
+			"/api/envelope?path=/sessions/repairing-what-you-own",
+		)
+
+		const list = find_block(
+			body.data.entry.main_region,
+			"list.session-list-v1",
+		)
+
+		expect( list.normalise_colors ).toBe( true )
+	})
 })
 
 /**

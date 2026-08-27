@@ -101,19 +101,74 @@ const CHANGE_FILL_ON_HOVER = "change-fill-on-hover"
  | colour under the pointer would be the loudest part of a movement meant to be
  | small.
  |
+ | # Normalised colours
+ |
+ | `normalise_colors` forces the points line and the featured card's short rule
+ | to black **at rest**, and it is the curated strip's default. Colour is what a
+ | strip of ten mixed categories has too much of; what it needs is a date and a
+ | category a visitor can read without the panel behind them fighting.
+ |
+ | Colour a pointer brings is another matter, so the two treatments part company
+ | here:
+ |
+ |   • under **stroke**, both still go up to the category's colour on hover —
+ |     which is what the stroke treatment *is*, and which gives the rule a hover
+ |     state it does not otherwise have; and
+ |
+ |   • under **fill**, both stay black throughout, because the panel behind them
+ |     is what moves and black is legible over either state of it.
+ |
  */
-function treatment_of ( style_and_transition: Style_And_Transition ) {
+const TREATMENTS = {
+	"fill": {
+		details: "bg-white group-hover:bg-context",
+		points: "text-context group-hover:text-black",
+		rule: "border-context group-hover:border-black",
+	},
+	// Both ends black, so neither carries a `group-hover:` at all: the panel
+	// behind them is the only thing that moves.
+	"fill, normalised": {
+		details: "bg-white group-hover:bg-context",
+		points: "text-black",
+		rule: "border-black",
+	},
+	"stroke": {
+		details: "bg-white",
+		points: "text-black group-hover:text-context",
+		// One class rather than two. Under the stroke the rule is the
+		// category's colour at both ends, and `group-hover:` onto the colour
+		// already showing is a transition to nowhere.
+		rule: "border-context",
+	},
+	// The points are unchanged from the stroke above — that treatment had
+	// already begun them at black. The rule is the whole of the difference,
+	// and this is where it gains the hover state it does not otherwise have.
+	"stroke, normalised": {
+		details: "bg-white",
+		points: "text-black group-hover:text-context",
+		rule: "border-black group-hover:border-context",
+	},
+} as const
+
+/**
+ |
+ | **Every class is written out whole**, rather than composed from the colour
+ | it names, for the reason `context-colours.ts` gives about `ROLE_BACKGROUND`:
+ | Tailwind scans the source for complete class names, so `border-${colour}` is
+ | a class that never gets compiled and a rule that never gets drawn.
+ |
+ */
+function treatment_of (
+	style_and_transition: Style_And_Transition,
+	normalise_colors: boolean,
+) {
 	const stroke = style_and_transition !== CHANGE_FILL_ON_HOVER
 
-	return {
-		details: stroke ? "bg-white" : "bg-white group-hover:bg-context",
-		points: stroke
-			? "text-black group-hover:text-context"
-			: "text-context group-hover:text-black",
-		rule: stroke
-			? "border-context"
-			: "border-context group-hover:border-black",
-	}
+	return TREATMENTS[
+		`${stroke ? "stroke" : "fill"}${
+			normalise_colors ? ", normalised" : ""
+		}` as keyof typeof TREATMENTS
+	]
 }
 
 /**
@@ -125,8 +180,23 @@ function treatment_of ( style_and_transition: Style_And_Transition ) {
  |
  */
 export function Card (
-	{ className = "", session, style_and_transition }: {
+	{
+		className = "",
+		normalise_colors = false,
+		session,
+		style_and_transition,
+	}: {
 		className?: string
+		/**
+		 |
+		 | Whether the points line and the featured card's rule are forced to
+		 | black at rest. **Off here and on at the one listing that offers it**,
+		 | because it is that listing's attribute rather than a card's: a card
+		 | in any other listing was never asked, and off is what those have
+		 | always drawn.
+		 |
+		 */
+		normalise_colors?: boolean
 		session: Session_Card
 		style_and_transition?: Style_And_Transition
 	},
@@ -134,7 +204,7 @@ export function Card (
 	const origin = use_media_origin()
 	const cover = responsive_picture_of( session.cover, origin )
 	const role = role_of_category( session.category )
-	const treatment = treatment_of( style_and_transition )
+	const treatment = treatment_of( style_and_transition, normalise_colors )
 
 	return <Card_Link
 		// `group` is what every `group-hover:` below hangs off, and the
