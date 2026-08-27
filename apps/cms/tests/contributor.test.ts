@@ -90,7 +90,7 @@ describe("a collaborator's derived events", () => {
 		const events = await events_of( "Debasmita Ghosh" )
 
 		expect( events.map( ( event ) => event.name ) ).toEqual( [
-			"Conscious Collective 2025",
+			"Conscious Collective 2027",
 		] )
 	})
 
@@ -98,7 +98,7 @@ describe("a collaborator's derived events", () => {
 		const events = await events_of( "Kaveri Nair" )
 
 		expect( events.map( ( event ) => event.name ) ).toEqual( [
-			"Conscious Collective 2027",
+			"Conscious Collective 2029",
 		] )
 	})
 
@@ -127,7 +127,7 @@ describe("the middleware", () => {
 		try {
 			expect( ( await events_of( previously_empty ) )
 				.map( ( event ) => event.name ) )
-				.toEqual( [ "Conscious Collective 2025" ] )
+				.toEqual( [ "Conscious Collective 2027" ] )
 		} finally {
 			await cms.strapi.documents( "api::session.session" ).unpublish( {
 				documentId: draft.documentId,

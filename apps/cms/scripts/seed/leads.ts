@@ -138,7 +138,7 @@ export async function write_leads (
 	// the seed ran. The days are spread out because a registration list that
 	// arrived all in one second reads as machine-made, which it is, but the
 	// point of sample content is to exercise what real content looks like.
-	const first_consent = Date.UTC( 2025, 8, 14, 9, 12, 0 )
+	const first_consent = Date.UTC( 2027, 8, 14, 9, 12, 0 )
 	const a_day = 24 * 60 * 60 * 1000
 
 	for ( const [ position, lead ] of LEADS.entries() ) {

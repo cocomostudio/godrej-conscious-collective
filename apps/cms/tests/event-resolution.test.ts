@@ -39,8 +39,8 @@ const EVENT = "api::event.event"
 const PAGE = "api::page.page"
 const PAGE_SHELL = "api::page-shell.page-shell"
 
-const MAIN_EVENT_NAME = "Conscious Collective 2025"
-const OTHER_EVENT_NAME = "Conscious Collective 2027"
+const MAIN_EVENT_NAME = "Conscious Collective 2027"
+const OTHER_EVENT_NAME = "Conscious Collective 2029"
 
 let cms: Seeded_Cms
 
@@ -57,8 +57,8 @@ describe("the site chrome", () => {
 		const { body } = await cms.get( "/api/envelope?path=/about" )
 
 		expect( body.data.main_event.name ).toBe( MAIN_EVENT_NAME )
-		expect( body.data.main_event.date_start ).toBe( "2025-12-11" )
-		expect( body.data.main_event.date_end ).toBe( "2025-12-13" )
+		expect( body.data.main_event.date_start ).toBe( "2027-12-11" )
+		expect( body.data.main_event.date_end ).toBe( "2027-12-13" )
 	})
 
 	it("reads the main event on an archived page", async () => {
@@ -74,7 +74,7 @@ describe("the site chrome", () => {
 
 	it("reads the main event on a page belonging to another event", async () => {
 		const { body } = await cms.get(
-			"/api/envelope?path=/conscious-collective-2027",
+			"/api/envelope?path=/conscious-collective-2029",
 		)
 
 		expect( body.data.main_event.name ).toBe( MAIN_EVENT_NAME )
@@ -90,7 +90,7 @@ describe("the resolved event", () => {
 
 	it("is the entry's own event when it names one", async () => {
 		const { body } = await cms.get(
-			"/api/envelope?path=/conscious-collective-2027",
+			"/api/envelope?path=/conscious-collective-2029",
 		)
 
 		expect( body.data.resolved_event.name ).toBe( OTHER_EVENT_NAME )
@@ -106,7 +106,7 @@ describe("the resolved event", () => {
 
 	it("does not travel nested inside the entry as well", async () => {
 		const { body } = await cms.get(
-			"/api/envelope?path=/conscious-collective-2027",
+			"/api/envelope?path=/conscious-collective-2029",
 		)
 
 		expect( body.data.entry.event ).toBeUndefined()
@@ -341,7 +341,7 @@ describe("marking an event as main", () => {
 
 	it("still resolves a page that names its own event", async () => {
 		const { body } = await cms.get(
-			"/api/envelope?path=/conscious-collective-2027",
+			"/api/envelope?path=/conscious-collective-2029",
 		)
 
 		expect( body.data.main_event ).toBeNull()

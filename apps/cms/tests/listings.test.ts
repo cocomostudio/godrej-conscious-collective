@@ -108,11 +108,11 @@ describe("an auto-populated session listing", () => {
 		expect( experiences.sessions.length ).toBe( 3 )
 	})
 
-	// The seed holds twelve published Showcases in 2025 and two in 2027, so a
+	// The seed holds twelve published Showcases in 2027 and two in 2029, so a
 	// filter that had quietly stopped working would answer with ten here rather
 	// than with two.
 	it("is filtered to the event the page resolved to", async () => {
-		const later = await entry( "/conscious-collective-2027" )
+		const later = await entry( "/conscious-collective-2029" )
 
 		const [ showcases ] = listings( later, SESSION_LISTING )
 
@@ -125,8 +125,8 @@ describe("an auto-populated session listing", () => {
 	})
 
 	it("leaves the unpublished out, and lets draft preview in", async () => {
-		const published = await entry( "/conscious-collective-2027" )
-		const draft = await entry( "/conscious-collective-2027", "draft" )
+		const published = await entry( "/conscious-collective-2029" )
+		const draft = await entry( "/conscious-collective-2029", "draft" )
 
 		const names = ( page: unknown ) =>
 			listings( page, SESSION_LISTING )[0].sessions
@@ -150,8 +150,8 @@ describe("every row a listing pulls", () => {
 		expect( showcase.category ).toBe( "Showcase" )
 		expect( showcase.age_group ).toBe( "All" )
 		expect( showcase.price ).toBe( 1599 )
-		expect( showcase.session_date_first ).toBe( "2025-12-11" )
-		expect( showcase.session_date_last ).toBe( "2025-12-13" )
+		expect( showcase.session_date_first ).toBe( "2027-12-11" )
+		expect( showcase.session_date_last ).toBe( "2027-12-13" )
 		expect( showcase.standfirst ).toContain( "A two-part showcase" )
 		expect( showcase.cover?.small?.url ).toBeTruthy()
 		expect( showcase.contributors.map( ( person: any ) => person.name ) )
@@ -229,7 +229,7 @@ describe("a contributor listing", () => {
 
 		const names = listing.contributors.map( ( row: any ) => row.name )
 
-		// Kaveri Nair belongs to 2027 only, and Iris Han to no event at all,
+		// Kaveri Nair belongs to 2029 only, and Iris Han to no event at all,
 		// because the one session that names her has never been published.
 		expect( names ).not.toContain( "Kaveri Nair" )
 		expect( names ).not.toContain( "Iris Han" )
@@ -245,8 +245,8 @@ describe("a contributor listing", () => {
 			.toEqual( [
 				"Arthur Mamou-Mani",
 				"Debasmita Ghosh",
-				// Curated, so the event filter does not apply — this is a 2027
-				// person on a page belonging to 2025.
+				// Curated, so the event filter does not apply — this is a 2029
+				// person on a page belonging to 2027.
 				"Kaveri Nair",
 			] )
 	})

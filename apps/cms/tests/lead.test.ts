@@ -184,12 +184,12 @@ describe("what the server sets on a Lead", () => {
 
 		const stored = await find_lead( "stamped@example.com" )
 
-		expect( stored.event?.name ).toBe( "Conscious Collective 2025" )
+		expect( stored.event?.name ).toBe( "Conscious Collective 2027" )
 
-		// The main event ends on 2025-12-13, and the promise is twelve months
+		// The main event ends on 2027-12-13, and the promise is twelve months
 		// from there. Written out rather than computed the way the code
 		// computes it, so the assertion can disagree with the code.
-		expect( stored.retain_until.slice( 0, 10 ) ).toBe( "2026-12-13" )
+		expect( stored.retain_until.slice( 0, 10 ) ).toBe( "2028-12-13" )
 
 		expect( stored.consent_at ).toBeTruthy()
 		expect( stored.consent_text ).toBe( "The wording that was on screen." )
@@ -210,8 +210,8 @@ describe("what the server sets on a Lead", () => {
 
 		const stored = await find_lead( "overreaching@example.com" )
 
-		expect( stored.event?.name ).toBe( "Conscious Collective 2025" )
-		expect( stored.retain_until.slice( 0, 4 ) ).toBe( "2026" )
+		expect( stored.event?.name ).toBe( "Conscious Collective 2027" )
+		expect( stored.retain_until.slice( 0, 4 ) ).toBe( "2028" )
 	})
 
 	it("drops an attribute the schema does not have", async () => {
@@ -333,8 +333,8 @@ describe("the sample content", () => {
 		for ( const lead of seeded ) {
 			expect( lead.consent_given ).toBe( true )
 			expect( lead.consent_at ).toBeTruthy()
-			expect( lead.retain_until.slice( 0, 10 ) ).toBe( "2026-12-13" )
-			expect( lead.event?.name ).toBe( "Conscious Collective 2025" )
+			expect( lead.retain_until.slice( 0, 10 ) ).toBe( "2028-12-13" )
+			expect( lead.event?.name ).toBe( "Conscious Collective 2027" )
 		}
 	})
 })

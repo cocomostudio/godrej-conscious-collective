@@ -97,12 +97,12 @@ export async function write_contributors (
 		},
 	} )
 
-	// Belongs to the 2027 event's sessions only — so this contributor's
-	// events list points at 2027 rather than at 2025.
+	// Belongs to the 2029 event's sessions only — so this contributor's
+	// events list points at 2029 rather than at 2027.
 	const kaveri = await contributor.create( {
 		data: {
 			blurb: paragraphs(
-				"Kaveri Nair is a curator putting the 2027 programme "
+				"Kaveri Nair is a curator putting the 2029 programme "
 					+ "together.",
 			),
 			image: image( { alt: "Kaveri Nair", url: IMAGES.portrait_one } ),

@@ -22,10 +22,10 @@ export type Seeded_Events = {
  |
  | Two events.
  |
- | 2025 is the main one, so its dates and its Register Now button are the site
- | chrome on every page — including the pages belonging to 2027. 2027 exists so
+ | 2027 is the main one, so its dates and its Register Now button are the site
+ | chrome on every page — including the pages belonging to 2029. 2029 exists so
  | that the resolution rule has something to resolve *to*: a page naming it
- | keeps its colours while wearing 2025's chrome, which is the whole shape of
+ | keeps its colours while wearing 2027's chrome, which is the whole shape of
  | the arrangement in one pair of rows.
  |
  | The colours are the static site's inline palette, which is where they were
@@ -44,15 +44,15 @@ export async function write_events ( strapi: Strapi ): Promise<Seeded_Events> {
 			colour_showcase: "#F0503D",
 			colour_theme: "#0055E6",
 			colour_workshop: "#FABC1D",
-			date_end: "2025-12-13",
-			date_start: "2025-12-11",
+			date_end: "2027-12-13",
+			date_start: "2027-12-11",
 			is_archived: false,
 			main: true,
-			name: "Conscious Collective 2025",
+			name: "Conscious Collective 2027",
 			schedule: await upload_schedule_document(
 				strapi,
-				"conscious-collective-2025-schedule.pdf",
-				"Conscious Collective 2025",
+				"conscious-collective-2027-schedule.pdf",
+				"Conscious Collective 2027",
 			),
 		},
 	} )
@@ -65,15 +65,15 @@ export async function write_events ( strapi: Strapi ): Promise<Seeded_Events> {
 			colour_showcase: "#C2410C",
 			colour_theme: "#1B7F4B",
 			colour_workshop: "#F59E0B",
-			date_end: "2027-12-05",
-			date_start: "2027-12-02",
+			date_end: "2029-12-05",
+			date_start: "2029-12-02",
 			is_archived: false,
 			main: false,
-			name: "Conscious Collective 2027",
+			name: "Conscious Collective 2029",
 			schedule: await upload_schedule_document(
 				strapi,
-				"conscious-collective-2027-schedule.pdf",
-				"Conscious Collective 2027",
+				"conscious-collective-2029-schedule.pdf",
+				"Conscious Collective 2029",
 			),
 		},
 	} )

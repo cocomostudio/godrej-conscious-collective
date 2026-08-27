@@ -80,7 +80,7 @@ async function entry ( path: string, status = "published" ) {
 }
 
 describe("a session listing with filtration", () => {
-	// Twelve published Showcases belong to 2025 in the seed. The number is
+	// Twelve published Showcases belong to 2027 in the seed. The number is
 	// above ten on purpose: ten is what a listing that kept the cap would
 	// answer, and ten Showcases on a page of Showcases reads as a full page.
 	it("shows every session of its category, past the cap", async () => {
@@ -95,7 +95,7 @@ describe("a session listing with filtration", () => {
 })
 
 describe("a session schedule list", () => {
-	// Forty published sessions belong to 2025 in the seed, across all four
+	// Forty published sessions belong to 2027 in the seed, across all four
 	// categories. The schedule is the one listing that reads across the
 	// categories rather than within one, and forty is four times the cap.
 	it("holds every session of the event, whatever its category", async () => {
@@ -164,18 +164,18 @@ describe("a session schedule list", () => {
 		const [ list ] = nodes( schedule, SCHEDULE_LIST )
 
 		expect( list.schedule?.url ).toMatch( /\.pdf$/ )
-		expect( list.schedule?.name ).toContain( "2025" )
+		expect( list.schedule?.name ).toContain( "2027" )
 	})
 
 	// The same component on a page belonging to the event that is **not**
-	// main: thirteen sessions rather than forty, and 2027's schedule document
-	// rather than 2025's. One page, both rules.
+	// main: thirteen sessions rather than forty, and 2029's schedule document
+	// rather than 2027's. One page, both rules.
 	it("follows the event the page resolved to, not the main one", async () => {
-		const later = await entry( "/conscious-collective-2027" )
+		const later = await entry( "/conscious-collective-2029" )
 
 		const [ list ] = nodes( later, SCHEDULE_LIST )
 
 		expect( list.sessions.length ).toBe( 13 )
-		expect( list.schedule?.name ).toContain( "2027" )
+		expect( list.schedule?.name ).toContain( "2029" )
 	})
 })

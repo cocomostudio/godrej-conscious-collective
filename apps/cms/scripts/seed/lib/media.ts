@@ -190,7 +190,7 @@ export const COVERS_BY_NAME = {
 	living_with_the_land: responsive_image( {
 		url: COVERS.Showcase.native_cotton,
 	} ),
-	notes_for_2027: responsive_image( {
+	notes_for_2029: responsive_image( {
 		url: COVERS.Conversation.living_infrastructure,
 	} ),
 	repairing_what_you_own: responsive_image( {

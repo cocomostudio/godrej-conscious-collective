@@ -118,9 +118,9 @@ const SCHEDULE = [
 
 const SCHEDULE_DOCUMENT = {
 	ext: ".pdf",
-	name: "conscious-collective-2025-schedule.pdf",
+	name: "conscious-collective-2027-schedule.pdf",
 	size: 12,
-	url: "/uploads/conscious_collective_2025_schedule.pdf",
+	url: "/uploads/conscious_collective_2027_schedule.pdf",
 }
 
 beforeAll( async () => {

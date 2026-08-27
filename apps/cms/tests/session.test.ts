@@ -99,13 +99,13 @@ describe("a session's envelope", () => {
 
 	it("resolves to the session's own event, not the main one", async () => {
 		const { body } = await cms.get(
-			"/api/envelope?path=/sessions/notes-for-2027",
+			"/api/envelope?path=/sessions/notes-for-2029",
 		)
 
 		expect( body.data.resolved_event.name ).toBe(
-			"Conscious Collective 2027",
+			"Conscious Collective 2029",
 		)
-		expect( body.data.main_event.name ).toBe( "Conscious Collective 2025" )
+		expect( body.data.main_event.name ).toBe( "Conscious Collective 2027" )
 	})
 
 	it("does not serve an unpublished session", async () => {
@@ -122,8 +122,8 @@ describe("a session's derived dates", () => {
 	it("follow the date portions of its instances", async () => {
 		const { body } = await cms.get( SHOWCASE )
 
-		expect( body.data.entry.session_date_first ).toBe( "2025-12-11" )
-		expect( body.data.entry.session_date_last ).toBe( "2025-12-13" )
+		expect( body.data.entry.session_date_first ).toBe( "2027-12-11" )
+		expect( body.data.entry.session_date_last ).toBe( "2027-12-13" )
 	})
 
 	it("follow a change to those instances", async () => {
@@ -133,12 +133,12 @@ describe("a session's derived dates", () => {
 			data: {
 				instances: [
 					{
-						time_end: "2025-12-09T13:00:00.000+05:30",
-						time_start: "2025-12-09T12:00:00.000+05:30",
+						time_end: "2027-12-09T13:00:00.000+05:30",
+						time_start: "2027-12-09T12:00:00.000+05:30",
 					},
 					{
-						time_end: "2025-12-16T13:00:00.000+05:30",
-						time_start: "2025-12-16T12:00:00.000+05:30",
+						time_end: "2027-12-16T13:00:00.000+05:30",
+						time_start: "2027-12-16T12:00:00.000+05:30",
 					},
 				],
 			},
@@ -147,8 +147,8 @@ describe("a session's derived dates", () => {
 
 		const changed = await find_session( "Designing for Heat" )
 
-		expect( changed.session_date_first ).toBe( "2025-12-09" )
-		expect( changed.session_date_last ).toBe( "2025-12-16" )
+		expect( changed.session_date_first ).toBe( "2027-12-09" )
+		expect( changed.session_date_last ).toBe( "2027-12-16" )
 	})
 
 	it("survives a write that says nothing about the instances", async () => {
@@ -182,8 +182,8 @@ describe("a datetime that does not say where it is", () => {
 				data: {
 					category: "Workshop",
 					instances: [ {
-						time_end: "2025-12-27T13:00:00",
-						time_start: "2025-12-27T11:00:00",
+						time_end: "2027-12-27T13:00:00",
+						time_start: "2027-12-27T11:00:00",
 					} ],
 					name: "Eleven In The Morning",
 				},
@@ -199,9 +199,9 @@ describe("a datetime that does not say where it is", () => {
 
 		// Eleven in Mumbai is half past five in the morning, UTC.
 		expect( new Date( stored.instances[0].time_start ).toISOString() )
-			.toBe( "2025-12-27T05:30:00.000Z" )
+			.toBe( "2027-12-27T05:30:00.000Z" )
 		expect( new Date( stored.instances[0].time_end ).toISOString() )
-			.toBe( "2025-12-27T07:30:00.000Z" )
+			.toBe( "2027-12-27T07:30:00.000Z" )
 	})
 
 	it("leaves a value that does say where it is exactly as it arrived", async () => {
@@ -210,8 +210,8 @@ describe("a datetime that does not say where it is", () => {
 				data: {
 					category: "Workshop",
 					instances: [ {
-						time_end: "2025-12-27T13:00:00.000Z",
-						time_start: "2025-12-27T11:00:00.000Z",
+						time_end: "2027-12-27T13:00:00.000Z",
+						time_start: "2027-12-27T11:00:00.000Z",
 					} ],
 					name: "Eleven Zulu",
 				},
@@ -226,7 +226,7 @@ describe("a datetime that does not say where it is", () => {
 			} )
 
 		expect( new Date( stored.instances[0].time_start ).toISOString() )
-			.toBe( "2025-12-27T11:00:00.000Z" )
+			.toBe( "2027-12-27T11:00:00.000Z" )
 	})
 
 	/**
@@ -243,8 +243,8 @@ describe("a datetime that does not say where it is", () => {
 				data: {
 					category: "Workshop",
 					instances: [ {
-						time_end: "2025-12-27T23:59:00",
-						time_start: "2025-12-27",
+						time_end: "2027-12-27T23:59:00",
+						time_start: "2027-12-27",
 					} ],
 					name: "A Bare Day",
 				},
@@ -259,9 +259,9 @@ describe("a datetime that does not say where it is", () => {
 			} )
 
 		expect( new Date( stored.instances[0].time_start ).toISOString() )
-			.toBe( "2025-12-26T18:30:00.000Z" )
-		expect( stored.session_date_first ).toBe( "2025-12-27" )
-		expect( stored.session_date_last ).toBe( "2025-12-27" )
+			.toBe( "2027-12-26T18:30:00.000Z" )
+		expect( stored.session_date_first ).toBe( "2027-12-27" )
+		expect( stored.session_date_last ).toBe( "2027-12-27" )
 	})
 })
 
@@ -269,19 +269,19 @@ describe("a session's event", () => {
 	it("is the main event when the editor named none", async () => {
 		const session = await find_session( "Repairing What You Own" )
 
-		expect( session.event?.name ).toBe( "Conscious Collective 2025" )
+		expect( session.event?.name ).toBe( "Conscious Collective 2027" )
 	})
 
 	it("is left alone on a later save", async () => {
-		const session = await find_session( "Notes for 2027" )
+		const session = await find_session( "Notes for 2029" )
 
 		await cms.strapi.documents( "api::session.session" ).update( {
 			data: { standfirst: "Changed." },
 			documentId: session.documentId,
 		} )
 
-		expect( ( await find_session( "Notes for 2027" ) ).event?.name )
-			.toBe( "Conscious Collective 2027" )
+		expect( ( await find_session( "Notes for 2029" ) ).event?.name )
+			.toBe( "Conscious Collective 2029" )
 	})
 
 	/**
@@ -293,7 +293,7 @@ describe("a session's event", () => {
 	 |
 	 */
 	it("is required, so with no main event the save is refused", async () => {
-		const main = await find_event( "Conscious Collective 2025" )
+		const main = await find_event( "Conscious Collective 2027" )
 
 		await cms.strapi.documents( "api::event.event" ).update( {
 			data: { main: false },
@@ -306,8 +306,8 @@ describe("a session's event", () => {
 					data: {
 						category: "Workshop",
 						instances: [ {
-							time_end: "2025-12-14T11:00:00.000+05:30",
-							time_start: "2025-12-14T10:00:00.000+05:30",
+							time_end: "2027-12-14T11:00:00.000+05:30",
+							time_start: "2027-12-14T10:00:00.000+05:30",
 						} ],
 						name: "Eventless",
 					},

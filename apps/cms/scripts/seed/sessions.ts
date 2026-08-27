@@ -65,8 +65,8 @@ export async function write_sessions (
 		cover: COVERS_BY_NAME.living_with_the_land,
 		event: main,
 		instances: instances_daily(
-			"2025-12-11",
-			"2025-12-13",
+			"2027-12-11",
+			"2027-12-13",
 			"09:00",
 			"22:00",
 		),
@@ -91,8 +91,8 @@ export async function write_sessions (
 		cover: COVERS_BY_NAME.block_printing,
 		event: main,
 		instances: [
-			instance( "2025-12-12", "10:00", "12:30" ),
-			instance( "2025-12-12", "14:00", "16:30" ),
+			instance( "2027-12-12", "10:00", "12:30" ),
+			instance( "2027-12-12", "14:00", "16:30" ),
 		],
 		main_region: next_template(),
 		name: "Block Printing with Native Cotton",
@@ -109,7 +109,7 @@ export async function write_sessions (
 		contributors: [ contributors.rahul.documentId ],
 		cover: COVERS_BY_NAME.designing_for_heat,
 		event: main,
-		instances: [ instance( "2025-12-13", "17:00", "18:30" ) ],
+		instances: [ instance( "2027-12-13", "17:00", "18:30" ) ],
 		main_region: next_template(),
 		name: "Designing for Heat",
 		page_shell: shell,
@@ -126,8 +126,8 @@ export async function write_sessions (
 		cover: COVERS_BY_NAME.cooling_pergola,
 		event: main,
 		instances: instances_daily(
-			"2025-12-11",
-			"2025-12-13",
+			"2027-12-11",
+			"2027-12-13",
 			"11:00",
 			"19:00",
 		),
@@ -139,15 +139,15 @@ export async function write_sessions (
 		venue: link( "Outdoor Pergola", "https://example.com/maps/pergola" ),
 	} )
 
-	// The event that is not main: 2027's colours under 2025's chrome.
+	// The event that is not main: 2029's colours under 2027's chrome.
 	await create_session( strapi, {
 		category: "Conversation",
 		contributors: [ contributors.kaveri.documentId ],
-		cover: COVERS_BY_NAME.notes_for_2027,
+		cover: COVERS_BY_NAME.notes_for_2029,
 		event: events.other.documentId,
-		instances: [ instance( "2027-12-03", "16:00", "17:00" ) ],
+		instances: [ instance( "2029-12-03", "16:00", "17:00" ) ],
 		main_region: next_template(),
-		name: "Notes for 2027",
+		name: "Notes for 2029",
 		page_shell: shell,
 		standfirst: "The first thing announced for what comes next.",
 	} )
@@ -157,7 +157,7 @@ export async function write_sessions (
 	await create_session( strapi, {
 		category: "Workshop",
 		cover: COVERS_BY_NAME.repairing_what_you_own,
-		instances: [ instance( "2025-12-13", "10:00", "11:30" ) ],
+		instances: [ instance( "2027-12-13", "10:00", "11:30" ) ],
 		main_region: [
 			...next_template(),
 			// The one **curated** listing in the seed: three sessions an
@@ -192,7 +192,7 @@ export async function write_sessions (
 		contributors: [ contributors.iris.documentId ],
 		cover: COVERS_BY_NAME.unannounced,
 		event: main,
-		instances: [ instance( "2025-12-13", "12:00", "13:00" ) ],
+		instances: [ instance( "2027-12-13", "12:00", "13:00" ) ],
 		main_region: next_template(),
 		name: "Unannounced Showcase",
 		page_shell: shell,
@@ -201,13 +201,13 @@ export async function write_sessions (
 
 	// A second unpublished session, in the event that is **not** main, so that
 	// draft preview is observable *inside a listing* rather than only on a page
-	// of its own. 2027 holds two published Showcases; asking for its page as a
+	// of its own. 2029 holds two published Showcases; asking for its page as a
 	// draft is what makes this one the third.
 	await create_session( strapi, {
 		category: "Showcase",
 		cover: COVERS_BY_NAME.still_being_written,
 		event: events.other.documentId,
-		instances: [ instance( "2027-12-03", "10:00", "18:00" ) ],
+		instances: [ instance( "2029-12-03", "10:00", "18:00" ) ],
 		main_region: next_template(),
 		name: "Still Being Written",
 		page_shell: shell,
@@ -232,7 +232,7 @@ export async function write_sessions (
 			category: filler.category,
 			checkout_url: filler.checkout_url,
 			cover: cover_for( filler.category, position ),
-			event: filler.year === 2027 ? events.other.documentId : main,
+			event: filler.year === 2029 ? events.other.documentId : main,
 			instances: [
 				instance( filler.day, filler.from, filler.to ),
 			],

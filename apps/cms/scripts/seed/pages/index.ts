@@ -214,16 +214,16 @@ export async function write_pages (
 		} )
 	}
 
-	// A page belonging to the event that is **not** main. It takes 2027's
-	// colours and 2027's schedule document while the header and the footer
-	// above it still advertise 2025, which is the resolution rule made visible
+	// A page belonging to the event that is **not** main. It takes 2029's
+	// colours and 2029's schedule document while the header and the footer
+	// above it still advertise 2027, which is the resolution rule made visible
 	// in one page.
 	await create_entry( strapi, "api::page.page", {
 		event: events.other.documentId,
 		main_region: [
-			section( "Conscious Collective 2027", {
+			section( "Conscious Collective 2029", {
 				heading: heading_component(
-					"Conscious Collective 2027",
+					"Conscious Collective 2029",
 					"h2",
 				),
 				register_with_toc: true,
@@ -232,20 +232,20 @@ export async function write_pages (
 				],
 			} ),
 			// The same component as the home page's, on a page belonging to
-			// the event that is **not** main. It fills itself from 2027 while
-			// the header above it still advertises 2025 — the resolution rule
+			// the event that is **not** main. It fills itself from 2029 while
+			// the header above it still advertises 2027 — the resolution rule
 			// and the listing filter, in one page.
-			section( "Showcases in 2027", {
+			section( "Showcases in 2029", {
 				blocks: [ session_listing( "Showcase", 10 ) ],
-				heading: heading_component( "Showcases in 2027", "h2" ),
+				heading: heading_component( "Showcases in 2029", "h2" ),
 				register_with_toc: true,
 			} ),
 			// The schedule list, on the one page in the seed that belongs to
-			// the event that is **not** main. It answers with 2027's thirteen
-			// sessions rather than 2025's forty, and its download link points
-			// at 2027's schedule document — the resolution rule reaching two
+			// the event that is **not** main. It answers with 2029's thirteen
+			// sessions rather than 2027's forty, and its download link points
+			// at 2029's schedule document — the resolution rule reaching two
 			// different things through one component.
-			section( "The 2027 schedule", {
+			section( "The 2029 schedule", {
 				blocks: [ session_schedule_list() ],
 				heading: heading_component( "What is planned", "h2" ),
 				register_with_toc: true,
@@ -253,7 +253,7 @@ export async function write_pages (
 		],
 		page_shell: page_shells.primary.documentId,
 		standfirst: "A first look at what comes after this one.",
-		title: "Conscious Collective 2027",
+		title: "Conscious Collective 2029",
 	} )
 
 	// An archived page, on the archive shell, so that a second shell has a
