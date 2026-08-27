@@ -211,7 +211,7 @@ export function Card (
 		// context colour is re-pointed here rather than on the page, because
 		// ten cards side by side can be ten cards of four categories. See
 		// `context_colour_of`.
-		className={ `group relative block rounded-lg overflow-hidden ${className}` }
+		className={ `group relative block h-full rounded-lg overflow-hidden ${className}` }
 		path={ session.path }
 		style={ {
 			...context_colour_of( role ),
