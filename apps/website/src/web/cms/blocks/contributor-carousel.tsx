@@ -438,10 +438,22 @@ export function Contributor_Carousel (
 			}
 		}
 
+		// **A portrait is a picture inside a link, and the browser will pick
+		// up either one on its own.** Once that native drag begins it takes
+		// the pointer with it — `pointercancel` arrives and the `pointerup`
+		// above never does — so a swipe that started over a face left the ring
+		// where it was. Refusing the drag at the viewport catches both,
+		// because `dragstart` bubbles.
+		const on_drag_start = ( event: DragEvent ) => {
+			event.preventDefault()
+		}
+
+		node.addEventListener( "dragstart", on_drag_start )
 		node.addEventListener( "pointerdown", on_down )
 		node.addEventListener( "pointerup", on_up )
 
 		return () => {
+			node.removeEventListener( "dragstart", on_drag_start )
 			node.removeEventListener( "pointerdown", on_down )
 			node.removeEventListener( "pointerup", on_up )
 		}
