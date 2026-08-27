@@ -254,6 +254,28 @@ export function link (
 
 /**
  |
+ | The same component as an entry in a dynamic zone, where the discriminator is
+ | what tells Strapi which component was chosen.
+ |
+ | The bare shape above is an attribute — a section's link, or a row of a page
+ | shell's navigation — and Strapi refuses it inside a zone, where nothing but
+ | the discriminator says what it is.
+ |
+ */
+export function link_block (
+	label: string,
+	url: string,
+	style: "plain" | "button" = "plain",
+	text_color?: Text_Color,
+) {
+	return {
+		__component: "navigation.link-v1",
+		...link( label, url, style, text_color ),
+	}
+}
+
+/**
+ |
  | A plain string as an ordinary component attribute — a section's opening
  | line. It carries no `__component`, for the same reason the heading beside it
  | does not: it is not a choice an editor made from a dynamic zone.

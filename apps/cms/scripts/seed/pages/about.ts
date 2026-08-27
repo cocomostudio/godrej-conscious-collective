@@ -20,6 +20,7 @@ import {
 	heading_component,
 	image,
 	image_block,
+	link_block,
 	plain_string,
 	plain_string_component,
 	quote,
@@ -27,6 +28,7 @@ import {
 	section,
 	vanilla_carousel,
 	wysiwyg,
+	wysiwyg_from_markdown,
 } from "../lib/components.ts"
 import { contributor_listing } from "../lib/listings.ts"
 import { IMAGES, INSTAGRAM_SLIDES, TEAM } from "../lib/media.ts"
@@ -50,6 +52,31 @@ const PLANT_13 =
 	+ "!4b1!5s0x397878ffde0c8ab3:0x8b5bde3d4ef844a4!4m6!3m5"
 	+ "!1s0x3be7c752aef03905:0x95914985cbca39c8!8m2!3d19.0939921!4d72.9226328"
 	+ "!16s%2Fg%2F11hhrs35dw"
+
+/**
+ |
+ | The Location section, as one passage.
+ |
+ | The GCC site's shape with this repository's own content: a heading, a line
+ | about what to expect, the address on its own lines, and — as a component
+ | beside this block rather than inside it — the button to Maps.
+ |
+ | **The heading is inside the text rather than on the section**, at the size
+ | the GCC site draws it. The section keeps its title and its place in the table
+ | of contents, so the entry survives and its anchor lands on the section rather
+ | than on a heading part-way down it.
+ |
+ | The address is one paragraph with a newline in it, which is a hard break.
+ |
+ */
+const LOCATION = `
+### Location
+
+Please arrive prepared for a grand buffet at the offsite location.
+
+Plant 13, Pirojshanagar
+Vikhroli, Mumbai 400079
+`
 
 export async function write_about_page (
 	strapi: Strapi,
@@ -204,26 +231,36 @@ export async function write_about_page (
 					{
 						__component: "container.map-and-content-v1",
 						content: [
-							plain_string(
-								"Please arrive prepared for a grand buffet at the offsite location.",
+							wysiwyg_from_markdown( LOCATION ),
+							link_block(
+								"View on Maps",
+								PLANT_13,
+								"button",
 							),
 						],
 						layout: "map-left",
-						map: google_map( {
-							alt: "A drawn map of the way to Plant 13",
-							caption:
-								"Plant 13, Pirojshanagar, Vikhroli, Mumbai 400079",
-							image_url: IMAGES.sketch_map,
-							place_url: PLANT_13,
-						} ),
+						// No picture, so this is the branch that embeds an
+						// actual Google Map. The other branch — a drawing, and
+						// no third-party request — is the one the component
+						// prefers, and it is left to an editor with a drawing
+						// to give it.
+						map: google_map( { place_url: PLANT_13 } ),
 					},
 					{
 						__component: "miscellaneous.horizontal-rule-v1",
 						shade: "light",
 					},
-					vanilla_carousel( INSTAGRAM_SLIDES.concat( INSTAGRAM_SLIDES, INSTAGRAM_SLIDES ) ),
+					vanilla_carousel(
+						INSTAGRAM_SLIDES.concat(
+							INSTAGRAM_SLIDES,
+							INSTAGRAM_SLIDES,
+						),
+					),
 				],
-				heading: heading_component( "Location", "h2" ),
+				// No heading of its own: this section's heading is inside the
+				// text block, which is what makes the passage read as one. The
+				// title and the opt-in stay, so the table of contents keeps its
+				// entry and points it at the section — see `LOCATION` above.
 				horizontal_rule: true,
 				register_with_toc: true,
 			} ),

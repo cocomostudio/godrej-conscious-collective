@@ -490,10 +490,11 @@ describe("the composites", () => {
 		expect( composite.map.latitude ).toBe( 19.0939921 )
 		expect( composite.map.longitude ).toBe( 72.9226328 )
 		expect( composite.map.zoom ).toBe( 16 )
-		expect( composite.map.image.url ).toContain( "sketch-map" )
-		expect( composite.content[0].__component ).toBe(
-			"text.plain-string-v1",
-		)
+		// No picture, which is what puts the website on its embedding branch.
+		expect( composite.map.image ).toBeNull()
+		expect( composite.content[0].__component ).toBe( "text.wysiwyg-v1" )
+		expect( composite.content[1].__component ).toBe( "navigation.link-v1" )
+		expect( composite.content[1].label ).toBe( "View on Maps" )
 	})
 })
 
