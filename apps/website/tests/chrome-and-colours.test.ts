@@ -191,7 +191,7 @@ describe("the context colours", () => {
 		const { html } = await website.get( "/about" )
 
 		expect( variables( html ) ).toMatchObject( {
-			"--ctx-collaborator-color": "255, 92, 35",
+			"--ctx-contributor-color": "255, 92, 35",
 			"--ctx-conversation-color": "0, 85, 230",
 			"--ctx-experience-color": "0, 225, 182",
 			"--ctx-showcase-color": "240, 80, 61",

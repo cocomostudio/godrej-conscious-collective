@@ -31,7 +31,7 @@
  | **Two changes from the static site.** The slides come from the CMS rather
  | than from a literal array, so the loop's repetition count is measured rather
  | than assumed — an editor asking for three portraits would otherwise leave
- | gaps. And the glow under a portrait follows the resolved event's collaborator
+ | gaps. And the glow under a portrait follows the resolved event's contributor
  | colour instead of the one hex value the static site hardcodes, which is the
  | same rule every other colour on the page already follows.
  |
@@ -536,7 +536,7 @@ export function Contributor_Carousel (
 							caption_className="js_caption opacity-[var(--caption-opacity)] transition-opacity [translate:0_var(--from-caption)] will-change-transform"
 							contributor={ person }
 							figure_className="js_figure relative select-none will-change-transform [translate:var(--from-x)_var(--from-y)]"
-							image_className="js_image origin-center will-change-transform [scale:var(--from-scale)] shadow-[0_2px_32px_0_rgba(var(--ctx-collaborator-color),0.65)]" />
+							image_className="js_image origin-center will-change-transform [scale:var(--from-scale)] shadow-[0_2px_32px_0_rgba(var(--ctx-contributor-color),0.65)]" />
 					</div>
 				) ) }
 			</div>

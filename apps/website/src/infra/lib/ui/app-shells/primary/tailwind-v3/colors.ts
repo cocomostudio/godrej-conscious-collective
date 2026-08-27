@@ -61,7 +61,7 @@ export const colors = {
 	"experience": "rgba( var( --ctx-experience-color ), <alpha-value> )",
 	"conversation": "rgba( var( --ctx-conversation-color ), <alpha-value> )",
 	"workshop": "rgba( var( --ctx-workshop-color ), <alpha-value> )",
-	"collaborator": "rgba( var( --ctx-collaborator-color ), <alpha-value> )",
+	"contributor": "rgba( var( --ctx-contributor-color ), <alpha-value> )",
 }
 
 // Emits the static-palette triplets on `:root` (the v4 `@theme` hex tokens'

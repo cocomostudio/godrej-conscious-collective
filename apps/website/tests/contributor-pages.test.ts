@@ -183,14 +183,14 @@ describe("the page's colours", () => {
 		const { html } = await website.get( "/collaborators/debasmita-ghosh" )
 
 		expect( html ).toContain(
-			"--ctx-context-color:var(--ctx-collaborator-color)",
+			"--ctx-context-color:var(--ctx-contributor-color)",
 		)
 	})
 
 	it("follow the resolved event, not the main one", async () => {
 		const { html } = await website.get( "/collaborators/other-year" )
 
-		expect( html ).toContain( "--ctx-collaborator-color:9, 9, 9" )
+		expect( html ).toContain( "--ctx-contributor-color:9, 9, 9" )
 	})
 })
 

@@ -217,7 +217,7 @@ export async function write_home_page (
 			// half of the contributor listing and the About page below is the
 			// curated half.
 			section( "Collaborators", {
-				background_gradient: "collaborator-to-light",
+				background_gradient: "contributor-to-light",
 				background_pattern: "spider-web-3",
 				background_position: "left",
 				blocks: [ contributor_listing( "carousel", 10 ) ],

@@ -31,13 +31,6 @@ import type { Event } from "./envelope.ts"
  | The six roles, each with the attribute it reads and the custom property it
  | is written to.
  |
- | The two disagree in one place. The role is `contributor`, which is the word
- | this codebase uses; the property is `--ctx-collaborator-color`, because the
- | Tailwind tokens were lifted from the static site and name the colour by the
- | word the public sees. Both are correct in their own register, and mapping
- | between them here is cheaper than either renaming the design system or
- | letting the public word into the code.
- |
  */
 const ROLES = {
 	"theme": {
@@ -62,7 +55,7 @@ const ROLES = {
 	},
 	"contributor": {
 		attribute: "colour_contributor_rgb",
-		variable: "--ctx-collaborator-color",
+		variable: "--ctx-contributor-color",
 	},
 } as const
 
@@ -84,7 +77,7 @@ export type Role = keyof typeof ROLES
  |
  */
 export const ROLE_BACKGROUND: Record<Role, string> = {
-	contributor: "bg-collaborator",
+	contributor: "bg-contributor",
 	conversation: "bg-conversation",
 	experience: "bg-experience",
 	showcase: "bg-showcase",

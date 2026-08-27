@@ -5,7 +5,7 @@
 		"singularName": "contributor",
 		"pluralName": "contributors",
 		"displayName": "Collaborator",
-		"description": "A person who takes part in a session. Called \"Contributor\" in code, \"Collaborator\" everywhere an editor or visitor reads it."
+		"description": "A person who takes part in a session."
 	},
 	"options": {
 		"draftAndPublish": false

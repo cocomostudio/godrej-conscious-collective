@@ -184,7 +184,7 @@
 			"colour_contributor": {
 				"edit": {
 					"label": "Collaborator colour",
-					"description": "\"Collaborator\" is what a contributor is called in public, and this colour is what a collaborator's page is coloured by."
+					"description": "The colour a contributor's page is drawn in."
 				},
 				"list": {
 					"label": "Collaborator colour"

@@ -45,15 +45,16 @@ const GRADIENTS: Record<
 	"light": { colour: LIGHT },
 	"white-to-light": {
 		colour: "#FFFFFF",
-		image: `linear-gradient( to bottom, transparent, transparent 50%, ${LIGHT} )`,
+		image:
+			`linear-gradient( to bottom, transparent, transparent 50%, ${LIGHT} )`,
 	},
 
 	"showcase": { colour: role( "showcase" ) },
 	"showcase-to-light": {
-		image: fades_to_light( role( "showcase" ) )
+		image: fades_to_light( role( "showcase" ) ),
 	},
 	"light-to-showcase": {
-		image: fades_into_colour( role( "showcase" ) )
+		image: fades_into_colour( role( "showcase" ) ),
 	},
 
 	"conversation": { colour: role( "conversation" ) },
@@ -66,7 +67,7 @@ const GRADIENTS: Record<
 
 	"experience": { colour: role( "experience" ) },
 	"experience-to-light": {
-		image: fades_to_light( role( "experience" ) )
+		image: fades_to_light( role( "experience" ) ),
 	},
 	"light-to-experience": {
 		image: fades_into_colour( role( "experience" ) ),
@@ -74,34 +75,34 @@ const GRADIENTS: Record<
 
 	"workshop": { colour: role( "workshop" ) },
 	"workshop-to-light": {
-		image: fades_to_light( role( "workshop" ) )
+		image: fades_to_light( role( "workshop" ) ),
 	},
 	"light-to-workshop": {
-		image: fades_into_colour( role( "workshop" ) )
+		image: fades_into_colour( role( "workshop" ) ),
 	},
 
-	"collaborator": { colour: role( "collaborator" ) },
-	"collaborator-to-light": {
-		image: fades_to_light( role( "collaborator" ) ),
+	"contributor": { colour: role( "contributor" ) },
+	"contributor-to-light": {
+		image: fades_to_light( role( "contributor" ) ),
 	},
-	"light-to-collaborator": {
-		image: fades_into_colour( role( "collaborator" ) ),
+	"light-to-contributor": {
+		image: fades_into_colour( role( "contributor" ) ),
 	},
 
 	"theme": { colour: role( "theme" ) },
 	"theme-to-light": {
-		image: fades_to_light( role( "theme" ) )
+		image: fades_to_light( role( "theme" ) ),
 	},
 	"light-to-theme": {
-		image: fades_into_colour( role( "theme" ) )
+		image: fades_into_colour( role( "theme" ) ),
 	},
 
 	"context": { colour: role( "context" ) },
 	"light-to-context": {
-		image: fades_into_colour( role( "context" ) )
+		image: fades_into_colour( role( "context" ) ),
 	},
 	"context-to-light": {
-		image: fades_into_colour( role( "context" ) )
+		image: fades_into_colour( role( "context" ) ),
 	},
 }
 
