@@ -4,8 +4,8 @@
  | Pages — the content type the route table is made of.
  |
  | A Page is a title, a shell, a layout and two regions of catalogue
- | components; its URL is derived from its title. The two long ones have files
- | of their own beside this; everything written here is either thin, derived
+ | components; its URL is derived from its title. The long ones have files of
+ | their own beside this; everything written here is either thin, derived
  | from a table, or exists to prove one branch of the arrangement:
  |
  |   • the **Archives** page, whose timeline is the one repeatable component in
@@ -41,19 +41,7 @@ import type { Seeded_Page_Shells } from "../page-shells.ts"
 import { write_about_page } from "./about.ts"
 import { write_archives_page } from "./archives.ts"
 import { write_home_page } from "./home.ts"
-
-/**
- |
- | The pages the route table names that this ticket has nothing else to say
- | about. Titles are what the URL is derived from, so they are the point.
- |
- */
-const REMAINING_ROUTE_TABLE = [
-	{
-		standfirst: "How we collect, use and protect your personal data.",
-		title: "Privacy Policy",
-	},
-]
+import { write_privacy_policy_page } from "./privacy-policy.ts"
 
 /**
  |
@@ -101,6 +89,7 @@ export async function write_pages (
 	await write_home_page( strapi, page_shells )
 	await write_about_page( strapi, page_shells, contributors )
 	await write_archives_page( strapi, page_shells )
+	await write_privacy_policy_page( strapi, page_shells )
 
 	// Two columns, stated rather than left to the default, because this is the
 	// page the arrangement is easiest to read off: a short document with a back
@@ -191,27 +180,6 @@ export async function write_pages (
 			"Please Note : This programming schedule is subject to changes",
 		title: "Schedule",
 	} )
-
-	// The rest of the route table.
-	//
-	// Every one of these is linked from the page shell's navigation, so
-	// leaving them out would have the site chrome advertising a URL that
-	// answers 404. They are thin on purpose: each becomes a real page when the
-	// ticket that owns it arrives.
-	for ( const { standfirst, title } of REMAINING_ROUTE_TABLE ) {
-		await create_entry( strapi, "api::page.page", {
-			main_region: [
-				section( title, {
-					heading: heading_component( title, "h2" ),
-					register_with_toc: true,
-					strings: [ standfirst ],
-				} ),
-			],
-			page_shell: page_shells.primary.documentId,
-			standfirst,
-			title,
-		} )
-	}
 
 	// A page belonging to the event that is **not** main. It takes 2029's
 	// colours and 2029's schedule document while the header and the footer
