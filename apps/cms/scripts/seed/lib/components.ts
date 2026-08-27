@@ -16,6 +16,8 @@
  |
  */
 
+import { rich_text_from_markdown } from "./markdown.ts"
+
 export type Image_Fields = {
 	url: string
 	title?: string
@@ -116,14 +118,40 @@ export function image_link ( url: string, label: string, image_url: string ) {
 	}
 }
 
+/**
+ |
+ | The component, given rich text already assembled. The two helpers below are
+ | the two ways this seed assembles it, and they share this so that the
+ | discriminator is written down once.
+ |
+ */
+function wysiwyg_of ( rich_text: unknown[] ) {
+	return { __component: "text.wysiwyg-v1", rich_text }
+}
+
 export function wysiwyg ( paragraphs: string[] ) {
-	return {
-		__component: "text.wysiwyg-v1",
-		rich_text: paragraphs.map( ( paragraph ) => ( {
-			children: [ { text: paragraph, type: "text" } ],
-			type: "paragraph",
-		} ) ),
-	}
+	return wysiwyg_of( paragraphs.map( ( paragraph ) => ( {
+		children: [ { text: paragraph, type: "text" } ],
+		type: "paragraph",
+	} ) ) )
+}
+
+/**
+ |
+ | The same component, written as markdown.
+ |
+ | A passage of headings, lists and nesting is unreadable as Strapi's node tree
+ | and unreviewable in a diff, so it is written as markdown and parsed here. The
+ | parser is a development-only dependency and this is the only thing that
+ | reaches it — see `markdown.ts` for what it does and does not accept.
+ |
+ | The plain helper above stays for the many sections that are a run of
+ | paragraphs and nothing more, where markdown would be ceremony around a list
+ | of strings.
+ |
+ */
+export function wysiwyg_from_markdown ( source: string ) {
+	return wysiwyg_of( rich_text_from_markdown( source ) )
 }
 
 export function quote (
