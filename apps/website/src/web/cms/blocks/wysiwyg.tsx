@@ -20,11 +20,15 @@
  |
  | The alternative was to colour the whole block, and it was rejected on the
  | shape of the data rather than on taste: this block has drawn two colours
- | since it was written, three enum values cannot say "mixed", and whichever
- | single value became the default would repaint every WYSIWYG already saved —
- | prose in the context colour, or every rich-text heading in black. Prose is
- | the half the attribute governs because the context colour on a heading or a
- | link is what marks it out as one.
+ | since it was written and one enum value cannot say "mixed". Prose is the half
+ | the attribute governs because the context colour on a heading or a link is
+ | what marks it out as one.
+ |
+ | **Where nobody answered, the prose is black.** That is this component's own
+ | fallback and not the schema's, which says `auto` and declines to choose — a
+ | heading and a link fall back to the page's own colour, and this block's prose
+ | to black, because that is what each has always drawn. See
+ | `blocks/text-color.ts`.
  |
  | **The cost is real and worth naming**: a block set to `white` draws its
  | subheadings in the context colour, and an editor cannot say otherwise. If
@@ -71,9 +75,10 @@ type Wysiwyg_Props = {
 export function Wysiwyg ( { rich_text, text_color }: Wysiwyg_Props ) {
 	const origin = use_media_origin()
 	const body_size = use_body_text_class()
-	// Over a dark ground every word is white whatever an editor stored — see
-	// the note in `dark-surface.tsx`.
-	const prose = use_text_colour_class( text_color, "context" )
+	// `auto` and an unset value both land on the fallback, and the fallback is
+	// this block's own — see the note above. Over a dark ground every word is
+	// white whatever an editor stored, per `dark-surface.tsx`.
+	const prose = use_text_colour_class( text_color, "black" )
 
 	if ( !Array.isArray( rich_text ) || rich_text.length === 0 ) {
 		return null

@@ -399,7 +399,7 @@ describe("the colour of a block's words", () => {
 	// `context` and `theme` mean different things now that a page can be
 	// something other than the theme colour, and `theme` is how a run of words
 	// asks for the event's own regardless.
-	it("offers the same four values, and the same default, on every one of them", () => {
+	it("offers the same five values, and the same default, on every one of them", () => {
 		for ( const component of carriers ) {
 			expect( {
 				default: component.schema.attributes.text_color.default,
@@ -407,11 +407,62 @@ describe("the colour of a block's words", () => {
 				values: component.schema.attributes.text_color.enum,
 			} )
 				.toEqual( {
-					default: "context",
+					default: "auto",
 					uid: component.uid,
-					values: [ "context", "theme", "black", "white" ],
+					values: [
+						"auto",
+						"context",
+						"theme",
+						"black",
+						"white",
+					],
 				} )
 		}
+	})
+
+	/**
+	 |
+	 | **`auto` is the schema declining to answer**, and the whole of why it is
+	 | here: the four components disagree about what an unanswered block draws —
+	 | a heading and a link in the page's own colour, a plain string and a
+	 | WYSIWYG's prose in black — and a schema default has to be one value. So
+	 | the default names the absence of an answer instead, and the website
+	 | resolves it per component.
+	 |
+	 | The attribute stays required, which is what keeps the state a named option
+	 | an editor can return to rather than a blank field they can only leave.
+	 |
+	 | This is the one assertion pinning that arrangement from the CMS's side.
+	 | What each component then *draws* for `auto` cannot be seen from here, and
+	 | is pinned in the website's catalogue suite.
+	 |
+	 */
+	it("declines to answer by default, rather than naming a colour", () => {
+		for ( const component of carriers ) {
+			const attribute = component.schema.attributes.text_color
+
+			expect( {
+				default: attribute.default,
+				required: attribute.required,
+				uid: component.uid,
+			} )
+				.toEqual( {
+					default: "auto",
+					required: true,
+					uid: component.uid,
+				} )
+
+			// A colour it is not, so it carries no class and belongs in no
+			// palette. See `text-color.ts` on the website.
+			expect( attribute.enum[0] ).toBe( "auto" )
+		}
+	})
+
+	// The option an editor meets is "Automatic". Same pairing as the
+	// Collaborator below, and the same reason it has to be asserted in two
+	// halves: the schema holds the stored word and the translation names it.
+	it("shows the unanswered option by a word that says so", () => {
+		expect( admin_translations().auto ).toBe( "Automatic" )
 	})
 })
 

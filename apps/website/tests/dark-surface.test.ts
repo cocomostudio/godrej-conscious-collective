@@ -134,19 +134,22 @@ describe("prose", () => {
 	it("falls back to white over a dark ground", () => {
 		const rendered = both( h( Wysiwyg, { rich_text: PARAGRAPH as any } ) )
 
-		// On a white page an unanswered block draws in the page's own colour,
-		// which is the schema's default on all four of the components that
-		// carry the attribute. Over the dark ground it is white regardless.
-		expect( prose_class_of( rendered.light ) ).toBe( "text-context" )
+		// On a white page an unanswered block draws its own colour, which for
+		// prose is black — the schema answers `auto` on all four components
+		// that carry the attribute and leaves each of them to say what that
+		// means. Over the dark ground it is white regardless.
+		expect( prose_class_of( rendered.light ) ).toBe( "text-black" )
 		expect( rendered.dark ).toContain( "text-white" )
 	})
 
-	// **The dialog forces its colours**, so this is every colour an editor can
-	// pick rather than the two that are not defaults of anything. A snapshot
-	// nobody can read is not a state the catalogue should be able to reach,
-	// and the enclosing Archive component's admin description says so.
+	// **The dialog forces its colours**, so this is every value an editor can
+	// pick, `auto` included. A snapshot nobody can read is not a state the
+	// catalogue should be able to reach, and the enclosing Archive component's
+	// admin description says so.
 	it("is white whatever an editor picked", () => {
-		for ( const chosen of [ "black", "context", "theme", "white" ] ) {
+		for (
+			const chosen of [ "auto", "black", "context", "theme", "white" ]
+		) {
 			const rendered = both(
 				h( Wysiwyg, {
 					rich_text: PARAGRAPH as any,
@@ -161,7 +164,8 @@ describe("prose", () => {
 
 	// The rule that read a stored `black` as no answer at all is gone. It only
 	// existed because `black` was the schema's default and could not be told
-	// apart from a value nobody chose; `context` is the default now.
+	// apart from a value nobody chose; `auto` is the default now, and it is
+	// the one value that means nobody chose.
 	it("draws a stored black as black on a white page", () => {
 		const rendered = both(
 			h( Wysiwyg, {
@@ -213,7 +217,9 @@ describe("a heading and a link", () => {
 	const on_black = ( node: ReactNode ) => both( node ).dark
 
 	it("are white over a dark ground whatever they asked for", () => {
-		for ( const chosen of [ "black", "context", "theme", "white" ] ) {
+		for (
+			const chosen of [ "auto", "black", "context", "theme", "white" ]
+		) {
 			const heading = on_black( h( Heading, {
 				__component: "text.heading-v1",
 				content: "A heading",

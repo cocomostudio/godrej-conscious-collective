@@ -203,10 +203,17 @@ export function vanilla_carousel ( slides: Slide[] ) {
 /**
  |
  | The colour a component draws its words in. Left off where it is not given, so
- | the seed exercises each schema's own default rather than restating it.
+ | the seed lands on the schema's default — which is `auto`, meaning nobody
+ | answered, and which leaves the website to draw whatever that component draws
+ | where nobody has: the page's own colour for a heading and a link, and black
+ | for a plain string and a WYSIWYG's prose.
+ |
+ | `auto` is spellable here even so. Omitting the attribute and passing it are
+ | the same thing, and a seed that wants to say "deliberately unanswered" out
+ | loud should be able to.
  |
  */
-export type Text_Color = "context" | "theme" | "black" | "white"
+export type Text_Color = "auto" | "context" | "theme" | "black" | "white"
 
 export function link (
 	label: string,

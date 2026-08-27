@@ -29,10 +29,13 @@
  | the strongest form the rule has taken. It replaces an earlier one that read a
  | stored `black` as no answer at all — a rule that existed only because `black`
  | was the schema's default, so a stored `black` could not be told apart from a
- | value nobody chose. `context` is the default now, `black` is a choice again
- | and is drawn as one everywhere else, and the dialog no longer has to guess
- | what an editor meant: nothing an editor picks can make a snapshot
- | unreadable, and the enclosing Archive component's admin description says so.
+ | value nobody chose.
+ |
+ | **Forcing is what lets the schema stop guessing.** The default is `auto` now,
+ | which names the absence of an answer outright, so `black` is a choice again
+ | and is drawn as one everywhere else — and the dialog does not have to weigh
+ | any of it: nothing an editor picks can make a snapshot unreadable, and the
+ | enclosing Archive component's admin description says so.
  |
  | A caption is simpler still: it carries no `text_color` at all, so there was
  | never anything to weigh, and it just follows the ground.
@@ -97,9 +100,10 @@ export function use_dark_surface () {
  | The colour a block draws its words in, given what an editor stored and what
  | that block's own default is.
  |
- | The fallback is the caller's because the components' stored default answers
- | for what an editor chose, and `null` — every row written before the attribute
- | existed — is what this has to answer for instead.
+ | The fallback is the caller's because the four components disagree about it,
+ | and the schema declines to settle the disagreement: it stores `auto`, which
+ | means nobody answered. `null` — every row written before the attribute
+ | existed — means the same thing, and `text_color_token` treats the two alike.
  |
  | On a white page this is exactly `text_color_token`. On a dark one it is
  | white, full stop: **every component carrying `text_color` asks this**, so

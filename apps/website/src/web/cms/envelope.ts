@@ -36,13 +36,18 @@ export type Link = {
 	style: "plain" | "button"
 	/**
 	 |
-	 | Null on every link written before the attribute existed — a schema
-	 | default is applied when a row is saved, not when one is read. The website
-	 | reads that as the colour the link has always drawn itself in. See
-	 | `blocks/text-color.ts`.
+	 | `auto` where nobody answered, which is the schema's default and what the
+	 | CMS writes onto every row saved from here on — the schema declines to name
+	 | a colour, because the four components that carry this attribute disagree
+	 | about what an unanswered one should draw.
+	 |
+	 | Null on every link written before the attribute existed, a schema default
+	 | being applied when a row is saved rather than when one is read. The two
+	 | mean the same thing and the website reads both as the colour the link has
+	 | always drawn itself in. See `blocks/text-color.ts`.
 	 |
 	 */
-	text_color?: "context" | "theme" | "black" | "white" | null
+	text_color?: "auto" | "context" | "theme" | "black" | "white" | null
 }
 
 export type Page_Shell = {

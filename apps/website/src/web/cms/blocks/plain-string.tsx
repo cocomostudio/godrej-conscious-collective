@@ -15,6 +15,10 @@
  | between two renders, which is the "rendered more hooks than during the
  | previous render" crash rather than a style point.
  |
+ | **Where nobody answered, the words are black.** The schema stores `auto` and
+ | declines to choose; the fallback below is this component's own, and is what a
+ | plain string has always drawn. See `text-color.ts`.
+ |
  */
 
 import { use_text_colour_class } from "../dark-surface.tsx"
@@ -29,7 +33,7 @@ type Plain_String_Props = {
 
 export function Plain_String ( { content, text_color }: Plain_String_Props ) {
 	const body_size = use_body_text_class()
-	const prose = use_text_colour_class( text_color, "context" )
+	const prose = use_text_colour_class( text_color, "black" )
 
 	if ( !content ) {
 		return null

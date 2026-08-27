@@ -36,12 +36,13 @@
 		"text_color": {
 			"type": "enumeration",
 			"enum": [
+				"auto",
 				"context",
 				"theme",
 				"black",
 				"white"
 			],
-			"default": "context",
+			"default": "auto",
 			"required": true
 		}
 	},
@@ -88,7 +89,7 @@
 			"text_color": {
 				"edit": {
 					"label": "Text colour",
-					"description": "The colour of the words. \"context\" is the page’s own colour, which follows both the event it belongs to and the colour scheme its editor chose; \"theme\" is that event’s theme colour whatever the page is set to. A link beside the heading carries its own."
+					"description": "The colour of the words. \"auto\" is no answer at all and leaves it to the block, which draws a heading in the page’s own colour. \"context\" names that colour outright, and follows both the event the page belongs to and the colour scheme its editor chose; \"theme\" is that event’s theme colour whatever the page is set to. A link beside the heading carries its own."
 				},
 				"list": {
 					"label": "Text colour"

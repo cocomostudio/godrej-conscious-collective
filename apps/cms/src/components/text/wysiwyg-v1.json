@@ -12,12 +12,13 @@
 		"text_color": {
 			"type": "enumeration",
 			"enum": [
+				"auto",
 				"context",
 				"theme",
 				"black",
 				"white"
 			],
-			"default": "context",
+			"default": "auto",
 			"required": true
 		}
 	},
@@ -37,7 +38,7 @@
 			"text_color": {
 				"edit": {
 					"label": "Text colour",
-					"description": "The colour of the prose — paragraphs, lists, quotations and code. Headings and links inside the text keep the page’s own colour, which is what marks them out as headings and links; \"context\" is that colour, and \"theme\" is the event’s theme colour whatever the page is set to."
+					"description": "The colour of the prose — paragraphs, lists, quotations and code. Headings and links inside the text keep the page’s own colour, which is what marks them out as headings and links. \"auto\" is no answer at all and leaves the prose to the block, which draws it black; \"context\" is the page’s own colour, which follows both the event it belongs to and the colour scheme its editor chose; \"theme\" is that event’s theme colour whatever the page is set to."
 				},
 				"list": {
 					"label": "Text colour"

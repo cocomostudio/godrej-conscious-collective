@@ -363,7 +363,7 @@ describe("the colour of a block's words", () => {
 		expect( showcases.link.text_color ).toBe( "white" )
 	})
 
-	it("is each component's own default where nobody picked one", async () => {
+	it("arrives as `auto` where nobody picked one", async () => {
 		const { body } = await cms.get( "/api/envelope?path=/home" )
 
 		// The blocks inside the image stack and the site navigation's links,
@@ -379,13 +379,15 @@ describe("the colour of a block's words", () => {
 			"text.plain-string-v1",
 		)
 
-		// One default across all four, which is what a page's own colour means
-		// now that a page can be something other than the theme: a component
-		// that says nothing draws in whatever colour the page it landed on is.
-		expect( heading.text_color ).toBe( "context" )
-		expect( plain.text_color ).toBe( "context" )
+		// One default across all four, and it names no colour. The four
+		// disagree about what an unanswered block draws — a heading in the
+		// page's own colour, a plain string in black — so the schema says
+		// `auto` and the website resolves it per component. What each of them
+		// then draws is asserted in the website's own suite.
+		expect( heading.text_color ).toBe( "auto" )
+		expect( plain.text_color ).toBe( "auto" )
 		expect( body.data.page_shell.navigation_header[0].text_color )
-			.toBe( "context" )
+			.toBe( "auto" )
 	})
 })
 

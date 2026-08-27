@@ -295,12 +295,38 @@ beforeAll( async () => {
 							null,
 						),
 						coloured(
+							wysiwyg( "Rich prose saved before" ),
+							null,
+						),
+						coloured(
 							heading( "Heading saved before" ),
 							null,
 						),
 						coloured(
 							link( "/before", "Link saved before" ),
 							null,
+						),
+					],
+				} ),
+				// The same state, in the spelling the schema writes onto every
+				// row saved from here on.
+				section( "Unanswered", {
+					content: [
+						coloured(
+							plain_string( "Prose left automatic" ),
+							"auto",
+						),
+						coloured(
+							wysiwyg( "Rich prose left automatic" ),
+							"auto",
+						),
+						coloured(
+							heading( "Heading left automatic" ),
+							"auto",
+						),
+						coloured(
+							link( "/automatic", "Link left automatic" ),
+							"auto",
 						),
 					],
 				} ),
@@ -596,20 +622,36 @@ describe("the colour of a block's words", () => {
 		expect( prose ).not.toContain( "text-context" )
 	})
 
-	it("is the page's own colour where nobody set one", async () => {
+	// **`auto` and a missing value are one state in two spellings**, and they
+	// are asserted together because the day they diverge is the day half the
+	// catalogue quietly repaints. `auto` is what the schema writes onto every
+	// row saved from here on; `null` is what a row written before the attribute
+	// existed still carries, a schema default being applied on save rather than
+	// on read.
+	it("is each component's own where nobody answered, in either spelling", async () => {
 		const { html } = await website.get( "/text-colour" )
 
-		// A schema default is written when a row is created, so an entry that
-		// predates the attribute comes back with `null` in it — and what a
-		// block draws when nobody answered is a question the schema and the
-		// renderer must not give two answers to. The schema's default is
-		// `context` on all four, so this is too.
-		expect( element_carrying( html, "Prose saved before" ) )
-			.toContain( "text-context" )
-		expect( element_carrying( html, "Heading saved before" ) )
-			.toContain( "text-context" )
-		expect( element_carrying( html, "Link saved before" ) )
-			.toContain( "text-context" )
+		// The four disagree, which is exactly why the schema declines to answer
+		// for them: a heading and a link have always drawn themselves in the
+		// page's own colour, and a plain string and a WYSIWYG's prose in black.
+		for (
+			const [ words, colour ] of [
+				[ "Prose saved before", "text-black" ],
+				[ "Rich prose saved before", "text-black" ],
+				[ "Heading saved before", "text-context" ],
+				[ "Link saved before", "text-context" ],
+				[ "Prose left automatic", "text-black" ],
+				[ "Rich prose left automatic", "text-black" ],
+				[ "Heading left automatic", "text-context" ],
+				[ "Link left automatic", "text-context" ],
+			]
+		) {
+			expect( {
+				drawn: element_carrying( html, words ).includes( colour ),
+				words,
+			} )
+				.toEqual( { drawn: true, words } )
+		}
 	})
 
 	it("leaves a heading inside rich text on the page's own colour", async () => {
