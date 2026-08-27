@@ -297,7 +297,7 @@ export function Archive_Carousel_Listing (
 			   the ring, lined up with the section's heading, and absent below
 			   the medium breakpoint where the ring is dragged instead. */
 		}
-		{/*<div className="flex justify-end gap-4 max-md:hidden">*/}
+		{ /*<div className="flex justify-end gap-4 max-md:hidden">*/ }
 		<div className="max-md:hidden cc mt-6 mx-auto px-1c">
 			<div className="relative">
 				<div className="flex justify-end gap-4 absolute -top-13 right-0">
@@ -308,7 +308,7 @@ export function Archive_Carousel_Listing (
 						onClick={ () => embla_api?.scrollPrev() }>
 						<Chevron_Left />
 					</Icon_Button>
-		
+
 					<Icon_Button
 						aria-label="View the next archived event"
 						colour="white"
@@ -361,7 +361,7 @@ function Slide (
 			in_focus ? "opacity-100" : "opacity-65"
 		}` }>
 		<div
-			className={ `relative size-73.5 md:w-185 lg:w-264 md:h-auto md:aspect-2/1 rounded-lg overflow-hidden ${moving} [transform:translateZ(0)_scale(1)] ${
+			className={ `relative size-73.5 md:w-225 lg:w-264 md:h-auto md:aspect-2/1 rounded-lg overflow-hidden ${moving} [transform:translateZ(0)_scale(1)] ${
 				in_focus
 					? "[transform:translateZ(0)_scale(var(--cc-scale))]"
 					: ""
@@ -373,7 +373,7 @@ function Slide (
 
 		{ label
 			&& <figcaption
-				className={ `mt-6 md:-mx-8 lg:-mx-12 md:mt-11 transition-opacity duration-150 ease-in text-center md:text-left ${
+				className={ `mt-6 md:-mx-10 lg:-mx-12 md:mt-11 transition-opacity duration-150 ease-in text-center md:text-left ${
 					in_focus ? "opacity-100 delay-450" : "opacity-0"
 				}` }>
 				<p className="text-h6">{ label }</p>
