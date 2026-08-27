@@ -188,8 +188,7 @@ export async function write_pages (
 		],
 		page_shell: page_shells.primary.documentId,
 		standfirst:
-			"Everything that is on, day by day. This programming schedule is "
-			+ "subject to changes.",
+			"Please Note : This programming schedule is subject to changes",
 		title: "Schedule",
 	} )
 
