@@ -401,11 +401,18 @@ describe("the three collaborator layouts", () => {
 	it("turn a ring when the layout is a carousel", async () => {
 		const body = body_of( ( await website.get( "/" ) ).html )
 
-		// Repeated for the loop, and steered by two controls the other two
-		// layouts do not have.
+		// Repeated for the loop, which is what makes it a ring rather than a
+		// row: the other two layouts draw each collaborator once.
 		expect( occurrences( body, "Kaveri Nair" ) ).toBeGreaterThan( 1 )
-		expect( body ).toContain( "View the previous collaborator" )
-		expect( body ).toContain( "View the next collaborator" )
+	})
+
+	// **The ring is turned by swiping it and by nothing else.** It had a pair
+	// of chevrons above it, lifted from the static site, and they are gone.
+	it("turn without a pair of controls above them", async () => {
+		const body = body_of( ( await website.get( "/" ) ).html )
+
+		expect( body ).not.toContain( "View the previous collaborator" )
+		expect( body ).not.toContain( "View the next collaborator" )
 	})
 })
 

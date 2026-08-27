@@ -49,9 +49,6 @@ import {
 import useEmblaCarousel from "embla-carousel-react"
 
 import { use_repetitions_needed_for_looping } from "#infra/lib/ui/react/embla-carousel/use-repetitions-needed-for-looping.ts"
-import { Icon_Button } from "#infra/lib/ui/react/buttons/icon-button.tsx"
-import { Chevron_Left } from "#infra/lib/ui/react/icons/chevron-left.tsx"
-import { Chevron_Right } from "#infra/lib/ui/react/icons/chevron-right.tsx"
 import { use_media_query_event } from "#infra/lib/ui/react/use-media-query-event.tsx"
 
 import type { Contributor_Card } from "../envelope.ts"
@@ -312,8 +309,8 @@ export function Contributor_Carousel (
 		}
 	}, [] )
 
-	// The one place that marks the carousel as travelling, used by all three
-	// ways a visitor can move it.
+	// The one place that marks the carousel as travelling. A swipe is the
+	// only way a visitor moves it, and it goes through here.
 	const begin = useCallback( () => {
 		travelling.current = true
 		viewport.current?.style.setProperty( "--caption-opacity", "0" )
@@ -460,86 +457,39 @@ export function Contributor_Carousel (
 		contributors.length,
 	)
 
-	const step = useCallback( ( forwards: boolean ) => {
-		if ( travelling.current ) {
-			return
-		}
-
-		begin()
-
-		if ( forwards ) {
-			api_for_pointers.current?.scrollNext()
-		}
-		else {
-			api_for_pointers.current?.scrollPrev()
-		}
-	}, [ begin ] )
-
-	return <div>
-		{
-			/* The static site's own pagination: two outlined squares, drawn by
-			   `Icon_Button` rather than by `Button` with the words taken out.
-			   `Button` is sized by its text and pads horizontally, so an icon
-			   inside one comes out as a pill of whatever width the glyph
-			   happens to be — which is what this was before. */
-		}
-		<div className="flex justify-end gap-4 max-md:hidden">
-			<Icon_Button
-				aria-label="View the previous collaborator"
-				colour="white"
-				emphasis="outline"
-				onClick={ () => step( false ) }>
-				<Chevron_Left />
-			</Icon_Button>
-
-			<Icon_Button
-				aria-label="View the next collaborator"
-				colour="white"
-				emphasis="outline"
-				onClick={ () => step( true ) }>
-				<Chevron_Right />
-			</Icon_Button>
-		</div>
-
-		{
-			/* The four custom properties are the pre-hydration pose, and they are
-		     written as literals because Tailwind generates a class from what it
-		     can read in the source. **They must agree with the constants at the
-		     top of this file** — 32/56 for the overflow, 312 for the drop,
-		     234/170 and 336/224 for the scale. The static site's copy of this
-		     disagreed with its own script by 56 pixels, which is what a first
-		     paint against a stale number looks like. */
-		}
-		{
-			/* **The ring alone takes the section's full width**, so that it
-			   runs off both edges rather than stopping at the twelve-column
-			   container and showing where the loop ends. The pagination above
-			   stays inside the container, lined up with the section's heading,
-			   which is where the static site puts it. */
-		}
+	// The four custom properties are the pre-hydration pose, and they are
+	// written as literals because Tailwind generates a class from what it can
+	// read in the source. **They must agree with the constants at the top of
+	// this file** — 32/56 for the overflow, 312 for the drop, 234/170 and
+	// 336/224 for the scale. The static site's copy of this disagreed with its
+	// own script by 56 pixels, which is what a first paint against a stale
+	// number looks like.
+	//
+	// **The ring takes the section's full width**, so that it runs off both
+	// edges rather than stopping at the twelve-column container and showing
+	// where the loop ends.
+	return <div
+		className={ `${full_bleed} -mt-4 overflow-hidden pt-[calc(var(--cc-overflow)+48px)] pb-[calc(var(--cc-overflow)+var(--cc-drop))] [--caption-opacity:1] [--cc-overflow:32px] md:[--cc-overflow:56px] [--cc-drop:0px] md:[--cc-drop:312px] [--cc-centre-scale:1.3764706] md:[--cc-centre-scale:1.5]` }
+		ref={ viewport_ref }>
 		<div
-			className={ `${full_bleed} -mt-4 overflow-hidden pt-[calc(var(--cc-overflow)+48px)] pb-[calc(var(--cc-overflow)+var(--cc-drop))] [--caption-opacity:1] [--cc-overflow:32px] md:[--cc-overflow:56px] [--cc-drop:0px] md:[--cc-drop:312px] [--cc-centre-scale:1.3764706] md:[--cc-centre-scale:1.5]` }
-			ref={ viewport_ref }>
-			<div
-				className="flex items-start gap-4 md:gap-8 [&>*:first-child]:ml-4 md:[&>*:first-child]:ml-8 [touch-action:pan-y]"
-				ref={ set_track_node }>
-				{ Array.from( { length: repeat_count } ).flatMap( (
-					_unused,
-					repetition,
-				) => contributors.map( ( person, index ) =>
-					<div
-						aria-hidden={ repetition > 0 }
-						className="shrink-0 w-42.5 md:w-56"
-						key={ `${repetition}-${index}` }
-						style={ at_rest( index, contributors.length ) }>
-						<Portrait
-							caption_className="js_caption opacity-[var(--caption-opacity)] transition-opacity [translate:0_var(--from-caption)] will-change-transform"
-							contributor={ person }
-							figure_className="js_figure relative select-none will-change-transform [translate:var(--from-x)_var(--from-y)]"
-							image_className="js_image origin-center will-change-transform [scale:var(--from-scale)] shadow-[0_2px_32px_0_rgba(var(--ctx-contributor-color),0.65)]" />
-					</div>
-				) ) }
-			</div>
+			className="flex items-start gap-4 md:gap-8 [&>*:first-child]:ml-4 md:[&>*:first-child]:ml-8 [touch-action:pan-y]"
+			ref={ set_track_node }>
+			{ Array.from( { length: repeat_count } ).flatMap( (
+				_unused,
+				repetition,
+			) => contributors.map( ( person, index ) =>
+				<div
+					aria-hidden={ repetition > 0 }
+					className="shrink-0 w-42.5 md:w-56"
+					key={ `${repetition}-${index}` }
+					style={ at_rest( index, contributors.length ) }>
+					<Portrait
+						caption_className="js_caption opacity-[var(--caption-opacity)] transition-opacity [translate:0_var(--from-caption)] will-change-transform"
+						contributor={ person }
+						figure_className="js_figure relative select-none will-change-transform [translate:var(--from-x)_var(--from-y)]"
+						image_className="js_image origin-center will-change-transform [scale:var(--from-scale)] shadow-[0_2px_32px_0_rgba(var(--ctx-contributor-color),0.65)]" />
+				</div>
+			) ) }
 		</div>
 	</div>
 }
