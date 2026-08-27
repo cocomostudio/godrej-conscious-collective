@@ -12,12 +12,18 @@
  |
  | **The widget's placement is a client-side move, by construction.** A fill
  | registers itself in a layout effect, which does not run on the server, so a
- | server-rendered page carries the widget where it stands and hydration takes
- | it to the sidebar. That is the tunnel's design rather than an accident here —
+ | server-rendered page carries the widget at its origin and hydration takes it
+ | to the sidebar. That is the tunnel's design rather than an accident here —
  | one pass over a tree cannot fill a slot that was rendered before the fill —
  | and it means this seam can assert the widget is *served* but not that it has
  | *arrived*. The predicate's own tests are in `session-filters.test.ts`; what
  | no seam reaches is written down in the ticket.
+ |
+ | What the seam *can* hold is that the served copy is not painted where it is
+ | about to leave, which is the whole of how the flicker is answered and is a
+ | rule the browser applies before it runs anything. That is the last describe
+ | below, and it is the reason every other assertion here can go on reading
+ | facet names out of a two-column page's HTML.
  |
  | `body_of` strips the hydration payload, for the reason the other files give:
  | React Router streams the loader's data back down as a script, so every string
@@ -422,6 +428,37 @@ describe("the schedule page", () => {
 
 	it("carries the trigger that opens the filters", async () => {
 		expect( await body( "/schedule" ) ).toContain( "Filter" )
+	})
+})
+
+/**
+ |
+ | Where the widget is served, on a page that has a sidebar and on one that does
+ | not.
+ |
+ | The widget is written in the main column either way. On a two-column page it
+ | is only passing through — hydration moves it into the sidebar — so its origin
+ | is `hidden` and the browser paints nothing there in the meantime. On a
+ | one-column page there is no sidebar and no slot, so the origin is where it
+ | stays and is `contents`, which is a wrapper the layout does not see.
+ |
+ | Both assertions are on the wrapper and the form together, because the wrapper
+ | alone is one class name shared with everything else on the page.
+ |
+ */
+describe("where the widget is served", () => {
+	it("keeps it out of the main column on a page with a sidebar", async () => {
+		const html = await body( "/showcases" )
+
+		expect( html ).toMatch( /<div class="hidden"><div class="max-md:hidden/ )
+	})
+
+	it("leaves it where it stands on a page with none", async () => {
+		const html = await body( "/experiences" )
+
+		expect( html ).toMatch(
+			/<div class="contents"><div class="max-md:hidden/,
+		)
 	})
 })
 

@@ -17,11 +17,31 @@
  | owns, which is what lets the two be laid out entirely differently rather than
  | one being moved and made to fit twice.
  |
- | # On a one-column page
+ | # On a one-column page, and the flicker on every other one
  |
- | There is no sidebar to portal into, so `when_absent="inline"` renders the
- | inline copy where the listing stands. The tunnel already answers this; there
- | is no branch here for it.
+ | A fill registers itself in a layout effect, which never runs on the server,
+ | so nothing can tunnel until hydration. Left alone the fill answers "no slot"
+ | on the server pass and renders the form where the listing stands — a form
+ | painted in the main column and then taken out of it. That is the flicker.
+ |
+ | The static site hides that provisional copy with a rule on the place it is
+ | written, which the browser has before it has any JavaScript and which
+ | therefore cannot lag behind the move. This does the same, with the one
+ | difference this build needs: there, every page the widget is written on has
+ | a sidebar, so the origin is marked unconditionally. Here a one-column page
+ | renders no sidebar and therefore no slot, so the copy standing at the origin
+ | is the only one there will ever be, and hiding it would hide the widget.
+ |
+ | The page's arrangement answers which of the two this is, at render time and
+ | identically on the server and in the browser. So the origin below is a box
+ | with no display where the copy is only passing through, and a box with no
+ | layout of its own where the copy stays. **The markup is served either way**
+ | — what changes is only that it is never painted anywhere it is about to
+ | leave.
+ |
+ | It fades in, because on a two-column page arriving is the one thing it
+ | cannot do before hydration, and a form appearing beside a page already drawn
+ | should look like it was on its way rather than like a correction.
  |
  | # Why the drawer travels too
  |
@@ -37,10 +57,12 @@ import { Drawer } from "@base-ui/react/drawer"
 
 import type { Facet } from "./facets.ts"
 
+import { ONE_COLUMN } from "../assemble-root.ts"
 import {
 	SCREEN,
 	SIDEBAR,
 } from "../channels.ts"
+import { use_page_layout } from "../page-layout.tsx"
 import { Filtration } from "./filtration.tsx"
 import {
 	use_apply_filters,
@@ -72,6 +94,11 @@ export function Filtration_Widget (
 	// destination.
 	const apply = use_apply_filters()
 
+	// Whether there is a sidebar to leave for, which is the same question as
+	// whether there will be a slot to leave for: the root renders the one with
+	// the other. See the note above.
+	const has_sidebar = use_page_layout() !== ONE_COLUMN
+
 	// The drawer's container has to exist before the portal can be told to use
 	// it, so the element is held in state rather than in a ref — a ref would
 	// be filled in after the render that needed it.
@@ -82,14 +109,23 @@ export function Filtration_Widget (
 	}
 
 	return <>
-		<Fill into={ SIDEBAR } when_absent="inline">
-			<Filtration
-				apply={ apply }
-				className="max-md:hidden w-full"
-				committed={ committed }
-				facets={ facets }
-				reset_token={ NEVER_RESETS } />
-		</Fill>
+		{
+			/* The origin: where the sidebar's copy is written, and where it
+		     stays on a page that has no sidebar. `contents` there, so the
+		     form lays out as though this element were not around it;
+		     `hidden` where the copy is on its way out, so the one paint it
+		     would otherwise get in the main column never happens. */
+		}
+		<div className={ has_sidebar ? "hidden" : "contents" }>
+			<Fill into={ SIDEBAR } when_absent="inline">
+				<Filtration
+					apply={ apply }
+					className="max-md:hidden w-full animate-[fade\_in_250ms_ease-in_forwards]"
+					committed={ committed }
+					facets={ facets }
+					reset_token={ NEVER_RESETS } />
+			</Fill>
+		</div>
 
 		<Fill into={ SCREEN }>
 			<div className="relative z-40" ref={ set_container }>
