@@ -14,6 +14,9 @@
 import fs from "node:fs"
 import path from "node:path"
 
+import { DIRECTORY_PLACEHOLDER, uploads_directory } from "../../scripts/seed/guards.ts"
+import type { Strapi } from "../../scripts/seed/lib/strapi.ts"
+
 export const CMS_DIR = path.resolve( import.meta.dirname, "..", ".." )
 
 /**
@@ -62,6 +65,80 @@ export function copy_database ( from: string, to: string ) {
 		if ( fs.existsSync( `${from}${suffix}` ) ) {
 			fs.copyFileSync( `${from}${suffix}`, `${to}${suffix}` )
 		}
+	}
+}
+
+/**
+ |
+ | ─── THE UPLOADS THE SUITE LEAVES BEHIND ────────────────────────────────────
+ |
+ | The seed writes media as files rather than rows, and Strapi's local provider
+ | puts them in `public/uploads` — the same directory a developer's own database
+ | points at, because the provider resolves it from the application and it
+ | cannot be moved. So a run cannot empty that directory when it is finished: it
+ | would take the media out from under whatever is in `.tmp`.
+ |
+ | It cannot decide by *time* either, which is the trap. Listing the directory
+ | before the seed and deleting whatever appeared looks equivalent and is not:
+ | `pnpm seed` empties this same directory and refills it over the couple of
+ | minutes that follow, so a suite starting anywhere inside that window records
+ | an empty directory and then deletes the developer's entire freshly-seeded
+ | media library on the way out. That is not a rare interleaving — it is running
+ | the seed and the tests at the same time, which is a Tuesday.
+ |
+ | So the run deletes by **record** instead. Once the seed has written, the file
+ | rows in the template database name every file it created, variants included;
+ | those exact names are what teardown removes, and nothing else is looked at.
+ | A file this run did not write cannot appear in that list, whatever else is
+ | happening in the directory and whenever it happens.
+ |
+ | A hard kill still takes the teardown with it and leaves that run's files
+ | behind, which is no worse than not doing this at all.
+ |
+ */
+export async function uploads_written_to ( strapi: Strapi ) {
+	const files = await strapi.db.query( "plugin::upload.file" ).findMany()
+	const names: string[] = []
+
+	for ( const file of files ) {
+		const formats = Object.values( file.formats ?? {} ) as { url?: string }[]
+
+		for ( const url of [ file.url, ...formats.map( ( f ) => f?.url ) ] ) {
+			if ( typeof url === "string" ) {
+				names.push( path.basename( url ) )
+			}
+		}
+	}
+
+	return names
+}
+
+/**
+ |
+ | The names come out of a database column, so they are treated as untrusted
+ | input rather than as paths: anything that is not a bare filename is dropped
+ | rather than resolved, and `.gitkeep` is never removed whoever asks.
+ |
+ | Removal is recursive so that a name which somehow resolves to a directory is
+ | removed rather than throwing `EISDIR` — a throw here would abandon every name
+ | after it in the list, turning one odd entry into a whole run's worth of leak.
+ |
+ | The directory is a parameter so the tests can point it somewhere harmless.
+ |
+ */
+export function remove_uploads (
+	names: string[],
+	directory = uploads_directory(),
+) {
+	for ( const name of names ) {
+		if ( name === DIRECTORY_PLACEHOLDER || path.basename( name ) !== name ) {
+			continue
+		}
+
+		fs.rmSync( path.join( directory, name ), {
+			force: true,
+			recursive: true,
+		} )
 	}
 }
 

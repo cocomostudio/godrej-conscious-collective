@@ -29,6 +29,13 @@
  | runs each test file in a forked process, so nothing in this one's heap
  | reaches them; a database on disk does.
  |
+ | The database is not all the seed writes, though — the schedule documents are
+ | files in `public/uploads`, and that directory is shared with the developer's
+ | own database rather than owned by this run. So teardown removes the files
+ | this run's own seed recorded, by name, and looks at nothing else in there.
+ | `uploads_written_to` in `strapi-lifecycle.ts` carries the reasoning, and it
+ | is worth reading before changing any of it.
+ |
  */
 
 import fs from "node:fs"
@@ -40,8 +47,10 @@ import {
 	CMS_DIR,
 	destroy_strapi,
 	remove_database,
+	remove_uploads,
 	require_dotenv,
 	TEMPLATE_DATABASE,
+	uploads_written_to,
 } from "./strapi-lifecycle.ts"
 
 /**
@@ -56,6 +65,15 @@ const { compileStrapi, createStrapi } = createRequire( import.meta.url )(
 )
 
 const template_path = path.join( CMS_DIR, TEMPLATE_DATABASE )
+
+/**
+ |
+ | The media files this run's seed wrote, named by its own file rows. Empty
+ | until the seed has written, so a teardown after a setup that failed early
+ | removes nothing rather than guessing.
+ |
+ */
+let uploads_written: string[] = []
 
 export async function setup () {
 	require_dotenv()
@@ -75,6 +93,10 @@ export async function setup () {
 		// of the seed that leaves the machine, and nothing in this suite looks
 		// at those pictures. See `Seed_Options`.
 		await write_seed_content( strapi, { download_media: false } )
+
+		// Read while the instance is still up, because the database it is read
+		// from is deleted in the teardown that uses it.
+		uploads_written = await uploads_written_to( strapi )
 	} finally {
 		// Destroyed rather than left listening: what the test files want is
 		// the database this wrote, and a second live instance is the one thing
@@ -85,4 +107,5 @@ export async function setup () {
 
 export async function teardown () {
 	remove_database( template_path )
+	remove_uploads( uploads_written )
 }

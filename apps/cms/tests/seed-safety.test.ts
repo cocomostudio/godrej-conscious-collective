@@ -1,8 +1,8 @@
 
 /**
  |
- | What the seed takes with it when it runs. It needs no Strapi instance, so it
- | boots none.
+ | What the seed takes with it when it runs, and what a test run takes with it
+ | when it finishes. Neither needs a Strapi instance, so neither boots one.
  |
  | Every other test in this suite is about content being right. This one is
  | about a person still having their content at all, which is why it is worth
@@ -21,6 +21,7 @@ import {
 } from "vitest"
 
 import { delete_uploads } from "../scripts/seed/guards.ts"
+import { remove_uploads } from "./support/strapi-lifecycle.ts"
 
 function a_directory_holding ( ...entries: string[] ) {
 	const directory = fs.mkdtempSync(
@@ -71,5 +72,68 @@ describe( "deleting the uploads", () => {
 		delete_uploads( directory )
 
 		expect( fs.existsSync( directory ) ).toBe( true )
+	} )
+} )
+
+describe( "removing the uploads a test run wrote", () => {
+	it( "removes the files it is named", () => {
+		const directory = a_directory_holding( "ours.pdf", "also_ours.pdf" )
+
+		remove_uploads( [ "ours.pdf", "also_ours.pdf" ], directory )
+
+		expect( fs.readdirSync( directory ) ).toEqual( [] )
+	} )
+
+	// The whole point. This directory is shared with whatever database the
+	// developer has in `.tmp`, and with any seed running beside this one, so
+	// anything this run did not write is never this run's to delete — however
+	// new it looks.
+	it( "leaves everything it is not named", () => {
+		const directory = a_directory_holding(
+			".gitkeep",
+			"theirs.jpg",
+			"ours.pdf",
+		)
+
+		remove_uploads( [ "ours.pdf" ], directory )
+
+		expect( fs.readdirSync( directory ).sort() ).toEqual(
+			[ ".gitkeep", "theirs.jpg" ],
+		)
+	} )
+
+	it( "does not mind a file that has already gone", () => {
+		const directory = a_directory_holding( ".gitkeep" )
+
+		expect( () => remove_uploads( [ "gone.pdf" ], directory ) )
+			.not.toThrow()
+
+		expect( fs.readdirSync( directory ) ).toEqual( [ ".gitkeep" ] )
+	} )
+
+	// The names come from a database column, so they are treated as untrusted
+	// input rather than as paths: nothing that could climb out of the directory
+	// is ever handed to `rm`.
+	it( "ignores a name that is a path rather than a name", () => {
+		const directory = a_directory_holding( ".gitkeep" )
+		const sibling = path.join( directory, "..", "sibling.txt" )
+		fs.writeFileSync( sibling, "x" )
+
+		remove_uploads( [ "../sibling.txt", "nested/one.pdf" ], directory )
+
+		expect( fs.existsSync( sibling ) ).toBe( true )
+	} )
+
+	it( "does not remove .gitkeep even if asked to", () => {
+		const directory = a_directory_holding( ".gitkeep" )
+
+		remove_uploads( [ ".gitkeep" ], directory )
+
+		expect( fs.readdirSync( directory ) ).toEqual( [ ".gitkeep" ] )
+	} )
+
+	it( "does not mind the directory having gone", () => {
+		expect( () => remove_uploads( [ "ours.pdf" ], "/nowhere" ) )
+			.not.toThrow()
 	} )
 } )
