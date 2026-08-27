@@ -305,6 +305,12 @@ export async function write_home_page (
 				],
 				horizontal_rule: true,
 				register_with_toc: false,
+				// The strip runs the section's full width and carries its own
+				// breathing room, so the page's full opening gap above it
+				// reads as a hole rather than as a separation. It closes
+				// normally: the gap below is what holds the rule off the
+				// footer.
+				spacing_around: "below",
 			} ),
 		],
 		page_layout: "one-column",
