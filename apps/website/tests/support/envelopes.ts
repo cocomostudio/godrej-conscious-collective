@@ -556,10 +556,15 @@ export function google_map (
 	over: Record<string, unknown> = {},
 ): Record<string, unknown> {
 	return {
-		address: "Plant 13, Vikhroli",
 		image: null,
-		label: null,
-		map_url: "https://example.com/maps/plant-13",
+		// The pin, as the CMS derived it — 270 metres from the `@` viewport
+		// the same URL also carries, which is why the two differ here.
+		latitude: 19.0939921,
+		longitude: 72.9226328,
+		place_url:
+			"https://www.google.com/maps/place/@19.0939921,72.9200579,17z"
+			+ "/data=!4m6!3m5!8m2!3d19.0939921!4d72.9226328",
+		zoom: 16,
 		...over,
 	}
 }

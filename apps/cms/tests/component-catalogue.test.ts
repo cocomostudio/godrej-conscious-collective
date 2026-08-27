@@ -452,10 +452,13 @@ describe("the composites", () => {
 			"container.map-and-content-v1",
 		)
 
-		expect( composite.map.map_url ).toBe(
-			"https://example.com/maps/plant-13",
-		)
-		expect( composite.map.image.small.url ).toContain( "sketch-map" )
+		expect( composite.map.place_url ).toContain( "google.com/maps/place" )
+		// Derived on the way in, and the pin rather than the viewport: the
+		// seed's URL also carries `@…,72.9200579`, 270 metres west of this.
+		expect( composite.map.latitude ).toBe( 19.0939921 )
+		expect( composite.map.longitude ).toBe( 72.9226328 )
+		expect( composite.map.zoom ).toBe( 16 )
+		expect( composite.map.image.url ).toContain( "sketch-map" )
 		expect( composite.content[0].__component ).toBe(
 			"text.plain-string-v1",
 		)

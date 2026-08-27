@@ -39,15 +39,17 @@ import { demote_other_main_events } from "./demote-other-main-events"
 import { default_session_event_to_main } from "./default-session-event-to-main"
 import { derive_colour_triplets } from "./derive-colour-triplets"
 import { derive_contributor_events } from "./derive-contributor-events"
+import { derive_map_coordinates } from "./derive-map-coordinates"
 import { derive_session_dates } from "./derive-session-dates"
 import { fill_page_shell_from_default } from "./fill-page-shell-from-default"
 import { reject_inverted_date_range } from "./reject-inverted-date-range"
 import { reject_session_without_event } from "./reject-session-without-event"
+import { reject_unreadable_map_url } from "./reject-unreadable-map-url"
 
 export function register_document_middlewares ( strapi: Core.Strapi ) {
 	// Order matters, and one rule settles it: **every refusal runs before every
 	// amendment**, so a rejected save leaves no half-amended `params` behind
-	// it. Both refusals therefore sit at the top.
+	// it. Every refusal therefore sits at the top.
 	//
 	// The one exception is the middleware that fills a session's event, which
 	// has to run before the refusal that reads the attribute — otherwise every
@@ -56,6 +58,12 @@ export function register_document_middlewares ( strapi: Core.Strapi ) {
 	// rule above is stated as what it is: an ordering with one deliberate
 	// inversion, rather than an absolute.
 	strapi.documents.use( reject_inverted_date_range( strapi ) )
+	// Watches no content type in particular. A map is a component, and it sits
+	// inside the regions of a Page, a Session, an Event and a Page Shell — so
+	// this one walks the write looking for maps rather than reading an
+	// attribute off the top of one content type. `components-in.ts` says why
+	// the schema has to be walked to find them.
+	strapi.documents.use( reject_unreadable_map_url( strapi ) )
 	strapi.documents.use( default_session_event_to_main( strapi ) )
 	strapi.documents.use( reject_session_without_event( strapi ) )
 	// Before the dates are derived from them: the derivation asks which day a
@@ -63,6 +71,9 @@ export function register_document_middlewares ( strapi: Core.Strapi ) {
 	// answer to that.
 	strapi.documents.use( assume_event_time( strapi ) )
 	strapi.documents.use( derive_colour_triplets( strapi ) )
+	// After the refusal above, which has already read every URL this will
+	// read — so anything still here can be read again without failing.
+	strapi.documents.use( derive_map_coordinates( strapi ) )
 	strapi.documents.use( derive_session_dates( strapi ) )
 	strapi.documents.use( fill_page_shell_from_default( strapi ) )
 	strapi.documents.use( demote_other_main_events( strapi ) )

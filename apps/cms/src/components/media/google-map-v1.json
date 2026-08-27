@@ -6,53 +6,69 @@
 	},
 	"options": {},
 	"attributes": {
-		"label": {
-			"type": "string",
-			"required": false
-		},
-		"address": {
-			"type": "text",
-			"required": false
-		},
-		"map_url": {
+		"place_url": {
 			"type": "string",
 			"required": true
 		},
+		"latitude": {
+			"type": "decimal",
+			"required": false
+		},
+		"longitude": {
+			"type": "decimal",
+			"required": false
+		},
+		"zoom": {
+			"type": "integer",
+			"required": false,
+			"default": 16
+		},
 		"image": {
 			"type": "component",
-			"component": "media.responsive-image-v1",
+			"component": "media.image-v1",
 			"required": false
 		}
 	},
 
 	"__": {
-		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot.",
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot. Latitude and longitude are hidden: they are read out of the place URL by the `derive-map-coordinates` document middleware on every save, so anything typed into them would be overwritten by the next one.",
 		"metadatas": {
-			"label": {
+			"place_url": {
 				"edit": {
-					"label": "Label",
-					"description": "The words on the button that opens the map. Left empty, it reads \"View on Maps\"."
+					"label": "Place URL",
+					"description": "Open Google Maps in a browser, search for the place or click the map to drop a pin on it, and copy the address out of the browser's own address bar. A short link from the Share button — maps.app.goo.gl/… — will not work here, because it says nothing about where the place is and this server cannot reach Google to ask: paste it into a new browser tab first, wait for it to land on the map, and copy the longer address the address bar then shows."
 				},
 				"list": {
-					"label": "Label"
+					"label": "Place URL"
 				}
 			},
-			"address": {
+			"latitude": {
 				"edit": {
-					"label": "Address",
-					"description": "The address as it should be read. Line breaks are kept."
+					"label": "Latitude",
+					"description": "Read out of the place URL on every save.",
+					"visible": false
 				},
 				"list": {
-					"label": "Address"
+					"label": "Latitude"
 				}
 			},
-			"map_url": {
+			"longitude": {
 				"edit": {
-					"label": "Map URL",
-					"description": "Where the map opens when the picture is clicked."
+					"label": "Longitude",
+					"description": "Read out of the place URL on every save.",
+					"visible": false
 				},
 				"list": {
-					"label": "Map URL"
+					"label": "Longitude"
+				}
+			},
+			"zoom": {
+				"edit": {
+					"label": "Zoom",
+					"description": "How much ground the map shows around the pin. 16 is close enough to read the street names; lower is further away."
+				},
+				"list": {
+					"label": "Zoom"
 				}
 			},
 			"image": {
@@ -68,11 +84,12 @@
 		"layouts": {
 			"edit": [
 				[
-					{ "name": "label", "size": 6 },
-					{ "name": "map_url", "size": 6 }
+					{ "name": "place_url", "size": 8 },
+					{ "name": "zoom", "size": 4 }
 				],
 				[
-					{ "name": "address", "size": 12 }
+					{ "name": "latitude", "size": 6 },
+					{ "name": "longitude", "size": 6 }
 				],
 				[
 					{ "name": "image", "size": 12 }

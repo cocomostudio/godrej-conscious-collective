@@ -35,6 +35,22 @@ import type { Strapi } from "../lib/strapi.ts"
 import type { Seeded_Contributors } from "../contributors.ts"
 import type { Seeded_Page_Shells } from "../page-shells.ts"
 
+/**
+ |
+ | Where the event is, as Google Maps writes it into a browser's address bar.
+ |
+ | Kept whole rather than trimmed to the part that is read. The URL carries the
+ | viewport at `@…,72.9200579` and the pin at `!4d72.9226328`, and those are
+ | 270 metres apart — so a seed holding only the coordinates would seed content
+ | while quietly retiring the one case the reading exists to get right.
+ |
+ */
+const PLANT_13 =
+	"https://www.google.com/maps/place/@19.0939921,72.9200579,17z/data=!3m2"
+	+ "!4b1!5s0x397878ffde0c8ab3:0x8b5bde3d4ef844a4!4m6!3m5"
+	+ "!1s0x3be7c752aef03905:0x95914985cbca39c8!8m2!3d19.0939921!4d72.9226328"
+	+ "!16s%2Fg%2F11hhrs35dw"
+
 export async function write_about_page (
 	strapi: Strapi,
 	page_shells: Seeded_Page_Shells,
@@ -194,11 +210,11 @@ export async function write_about_page (
 						],
 						layout: "map-left",
 						map: google_map( {
-							address:
-								"Plant 13, Godrej Enterprises Group\nPirojshanagar, Vikhroli, Mumbai 400079",
+							alt: "A drawn map of the way to Plant 13",
+							caption:
+								"Plant 13, Pirojshanagar, Vikhroli, Mumbai 400079",
 							image_url: IMAGES.sketch_map,
-							label: "View on Maps",
-							map_url: "https://example.com/maps/plant-13",
+							place_url: PLANT_13,
 						} ),
 					},
 					{

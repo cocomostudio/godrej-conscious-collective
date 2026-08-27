@@ -136,12 +136,8 @@ beforeAll( async () => {
 						map_and_content(
 							google_map( {
 								image: {
-									large: null,
-									medium: null,
-									small: {
-										alt: "A drawn map",
-										url: "/uploads/sketch-map.svg",
-									},
+									alt: "A drawn map",
+									url: "/uploads/sketch-map.svg",
 								},
 							} ),
 							[ plain_string( "Beside the map." ) ],
@@ -209,12 +205,9 @@ beforeAll( async () => {
 					content: [
 						google_map_block( {
 							image: {
-								large: null,
-								medium: null,
-								small: {
-									alt: "A drawn map",
-									url: "/uploads/sketch-map.svg",
-								},
+								alt: "A drawn map",
+								caption: "Plant 13, Pirojshanagar, Vikhroli",
+								url: "/uploads/sketch-map.svg",
 							},
 						} ),
 					],
@@ -654,6 +647,67 @@ describe("the map", () => {
 		expect( html ).toContain( "<iframe" )
 		expect( html ).toContain( "maps.google.com/maps?q=" )
 	})
+
+	// A coordinate rather than an address, because `q=` with words in it is a
+	// search — and a search is entitled to come back with more than one pin.
+	it("embeds the derived coordinate, not the URL the editor pasted", async () => {
+		const { html } = await website.get( "/everything" )
+
+		expect( html ).toContain( "maps.google.com/maps?q=19.0939921%2C72.9226328" )
+		expect( html ).toContain( "z=16" )
+		expect( html ).toContain( "output=embed" )
+	})
+
+	// The whole reason the embed is reachable at all: a cross-origin iframe
+	// tells its parent nothing, so a click on it can only be a click on the
+	// link because the map is not allowed to receive one.
+	it("keeps the embed out of reach of the pointer and the tab order", async () => {
+		const { html } = await website.get( "/everything" )
+
+		const iframe = /<iframe[^>]*>/.exec( rendered( html ) )?.[0] ?? ""
+
+		expect( iframe ).toContain( "pointer-events-none" )
+		expect( iframe ).toContain( "inert" )
+	})
+
+	it.each( [ "/mapped", "/everything" ] )(
+		"opens Google Maps in a new tab from anywhere on it: %s",
+		async ( path ) => {
+			const { html } = await website.get( path )
+			const link = map_link( html )
+
+			expect( link ).toContain( "target=\"_blank\"" )
+			expect( link ).toContain( "google.com/maps/place" )
+		},
+	)
+
+	// The button this component used to carry is gone; the whole picture is
+	// the link now, and the only words left are for a screen reader.
+	it("carries no button of its own", async () => {
+		const { html } = await website.get( "/mapped" )
+
+		expect( html ).not.toContain( "View on Maps" )
+		expect( html ).toContain( "Open this location in Google Maps" )
+	})
+
+	// A link is named by its contents, so a visually-hidden span would be
+	// appended to the picture's alt rather than replacing it — and the link
+	// would announce the editor's words followed by ours.
+	it("names the link the same thing whatever the picture's alt says", async () => {
+		const { html } = await website.get( "/mapped" )
+
+		expect( map_link( html ) ).toContain(
+			"aria-label=\"Open this location in Google Maps\"",
+		)
+		// Still the picture's own words, and no longer the link's name.
+		expect( html ).toContain( "alt=\"A drawn map\"" )
+	})
+
+	it("renders the picture's caption", async () => {
+		const { html } = await website.get( "/mapped" )
+
+		expect( html ).toContain( "Plant 13, Pirojshanagar, Vikhroli" )
+	})
 })
 
 describe("the page shell's injected code", () => {
@@ -728,6 +782,28 @@ function element_carrying ( html: string, needle: string ) {
 		markup.lastIndexOf( "<", at ),
 		markup.indexOf( ">", at ) + 1,
 	)
+}
+
+/**
+ |
+ | The opening tag of the link a map sits inside.
+ |
+ | Not `element_carrying`: the words are on a `sr-only` span, and on the
+ | embedded path they are also the iframe's title — so the innermost element
+ | holding them is never the anchor. The nearest `<a` above them always is.
+ |
+ */
+function map_link ( html: string ) {
+	const markup = rendered( html )
+	const at = markup.indexOf( "Open this location in Google Maps" )
+
+	expect( at ).toBeGreaterThan( -1 )
+
+	const opened = markup.lastIndexOf( "<a ", at )
+
+	expect( opened ).toBeGreaterThan( -1 )
+
+	return markup.slice( opened, markup.indexOf( ">", opened ) + 1 )
 }
 
 /**

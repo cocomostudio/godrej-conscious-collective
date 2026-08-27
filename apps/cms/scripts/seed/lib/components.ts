@@ -159,21 +159,20 @@ export function gallery (
 }
 
 export function google_map (
-	{ address, image_url, label, map_url }: {
-		address: string
-		map_url: string
-		label?: string
+	{ alt, caption, image_url, place_url }: {
+		place_url: string
+		alt?: string
+		caption?: string
 		image_url?: string
 	},
 ) {
 	return {
-		address,
-		label,
-		map_url,
+		place_url,
 		...( image_url
 			? {
-				image: responsive_image( {
-					alt: "Location map",
+				image: image( {
+					alt: alt ?? "",
+					caption,
 					url: image_url,
 				} ),
 			}

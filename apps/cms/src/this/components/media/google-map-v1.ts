@@ -10,8 +10,8 @@
  |
  */
 
-import { populate_responsive_image_v1 } from "./responsive-image-v1"
+import { populate_image_v1 } from "./image-v1"
 
 export const populate_google_map_v1 = {
-	image: { populate: populate_responsive_image_v1 },
+	image: { populate: populate_image_v1 },
 }
