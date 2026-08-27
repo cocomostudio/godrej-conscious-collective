@@ -31,6 +31,8 @@ import { picture_of } from "../media.ts"
 import { Nav_Link } from "../nav-link.tsx"
 import { Picture_Image } from "../pictures.tsx"
 
+import { with_nested_lists_normalised } from "./rich-text-nesting.ts"
+
 import {
 	H,
 	Level,
@@ -91,8 +93,20 @@ export function Contributor_Profile (
 
 			{ prose && <div className="mt-8 pb-8 md:m-0 md:pb-0 space-y-4">
 				<Level>
+					{
+						/*
+					 | **The nesting pass, and only the nesting pass**, is
+					 | shared with the WYSIWYG. Valid markup should not
+					 | depend on which block happened to render the rich
+					 | text, so one module answers for both.
+					 |
+					 | The rest of that block's treatment — the spacing, the
+					 | nested card, the rhombus, `---` — is not shared, and a
+					 | blurb still draws its own way.
+					 */
+					}
 					<BlocksRenderer
-						content={ prose }
+						content={ with_nested_lists_normalised( prose ) }
 						blocks={ {
 							link: ( { children, url } ) =>
 								<Nav_Link
