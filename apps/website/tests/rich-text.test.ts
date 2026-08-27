@@ -393,6 +393,17 @@ describe("the space between two nodes", () => {
 
 		expect( from_the_shorthand ).toBe( from_the_component )
 	})
+
+	it("is none of a horizontal rule's own", async () => {
+		const { html } = await website.get( "/rules" )
+
+		// A rule separates; it does not space. What sits around one is
+		// whatever its neighbours already leave — which in a passage of prose,
+		// spaced from the top and not the bottom, is nothing above it.
+		for ( const rule of rules( html ) ) {
+			expect( rule ).not.toMatch( /\bm[ytb]-/ )
+		}
+	})
 })
 
 describe("a list", () => {

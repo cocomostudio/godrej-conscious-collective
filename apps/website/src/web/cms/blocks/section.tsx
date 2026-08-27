@@ -118,6 +118,16 @@ type Section_Props = Pick<Block, "__component" | "id"> & {
 	background_gradient?: string
 	background_pattern?: string
 	background_position?: string
+	/**
+	 |
+	 | A line below this section, drawn outside it and separating it from the
+	 | one after.
+	 |
+	 | It is a hairline and it carries no spacing — neither its own nor any
+	 | share of its neighbours'. What sits around it is the two sections'
+	 | ordinary padding, unchanged by its being there.
+	 |
+	 */
 	horizontal_rule?: boolean
 	/**
 	 |
@@ -172,12 +182,7 @@ export function Section (
 	const pad_top = pads_at_top( edges )
 	const pad_bottom = pads_at_bottom( edges )
 
-	const padding = section_padding( {
-		horizontal_rule,
-		one_column,
-		pad_bottom,
-		pad_top,
-	} )
+	const padding = section_padding( { one_column, pad_bottom, pad_top } )
 
 	// Sections own the outer spacing at the top and bottom of the main
 	// column now: the two-column main column carries no vertical padding
@@ -185,9 +190,16 @@ export function Section (
 	// used to lay down. A section that declined its padding at an edge — the
 	// ticker is the case — declines this too and keeps butting against the
 	// edge of the page.
+	//
+	// **Of the type, not of the children.** A section that draws a rule is
+	// followed by an `<hr>` in the same parent, which costs it `:last-child`
+	// and with it the padding that closes the page — silently, because a
+	// positional selector that stops matching is not an error. A main region
+	// holds nothing but sections, so the last `<section>` is the last section
+	// however many rules are drawn between them.
 	const outer_edges = one_column ? "" : [
-		pad_top ? "[&:first-child]:md:pt-16" : "",
-		pad_bottom ? "[&:last-child]:pb-8 [&:last-child]:md:pb-16" : "",
+		pad_top ? "[&:first-of-type]:md:pt-16" : "",
+		pad_bottom ? "[&:last-of-type]:pb-8 [&:last-of-type]:md:pb-16" : "",
 	].filter( Boolean ).join( " " )
 
 	return <>

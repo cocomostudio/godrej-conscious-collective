@@ -256,6 +256,26 @@ beforeAll( async () => {
 			title: "Spacing",
 		} ),
 
+		// A ruled section at the front, an unruled one to measure it against,
+		// and a ruled one at the back — the last is the case that matters,
+		// because its trailing `<hr>` is what used to cost it `:last-child`.
+		"/section-rules": envelope( {
+			main_region: [
+				section( "Ruled", {
+					content: [ plain_string( "Above a rule." ) ],
+					horizontal_rule: true,
+				} ),
+				section( "Unruled", {
+					content: [ plain_string( "Between two rules." ) ],
+				} ),
+				section( "Ruled and last", {
+					content: [ plain_string( "Below a rule." ) ],
+					horizontal_rule: true,
+				} ),
+			],
+			title: "Rules",
+		} ),
+
 		"/text-colour": envelope( {
 			main_region: [
 				section( "Asked for", {
@@ -524,8 +544,8 @@ describe("spacing around a block", () => {
 		// Not undone from inside the block — a negative margin on a child is
 		// clamped at the padding box — but never laid down.
 		expect( flush.padding ).not.toMatch( /\bp[tb]-/ )
-		expect( flush.outer ).not.toContain( "first-child" )
-		expect( flush.outer ).not.toContain( "last-child" )
+		expect( flush.outer ).not.toContain( "first-of-type" )
+		expect( flush.outer ).not.toContain( "last-of-type" )
 	})
 
 	it("keeps the bottom padding when only the top was declined", async () => {
@@ -537,8 +557,8 @@ describe("spacing around a block", () => {
 		// The outer edge of the column follows the same decision, so a first
 		// section that opens flush stays flush and a last one still closes.
 		// The class is an arbitrary variant, so its ampersand arrives escaped.
-		expect( below.outer ).not.toContain( "first-child" )
-		expect( below.outer ).toContain( "last-child" )
+		expect( below.outer ).not.toContain( "first-of-type" )
+		expect( below.outer ).toContain( "last-of-type" )
 	})
 
 	it("keeps the top padding where the section has words at that edge", async () => {
@@ -567,6 +587,48 @@ describe("spacing around a block", () => {
 
 		expect( own.padding ).toContain( "pt-6" )
 		expect( own.padding ).not.toMatch( /\bpb-/ )
+	})
+})
+
+describe("a section's horizontal rule", () => {
+	it("does not change the padding of the section that draws it", async () => {
+		const [ ruled, unruled ] = await section_frames( "/section-rules" )
+
+		// A rule separates; it does not space. The `pt-3 md:pt-4` this used to
+		// buy was the static site's tight section-to-section pair, which that
+		// page lays down between two unruled sections as readily as around a
+		// rule — it was never the rule's.
+		expect( ruled.padding ).toBe( unruled.padding )
+		expect( ruled.padding ).not.toMatch( /\bpt-[34]\b/ )
+	})
+
+	it("does not cost the last section the padding that closes the page", async () => {
+		const frames = await section_frames( "/section-rules" )
+		const last = frames[frames.length - 1]
+
+		// The rule renders as a sibling after the section, so `:last-child`
+		// stops matching and the page loses its bottom margin with nothing
+		// raised. A main region holds sections and their rules and nothing
+		// else, so the last `<section>` is the last section.
+		expect( last.outer ).toContain( "last-of-type" )
+	})
+
+	it("carries no spacing of its own where an editor places one", async () => {
+		const { html } = await website.get( "/everything" )
+
+		const rules = [
+			...html.matchAll( /<hr class="([^"]*border-t-2[^"]*)"/g ),
+		].map( ( [ , classes ] ) => classes )
+
+		expect( rules.length ).toBeGreaterThan( 0 )
+
+		// The blocks on either side already leave a gap, and margins on
+		// adjacent siblings in ordinary flow collapse — so the rule's own
+		// never added to it. It only ever showed as a rule placed last in a
+		// section, pushing into the section's padding.
+		for ( const classes of rules ) {
+			expect( classes ).not.toMatch( /\bm[ytb]-/ )
+		}
 	})
 })
 
@@ -800,9 +862,11 @@ describe("the page shell's injected code", () => {
 async function section_frames ( path: string ) {
 	const { html } = await website.get( path )
 
+	// A section's rule is drawn after it rather than inside it, so nothing
+	// stands between the `<section>` and the box it pads with.
 	const frames = [
 		...html.matchAll(
-			/<section class="([^"]*scroll-mt-4[^"]*)"[^>]*>(?:<hr[^>]*\/?>)?<div class="([^"]*)"/g,
+			/<section class="([^"]*scroll-mt-4[^"]*)"[^>]*><div class="([^"]*)"/g,
 		),
 	].map( ( [ , outer, padding ] ) => ( { outer, padding } ) )
 
@@ -819,7 +883,7 @@ async function section_frames ( path: string ) {
  */
 function section_markup ( html: string ) {
 	const match = html.match(
-		/<section[^>]*class="[^"]*scroll-mt-4[^"]*"[^>]*>(?:<hr[^>]*>)?<div[^>]*>/,
+		/<section[^>]*class="[^"]*scroll-mt-4[^"]*"[^>]*><div[^>]*>/,
 	)
 
 	expect( match ).not.toBeNull()

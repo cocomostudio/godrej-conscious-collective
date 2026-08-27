@@ -72,7 +72,6 @@ const FULL_BLEED = "-mx-1ccm"
 const COLUMN_BLEED = "-ml-1ccm md:-ml-16 -mr-1ccm md:-mr-2g"
 
 type Section_Padding = {
-	horizontal_rule: boolean
 	one_column: boolean
 	pad_bottom: boolean
 	pad_top: boolean
@@ -80,16 +79,22 @@ type Section_Padding = {
 
 /**
  |
- | A section that draws a rule above itself sits closer to the one before it:
- | the line is already doing the separating, and the full gap on top of it reads
- | as a stranded rule rather than as a division.
- |
  | Padding is greater on a one-column page than on a two-column one: a
  | one-column page has the whole width and the design opens it up to match.
+ | 48px and 64px there, 24px and 32px here.
+ |
+ | **A section's rule does not enter into it.** It used to: `horizontal_rule`
+ | once bought a `pt-3 md:pt-4` here. That value came from the static site's
+ | session page, where it is the top half of the tight `pb-3` / `pt-3` pair that
+ | page gives *every* section in its stack — the two sections with no rule
+ | between them carry it too, and the rules there hold their own margins rather
+ | than lean on a neighbour's padding. It was read as belonging to the rule and
+ | wired to the flag, and it has been the site-wide norm ever since. A rule
+ | separates; it does not space.
  |
  */
 export function section_padding (
-	{ horizontal_rule, one_column, pad_bottom, pad_top }: Section_Padding,
+	{ one_column, pad_bottom, pad_top }: Section_Padding,
 ) {
 	const bottom = pad_bottom
 		? ( one_column ? "pb-12 md:pb-16" : "pb-6 md:pb-8" )
@@ -97,10 +102,6 @@ export function section_padding (
 
 	if ( !pad_top ) {
 		return bottom
-	}
-
-	if ( horizontal_rule ) {
-		return `pt-3 md:pt-4 ${bottom}`
 	}
 
 	return `${one_column ? "pt-12 md:pt-16" : "pt-6 md:pt-8"} ${bottom}`
