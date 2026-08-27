@@ -7,7 +7,7 @@ An event listing website and the Strapi CMS behind that website. The site featur
 ### The event domain
 
 **Event**:
-A festival edition, such as "Conscious Collective 2025". An event owns a date range, a schedule document and a colour scheme.
+A festival edition, such as "Conscious Collective 2025". An event owns a date range, a schedule document and a **palette** — the six colours a page can be drawn in. Not a "colour scheme", which is the separate thing a Page chooses.
 _Avoid_: "festival", "edition"
 
 **Main event**:
@@ -53,6 +53,14 @@ The column arrangement of a rendered page. An editor chooses between `one-column
 
 The stored values spell the numbers out because Strapi refuses an enumeration value that begins with a digit.
 _Avoid_: "layout" unqualified, "page type"
+
+**Context colour**:
+The colour a page is drawn in, as an alias every block points at rather than as a colour of its own. A block says `bg-context` once and is right wherever it is placed, because whatever owns the page — or the card, or the dialog — aims the alias at what that thing actually is. A Session aims it at its category's colour, a Contributor at the contributor one, and a Page at its **colour scheme**.
+_Avoid_: "page colour", "current colour", "accent"
+
+**Colour scheme**:
+What a Page's editor points its **context colour** at: any of the resolved event's six palette colours, or plain black or plain white. It is the default the page starts from and never a repaint — a listing below still aims the alias at each card's own category, so a strip of mixed categories draws in several colours whatever the page is set to. Black and white are not palette colours and carry no per-event value. The editor meets it as `color_scheme`.
+_Avoid_: "theme" for this meaning, "page colour", "palette" — that is the event's
 
 **Sidebar**:
 The narrow first column of a two-column page layout. The sidebar holds the back link, and the sidebar receives content from both the content type and from components. It also holds one piece of chrome — the **When and Where** — which is the one thing in it that follows the main event rather than the page.
@@ -141,7 +149,7 @@ The set of components an editor may place inside an archive entry — the third 
 _Avoid_: "snapshot list", "the archive zone"
 
 **Dark surface**:
-A ground the catalogue's blocks are being drawn over that is dark rather than white. The snapshot dialog is the only one. It travels as context rather than as a prop, because a block can sit at any depth and the dialog does not know what an editor put in it.
+A ground the catalogue's blocks are being drawn over that is dark rather than white. The snapshot dialog is the only one. It travels as context rather than as a prop, because a block can sit at any depth and the dialog does not know what an editor put in it. It **forces** rather than defaults: every word inside it is white and its **context colour** is pointed at white, whatever any component within it asks for, so nothing an editor picks can make a snapshot unreadable.
 _Avoid_: "dark mode" — the site has no theme switch and never draws a page this way
 
 ### Filtration
