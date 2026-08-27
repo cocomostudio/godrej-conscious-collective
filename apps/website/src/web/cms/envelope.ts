@@ -132,6 +132,27 @@ export type Page_Entry = Entry_Common & {
 	 |
 	 */
 	page_layout: Page_Layout
+	/**
+	 |
+	 | What the page's context colour is pointed at — any of the event's six
+	 | colours, or plain black or plain white.
+	 |
+	 | Null on every page saved before the attribute existed, for the reason
+	 | `text_color` above is: a schema default is written when a row is saved,
+	 | not read when one is. The website reads that as the theme, which is what
+	 | every page drew as before there was anything to choose.
+	 |
+	 */
+	color_scheme?:
+		| "theme"
+		| "showcase"
+		| "experience"
+		| "conversation"
+		| "workshop"
+		| "contributor"
+		| "black"
+		| "white"
+		| null
 	toc: boolean
 	side_region: Block[]
 }

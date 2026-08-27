@@ -34,8 +34,11 @@ import {
 import {
 	envelope,
 	event,
+	heading,
 	page_shell,
 	section,
+	session_card,
+	session_list,
 } from "./support/envelopes.ts"
 
 const MAIN = event( {
@@ -115,6 +118,77 @@ beforeAll( async () => {
 				main_region: [ section( "Alone" ) ],
 				page_layout: "one-column",
 				title: "Alone",
+			},
+			{ main_event: MAIN, page_shell: SHELL, resolved_event: MAIN },
+		),
+
+		/* _____
+		 | The colour scheme, in each of the three kinds of answer it has:
+		 | one of the event's roles, one of the two static colours, and
+		 | nothing at all.
+		 */
+
+		"/black-page": envelope(
+			{
+				color_scheme: "black",
+				main_region: [
+					section( "In black", {
+						content: [ heading( "A heading in black" ) ],
+					} ),
+				],
+				title: "Black",
+			},
+			{ main_event: MAIN, page_shell: SHELL, resolved_event: MAIN },
+		),
+
+		"/mixed-cards": envelope(
+			{
+				color_scheme: "white",
+				main_region: [
+					section( "Mixed", {
+						content: [ session_list( [
+							session_card( {
+								category: "Showcase",
+								name: "Living with the Land",
+								path: "/sessions/living-with-the-land",
+							} ),
+							session_card( {
+								category: "Workshop",
+								name: "Cooling Pots in Clay",
+								path: "/sessions/cooling-pots-in-clay",
+							} ),
+						] ) ],
+					} ),
+				],
+				title: "Mixed",
+			},
+			{ main_event: MAIN, page_shell: SHELL, resolved_event: MAIN },
+		),
+
+		// What every page saved before the attribute existed comes back as.
+		"/no-colour-scheme": envelope(
+			{
+				color_scheme: null,
+				main_region: [ section( "Unset" ) ],
+				title: "Unset",
+			},
+			{ main_event: MAIN, page_shell: SHELL, resolved_event: MAIN },
+		),
+
+		"/workshop-page": envelope(
+			{
+				color_scheme: "workshop",
+				main_region: [ section( "In the workshop colour" ) ],
+				title: "Workshop",
+			},
+			{ main_event: MAIN, page_shell: SHELL, resolved_event: MAIN },
+		),
+
+		"/white-page": envelope(
+			{
+				color_scheme: "white",
+				main_region: [ section( "In white" ) ],
+				title: "White",
 			},
 			{ main_event: MAIN, page_shell: SHELL, resolved_event: MAIN },
 		),
@@ -218,13 +292,106 @@ describe("the context colours", () => {
 	})
 
 	it("alias the context colour to the role that matches the page", async () => {
-		const { html } = await website.get( "/next-event" )
+		const { html } = await website.get( "/no-colour-scheme" )
 
-		// A Page has no role of its own, so its context colour is the theme.
+		// A page nobody has answered for takes the theme, which is what every
+		// page drew as before there was anything to choose.
 		expect( variables( html )["--ctx-context-color"] )
 			.toBe( "var(--ctx-theme-color)" )
 	})
 })
+
+/**
+ |
+ | The colour scheme.
+ |
+ | It answers one question — **what the page's context colour is pointed at** —
+ | and the assertions are on that one declaration rather than on the blocks
+ | below it, because that is the whole mechanism. A block goes on carrying
+ | `bg-context` and `text-context` whatever the page is set to; re-pointing the
+ | alias is what makes those classes draw something else.
+ |
+ */
+describe("a page's colour scheme", () => {
+	it("points the context colour at whichever of the event's colours was chosen", async () => {
+		const { html } = await website.get( "/workshop-page" )
+
+		expect( variables( html )["--ctx-context-color"] )
+			.toBe( "var(--ctx-workshop-color)" )
+	})
+
+	// Black and white are not roles and have no per-event value, so they point
+	// at the static palette instead — still a channel triplet, so `bg-context`
+	// and its opacity modifiers go on compiling to plain `rgba()`.
+	it("points it at the static palette for black and for white", async () => {
+		expect(
+			variables(
+				( await website.get( "/black-page" ) ).html,
+			)["--ctx-context-color"],
+		)
+			.toBe( "var(--color-black)" )
+
+		expect(
+			variables(
+				( await website.get( "/white-page" ) ).html,
+			)["--ctx-context-color"],
+		)
+			.toBe( "var(--color-white)" )
+	})
+
+	// The point of pointing an alias rather than repainting: a block set to
+	// the page's own colour says so with the class it has always carried.
+	it("changes no class a block carries", async () => {
+		const { html } = await website.get( "/black-page" )
+
+		expect( element_carrying( html, "A heading in black" ) )
+			.toContain( "text-context" )
+	})
+
+	// The six roles keep the values the resolved event gave them whatever the
+	// page is set to, because a listing below re-points the alias at one of
+	// them per card.
+	it("leaves the six roles' own values alone", async () => {
+		const { html } = await website.get( "/black-page" )
+
+		expect( variables( html ) ).toMatchObject( {
+			"--ctx-theme-color": "0, 85, 230",
+			"--ctx-workshop-color": "250, 188, 29",
+		} )
+	})
+
+	it("does not reach a card, which re-points the alias for itself", async () => {
+		const { html } = await website.get( "/mixed-cards" )
+
+		// The page is white and the strip is still two colours: a page's
+		// scheme sets where the mechanism starts, and does not replace it.
+		expect( html ).toContain(
+			"--ctx-context-color:var(--ctx-showcase-color)",
+		)
+		expect( html ).toContain(
+			"--ctx-context-color:var(--ctx-workshop-color)",
+		)
+	})
+})
+
+/**
+ |
+ | The element carrying a given run of words, with its own attributes.
+ |
+ | The same helper the catalogue suite uses, for the same reason: a
+ | whole-document assertion on a class as common as `text-context` passes
+ | whether or not the element under test carries it.
+ |
+ */
+function element_carrying ( html: string, text: string ) {
+	const at = html.indexOf( text )
+
+	if ( at < 0 ) {
+		return ""
+	}
+
+	return html.slice( html.lastIndexOf( "<", at ), at )
+}
 
 /**
  |

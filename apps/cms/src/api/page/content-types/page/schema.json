@@ -50,6 +50,21 @@
 			"default": "two-column",
 			"required": true
 		},
+		"color_scheme": {
+			"type": "enumeration",
+			"enum": [
+				"theme",
+				"showcase",
+				"experience",
+				"conversation",
+				"workshop",
+				"contributor",
+				"black",
+				"white"
+			],
+			"default": "theme",
+			"required": true
+		},
 		"toc": {
 			"type": "boolean",
 			"default": true,
@@ -142,6 +157,15 @@
 					"label": "Page layout"
 				}
 			},
+			"color_scheme": {
+				"edit": {
+					"label": "Colour scheme",
+					"description": "What this page is coloured in. Every block on it that draws in the page's own colour follows this, including the sections' backgrounds. A listing still draws each card in its own category's colour."
+				},
+				"list": {
+					"label": "Colour scheme"
+				}
+			},
 			"toc": {
 				"edit": {
 					"label": "Table of contents",
@@ -205,6 +229,9 @@
 				[
 					{ "name": "page_shell", "size": 6 },
 					{ "name": "event", "size": 6 }
+				],
+				[
+					{ "name": "color_scheme", "size": 6 }
 				],
 				[
 					{ "name": "toc", "size": 3 },

@@ -103,22 +103,53 @@ export const FALLBACK_PALETTE: Record<Role, string> = {
 
 /**
  |
+ | **Black and white are not roles.**
+ |
+ | They carry no per-event value and no `--ctx-*` variable of their own: they
+ | are two channels of the static palette, which `:root` already holds. Pointing
+ | the alias straight at those keeps the whole mechanism intact — what stands
+ | behind the alias is still three bare channels, so `bg-context/35` still
+ | compiles to plain `rgba()` and every block still carries the one context
+ | class it already had.
+ |
+ */
+const STATIC_COLOURS = {
+	black: "--color-black",
+	white: "--color-white",
+} as const
+
+export type Static_Color = keyof typeof STATIC_COLOURS
+
+/**
+ |
+ | What the context colour may be pointed at: any of the six roles, or plain
+ | black or plain white.
+ |
+ | It is the whole of what a Page's `color_scheme` says, and it is wider than
+ | `Role` because two of the eight answers are not roles.
+ |
+ */
+export type Color_Scheme = Role | Static_Color
+
+/**
+ |
  | The context colour is an **alias**, not a seventh colour: it points at
- | whichever of the six matches what the page is, so a block can say
- | `bg-context` once and be right wherever it is placed.
+ | whichever colour matches what the page is, so a block can say `bg-context`
+ | once and be right wherever it is placed.
  |
- | A Page has no role of its own and takes the theme. A Session points it at its
- | category's colour, and a Contributor will point it at the contributor one.
+ | A Page points it at whichever scheme its editor chose, and takes the theme
+ | where nobody chose. A Session points it at its category's colour, and a
+ | Contributor at the contributor one.
  |
- | It aliases rather than copies so that a page which changes role without
+ | It aliases rather than copies so that a page which changes what it is without
  | changing event changes one declaration.
  |
  */
-const DEFAULT_ROLE: Role = "theme"
+const DEFAULT_SCHEME: Color_Scheme = "theme"
 
 export function context_colours (
 	resolved_event: Event | null,
-	context_role: Role = DEFAULT_ROLE,
+	color_scheme: Color_Scheme = DEFAULT_SCHEME,
 ): Record<string, string> {
 	const declarations: Record<string, string> = {}
 
@@ -127,16 +158,37 @@ export function context_colours (
 			?? FALLBACK_PALETTE[role as Role]
 	}
 
-	declarations[CONTEXT] = alias_to( context_role )
+	declarations[CONTEXT] = alias_to( color_scheme )
 
 	return declarations
 }
 
-/** The one custom property both writers of the alias set. */
+/** The one custom property every writer of the alias sets. */
 const CONTEXT = "--ctx-context-color"
 
-function alias_to ( role: Role ) {
-	return `var(${ROLES[role].variable})`
+function alias_to ( scheme: Color_Scheme ) {
+	return `var(${
+		scheme in STATIC_COLOURS
+			? STATIC_COLOURS[scheme as Static_Color]
+			: ROLES[scheme as Role].variable
+	})`
+}
+
+/**
+ |
+ | A stored colour scheme, or nothing.
+ |
+ | An entry saved before the attribute existed comes back with `null` in it, and
+ | a value the schema no longer offers is the same kind of nothing. Both take
+ | the default, rather than the page drawing against a variable that was never
+ | declared.
+ |
+ */
+export function color_scheme_of ( stored: unknown ): Color_Scheme {
+	return typeof stored === "string"
+			&& ( stored in ROLES || stored in STATIC_COLOURS )
+		? stored as Color_Scheme
+		: DEFAULT_SCHEME
 }
 
 /**

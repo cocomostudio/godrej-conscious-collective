@@ -376,6 +376,119 @@ describe("depth", () => {
 	})
 })
 
+describe("a page's colour scheme", () => {
+	const page = content_type( "page" )
+
+	it("offers the event's six colours and the two static ones, and defaults to the theme", () => {
+		expect( page.attributes.color_scheme ).toMatchObject( {
+			default: "theme",
+			enum: [
+				"theme",
+				"showcase",
+				"experience",
+				"conversation",
+				"workshop",
+				// The internal word. The public one is what the admin shows,
+				// and it is not the schema's business which.
+				"contributor",
+				"black",
+				"white",
+			],
+			required: true,
+			type: "enumeration",
+		} )
+	})
+
+	it("declares its own admin metadata and a place in the form", () => {
+		expect( page.__.metadatas.color_scheme.edit.label ).toBeTruthy()
+		expect( page.__.metadatas.color_scheme.edit.description ).toBeTruthy()
+		expect( named_in_the_edit_layout( page, "color_scheme" ) ).toBe( true )
+	})
+
+	/**
+	 |
+	 | **The contributor option is stored by the code word and shown by the
+	 | public one.**
+	 |
+	 | Strapi gives an enumeration option no label of its own — it builds the
+	 | options from `attribute.enum` and then renders
+	 | `label ?? formatMessage( { id: value } )`, so an admin translation keyed
+	 | by the stored value is the only thing that can name it. Which makes the
+	 | pairing below the whole behaviour: the schema holds `contributor` and the
+	 | translation turns it into "Collaborator" on screen. Either half alone is
+	 | the bug — a schema storing the public word, or an option an editor meets
+	 | as the internal one.
+	 |
+	 | Read off the file rather than driven through a browser: this is the admin
+	 | panel's own bundle, which no seam in this suite boots.
+	 |
+	 */
+	it("shows the contributor option by the public word", () => {
+		expect( page.attributes.color_scheme.enum ).toContain( "contributor" )
+
+		expect( admin_translations().contributor ).toBe( "Collaborator" )
+	})
+})
+
+/**
+ |
+ | The admin panel's English translations, as `src/admin/app.ts` declares them.
+ |
+ | Parsed out of the source rather than imported, because the file is the
+ | admin's entry point: it is excluded from the server tsconfig and is built by
+ | Vite for a browser, so importing it here would pull the admin bundle into a
+ | Node test run.
+ |
+ */
+function admin_translations (): Record<string, string> {
+	const file = path.join(
+		fileURLToPath( new URL( ".", import.meta.url ) ),
+		"..",
+		"src",
+		"admin",
+		"app.ts",
+	)
+
+	expect( { exists: fs.existsSync( file ), file } )
+		.toEqual( { exists: true, file } )
+
+	return Object.fromEntries(
+		[
+			...fs.readFileSync( file, "utf8" )
+				.matchAll( /^\t{4}(\w+): "([^"]*)",$/gm ),
+		]
+			.map( ( found ) => [ found[1], found[2] ] ),
+	)
+}
+
+function content_type ( name: string ) {
+	const file = path.join(
+		CONTENT_TYPES,
+		name,
+		"content-types",
+		name,
+		"schema.json",
+	)
+
+	expect( { exists: fs.existsSync( file ), file } )
+		.toEqual( { exists: true, file } )
+
+	return JSON.parse( fs.readFileSync( file, "utf8" ) )
+}
+
+/**
+ |
+ | Whether an attribute has a place in the admin's edit form. An attribute the
+ | layout does not name is one an editor never meets, whatever its description
+ | says.
+ |
+ */
+function named_in_the_edit_layout ( schema: any, attribute: string ) {
+	return ( schema.__?.layouts?.edit ?? [] ).some( ( row: any[] ) =>
+		row.some( ( field ) => field.name === attribute )
+	)
+}
+
 function content_type_zones (): string[][] {
 	return fs.readdirSync( CONTENT_TYPES, { withFileTypes: true } )
 		.filter( ( entry ) => entry.isDirectory() )

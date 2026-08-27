@@ -28,10 +28,13 @@ import type {
 	Page_Shell,
 	Session_Entry,
 } from "./envelope.ts"
-import type { Role } from "./context-colours.ts"
+import type { Color_Scheme } from "./context-colours.ts"
 import type { Table_Of_Contents } from "./table-of-contents.ts"
 
-import { context_colours } from "./context-colours.ts"
+import {
+	color_scheme_of,
+	context_colours,
+} from "./context-colours.ts"
 import {
 	is_contributor,
 	is_session,
@@ -191,7 +194,7 @@ export function assemble_root (
 				: [],
 			colours: context_colours(
 				resolved_event,
-				contribution.context_role,
+				contribution.color_scheme,
 			),
 			main: contribution.main ?? entry.main_region ?? [],
 			main_event,
@@ -276,7 +279,18 @@ type Content_Type_Contribution = {
 	 */
 	sidebar_at_every_width: boolean
 	sidebar_repeat: Block[]
-	context_role: Role
+	/**
+	 |
+	 | What the page's context colour is pointed at.
+	 |
+	 | **A Page's is an editor's choice** and may be plain black or plain white
+	 | as well as any of the event's six colours. A session's and a
+	 | contributor's are not choices: a session is its category and a
+	 | contributor is a contributor, and either of those being answerable would
+	 | let a page disagree with the card that led to it.
+	 |
+	 */
+	color_scheme: Color_Scheme
 	/**
 	 |
 	 | **A table of contents renders only on a Page**, and only when it asked
@@ -315,7 +329,7 @@ function of_a_contributor (
 	return {
 		back_link: { label: "Back to Collaborators", url: "/collaborators" },
 		collects_a_toc: false,
-		context_role: "contributor",
+		color_scheme: "contributor",
 		main: [],
 		masthead: [ {
 			__component: CONTRIBUTOR_PROFILE,
@@ -340,7 +354,7 @@ function of_a_page ( entry: Page_Entry ): Content_Type_Contribution {
 	return {
 		back_link: { label: "Back to Home", url: "/" },
 		collects_a_toc: entry.toc,
-		context_role: "theme",
+		color_scheme: color_scheme_of( entry.color_scheme ),
 		masthead: [],
 		page_layout: entry.page_layout,
 		sidebar: entry.side_region ?? [],
@@ -377,7 +391,7 @@ function of_a_session (
 	return {
 		back_link,
 		collects_a_toc: false,
-		context_role: role_of( entry ),
+		color_scheme: role_of( entry ),
 		masthead: [ {
 			__component: MASTHEAD,
 			// The masthead's own copy of the back link, shown only below the

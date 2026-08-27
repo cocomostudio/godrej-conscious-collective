@@ -317,6 +317,20 @@ describe("what a card does when it is pointed at", () => {
 	})
 })
 
+/**
+ |
+ | The page's colour scheme — one scalar on the entry, and the whole of what an
+ | editor says about what colour a page is.
+ |
+ */
+describe("a page's colour scheme", () => {
+	it("arrives on the entry, at the schema's own default", async () => {
+		const { body } = await cms.get( "/api/envelope?path=/home" )
+
+		expect( body.data.entry.color_scheme ).toBe( "theme" )
+	})
+})
+
 describe("the colour of a block's words", () => {
 	it("travels with the component that carries it", async () => {
 		const { body } = await cms.get( "/api/envelope?path=/home" )
