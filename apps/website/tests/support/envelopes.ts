@@ -331,14 +331,7 @@ export function link ( url: string, label: string, style = "plain" ): Block {
 }
 
 export function wysiwyg ( ...paragraphs: string[] ): Block {
-	return {
-		__component: "text.wysiwyg-v1",
-		id: id(),
-		rich_text: paragraphs.map( ( paragraph ) => ( {
-			children: [ { text: paragraph, type: "text" } ],
-			type: "paragraph",
-		} ) ),
-	}
+	return wysiwyg_of( ...paragraphs.map( ( text ) => rich_paragraph( text ) ) )
 }
 
 /**
@@ -351,18 +344,111 @@ export function wysiwyg_with_a_heading (
 	heading_text: string,
 	...paragraphs: string[]
 ): Block {
-	const block = wysiwyg( ...paragraphs )
+	return wysiwyg_of(
+		rich_heading( heading_text ),
+		...paragraphs.map( ( text ) => rich_paragraph( text ) ),
+	)
+}
 
+/* _____
+ | Rich text, node by node.
+ |
+ | The two builders above cover the common shapes and read as sentences at the
+ | call site. Everything the WYSIWYG can hold that they cannot say — a list, a
+ | nested list, a quotation, a code block, formatting on a run of words — is
+ | assembled from the node builders below and handed to `wysiwyg_of`.
+ |
+ | These are Strapi's own node shapes and not a convenience of ours, **nesting
+ | included**: Strapi stores a nested list as a SIBLING of the list items it
+ | belongs under rather than as a child of one, so `rich_list` takes a nested
+ | list in the same argument list as the items it follows. Writing it any other
+ | way here would be testing against a shape the CMS never sends.
+ |
+ */
+
+/** A rich-text node, as Strapi stores it. Deliberately loose — see above. */
+export type Rich_Node = Record<string, unknown>
+
+export function wysiwyg_of ( ...rich_text: Rich_Node[] ): Block {
+	return { __component: "text.wysiwyg-v1", id: id(), rich_text }
+}
+
+/**
+ |
+ | One run of words, with whatever formatting an editor marked it with —
+ | `{ bold: true }`, `{ code: true }`, and the rest.
+ |
+ */
+export function rich_words (
+	text: string,
+	modifiers: Record<string, boolean> = {},
+): Rich_Node {
+	return { text, type: "text", ...modifiers }
+}
+
+/** A string is the unformatted case, which is nearly every case. */
+function inline_of ( child: string | Rich_Node ): Rich_Node {
+	return typeof child === "string" ? rich_words( child ) : child
+}
+
+export function rich_paragraph (
+	...children: (string | Rich_Node)[]
+): Rich_Node {
+	return { children: children.map( inline_of ), type: "paragraph" }
+}
+
+export function rich_heading ( text: string, level = 2 ): Rich_Node {
+	return { children: [ rich_words( text ) ], level, type: "heading" }
+}
+
+export function rich_quote ( ...children: (string | Rich_Node)[] ): Rich_Node {
+	return { children: children.map( inline_of ), type: "quote" }
+}
+
+/** A code block holds its lines in one text node, newlines and all. */
+export function rich_code ( ...lines: string[] ): Rich_Node {
+	return { children: [ rich_words( lines.join( "\n" ) ) ], type: "code" }
+}
+
+export function rich_link (
+	url: string,
+	...children: (string | Rich_Node)[]
+): Rich_Node {
+	return { children: children.map( inline_of ), type: "link", url }
+}
+
+export function rich_item ( ...children: (string | Rich_Node)[] ): Rich_Node {
+	return { children: children.map( inline_of ), type: "list-item" }
+}
+
+/**
+ |
+ | A list. Its children are its items — and, where an editor indented, the
+ | nested lists that Strapi files beside them rather than inside them.
+ |
+ */
+export function rich_list (
+	format: "ordered" | "unordered",
+	...children: Rich_Node[]
+): Rich_Node {
+	return { children, format, type: "list" }
+}
+
+/** The upload's own row, which is what a rich-text image node carries. */
+export function rich_image (
+	url: string,
+	over: Record<string, unknown> = {},
+): Rich_Node {
 	return {
-		...block,
-		rich_text: [
-			{
-				children: [ { text: heading_text, type: "text" } ],
-				level: 2,
-				type: "heading",
-			},
-			...block.rich_text as unknown[],
-		],
+		children: [ rich_words( "" ) ],
+		image: {
+			alternativeText: null,
+			caption: "A caption the renderer never shows.",
+			name: "picture.png",
+			url,
+			...over,
+		},
+		type: "image",
 	}
 }
 

@@ -39,6 +39,23 @@ const SIZES: Record<string, string> = {
 	h6: "text-h6",
 }
 
+/**
+ |
+ | How large a heading of a given level looks.
+ |
+ | Exported because a heading typed inside a text block is meant to be
+ | indistinguishable from one placed as a component, and two copies of this table
+ | would be two answers to how large `h3` is. Rich text names the level as a
+ | number and this component as a string, which is the only difference between
+ | them and is reconciled here rather than at either call site.
+ |
+ */
+export function heading_size_class ( level: string | number ) {
+	const named = typeof level === "number" ? `h${level}` : level
+
+	return SIZES[named] ?? SIZES.h2
+}
+
 type Heading_Props = Pick<Block, "__component" | "id"> & {
 	content: string
 	level?: string
@@ -57,7 +74,7 @@ export function Heading (
 		id={ anchor }>
 		<H
 			className={ `${
-				SIZES[level] ?? SIZES.h2
+				heading_size_class( level )
 			} md:font-semibold ${colour}` }>
 			{ content }
 		</H>
