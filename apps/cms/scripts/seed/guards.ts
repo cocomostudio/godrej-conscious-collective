@@ -1,7 +1,8 @@
 
 /**
  |
- | The two refusals, which are what make `index.ts` safe to run.
+ | The refusals that keep `index.ts` on a developer's own machine, and the two
+ | deletions it makes once it is allowed to run.
  |
  | The seed deletes the database before it rebuilds it. That is its whole
  | design — schema iteration is cheap only when a rebuild is one command — and
@@ -69,6 +70,23 @@ export function database_file () {
 
 /**
  |
+ | Where the media library keeps its files.
+ |
+ | Not configurable, and not for want of trying: Strapi's local upload provider
+ | resolves this from `strapi.dirs.static.public` itself and ignores the
+ | `directory` handed to it in `config/plugins.ts`. Everything that boots this
+ | application writes here — the seed, the admin, and the test suite.
+ |
+ */
+export function uploads_directory () {
+	return path.join( CMS_DIR, "public", "uploads" )
+}
+
+/** The one file in the uploads directory that is committed. */
+export const DIRECTORY_PLACEHOLDER = ".gitkeep"
+
+/**
+ |
  | Deletes the database file and the two sidecars SQLite leaves beside it in
  | write-ahead-logging mode. Strapi rebuilds the schema from the models on the
  | next boot.
@@ -84,6 +102,37 @@ export function delete_database () {
 	fs.mkdirSync( path.dirname( file ), { recursive: true } )
 
 	return file
+}
+
+/**
+ |
+ | Empties the uploads directory, which is as much of the last run's output as
+ | the rows were.
+ |
+ | The provider gives every stored file a random suffix, so nothing is ever
+ | overwritten and a rerun never reuses a name. Deleting the database on its own
+ | therefore leaves every file the last run wrote sitting on disk with nothing
+ | left pointing at it, and a directory that only ever grows — a few thousand
+ | files, in an afternoon of schema iteration.
+ |
+ | `.gitkeep` stays: it is the reason a clone has the directory at all.
+ |
+ | The directory is a parameter so the tests can point it somewhere harmless.
+ |
+ */
+export function delete_uploads ( directory = uploads_directory() ) {
+	fs.mkdirSync( directory, { recursive: true } )
+
+	for ( const entry of fs.readdirSync( directory ) ) {
+		if ( entry === DIRECTORY_PLACEHOLDER ) {
+			continue
+		}
+
+		fs.rmSync( path.join( directory, entry ), {
+			force: true,
+			recursive: true,
+		} )
+	}
 }
 
 function refuse ( reason: string ): never {

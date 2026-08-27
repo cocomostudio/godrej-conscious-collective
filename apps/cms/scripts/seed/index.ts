@@ -28,6 +28,7 @@ import {
 	CMS_DIR,
 	database_file,
 	delete_database,
+	delete_uploads,
 	refuse_in_production,
 	refuse_unless_sqlite,
 } from "./guards.ts"
@@ -62,6 +63,7 @@ async function main () {
 	}
 
 	delete_database()
+	delete_uploads()
 
 	const strapi = await boot()
 
