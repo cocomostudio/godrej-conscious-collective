@@ -183,7 +183,7 @@ export function Archive_Entry ( { entry }: { entry: Archive_Entry_Attribute } ) 
 				{ has_snapshots
 					&& <button
 						aria-label={ `View more info about ${entry.name} held in ${entry.year}` }
-						className="mt-4 md:mt-8 flex gap-1 items-center text-button font-medium text-theme cursor-pointer md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100 transition-opacity"
+						className="mt-4 md:mt-8 flex gap-1 items-center text-button font-medium text-context cursor-pointer md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100 transition-opacity"
 						onClick={ () => set_open( true ) }
 						type="button">
 						See Snapshots
@@ -243,10 +243,10 @@ function Spine () {
 	return <div
 		aria-hidden={ true }
 		className="relative ml-4 md:m-0 md:flex md:items-center before:content-[''] before:absolute before:right-full before:top-1/2 before:-translate-y-1/2 before:w-4 before:h-0.5 before:bg-[linear-gradient(var(--archive-spine-fade-sideways))] before:hidden max-md:group-first:before:block">
-		<span className="relative block size-8 rounded-full border-2 border-theme bg-white z-10">
+		<span className="relative block size-8 rounded-full border-2 border-context bg-white z-10">
 		</span>
 
-		<span className="absolute top-1/2 -translate-y-1/2 ml-8 w-full h-0.5 md:-top-4 md:-bottom-4 md:translate-y-0 md:left-1/2 md:-translate-x-1/2 md:ml-0 md:w-0.5 md:h-auto md:group-last:h-1/2 bg-theme md:group-first:bg-transparent md:group-first:bg-[linear-gradient(var(--archive-spine-fade-down))]">
+		<span className="absolute top-1/2 -translate-y-1/2 ml-8 w-full h-0.5 md:-top-4 md:-bottom-4 md:translate-y-0 md:left-1/2 md:-translate-x-1/2 md:ml-0 md:w-0.5 md:h-auto md:group-last:h-1/2 bg-context md:group-first:bg-transparent md:group-first:bg-[linear-gradient(var(--archive-spine-fade-down))]">
 		</span>
 	</div>
 }

@@ -236,6 +236,46 @@ describe("the archive timeline listing", () => {
 		expect( name!.rank ).toBe( year!.rank + 1 )
 	})
 
+	/**
+	 |
+	 | **The spine is drawn in the page's own colour, not the event's theme.**
+	 |
+	 | It used to read the theme directly, which is right on a page nobody could
+	 | recolour and wrong on one whose editor has chosen a scheme: the timeline
+	 | would be the one thing on such a page still drawn in the old colour.
+	 |
+	 | Both fades are custom properties on the list and both the dot and the
+	 | line are classes on a row, so a class name is the only seam either has —
+	 | the same argument the card hover suite makes at greater length.
+	 |
+	 */
+	it("draws its spine and its fades in the page's own colour", async () => {
+		const body = body_of( ( await website.get( "/archives" ) ).html )
+
+		const fades = /style="(--archive-spine-fade[^"]*)"/.exec( body )?.[1]
+			?? ""
+
+		expect( fades ).toContain( "--ctx-context-color" )
+		expect( fades ).not.toContain( "--ctx-theme-color" )
+
+		// Scoped to the spine itself: the chrome's Register Now button is
+		// `bg-theme` on every page of the site, so a whole-body assertion
+		// would fail on furniture that has nothing to do with the timeline.
+		const spine = spine_of( body )
+
+		expect( spine ).toContain( "border-context" )
+		expect( spine ).toContain( "bg-context" )
+		expect( spine ).not.toContain( "-theme" )
+	})
+
+	it("draws the way in to the snapshots in it too", async () => {
+		const body = body_of( ( await website.get( "/archives" ) ).html )
+
+		const affordance = /class="([^"]*)"[^>]*>\s*See Snapshots/.exec( body )
+
+		expect( affordance?.[1] ).toContain( "text-context" )
+	})
+
 	it("renders nothing at all when an editor has added no entries", async () => {
 		const empty = await boot_website( {
 			"/empty": envelope( {
@@ -292,4 +332,16 @@ function body_of ( html: string ) {
 
 function occurrences ( haystack: string, needle: string ) {
 	return haystack.split( needle ).length - 1
+}
+
+/**
+ |
+ | The spine of one row — the dot and the line running out of it — found by the
+ | sideways fade, which nothing else on the page declares.
+ |
+ */
+function spine_of ( body: string ) {
+	const at = body.indexOf( "--archive-spine-fade-sideways))]" )
+
+	return at < 0 ? "" : body.slice( at, body.indexOf( "</div>", at ) )
 }

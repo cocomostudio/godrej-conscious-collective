@@ -25,8 +25,8 @@
  | while a list can. They reach the rows as custom properties and are used by
  | `group-first`.
  |
- | The theme colour is read as an RGB triplet, which is how every colour in this
- | build is stored — the Tailwind tokens compile to `rgba(var(--token),
+ | The context colour is read as an RGB triplet, which is how every colour in
+ | this build is stored — the Tailwind tokens compile to `rgba(var(--token),
  | <alpha-value>)` and a gradient stop written any other way could not fade to
  | transparent without `color-mix()`, which the browser floor does not have.
  |
@@ -45,17 +45,17 @@ import type { Archive_Entry_Attribute } from "./archive-entry.tsx"
 import { Archive_Entry } from "./archive-entry.tsx"
 import { BLOCK_SPACING } from "./block-spacing.ts"
 
-/** Transparent → the theme colour, in the two directions the design uses. */
+/** Transparent → the context colour, in the two directions the design uses. */
 const FADE_SIDEWAYS = [
 	"to right",
-	"rgba( var( --ctx-theme-color ), 0 )",
-	"rgb( var( --ctx-theme-color ) )",
+	"rgba( var( --ctx-context-color ), 0 )",
+	"rgb( var( --ctx-context-color ) )",
 ].join( ", " )
 
 const FADE_DOWN = [
 	"to bottom",
-	"rgba( var( --ctx-theme-color ), 0 )",
-	"rgb( var( --ctx-theme-color ) ) 50%",
+	"rgba( var( --ctx-context-color ), 0 )",
+	"rgb( var( --ctx-context-color ) ) 50%",
 ].join( ", " )
 
 export function Archive_Timeline_Listing (
@@ -71,8 +71,9 @@ export function Archive_Timeline_Listing (
 			"--archive-spine-fade-down": FADE_DOWN,
 			"--archive-spine-fade-sideways": FADE_SIDEWAYS,
 		} as CSSProperties }>
-
-		<List_Header className="md:hidden sticky top-0 z-40 -mx-1ccm" entries_count={ entries.length } />
+		<List_Header
+			className="md:hidden sticky top-0 z-40 -mx-1ccm"
+			entries_count={ entries.length } />
 
 		{
 			/* The whole of the responsive behaviour is here. Below the medium
@@ -89,7 +90,12 @@ export function Archive_Timeline_Listing (
 	</div>
 }
 
-function List_Header ( { entries_count, className = "" }: { entries_count: number, className?: string } ) {
+function List_Header (
+	{ entries_count, className = "" }: {
+		entries_count: number
+		className?: string
+	},
+) {
 	/* **No rule above it.** The static site draws one to separate the
      sidebar's words from the timeline below on a phone, and the root
      block already draws exactly that rule for every two-column page
@@ -101,11 +107,10 @@ function List_Header ( { entries_count, className = "" }: { entries_count: numbe
      text nodes apart, and "2<!-- --> <!-- -->Events" is a sentence
      nothing can search for. */
 
-	return <div className={ `max-md:px-1ccm max-md:py-4 max-md:bg-gray-light ${ className }` }>
-		<p className="text-h6 md:text-h3 md:font-semibold font-light text-theme md:text-black">
-			{ `${entries_count} ${
-				entries_count === 1 ? "Event" : "Events"
-			}` }
+	return <div
+		className={ `max-md:px-1ccm max-md:py-4 max-md:bg-gray-light ${className}` }>
+		<p className="text-h6 md:text-h3 md:font-semibold font-light text-context md:text-black">
+			{ `${entries_count} ${entries_count === 1 ? "Event" : "Events"}` }
 		</p>
 	</div>
 }
