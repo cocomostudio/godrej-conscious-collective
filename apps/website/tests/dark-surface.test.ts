@@ -22,6 +22,13 @@
  | with black words on a black slide. Nothing throws and nothing looks wrong
  | until somebody opens the dialog.
  |
+ | **The forced context is here for the same reason and nothing else is.** The
+ | dialog points `--ctx-context-color` at white, so a block drawing in
+ | `text-context` or `border-context` is white too — and like everything else in
+ | this file, that declaration only exists in a tree nothing server-renders.
+ | Every other thing this build's colours do is observable over HTTP and is
+ | tested there.
+ |
  */
 
 import {
@@ -127,14 +134,19 @@ describe("prose", () => {
 	it("falls back to white over a dark ground", () => {
 		const rendered = both( h( Wysiwyg, { rich_text: PARAGRAPH as any } ) )
 
-		expect( rendered.light ).toContain( "text-black" )
+		// On a white page an unanswered block draws in the page's own colour,
+		// which is the schema's default on all four of the components that
+		// carry the attribute. Over the dark ground it is white regardless.
+		expect( prose_class_of( rendered.light ) ).toBe( "text-context" )
 		expect( rendered.dark ).toContain( "text-white" )
 	})
 
-	it("keeps a colour only a person would have typed", () => {
-		// `white` and `context` are not defaults of anything, so a stored one
-		// is a choice and survives the ground.
-		for ( const chosen of [ "white", "context" ] ) {
+	// **The dialog forces its colours**, so this is every colour an editor can
+	// pick rather than the two that are not defaults of anything. A snapshot
+	// nobody can read is not a state the catalogue should be able to reach,
+	// and the enclosing Archive component's admin description says so.
+	it("is white whatever an editor picked", () => {
+		for ( const chosen of [ "black", "context", "theme", "white" ] ) {
 			const rendered = both(
 				h( Wysiwyg, {
 					rich_text: PARAGRAPH as any,
@@ -142,20 +154,15 @@ describe("prose", () => {
 				} ),
 			)
 
-			expect( {
-				chosen,
-				drawn: rendered.dark.includes( `text-${chosen}` ),
-			} )
-				.toEqual( { chosen, drawn: true } )
+			expect( { chosen, drawn: prose_class_of( rendered.dark ) } )
+				.toEqual( { chosen, drawn: "text-white" } )
 		}
 	})
 
-	it("does not keep a stored black, because nobody necessarily chose it", () => {
-		// The schema's default is `black` and Strapi writes a default into the
-		// row **on save**, so every WYSIWYG in the catalogue carries the string
-		// whether an editor picked it or not. Respecting it would mean black
-		// prose on a black slide — which is what the first seeded dialog
-		// actually rendered. See the note in `dark-surface.tsx`.
+	// The rule that read a stored `black` as no answer at all is gone. It only
+	// existed because `black` was the schema's default and could not be told
+	// apart from a value nobody chose; `context` is the default now.
+	it("draws a stored black as black on a white page", () => {
 		const rendered = both(
 			h( Wysiwyg, {
 				rich_text: PARAGRAPH as any,
@@ -164,15 +171,16 @@ describe("prose", () => {
 		)
 
 		expect( rendered.light ).toContain( "text-black" )
-		expect( rendered.dark ).toContain( "text-white" )
-		expect( rendered.dark ).not.toContain( "text-black" )
 	})
 
-	it("draws its subheadings plain white rather than in the context colour", () => {
+	it("draws its subheadings in a context colour that is itself white", () => {
 		const rendered = both( h( Wysiwyg, { rich_text: A_HEADING as any } ) )
 
+		// The class does not change — the alias behind it does, which is the
+		// whole of how the forced context works.
 		expect( rendered.light ).toContain( "text-context" )
-		expect( rendered.dark ).not.toContain( "text-context" )
+		expect( rendered.dark ).toContain( "text-context" )
+		expect( rendered.dark ).toContain( FORCED_CONTEXT )
 	})
 })
 
@@ -195,54 +203,38 @@ describe("a floated caption", () => {
 })
 
 describe("a heading and a link", () => {
-	// Both default to `context`, so an untouched one is legible on black
-	// without help. A stored `black` is not — and both are reachable inside
-	// the dialog through the image-and-content composite's own region.
+	// Both are reachable inside the dialog through the image-and-content
+	// composite's own region, and both carry `text_color` of their own.
 	//
 	// The URLs are absolute so that `Nav_Link` takes its plain-anchor branch.
 	// A site-relative one renders a React Router `<Link>`, which needs a
 	// router above it — which is the narrow seam's cost, and the reason the
 	// rest of the suite drives HTTP instead.
-	const stored_black = ( node: ReactNode ) => both( node ).dark
+	const on_black = ( node: ReactNode ) => both( node ).dark
 
-	it("keep the context colour where nobody chose anything", () => {
-		expect(
-			both( h( Heading, {
+	it("are white over a dark ground whatever they asked for", () => {
+		for ( const chosen of [ "black", "context", "theme", "white" ] ) {
+			const heading = on_black( h( Heading, {
 				__component: "text.heading-v1",
 				content: "A heading",
 				id: 1,
-			} as any ) ).dark,
-		).toContain( "text-context" )
+				text_color: chosen,
+			} as any ) )
 
-		expect(
-			both( h( Link_Block, {
+			const link = on_black( h( Link_Block, {
 				label: "A link",
 				style: "plain",
+				text_color: chosen,
 				url: "https://example.com/somewhere",
-			} as any ) ).dark,
-		).toContain( "text-context" )
-	})
+			} as any ) )
 
-	it("do not draw a stored black over a dark ground", () => {
-		const heading = stored_black( h( Heading, {
-			__component: "text.heading-v1",
-			content: "A heading",
-			id: 1,
-			text_color: "black",
-		} as any ) )
-
-		expect( heading ).not.toContain( "text-black" )
-		expect( heading ).toContain( "text-context" )
-
-		const link = stored_black( h( Link_Block, {
-			label: "A link",
-			style: "plain",
-			text_color: "black",
-			url: "https://example.com/somewhere",
-		} as any ) )
-
-		expect( link ).not.toContain( "text-black" )
-		expect( link ).toContain( "text-context" )
+			expect( {
+				chosen,
+				heading: heading.includes( "text-white" ),
+				link: link.includes( "text-white" ),
+			} )
+				.toEqual( { chosen, heading: true, link: true } )
+		}
 	})
 
 	it("still draw a stored black on a white page", () => {
@@ -256,3 +248,28 @@ describe("a heading and a link", () => {
 		).toContain( "text-black" )
 	})
 })
+
+/**
+ |
+ | The declaration the dialog makes, as it reaches the markup. Written out here
+ | rather than imported, so that a change to it has to be made in two places
+ | and is therefore a decision rather than a slip.
+ |
+ */
+const FORCED_CONTEXT = "--ctx-context-color:var( --color-white )"
+
+/**
+ |
+ | The colour class on a WYSIWYG's paragraph, on its own. `text-white` is on
+ | the forced context's own element in every dark rendering, so a whole-tree
+ | assertion would pass with the prose left black.
+ |
+ */
+function prose_class_of ( markup: string ) {
+	const found = /<p class="([^"]*)"/.exec( markup )
+
+	return ( found?.[1] ?? "" )
+		.split( " " )
+		.find( ( name ) => name.startsWith( "text-" ) && name !== "text-p" )
+		?? ""
+}

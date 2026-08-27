@@ -203,11 +203,10 @@ export function vanilla_carousel ( slides: Slide[] ) {
 /**
  |
  | The colour a component draws its words in. Left off where it is not given, so
- | the seed exercises each schema's own default rather than restating it — and
- | the defaults differ, because the four components never shared a colour.
+ | the seed exercises each schema's own default rather than restating it.
  |
  */
-export type Text_Color = "black" | "white" | "context"
+export type Text_Color = "context" | "theme" | "black" | "white"
 
 export function link (
 	label: string,

@@ -80,7 +80,7 @@
 			"content": {
 				"edit": {
 					"label": "Snapshots",
-					"description": "What a visitor sees after pressing \"See Snapshots\". On a large, tall screen each one of these is a slide of its own, side by side; anywhere else they are a single column the visitor scrolls."
+					"description": "What a visitor sees after pressing \"See Snapshots\". On a large, tall screen each one of these is a slide of its own, side by side; anywhere else they are a single column the visitor scrolls. Everything here is drawn white on black: the snapshots open in a dialog that forces its own colours, so a text colour chosen inside it does not apply."
 				},
 				"list": {
 					"label": "Snapshots"

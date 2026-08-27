@@ -3,10 +3,16 @@
  |
  | The colour a block draws its words in.
  |
- | Three tokens and no more — `black`, `white`, and `context`, which is the
- | page's own colour and follows the event it belongs to. They are the Tailwind
- | colour tokens by exactly those names, so what an editor picked is what ends
- | up on the element and there is no third vocabulary in between.
+ | Four tokens and no more — `context`, which is the page's own colour and
+ | follows both the event it belongs to and the scheme its editor chose;
+ | `theme`, which is the event's theme colour whatever the page is set to;
+ | and plain `black` and `white`. They are the Tailwind colour tokens by exactly
+ | those names, so what an editor picked is what ends up on the element and
+ | there is no third vocabulary in between.
+ |
+ | `theme` is there because `context` stopped being the theme the moment a Page
+ | could say otherwise: an editor writing a run of words on a black page has no
+ | other way to ask for the event's colour.
  |
  | The four components of the **inner list** carry the attribute — heading,
  | plain string, WYSIWYG and link. Those four are the words on a page, and a
@@ -18,6 +24,7 @@
 const CLASSES = {
 	black: "text-black",
 	context: "text-context",
+	theme: "text-theme",
 	white: "text-white",
 }
 
@@ -25,7 +32,7 @@ export type Text_Color_Token = keyof typeof CLASSES
 
 /**
  |
- | What arrives on a block: one of the three, or nothing at all.
+ | What arrives on a block: one of the four, or nothing at all.
  |
  */
 export type Text_Color = string | null | undefined
@@ -39,10 +46,13 @@ export type Text_Color = string | null | undefined
  | `null` in it — and a default parameter would not catch that, because `null`
  | is a value a caller passed.
  |
- | The fallback is the caller's rather than one constant here, because the four
- | components never shared a colour to begin with: prose has always been black
- | and a heading has always been the context colour. The attribute is there to
- | let an editor say otherwise, not to repaint the catalogue.
+ | The fallback stays the caller's argument rather than becoming a constant
+ | here, and every caller now passes `context`. It used to be the one place the
+ | four components disagreed — prose fell back to black and a heading to the
+ | context colour, because that is what each had always drawn. They no longer
+ | disagree: the schema's default is `context` on all four, and "what this block
+ | draws when nobody answered" is a question the schema and the renderer must
+ | not give two answers to.
  |
  */
 export function text_color_token (

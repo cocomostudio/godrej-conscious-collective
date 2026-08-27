@@ -42,7 +42,7 @@ export type Link = {
 	 | `blocks/text-color.ts`.
 	 |
 	 */
-	text_color?: "black" | "white" | "context" | null
+	text_color?: "context" | "theme" | "black" | "white" | null
 }
 
 export type Page_Shell = {

@@ -376,6 +376,45 @@ describe("depth", () => {
 	})
 })
 
+/**
+ |
+ | What an editor may say about colour, read off the schema files.
+ |
+ | Between files rather than within one, which is what earns this a place here:
+ | `text_color` is one question asked by four separate components and the way it
+ | goes wrong is that three of them are widened and the fourth is not. What each
+ | value then *draws* is the website's, and is tested there.
+ |
+ */
+describe("the colour of a block's words", () => {
+	const carriers = components.filter( ( component ) =>
+		component.schema.attributes.text_color
+	)
+
+	it("is offered by the four components of the inner list, and no others", () => {
+		expect( carriers.map( ( component ) => component.uid ).sort() )
+			.toEqual( [ ...INNER_LIST ].sort() )
+	})
+
+	// `context` and `theme` mean different things now that a page can be
+	// something other than the theme colour, and `theme` is how a run of words
+	// asks for the event's own regardless.
+	it("offers the same four values, and the same default, on every one of them", () => {
+		for ( const component of carriers ) {
+			expect( {
+				default: component.schema.attributes.text_color.default,
+				uid: component.uid,
+				values: component.schema.attributes.text_color.enum,
+			} )
+				.toEqual( {
+					default: "context",
+					uid: component.uid,
+					values: [ "context", "theme", "black", "white" ],
+				} )
+		}
+	})
+})
+
 describe("a page's colour scheme", () => {
 	const page = content_type( "page" )
 
@@ -459,6 +498,31 @@ function admin_translations (): Record<string, string> {
 		]
 			.map( ( found ) => [ found[1], found[2] ] ),
 	)
+}
+
+/**
+ |
+ | The Archive entry says, where an editor meets it, that the dialog its
+ | snapshots open in forces its own colours. It is the one place in the
+ | catalogue where a colour an editor picks does not apply, so it is the one
+ | place that has to say so.
+ |
+ */
+describe("the archive entry's snapshots", () => {
+	it("warn that the dialog forces its own colours", () => {
+		const description = component( ARCHIVE_ENTRY )
+			.__.metadatas.content.edit.description
+
+		expect( description ).toContain( "forces its own colours" )
+	})
+})
+
+function component ( uid: string ) {
+	const found = components.find( ( entry ) => entry.uid === uid )
+
+	expect( { found: Boolean( found ), uid } ).toEqual( { found: true, uid } )
+
+	return found!.schema
 }
 
 function content_type ( name: string ) {

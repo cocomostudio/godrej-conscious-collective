@@ -363,11 +363,11 @@ describe("the colour of a block's words", () => {
 			"text.plain-string-v1",
 		)
 
-		// The four never shared a colour, so the defaults do not either: a
-		// heading and a link have always drawn themselves in the page's own
-		// colour, and prose in black.
+		// One default across all four, which is what a page's own colour means
+		// now that a page can be something other than the theme: a component
+		// that says nothing draws in whatever colour the page it landed on is.
 		expect( heading.text_color ).toBe( "context" )
-		expect( plain.text_color ).toBe( "black" )
+		expect( plain.text_color ).toBe( "context" )
 		expect( body.data.page_shell.navigation_header[0].text_color )
 			.toBe( "context" )
 	})

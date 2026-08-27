@@ -19,31 +19,28 @@
  | can turn up at any depth and the dialog does not know what an editor put in
  | it.
  |
- | # What black means over a dark ground
+ | # The dialog forces its colours
  |
- | **It means nothing, so it is not drawn.** That is the one place this
- | overrides rather than defaults, and the reason is the schema rather than
- | taste.
+ | **Every word inside it is white, whatever the component carrying it asked
+ | for**, and the context colour is pointed at white too, so a block drawing in
+ | `text-context` or `border-context` is white as well.
  |
- | `text_color` defaults to `black`, and a Strapi default is written into the
- | row **when it is saved**, not read at render time. So there is no such thing
- | as an unset `text_color` on anything an editor has touched: every WYSIWYG in
- | the catalogue carries the literal string `black` whether anybody chose it or
- | not. A rule that respected the stored value would therefore respect a choice
- | nobody made, and every snapshot in the Archive's dialog would be black words
- | on a black slide. That is not hypothetical — it is what the first seeded
- | dialog actually rendered.
+ | This is a forced colour and not a default a component may override, which is
+ | the strongest form the rule has taken. It replaces an earlier one that read a
+ | stored `black` as no answer at all — a rule that existed only because `black`
+ | was the schema's default, so a stored `black` could not be told apart from a
+ | value nobody chose. `context` is the default now, `black` is a choice again
+ | and is drawn as one everywhere else, and the dialog no longer has to guess
+ | what an editor meant: nothing an editor picks can make a snapshot
+ | unreadable, and the enclosing Archive component's admin description says so.
  |
- | `white` and `context` are honoured, because those are values only a person
- | types. Black is treated as the absence of an answer, and the ground answers
- | instead.
- |
- | A caption is simpler still: it carries no `text_color` at all, so there is
+ | A caption is simpler still: it carries no `text_color` at all, so there was
  | never anything to weigh, and it just follows the ground.
  |
  */
 
 import {
+	type CSSProperties,
 	type ReactNode,
 	createContext,
 	use,
@@ -61,9 +58,33 @@ import {
 
 const Dark_Surface_Context = createContext<boolean>( false )
 
+/**
+ |
+ | The context colour, forced to the static palette's white.
+ |
+ | Written as a custom property rather than swapped for a class, because that is
+ | the whole mechanism: a block below carries `text-context` and knows nothing
+ | about where it is, and re-pointing the alias is what makes the class draw
+ | white. It is the third place in the codebase the alias is aimed, after the
+ | page's root and a card's own element — see `context-colours.ts`.
+ |
+ */
+const FORCED_CONTEXT = {
+	"--ctx-context-color": "var( --color-white )",
+} as CSSProperties
+
+/**
+ |
+ | `display: contents` because this element exists only to carry a declaration.
+ | The dialog lays its own children out, and a box in the middle of that would
+ | be a box the design never asked for.
+ |
+ */
 export function Dark_Surface ( { children }: { children: ReactNode } ) {
 	return <Dark_Surface_Context value={ true }>
-		{ children }
+		<div className="contents" style={ FORCED_CONTEXT }>
+			{ children }
+		</div>
 	</Dark_Surface_Context>
 }
 
@@ -76,34 +97,23 @@ export function use_dark_surface () {
  | The colour a block draws its words in, given what an editor stored and what
  | that block's own default is.
  |
- | The fallback is the caller's because the components never shared one — prose
- | has always been black and a heading has always been the context colour. On a
- | white page this is exactly `text_color_token`. On a dark one it is that,
- | except that `black` is read as no answer and the fallback is used instead.
+ | The fallback is the caller's because the components' stored default answers
+ | for what an editor chose, and `null` — every row written before the attribute
+ | existed — is what this has to answer for instead.
  |
- | **Every component carrying `text_color` asks this**, not just the two whose
- | stored default is `black`. A heading defaults to `context` and is therefore
- | legible on a dark ground without help — but an editor who stored `black` on
- | one still gets black words on a black slide, and there is no ground on which
- | that is what they meant.
+ | On a white page this is exactly `text_color_token`. On a dark one it is
+ | white, full stop: **every component carrying `text_color` asks this**, so
+ | one answer here is what makes the dialog's guarantee hold however deeply a
+ | block is nested inside it.
  |
  */
 export function use_text_colour_token (
 	text_color: Text_Color,
 	fallback: Text_Color_Token,
 ): Text_Color_Token {
-	const dark = use_dark_surface()
-	const chosen = text_color_token( text_color, fallback )
-
-	if ( !dark || chosen !== "black" ) {
-		return chosen
-	}
-
-	// The fallback is what this block draws when nobody has answered, and on a
-	// dark ground that is what a stored `black` amounts to. Except when the
-	// fallback is itself `black` — prose — where there is nothing behind it to
-	// fall back to and white is the only legible answer.
-	return fallback === "black" ? "white" : fallback
+	return use_dark_surface()
+		? "white"
+		: text_color_token( text_color, fallback )
 }
 
 /** The same answer as a class, for the blocks that want one. */

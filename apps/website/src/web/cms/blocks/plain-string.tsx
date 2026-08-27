@@ -29,7 +29,7 @@ type Plain_String_Props = {
 
 export function Plain_String ( { content, text_color }: Plain_String_Props ) {
 	const body_size = use_body_text_class()
-	const prose = use_text_colour_class( text_color, "black" )
+	const prose = use_text_colour_class( text_color, "context" )
 
 	if ( !content ) {
 		return null

@@ -36,9 +36,10 @@
 		"text_color": {
 			"type": "enumeration",
 			"enum": [
+				"context",
+				"theme",
 				"black",
-				"white",
-				"context"
+				"white"
 			],
 			"default": "context",
 			"required": true
@@ -87,7 +88,7 @@
 			"text_color": {
 				"edit": {
 					"label": "Text colour",
-					"description": "The colour of the words. \"context\" is the page’s own colour, which follows the event it belongs to. A link beside the heading carries its own."
+					"description": "The colour of the words. \"context\" is the page’s own colour, which follows both the event it belongs to and the colour scheme its editor chose; \"theme\" is that event’s theme colour whatever the page is set to. A link beside the heading carries its own."
 				},
 				"list": {
 					"label": "Text colour"

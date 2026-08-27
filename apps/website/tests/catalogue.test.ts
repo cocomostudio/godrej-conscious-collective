@@ -206,7 +206,8 @@ beforeAll( async () => {
 						google_map_block( {
 							image: {
 								alt: "A drawn map",
-								caption: "Plant 13, Pirojshanagar, Vikhroli",
+								caption:
+									"Plant 13, Pirojshanagar, Vikhroli",
 								url: "/uploads/sketch-map.svg",
 							},
 						} ),
@@ -271,6 +272,10 @@ beforeAll( async () => {
 							"white",
 						),
 						coloured( heading( "Heading in black" ), "black" ),
+						coloured(
+							plain_string( "Prose in the theme" ),
+							"theme",
+						),
 						coloured(
 							link( "/asked", "Link in black" ),
 							"black",
@@ -579,15 +584,28 @@ describe("the colour of a block's words", () => {
 			.toContain( "text-black" )
 	})
 
-	it("is the colour a block has always drawn where nobody set one", async () => {
+	// **`theme` is not `context`.** It was `context` for as long as every page
+	// was the theme colour; a page whose editor has chosen a scheme is not, and
+	// this is how a run of words asks for the event's own colour anyway.
+	it("can be asked for the event's theme colour explicitly", async () => {
+		const { html } = await website.get( "/text-colour" )
+
+		const prose = element_carrying( html, "Prose in the theme" )
+
+		expect( prose ).toContain( "text-theme" )
+		expect( prose ).not.toContain( "text-context" )
+	})
+
+	it("is the page's own colour where nobody set one", async () => {
 		const { html } = await website.get( "/text-colour" )
 
 		// A schema default is written when a row is created, so an entry that
-		// predates the attribute comes back with `null` in it. The four never
-		// shared a colour, so each falls back to its own rather than to one
-		// constant: prose in black, a heading and a link in the page's own.
+		// predates the attribute comes back with `null` in it — and what a
+		// block draws when nobody answered is a question the schema and the
+		// renderer must not give two answers to. The schema's default is
+		// `context` on all four, so this is too.
 		expect( element_carrying( html, "Prose saved before" ) )
-			.toContain( "text-black" )
+			.toContain( "text-context" )
 		expect( element_carrying( html, "Heading saved before" ) )
 			.toContain( "text-context" )
 		expect( element_carrying( html, "Link saved before" ) )
@@ -653,7 +671,9 @@ describe("the map", () => {
 	it("embeds the derived coordinate, not the URL the editor pasted", async () => {
 		const { html } = await website.get( "/everything" )
 
-		expect( html ).toContain( "maps.google.com/maps?q=19.0939921%2C72.9226328" )
+		expect( html ).toContain(
+			"maps.google.com/maps?q=19.0939921%2C72.9226328",
+		)
 		expect( html ).toContain( "z=16" )
 		expect( html ).toContain( "output=embed" )
 	})

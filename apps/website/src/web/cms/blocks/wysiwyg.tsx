@@ -26,11 +26,11 @@
  | the half the attribute governs because the context colour on a heading or a
  | link is what marks it out as one.
  |
- | **The cost is real and worth naming**: a block set to `white` over a dark
- | ground draws its subheadings in the context colour, and an editor cannot
- | say otherwise. If that shows up in a design, the fix is the whole block
- | following the attribute and a one-off migration writing `context` onto
- | every WYSIWYG that predates it — not a second attribute.
+ | **The cost is real and worth naming**: a block set to `white` draws its
+ | subheadings in the context colour, and an editor cannot say otherwise. If
+ | that shows up in a design, the fix is the whole block following the
+ | attribute and a one-off migration writing `context` onto every WYSIWYG that
+ | predates it — not a second attribute.
  |
  */
 
@@ -43,10 +43,7 @@ import { H } from "#infra/lib/ui/react/headings.tsx"
 
 import type { Media } from "../envelope.ts"
 
-import {
-	use_dark_surface,
-	use_text_colour_class,
-} from "../dark-surface.tsx"
+import { use_text_colour_class } from "../dark-surface.tsx"
 import { use_media_origin } from "../media-origin.tsx"
 import { use_body_text_class } from "../page-layout.tsx"
 import { picture_of } from "../media.ts"
@@ -74,15 +71,9 @@ type Wysiwyg_Props = {
 export function Wysiwyg ( { rich_text, text_color }: Wysiwyg_Props ) {
 	const origin = use_media_origin()
 	const body_size = use_body_text_class()
-	// Over a dark ground the default flips to white, and so does a stored
-	// `black` — see the note in `dark-surface.tsx` for why that one is not a
-	// choice being overridden.
-	const prose = use_text_colour_class( text_color, "black" )
-	// The headings inside rich text are the context colour on a white page,
-	// which is what marks them out as headings. The dialog is black and the
-	// context colour is the event’s own, so they stay legible — except that a
-	// heading there opens a slide, and the design draws that in plain white.
-	const headings = use_dark_surface() ? "text-white" : "text-context"
+	// Over a dark ground every word is white whatever an editor stored — see
+	// the note in `dark-surface.tsx`.
+	const prose = use_text_colour_class( text_color, "context" )
 
 	if ( !Array.isArray( rich_text ) || rich_text.length === 0 ) {
 		return null
@@ -98,11 +89,16 @@ export function Wysiwyg ( { rich_text, text_color }: Wysiwyg_Props ) {
 						className={ `mt-4 ${body_size} font-mono ${prose}` }>
 						{ children }
 					</p>,
+				// The headings inside rich text are the context colour,
+				// which is what marks them out as headings. Inside the
+				// dialog the context colour is itself forced to white, so
+				// the one class is right in both places and there is
+				// nothing here to ask about the ground.
 				heading: ( { children, level } ) =>
 					<H
 						className={ `mt-6 md:mt-8 ${
 							HEADING_SIZES[level] ?? HEADING_SIZES[2]
-						} md:font-semibold ${headings}` }>
+						} md:font-semibold text-context` }>
 						{ children }
 					</H>,
 				image: ( { image } ) => {
