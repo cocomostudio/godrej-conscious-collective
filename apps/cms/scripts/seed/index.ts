@@ -4,16 +4,17 @@
  | Wipes the database and rebuilds it from scratch.
  |
  |     pnpm --filter app.cms seed
- |     pnpm --filter app.cms seed --interactive
+ |     pnpm --filter app.cms seed -y
  |
  | The content tree is deeply nested and every schema change invalidates the
  | shape of it, so this will be run constantly. That is the reason it rebuilds
  | rather than reconciles: reconciliation is a second model of the content, kept
  | in step by hand, and it goes wrong quietly.
  |
- | It is **non-interactive by default**, because a prompt in a tight loop stops
- | being read after the third time. `--interactive` puts the prompt back for the
- | rare occasion somebody wants it.
+ | Which is also why it is only ever right against an empty database. It says
+ | what it is about to delete and asks before it deletes any of it, and the
+ | answer has to be typed — see `confirmation.ts`. `-y` answers in advance, for
+ | a script, or for the fifth run of the afternoon.
  |
  | It refuses outright — as an exit, not a prompt — when the database client is
  | not SQLite and when the environment is production. See `guards.ts`.
@@ -21,8 +22,13 @@
  */
 
 import { createRequire } from "node:module"
-import readline from "node:readline/promises"
 
+import {
+	answered_yes,
+	consent_from,
+	disclaimer,
+	refuse_without_a_terminal,
+} from "./confirmation.ts"
 import { write_seed_content } from "./content.ts"
 import {
 	CMS_DIR,
@@ -31,6 +37,7 @@ import {
 	delete_uploads,
 	refuse_in_production,
 	refuse_unless_sqlite,
+	uploads_directory,
 } from "./guards.ts"
 
 /**
@@ -50,15 +57,19 @@ async function main () {
 	refuse_unless_sqlite()
 	refuse_in_production()
 
-	const file = database_file()
+	console.log( disclaimer( database_file(), uploads_directory() ) )
 
-	console.log(
-		`\nThis deletes ${file} and everything in it, then rebuilds the `
-			+ `database from the seed.\n`,
+	const consent = consent_from(
+		process.argv.slice( 2 ),
+		Boolean( process.stdin.isTTY ),
 	)
 
-	if ( process.argv.includes( "--interactive" ) && !await confirmed() ) {
-		console.log( "Nothing was changed.\n" )
+	if ( consent === "cannot_be_asked" ) {
+		refuse_without_a_terminal()
+	}
+
+	if ( consent === "must_be_asked" && !await answered_yes() ) {
+		console.log( "\nNothing was changed.\n" )
 		return
 	}
 
@@ -72,20 +83,6 @@ async function main () {
 		console.log( "\nSeeded.\n" )
 	} finally {
 		await strapi.destroy()
-	}
-}
-
-async function confirmed () {
-	const prompt = readline.createInterface( {
-		input: process.stdin,
-		output: process.stdout,
-	} )
-
-	try {
-		const answer = await prompt.question( "Type \"yes\" to continue: " )
-		return answer.trim().toLowerCase() === "yes"
-	} finally {
-		prompt.close()
 	}
 }
 

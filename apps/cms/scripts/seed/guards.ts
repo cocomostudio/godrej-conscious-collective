@@ -8,8 +8,9 @@
  | design — schema iteration is cheap only when a rebuild is one command — and
  | it means the difference between a developer's own machine and anything else
  | has to be a wall rather than a warning. Both checks run before anything is
- | deleted and both exit the process. Neither prompts, because a prompt is
- | something a tired person answers wrongly at eleven at night.
+ | deleted and both exit the process. Neither prompts: where the seed is running
+ | is not something to negotiate about. The one thing it does ask about is the
+ | content in front of it, and that lives in `confirmation.ts`.
  |
  */
 
@@ -135,7 +136,14 @@ export function delete_uploads ( directory = uploads_directory() ) {
 	}
 }
 
-function refuse ( reason: string ): never {
+/**
+ |
+ | One wording and one exit for every refusal in the seed, wherever it is
+ | decided — `confirmation.ts` refuses through this too, so a person who has hit
+ | one of these has hit all of them.
+ |
+ */
+export function refuse ( reason: string ): never {
 	console.error( `\nThe seed refuses to run.\n\n${reason}\n` )
 	process.exit( 1 )
 }
