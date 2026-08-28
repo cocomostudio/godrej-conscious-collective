@@ -324,7 +324,7 @@ function Page_Title (
 		<H className="text-h2 font-semibold text-context">{ title }</H>
 
 		{ standfirst
-			&& <p className="mt-4 text-p text-black">{ standfirst }</p> }
+			&& <p className="mt-2 text-caption text-black">{ standfirst }</p> }
 	</div>
 }
 
