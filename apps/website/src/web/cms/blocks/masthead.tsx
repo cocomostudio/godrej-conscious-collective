@@ -49,7 +49,7 @@ export function Masthead (
 
 	return <div className="relative overflow-hidden md:pl-16 bg-context">
 		<div
-			className={ `relative cc mx-auto pt-6 md:py-31 z-10 md:after:hidden after:absolute after:top-0 after:left-full after:size-full after:bg-linear-to-r after:from-context after:via-45% after:to-transparent${
+			className={ `relative cc mx-auto md:flex md:flex-col md:justify-center md:h-108 lg:h-129.5 pt-6 md:pt-0 z-10 md:after:hidden after:absolute after:top-0 after:left-full after:size-full after:bg-linear-to-r after:from-context after:via-45% after:to-transparent${
 				pictures ? "" : " max-md:pb-6"
 			}` }>
 			{ back_link && <div className="md:hidden">
