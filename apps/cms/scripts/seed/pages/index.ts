@@ -147,16 +147,33 @@ export async function write_pages (
 	// headed "Showcases" underneath a page headed "Showcases" says it twice.
 	// The section's `title` is the editor's label for the row in the admin,
 	// which is what that attribute is for.
+	//
+	// The page **is** its category, and `color_scheme` is where it says so:
+	// the context colour points at the category, which draws the sidebar
+	// beside the listing and the filtration widget inside it. The section
+	// behind it fills itself from that same alias rather than naming the
+	// category a second time, and takes a flat fill rather than one of the
+	// fades — a fade down into grey is how the home page ends a row, and
+	// these pages are one row that runs the whole way down.
+	//
+	// The section pads below itself and not above: the listing opens the page,
+	// and its own header is what a visitor should meet at the top edge. The
+	// schedule page below asks for the same thing from the other side — there
+	// the block declines the space rather than the section, and either of them
+	// declining is enough.
 	for ( const { category, standfirst, title } of CATEGORY_LISTING_PAGES ) {
 		await create_entry( strapi, "api::page.page", {
 			main_region: [
 				section( `${title} — the listing`, {
 					blocks: [ session_listing_with_filtration( category ) ],
+					spacing_around: "below",
+					background_gradient: "context",
 				} ),
 			],
 			page_shell: page_shells.primary.documentId,
 			standfirst,
 			title,
+			color_scheme: category.toLowerCase(),
 		} )
 	}
 
