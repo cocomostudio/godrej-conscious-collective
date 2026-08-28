@@ -25,6 +25,10 @@
  |     across the two gutters the white box holds beyond the container on the
  |     right. The full-bleed image is what asks.
  |
+ | And one way back in: **`use_column_inset`** is the padding that returns a
+ | block's content to where an ordinary block's would have been, for a block
+ | that wanted only its background out at the edges.
+ |
  | And one question a section asks before it frames anything: **whether to pad
  | at the top, and whether to pad at the bottom.** Padding is undone where it is
  | laid down and nowhere else — a negative margin on a child is clamped at the
@@ -70,6 +74,19 @@ const FULL_BLEED = "-mx-1ccm"
  |
  */
 const COLUMN_BLEED = "-ml-1ccm md:-ml-16 -mr-1ccm md:-mr-2g"
+
+/**
+ |
+ | The two bleeds again, as the padding that gives each of them back.
+ |
+ | Each is the mirror of the margins above it — one content-container margin
+ | on a one-column page; the column's own inset and the white box's two
+ | gutters on a two-column one — so a box carrying one of these sits exactly
+ | where it would have sat had neither been applied.
+ |
+ */
+const FULL_BLEED_INSET = "px-1ccm"
+const COLUMN_BLEED_INSET = "pl-1ccm md:pl-16 pr-1ccm md:pr-2g"
 
 type Section_Padding = {
 	one_column: boolean
@@ -195,4 +212,25 @@ export function use_full_bleed () {
  */
 export function use_column_bleed () {
 	return use_page_layout() === "one-column" ? FULL_BLEED : COLUMN_BLEED
+}
+
+/**
+ |
+ | The padding that undoes `use_column_bleed`.
+ |
+ | **A block that paints to the column's edges but sets its words where an
+ | ordinary block's words are needs both**: the bleed on the box carrying the
+ | paint, and this on a box inside it. The filtration listing is the case —
+ | its gradient runs the width of the column and its cards do not.
+ |
+ | It reads the arrangement for the same reason the bleed does: what was taken
+ | differs between the two, so what is given back has to differ with it. A
+ | block that wrote the two-column answer out by hand would inset itself past
+ | the margin on a one-column page, where there is no `md:pl-16` to give back.
+ |
+ */
+export function use_column_inset () {
+	return use_page_layout() === "one-column"
+		? FULL_BLEED_INSET
+		: COLUMN_BLEED_INSET
 }

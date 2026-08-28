@@ -21,6 +21,7 @@
  |
  */
 
+import type { CSSProperties } from "react"
 import { useMemo } from "react"
 
 import type {
@@ -44,6 +45,10 @@ import {
 	use_filtered_sessions,
 	use_loaded_sessions,
 } from "../filtration/sessions.tsx"
+import {
+	use_column_bleed,
+	use_column_inset,
+} from "./section-frame.tsx"
 import { use_filtration_visibility } from "../filtration/use-filtration-visibility.ts"
 
 import { Button } from "#infra/lib/ui/react/buttons/button.tsx"
@@ -98,16 +103,32 @@ function Listing ( { style_and_transition }: Treatment_Props ) {
 		[ loaded ],
 	)
 
-	return <>
-		<Header facets={ facets } on_open={ filtration.show } />
+	const { className: gradient_classname, style: gradient_style } =
+		compose_linear_vignette_gradient()
 
-		<Filtration_Widget
-			facets={ facets }
-			on_dismiss={ filtration.hide }
-			visible={ filtration.visible } />
+	/*
+	 | **Two boxes, because the gradient goes further than the words do.**
+	 |
+	 | The outer one bleeds to the edges of the column and carries the paint.
+	 | The inner one gives back exactly what that bleed took, so the header,
+	 | the widget and the cards sit on the same line as every other block on
+	 | the page. One box carrying both would have dragged the cards out with
+	 | the colour.
+	 */
+	return <div
+		className={ `${use_column_bleed()} ${gradient_classname}` }
+		style={ gradient_style }>
+		<div className={ use_column_inset() }>
+			<Header facets={ facets } on_open={ filtration.show } />
 
-		<Cards style_and_transition={ style_and_transition } />
-	</>
+			<Filtration_Widget
+				facets={ facets }
+				on_dismiss={ filtration.hide }
+				visible={ filtration.visible } />
+
+			<Cards style_and_transition={ style_and_transition } />
+		</div>
+	</div>
 }
 
 /**
@@ -118,6 +139,17 @@ function Listing ( { style_and_transition }: Treatment_Props ) {
  | with a visitor scrolling a long category. It scrolls away from there up,
  | where the filters are in the sidebar and stay visible on their own.
  |
+ | It is drawn against the context colour at both widths, and lays that
+ | colour down only below the breakpoint: there it is sticky and travels over
+ | the white the gradient turns into, so it has to carry its own background.
+ | Above, it sits still at the top of the gradient, which opens in the same
+ | colour — a background there would be the colour painted twice.
+ |
+ | **The two buttons are a pair in a box of their own**, rather than each
+ | pushed to the right on a margin of its own. The trigger is gone from the
+ | medium breakpoint up and drops out entirely where a listing has no facets
+ | to offer; the box holds the eight pixels between them through both.
+ |
  */
 function Header (
 	{ facets, on_open }: {
@@ -127,24 +159,25 @@ function Header (
 ) {
 	const showing = use_filtered_sessions()
 
-	return <div className="max-md:sticky max-md:top-0 max-md:z-10 max-md:-mx-1ccm max-md:px-1ccm max-md:py-4 max-md:bg-white flex items-center gap-2">
+	return <div className="max-md:sticky max-md:top-0 max-md:z-10 max-md:-mx-1ccm max-md:px-1ccm max-md:py-4 max-md:bg-context flex items-center gap-2">
 		<Showing
-			className="text-h6 md:text-h3 md:font-semibold font-light text-context"
+			className="text-h6 md:text-h3 md:font-semibold font-light text-white"
 			count={ showing.length } />
 
-		<Filtration_Trigger
-			className="ml-auto"
-			colour="theme"
-			facets={ facets }
-			on_press={ on_open } />
+		<div className="ml-auto flex items-center gap-2">
+			<Filtration_Trigger
+				colour="white"
+				facets={ facets }
+				on_press={ on_open } />
 
-		<Button
-			className="max-md:hidden ml-auto"
-			color="theme"
-			emphasis="solid"
-			render={ <Nav_Link url="/schedule" /> }>
-			Get the Schedule
-		</Button>
+			<Button
+				color="white"
+				emphasis="solid"
+				render={ <Nav_Link url="/schedule" /> }
+				text_color="context">
+				Get the Schedule
+			</Button>
+		</div>
 	</div>
 }
 
@@ -173,4 +206,26 @@ function Cards ( { style_and_transition }: Treatment_Props ) {
 			</li>
 		) }
 	</ul>
+}
+
+function compose_linear_vignette_gradient () {
+	const span_9c = "calc( ( 9 * var( --column-width ) ) + ( 8 * var( --gutter-x ) ) )"	// ≈ 1.5 cards tall
+	const span_5c = "calc( ( 5 * var( --column-width ) ) + ( 4 * var( --gutter-x ) ) )"	// ≈ 1 card tall
+
+	const linear_gradient = [
+		"to bottom",
+		"rgb( var( --ctx-context-color ) )",
+		`rgb( var( --color-white ) ) ${ span_9c }`,
+		"rgb( var( --color-white ) )",
+		`rgb( var( --color-white ) ) calc( 100% - ${ span_5c } )`,
+		"rgb( var( --ctx-context-color ) )",
+	].join( ", " )
+
+	return {
+		// Custom properties are not part of React's `CSSProperties`, and
+		// widening the type is the whole of what the cast buys — the same one
+		// `context_colour_of` and `Root` make, for the same reason.
+		style: { "--linear-gradient": linear_gradient } as CSSProperties,
+		className: "bg-[linear-gradient(var(--linear-gradient))]",
+	}
 }
