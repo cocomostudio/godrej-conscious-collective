@@ -69,6 +69,7 @@ const CATEGORY_LISTING_PAGES = [
 		standfirst:
 			"Our theme for Conscious Collective 2027, is a movement for heat-resilient design, equitable futures, and climate-responsive living.",
 		title: "Experiences",
+		style_and_transition: "change-fill-on-hover",
 	},
 	{
 		category: "Conversation",
@@ -80,6 +81,7 @@ const CATEGORY_LISTING_PAGES = [
 		standfirst:
 			"Hands-on sessions and masterclasses with the people who know their craft.",
 		title: "Workshops",
+		style_and_transition: "change-fill-on-hover",
 	},
 ]
 
@@ -161,11 +163,19 @@ export async function write_pages (
 	// schedule page below asks for the same thing from the other side — there
 	// the block declines the space rather than the section, and either of them
 	// declining is enough.
-	for ( const { category, standfirst, title } of CATEGORY_LISTING_PAGES ) {
+	for (
+		const { category, standfirst, style_and_transition, title }
+			of CATEGORY_LISTING_PAGES
+	) {
 		await create_entry( strapi, "api::page.page", {
 			main_region: [
 				section( `${title} — the listing`, {
-					blocks: [ session_listing_with_filtration( category ) ],
+					blocks: [
+						session_listing_with_filtration(
+							category,
+							style_and_transition,
+						),
+					],
 					spacing_around: "below",
 					background_gradient: "context",
 				} ),
