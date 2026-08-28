@@ -446,17 +446,17 @@ function Main_Column (
 				{ sidebar_repeat }
 			</div> }
 
-		{ two_column
-			? <div className="md:w-9c text-black">
-				<div className="cc mx-auto md:pl-16">
-					<Level>{ children }</Level>
-				</div>
-			</div>
-			// Nothing wraps the blocks on a one-column page: each section is
-			// full-width and brings its own padding and its own container.
-			: <div className="text-black">
-				<Level>{ children }</Level>
-			</div> }
+		{
+			/* Nothing wraps the blocks in either arrangement but the colour
+		     they are drawn in: a section is the full width of the column it
+		     is in, and brings its own padding and its own container. That is
+		     what lets its background reach the column's edges — see
+		     `section_container` in `section-frame.tsx`, which is where the
+		     words are put back where they belong. */
+		}
+		<div className="text-black">
+			<Level>{ children }</Level>
+		</div>
 	</>
 
 	return <div
@@ -476,10 +476,15 @@ function Main_Column (
 			: "w-full overflow-x-hidden bg-white" }>
 		{ two_column
 			// The white box, and everything the column holds is inside it.
-			// Nine columns and two gutters — two gutters wider than the
-			// `md:w-9c` container below it, all of that on the right, because
-			// a block is laid out from the left. Those two gutters are what a
-			// full-bleed block runs out into. See `use_column_bleed` in
+			// Nine columns and two gutters — two gutters wider than the nine
+			// columns a section's words are set in, all of that on the right,
+			// because a block is laid out from the left.
+			//
+			// **This is what a section spans.** Its background reaches both
+			// edges of this box, and the inset that keeps its words at nine
+			// columns is the section's own padding rather than a container
+			// out here — which is what those two gutters are then given back
+			// to. See `section_container` and `use_column_bleed` in
 			// `section-frame.tsx`.
 			? <div className="md:w-9c2g bg-white">{ body }</div>
 			: body }

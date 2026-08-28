@@ -10,13 +10,18 @@
  | outer padding against the column's, because there is nothing there to leave a
  | strip of.
  |
- | **On a one-column page a section is full-width, and holds the grid itself.**
- | The background reaches both edges of the window, and the twelve-column
- | container is introduced inside the padding so that the words still line up
- | with the grid. A block that has to run off those edges — a looping carousel,
- | the ticker — asks `section-frame.tsx` for the margins that take it back out.
- | On a two-column page none of that applies: the main column is already the
- | container.
+ | **A section is full-width, and holds the grid itself.** The background reaches
+ | both edges of the column the section is in — the window on a one-column page,
+ | the white box in `root.tsx` on a two-column one — and the container is
+ | introduced inside the padding so that the words still line up with the grid.
+ | A block that has to run off those edges — a looping carousel, the ticker, a
+ | full-bleed image — asks `section-frame.tsx` for the margins that take it back
+ | out, and those are the mirror of the container, so it needs no arithmetic of
+ | its own.
+ |
+ | The two arrangements differ only in what the container is: a centred
+ | twelve-column box on a one-column page, and the main column's own inset as
+ | padding on a two-column one. `section_container` answers for both.
  |
  | **Padding at each edge is a decision two parties can veto.** The section's
  | own `spacing_around` is one; the `spacing_around` of the block at that edge
@@ -65,8 +70,9 @@ import { Plain_String } from "./plain-string.tsx"
 import {
 	pads_at_bottom,
 	pads_at_top,
-	SECTION_CONTAINER,
+	section_container,
 	section_padding,
+	section_rule_inset,
 } from "./section-frame.tsx"
 
 type Section_Heading = {
@@ -192,11 +198,11 @@ export function Section (
 	// edge of the page.
 	//
 	// **Of the type, not of the children.** A section that draws a rule is
-	// followed by an `<hr>` in the same parent, which costs it `:last-child`
-	// and with it the padding that closes the page — silently, because a
-	// positional selector that stops matching is not an error. A main region
-	// holds nothing but sections, so the last `<section>` is the last section
-	// however many rules are drawn between them.
+	// followed by the box holding it in the same parent, which costs the section
+	// `:last-child` and with it the padding that closes the page — silently,
+	// because a positional selector that stops matching is not an error. A main
+	// region holds nothing but sections, so the last `<section>` is the last
+	// section however many rules are drawn between them.
 	const outer_edges = one_column ? "" : [
 		pad_top ? "[&:first-of-type]:md:pt-16" : "",
 		pad_bottom ? "[&:last-of-type]:pb-8 [&:last-of-type]:md:pb-16" : "",
@@ -209,7 +215,7 @@ export function Section (
 			style={ background }
 		>
 			<div className={ padding }>
-				<div className={ one_column ? SECTION_CONTAINER : "" }>
+				<div className={ section_container( { one_column } ) }>
 					{ heading?.content
 						? <Heading
 							__component="text.heading-v1"
@@ -245,7 +251,16 @@ export function Section (
 				</div>
 			</div>
 		</section>
+		{
+			/* The rule is a sibling of the section rather than a child of it,
+		     so nothing frames it and it has to carry the section's own inset.
+		     Only on a two-column page: there the rule sits at the width of the
+		     words, and on a one-column page it runs the full width of the
+		     document. See `section_rule_inset`. */
+		}
 		{ horizontal_rule
-			&& <hr className="border-0 border-t-2 border-gray-light" /> }
+			&& <div className={ section_rule_inset( { one_column } ) }>
+				<hr className="border-0 border-t-2 border-gray-light" />
+			</div> }
 	</>
 }

@@ -62,9 +62,10 @@ export function Contributor_Profile (
 		`rgb( 255, 255, 255, 0 ) ${span_4c}`,
 	].join( ", " )
 
-	// The outer container mirrors what the main column's own padded box gives
-	// every other content type. The block lives in the masthead slot — which
-	// sits above that padded box, so the padding has to be drawn here.
+	// The outer container mirrors the container a section introduces for every
+	// other content type — nine columns of the main column's nine-and-two, and
+	// the same inset inside them. The block lives in the masthead slot, above
+	// where any section sits, so it draws that itself.
 	//
 	// **Portrait on top, then the name and role, then the prose** — the same
 	// stack at every width. The static site does exactly this on the single

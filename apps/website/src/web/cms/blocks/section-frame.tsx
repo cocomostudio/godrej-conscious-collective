@@ -4,12 +4,23 @@
  | How a section frames what is inside it, and how a block gets out of that
  | frame.
  |
- | **The frame only exists on a one-column page.** There, the section runs the
- | full width of the document — that is what a one-column page is for — and the
- | twelve-column container is introduced *inside* it, centred, so that the words
- | line up with the grid instead of with the window. On a two-column page the
- | main column is already the container, and a second one inside every section
- | would narrow the page a second time.
+ | **A section is always the full width of the column it is in, and always
+ | introduces its own container inside that.** That is what lets its background
+ | reach the column's edges while its words stay on the grid — the background is
+ | painted by the section, and the container is a box inside it.
+ |
+ | What the column is differs between the two arrangements, and so does what the
+ | container has to be. On a one-column page the column is the document, and the
+ | container is the twelve-column one, centred. On a two-column page the column
+ | is the white box in `root.tsx` — nine columns and two gutters — and the
+ | container is padding: the main column's `md:pl-16` inset on the left, and the
+ | two gutters the box holds beyond the words on the right. `section_container`
+ | answers for both.
+ |
+ | Padding rather than a second centred container, because the two are not the
+ | same thing from inside. A `cc mx-auto` would re-answer what `100%` means to
+ | every block below it; padding leaves the content box exactly the width it was
+ | when the main column drew the container itself.
  |
  | Two ways out of the frame, because there are two frames:
  |
@@ -49,7 +60,7 @@ import { use_page_layout } from "../page-layout.tsx"
 import type { Block } from "../envelope.ts"
 
 /** The twelve-column container, centred, that a one-column section introduces. */
-export const SECTION_CONTAINER = "cc mx-auto"
+const SECTION_CONTAINER = "cc mx-auto"
 
 /**
  |
@@ -67,10 +78,11 @@ const FULL_BLEED = "-mx-1ccm"
  | Out to the edges of the white column on a two-column page.
  |
  | Below the medium breakpoint the column is the window, so it is the same
- | margin the one-column answer uses. From there up the main column is inset by
- | `md:pl-16` on the left, which `-ml-16` gives back, and the white box around
- | it runs two gutters wider than the container, which `-mr-2g` reaches. See
- | `root.tsx`, where that box is drawn.
+ | margin the one-column answer uses. From there up the section is inset by
+ | `md:pl-16` on the left, which `-ml-16` gives back, and it holds two gutters
+ | of padding on the right beyond where its words stop, which `-mr-2g` gives
+ | back. See `COLUMN_BLEED_INSET` below, of which this is the exact mirror, and
+ | `root.tsx`, where the box those two describe is drawn.
  |
  */
 const COLUMN_BLEED = "-ml-1ccm md:-ml-16 -mr-1ccm md:-mr-2g"
@@ -87,6 +99,36 @@ const COLUMN_BLEED = "-ml-1ccm md:-ml-16 -mr-1ccm md:-mr-2g"
  */
 const FULL_BLEED_INSET = "px-1ccm"
 const COLUMN_BLEED_INSET = "pl-1ccm md:pl-16 pr-1ccm md:pr-2g"
+
+/**
+ |
+ | The container a section introduces inside itself, so that its background can
+ | be the full width of the column while its words are not.
+ |
+ | A centred twelve-column container on a one-column page; the main column's own
+ | inset, as padding, on a two-column one. The two-column answer is
+ | `COLUMN_BLEED_INSET` itself rather than a copy of it: what a section lays
+ | down here is exactly what `use_column_bleed` takes back out, which is the
+ | whole reason a bleeding block needs no arithmetic of its own.
+ |
+ */
+export function section_container ( { one_column }: { one_column: boolean } ) {
+	return one_column ? SECTION_CONTAINER : COLUMN_BLEED_INSET
+}
+
+/**
+ |
+ | The same inset for the rule drawn *between* two sections, which is a sibling
+ | of the section rather than a child and so is framed by nothing.
+ |
+ | Empty on a one-column page, where the rule runs the full width of the
+ | document — it separates two full-width sections, and stopping at the grid
+ | would read as a rule belonging to one of them.
+ |
+ */
+export function section_rule_inset ( { one_column }: { one_column: boolean } ) {
+	return one_column ? "" : COLUMN_BLEED_INSET
+}
 
 type Section_Padding = {
 	one_column: boolean
