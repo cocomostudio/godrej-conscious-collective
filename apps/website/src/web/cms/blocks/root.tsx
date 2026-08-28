@@ -89,6 +89,17 @@ type Root_Props = {
 	 |
 	 */
 	sidebar_repeat: ReactNode
+	/**
+	 |
+	 | **Whether the sidebar wears the page's context colour below the medium
+	 | breakpoint**, where it stacks above the content rather than beside it.
+	 |
+	 | Decided during root assembly, because it turns on what content type the
+	 | page is and on whether an editor chose a scheme — neither of which is
+	 | visible from here. See `Content_Type_Contribution`.
+	 |
+	 */
+	sidebar_takes_the_context_colour: boolean
 	main: ReactNode
 }
 
@@ -104,6 +115,7 @@ export function Root (
 		sidebar,
 		sidebar_at_every_width,
 		sidebar_repeat,
+		sidebar_takes_the_context_colour,
 		standfirst,
 		title,
 	}: Root_Props,
@@ -165,6 +177,7 @@ export function Root (
 							footer_ref={ footer_ref }
 							main_event={ main_event }
 							standfirst={ standfirst }
+							takes_the_context_colour={ sidebar_takes_the_context_colour }
 							title={ title }>
 							{ sidebar }
 						</Sidebar> }
@@ -172,6 +185,7 @@ export function Root (
 						<Main_Column
 							masthead={ masthead }
 							sidebar_repeat={ sidebar_repeat }
+							sidebar_takes_the_context_colour={ sidebar_takes_the_context_colour }
 							two_column={ two_column }>
 							{ main }
 						</Main_Column>
@@ -217,6 +231,15 @@ export function Root (
  | a widget with nowhere to go falls back to rendering where it stands, which
  | the tunnel answers on its own.
  |
+ | **Below the medium breakpoint it may take the page's context colour**,
+ | where it is a band across the top of the page rather than a column beside
+ | it. Everything in it that is drawn in a colour has a second one for that
+ | band — the back link its own, the title and the line beneath it white.
+ | What the sidebar holds below that width is those three and nothing else:
+ | the filtration widget's inline copy and When and Where are both hidden
+ | there, and each is a `max-md:hidden` of its own rather than anything this
+ | arranges.
+ |
  | **When and Where sits at the foot of it, pinned to the bottom of the visible
  | area.** That is why the column itself is the flex container from the medium
  | breakpoint up rather than the box inside it: the pinned copy needs a
@@ -237,6 +260,7 @@ function Sidebar (
 		footer_ref,
 		main_event,
 		standfirst,
+		takes_the_context_colour,
 		title,
 	}: {
 		at_every_width: boolean
@@ -245,18 +269,26 @@ function Sidebar (
 		footer_ref: RefObject<HTMLElement | null>
 		main_event: Event | null
 		standfirst?: string | null
+		takes_the_context_colour: boolean
 		title: string | null
 	},
 ) {
 	return <div
 		className={ `${
 			at_every_width ? "" : "max-md:hidden "
-		}layout__1-4__col-1 md:pl-1ccm pb-6 bg-gray-light md:flex md:flex-col md:justify-between` }>
+		}layout__1-4__col-1 md:pl-1ccm pb-6 ${
+			takes_the_context_colour
+				? "max-md:bg-context md:bg-gray-light"
+				: "bg-gray-light"
+		} md:flex md:flex-col md:justify-between` }>
 		<div className="cc mx-auto sticky top-0 flex flex-col items-start pt-6 md:pt-8 md:pb-6">
 			{ back_link }
 
 			<div className="mt-4">
-				<Page_Title standfirst={ standfirst } title={ title } />
+				<Page_Title
+					on_the_context_colour={ takes_the_context_colour }
+					standfirst={ standfirst }
+					title={ title } />
 			</div>
 
 			{
@@ -311,7 +343,9 @@ function Sidebar (
  |
  */
 function Page_Title (
-	{ standfirst, title }: {
+	{ on_the_context_colour, standfirst, title }: {
+		/** Whether the band behind it is the context colour, below `md`. */
+		on_the_context_colour: boolean
 		standfirst?: string | null
 		title: string | null
 	},
@@ -321,10 +355,24 @@ function Page_Title (
 	}
 
 	return <div>
-		<H className="text-h2 font-semibold text-context">{ title }</H>
+		<H
+			className={ `text-h2 font-semibold ${
+				on_the_context_colour
+					? "max-md:text-white md:text-context"
+					: "text-context"
+			}` }>
+			{ title }
+		</H>
 
 		{ standfirst
-			&& <p className="mt-2 text-caption text-black">{ standfirst }</p> }
+			&& <p
+				className={ `mt-2 text-caption ${
+					on_the_context_colour
+						? "max-md:text-white md:text-black"
+						: "text-black"
+				}` }>
+				{ standfirst }
+			</p> }
 	</div>
 }
 
@@ -346,10 +394,18 @@ function Page_Title (
  |
  */
 function Main_Column (
-	{ children, masthead, sidebar_repeat, two_column }: {
+	{
+		children,
+		masthead,
+		sidebar_repeat,
+		sidebar_takes_the_context_colour,
+		two_column,
+	}: {
 		children: ReactNode
 		masthead: ReactNode
 		sidebar_repeat: ReactNode
+		/** Read for the strip below the sidebar, which continues its band. */
+		sidebar_takes_the_context_colour: boolean
 		two_column: boolean
 	},
 ) {
@@ -358,15 +414,29 @@ function Main_Column (
 			/* On mobile, the sidebar stacks above the main column and the two
 		     were separated by a white strip of the main column's own top
 		     padding. That padding is gone; this line takes its place so the
-		     grey sidebar and whatever the main column opens with — a listing
+		     sidebar and whatever the main column opens with — a listing
 		     header, a section — have a clear break between them rather than
 		     one running straight into the other. Two-column pages that show
 		     their sidebar on mobile are the ones that see it, which is what
-		     `sidebar_repeat` being empty means. */
+		     `sidebar_repeat` being empty means.
+
+		     **The strip is the last of the sidebar rather than the first of
+		     the column**, so it wears whichever background the sidebar above
+		     it wore. The rule is the same black either way and only its
+		     weight changes: a tenth is enough against grey, and a fifth is
+		     what it takes to be seen against a colour. */
 		}
 		{ two_column && !has_blocks( sidebar_repeat )
-			&& <div className="bg-gray-light">
-				<hr className="md:hidden cc mx-auto border-black opacity-10" />
+			&& <div
+				className={ sidebar_takes_the_context_colour
+					? "bg-context"
+					: "bg-gray-light" }>
+				<hr
+					className={ `md:hidden cc mx-auto border-black ${
+						sidebar_takes_the_context_colour
+							? "opacity-20"
+							: "opacity-10"
+					}` } />
 			</div> }
 
 		{ masthead }

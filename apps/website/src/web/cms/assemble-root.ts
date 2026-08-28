@@ -34,6 +34,7 @@ import type { Table_Of_Contents } from "./table-of-contents.ts"
 import {
 	color_scheme_of,
 	context_colours,
+	DEFAULT_SCHEME,
 } from "./context-colours.ts"
 import {
 	is_contributor,
@@ -190,7 +191,15 @@ export function assemble_root (
 		root: {
 			__component: ROOT,
 			back_link: has_sidebar
-				? [ { __component: BACK_LINK, ...contribution.back_link } ]
+				? [ {
+					__component: BACK_LINK,
+					...contribution.back_link,
+					// The sidebar it sits in is grey or it is not, and the link
+					// is drawn against whichever it turns out to be.
+					color: contribution.sidebar_takes_the_context_colour
+						? "context-above-md"
+						: "context",
+				} ]
 				: [],
 			colours: context_colours(
 				resolved_event,
@@ -212,6 +221,8 @@ export function assemble_root (
 				: [],
 			sidebar_at_every_width: contribution.sidebar_at_every_width,
 			sidebar_repeat: has_sidebar ? contribution.sidebar_repeat : [],
+			sidebar_takes_the_context_colour: has_sidebar
+				&& contribution.sidebar_takes_the_context_colour,
 			standfirst: contribution.standfirst,
 			title: contribution.title,
 		},
@@ -281,6 +292,20 @@ type Content_Type_Contribution = {
 	sidebar_repeat: Block[]
 	/**
 	 |
+	 | Whether that sidebar wears the page's context colour below the medium
+	 | breakpoint, where it stacks above the content rather than sitting beside
+	 | it.
+	 |
+	 | **A Page's, and only where an editor chose a scheme.** The colour is the
+	 | editor's statement about what the page is, and a page that made no such
+	 | statement falls back to the theme — which every page would then wear,
+	 | turning a statement into the default. A contributor's colour is not a
+	 | choice either, and a session hides its sidebar at that width entirely.
+	 |
+	 */
+	sidebar_takes_the_context_colour: boolean
+	/**
+	 |
 	 | What the page's context colour is pointed at.
 	 |
 	 | **A Page's is an editor's choice** and may be plain black or plain white
@@ -342,6 +367,7 @@ function of_a_contributor (
 		sidebar: [],
 		sidebar_at_every_width: true,
 		sidebar_repeat: [],
+		sidebar_takes_the_context_colour: false,
 		// The ContributorProfile in the masthead slot carries the name, and
 		// the role sits beneath it there. Repeating either in the sidebar
 		// would be two `h1`s, or the role in two places.
@@ -351,15 +377,20 @@ function of_a_contributor (
 }
 
 function of_a_page ( entry: Page_Entry ): Content_Type_Contribution {
+	const color_scheme = color_scheme_of( entry.color_scheme )
+
 	return {
 		back_link: { label: "Back to Home", url: "/" },
 		collects_a_toc: entry.toc,
-		color_scheme: color_scheme_of( entry.color_scheme ),
+		color_scheme,
 		masthead: [],
 		page_layout: entry.page_layout,
 		sidebar: entry.side_region ?? [],
 		sidebar_at_every_width: true,
 		sidebar_repeat: [],
+		// The default is what a page that said nothing gets, and a sidebar
+		// that coloured itself on that would be colouring itself on silence.
+		sidebar_takes_the_context_colour: color_scheme !== DEFAULT_SCHEME,
 		standfirst: entry.standfirst,
 		title: entry.title,
 	}
@@ -414,6 +445,8 @@ function of_a_session (
 			{ __component: SESSION_DETAILS, columns: 2, details },
 			{ __component: ADD_TO_CALENDAR, instances },
 		],
+		// Nothing to colour: the sidebar is not drawn at that width at all.
+		sidebar_takes_the_context_colour: false,
 		// Both are in the masthead, and a name or a line said twice is worse
 		// than a sidebar that is quieter than a Page's.
 		standfirst: null,

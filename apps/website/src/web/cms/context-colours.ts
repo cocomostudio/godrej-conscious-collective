@@ -145,7 +145,7 @@ export type Color_Scheme = Role | Static_Color
  | changing event changes one declaration.
  |
  */
-const DEFAULT_SCHEME: Color_Scheme = "theme"
+export const DEFAULT_SCHEME: Color_Scheme = "theme"
 
 export function context_colours (
 	resolved_event: Event | null,
