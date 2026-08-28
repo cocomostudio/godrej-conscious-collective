@@ -60,22 +60,25 @@ import { write_privacy_policy_page } from "./privacy-policy.ts"
 const CATEGORY_LISTING_PAGES = [
 	{
 		category: "Showcase",
-		standfirst: "Installations and concept designs across all three days.",
+		standfirst:
+			"Our theme for Conscious Collective 2027, is a movement for heat-resilient design, equitable futures, and climate-responsive living.",
 		title: "Showcases",
 	},
 	{
 		category: "Experience",
-		standfirst: "Things to walk through, touch and take part in.",
+		standfirst:
+			"Our theme for Conscious Collective 2027, is a movement for heat-resilient design, equitable futures, and climate-responsive living.",
 		title: "Experiences",
 	},
 	{
 		category: "Conversation",
-		standfirst: "Talks and panels with the people making the work.",
+		standfirst: "Talks and panels with the people doing the work.",
 		title: "Conversations",
 	},
 	{
 		category: "Workshop",
-		standfirst: "Hands-on sessions, with places to book.",
+		standfirst:
+			"Hands-on sessions and masterclasses with the people who know their craft.",
 		title: "Workshops",
 	},
 ]
