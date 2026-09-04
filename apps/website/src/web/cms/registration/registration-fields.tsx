@@ -365,7 +365,7 @@ export function Consent_Field (
 
 		<label
 			htmlFor={ consent.id }
-			className="flex items-start gap-4 cursor-pointer text-p font-semibold lg:font-medium text-black">
+			className="flex items-start gap-4 cursor-pointer text-p md:text-small font-semibold md:font-medium text-black">
 			{
 				/* The colour drives the border AND the mark, both being
 			     `currentColor` — so an error turns the whole box red. */
