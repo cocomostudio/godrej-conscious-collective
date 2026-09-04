@@ -29,8 +29,9 @@ const RECOGNISED_KEYS = new Set( [
 	// Merged into the content manager's stored configuration.
 	"metadatas",
 	"layouts",
-	// Merged over `metadatas` first, and only when the environment is not
-	// production. See `configure-admin-metadata.ts`.
+	// Merged over `metadatas` first, and only where developer fields are shown
+	// — `ADMIN_SHOW_DEVELOPER_FIELDS`, or the environment when that is unset.
+	// See `configure-admin-metadata.ts`.
 	"metadatas_outside_production",
 	// Free text for whoever opens the file next. Ignored.
 	"note",

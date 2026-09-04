@@ -29,9 +29,9 @@ import {
  | being merged over.
  |
  | A schema may also carry `metadatas_outside_production`, which is merged over
- | `metadatas` before any of that happens and only when the environment is not
- | production. It is how a field is shown to a developer and hidden from an
- | editor — see `outside_production` below.
+ | `metadatas` before any of that happens and only where developer fields are
+ | shown. It is how a field is shown to a developer and hidden from an editor —
+ | see `should_show_developer_fields` below for what decides that.
  |
  | Every key is checked against the schema's actual attributes first, and a
  | mismatch throws — see `validate-admin-metadata.ts` for why a boot failure is
@@ -45,12 +45,19 @@ const COMPONENT_STORE_PREFIX = "configuration_components"
 export async function configure_admin_metadata ( strapi: Core.Strapi ) {
 	const store = strapi.store( { type: "plugin", name: "content_manager" } )
 
+	const show_developer_fields = should_show_developer_fields()
+	// ↑ Answered once, here, before a single schema is looked at. An unreadable
+	// 	flag throws, and it has to throw whether or not the first schema that
+	// 	comes back from the loader happens to declare a field for it to govern —
+	// 	otherwise whether a typo is caught depends on iteration order.
+
 	for ( const uid of user_defined_component_uids( strapi ) ) {
 		await apply_declared_metadata(
 			COMPONENT_STORE_PREFIX,
 			uid,
 			strapi.components[uid],
 			store,
+			show_developer_fields,
 		)
 	}
 
@@ -60,6 +67,7 @@ export async function configure_admin_metadata ( strapi: Core.Strapi ) {
 			uid,
 			strapi.contentTypes[uid],
 			store,
+			show_developer_fields,
 		)
 	}
 }
@@ -93,11 +101,12 @@ async function apply_declared_metadata (
 	uid: string,
 	schema,
 	store: ReturnType<Core.Strapi["store"]>,
+	show_developer_fields: boolean,
 ) {
 	validate_admin_metadata( uid, schema )
 
 	const declaration = schema?.[ADMIN_METADATA_KEY]
-	const metadatas = metadatas_for_this_environment( declaration )
+	const metadatas = metadatas_to_apply( declaration, show_developer_fields )
 	const declared = {
 		...( metadatas ? { metadatas } : {} ),
 		...( declaration?.layouts ? { layouts: declaration.layouts } : {} ),
@@ -118,24 +127,87 @@ async function apply_declared_metadata (
 
 /**
  |
- | The `metadatas` this environment gets: the declared ones outright, or the
- | declared ones with `metadatas_outside_production` merged over them.
+ | The `metadatas` to write: the declared ones outright, or the declared ones
+ | with `metadatas_outside_production` merged over them.
  |
  | **Both halves state the same keys, and the base half states the production
- | value.** That is what makes the switch travel in both directions: a boot in
- | production writes the production value back over whatever a development boot
- | left in the store, rather than leaving a key nobody sets again.
+ | value.** That is what makes the switch travel in both directions: a boot with
+ | developer fields hidden writes the hidden value back over whatever a boot
+ | that showed them left in the store, rather than leaving a key nobody sets
+ | again.
  |
  */
-function metadatas_for_this_environment ( declaration ) {
+function metadatas_to_apply ( declaration, show_developer_fields: boolean ) {
 	const declared = declaration?.metadatas
 	const outside = declaration?.metadatas_outside_production
 
-	if ( !outside || !outside_production() ) {
+	if ( !outside || !show_developer_fields ) {
 		return declared
 	}
 
 	return deep_merge_replacing_arrays( declared ?? {}, outside )
+}
+
+/**
+ |
+ | Whether a schema's `metadatas_outside_production` is applied.
+ |
+ | `ADMIN_SHOW_DEVELOPER_FIELDS` answers it outright wherever it is set, and the
+ | environment answers it wherever the flag is not. The flag exists because the
+ | two are not the same question: whether this is a production deployment
+ | decides how the application *behaves*, and whether an editor should meet the
+ | fields that exist for the seed script decides what one *form* looks like.
+ |
+ | A staging server is the case that pulls them apart. It runs as production in
+ | every way that matters and is still somewhere a developer wants to see a
+ | seeded picture's address — and, going the other way, a developer chasing what
+ | an editor actually sees wants the production form on a machine that is not
+ | production. Before this flag, neither was reachable without lying about
+ | `NODE_ENV`, which would have moved a great deal more than one field.
+ |
+ | Unset and empty both mean unset, so a deployment can hand the decision back
+ | to the environment by emptying the variable rather than by deleting the line.
+ |
+ */
+function should_show_developer_fields () {
+	return read_developer_fields_flag( process.env.ADMIN_SHOW_DEVELOPER_FIELDS )
+		?? outside_production()
+}
+
+/**
+ |
+ | `"true"` or `"false"`, and **nothing else** — an unrecognised value throws
+ | rather than falling back to the environment.
+ |
+ | Falling back would be the worst of the three answers available. Somebody who
+ | wrote `ADMIN_SHOW_DEVELOPER_FIELDS=flase` was reaching for a field an editor
+ | must not see, and would get an admin panel showing it with nothing anywhere
+ | to say the flag they set was never read. This is the reading
+ | `config/database.ts` takes of an unknown `DATABASE_CLIENT`, for the reason it
+ | gives there: a default that quietly replaces a stated intention is worse than
+ | a boot that stops.
+ |
+ */
+function read_developer_fields_flag ( raw: string | undefined ) {
+	if ( raw === undefined || raw === "" ) {
+		return undefined
+	}
+
+	if ( raw === "true" ) {
+		return true
+	}
+
+	if ( raw === "false" ) {
+		return false
+	}
+
+	throw new Error(
+		`ADMIN_SHOW_DEVELOPER_FIELDS is "${raw}", which is neither "true" nor `
+			+ `"false". Set it to one of those, or empty it to let the environment `
+			+ `decide. The boot is refused rather than continued because a flag that `
+			+ `is quietly not read would show an editor the fields it was set to `
+			+ `hide.`,
+	)
 }
 
 /**

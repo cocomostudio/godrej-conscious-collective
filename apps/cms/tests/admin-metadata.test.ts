@@ -364,3 +364,185 @@ describe("metadata declared for outside production only", () => {
 		expect( refusal?.message ).toContain( "summry" )
 	})
 })
+
+/**
+ |
+ | `ADMIN_SHOW_DEVELOPER_FIELDS`, which outranks the environment.
+ |
+ | The environment alone could not express staging. A staging server runs as
+ | production — it has to, or it is testing something else — and is still the
+ | place somebody wants to look at what the seed put in a field an editor never
+ | sees. The only lever before this flag was `NODE_ENV`, and moving that to see
+ | one field would have moved the database client, the upload provider and the
+ | transfer receiver along with it.
+ |
+ | So the flag is asserted in both directions **against the environment that
+ | disagrees with it** — showing in production and hiding in development. Either
+ | one passing by accident, because the environment happened to want the same
+ | answer, would be a test of nothing.
+ |
+ */
+describe("the developer-fields flag outranks the environment", () => {
+	let cms: Awaited<ReturnType<typeof boot_fixture_cms>>
+	let store: any
+
+	const set = ( name: string, value: string | undefined ) => {
+		if ( value === undefined ) {
+			delete process.env[name]
+		} else {
+			process.env[name] = value
+		}
+	}
+
+	const configured = async (
+		{ environment, flag }: {
+			environment: string | undefined
+			flag: string | undefined
+		},
+	) => {
+		const before_environment = process.env.NODE_ENV
+		const before_flag = process.env.ADMIN_SHOW_DEVELOPER_FIELDS
+
+		set( "NODE_ENV", environment )
+		set( "ADMIN_SHOW_DEVELOPER_FIELDS", flag )
+
+		try {
+			await configure_admin_metadata( cms.strapi )
+		} finally {
+			set( "NODE_ENV", before_environment )
+			set( "ADMIN_SHOW_DEVELOPER_FIELDS", before_flag )
+		}
+
+		return await store.get( { key: CONTENT_TYPE_KEY } )
+	}
+
+	const refusal_from = async (
+		arguments_: {
+			environment: string | undefined
+			flag: string | undefined
+		},
+	) => {
+		try {
+			await configured( arguments_ )
+		} catch ( error ) {
+			return error as Error
+		}
+
+		return undefined
+	}
+
+	beforeAll( async () => {
+		cms = await boot_fixture_cms( {
+			content_types: {
+				thing: thing_schema( {
+					metadatas: {
+						name: { edit: { label: "Name" } },
+						summary: {
+							edit: { label: "Summary", visible: false },
+						},
+					},
+					metadatas_outside_production: {
+						summary: { edit: { visible: true } },
+					},
+				} ),
+			},
+		} )
+
+		store = cms.strapi.store( { type: "plugin", name: "content_manager" } )
+	} )
+
+	afterAll( async () => {
+		await cms?.destroy()
+	} )
+
+	test("shows the field in production when it is \"true\"", async () => {
+		const stored = await configured( {
+			environment: "production",
+			flag: "true",
+		} )
+
+		expect( stored.metadatas.summary.edit.visible ).toBe( true )
+	})
+
+	test("hides the field in development when it is \"false\"", async () => {
+		const stored = await configured( {
+			environment: "development",
+			flag: "false",
+		} )
+
+		expect( stored.metadatas.summary.edit.visible ).toBe( false )
+	})
+
+	test("leaves the environment in charge when it is not set", async () => {
+		expect(
+			( await configured( {
+				environment: "development",
+				flag: undefined,
+			} ) ).metadatas.summary.edit.visible,
+		).toBe( true )
+
+		expect(
+			( await configured( {
+				environment: "production",
+				flag: undefined,
+			} ) ).metadatas.summary.edit.visible,
+		).toBe( false )
+	})
+
+	/**
+	 |
+	 | An emptied variable is a variable a deployment has handed back, not one it
+	 | has set to something falsy. Reading `""` as "false" would mean a `.env`
+	 | that names the flag and leaves it blank — which is what this repository's
+	 | own example file ships — silently hiding the fields from every developer
+	 | who copied it.
+	 |
+	 */
+	test("leaves the environment in charge when it is set to nothing", async () => {
+		const stored = await configured( {
+			environment: "development",
+			flag: "",
+		} )
+
+		expect( stored.metadatas.summary.edit.visible ).toBe( true )
+	})
+
+	test("refuses the boot on a value it cannot read, naming both", async () => {
+		const refusal = await refusal_from( {
+			environment: "production",
+			flag: "flase",
+		} )
+
+		expect( refusal?.message ).toContain( "ADMIN_SHOW_DEVELOPER_FIELDS" )
+		expect( refusal?.message ).toContain( "flase" )
+	})
+
+	/**
+	 |
+	 | The flag is read before the schemas are walked, so a value nobody can read
+	 | is a boot failure whether or not a schema happens to declare a field for it
+	 | to govern. Read lazily instead, this would depend on the loader's iteration
+	 | order — and a typo caught on one machine and not the next is worse than one
+	 | caught nowhere.
+	 |
+	 */
+	test("refuses it even where no schema declares a developer field", async () => {
+		const schema = cms.strapi.contentTypes["api::thing.thing"]
+		const original = schema.__
+
+		schema.__ = { metadatas: { name: { edit: { label: "Name" } } } }
+
+		try {
+			const refusal = await refusal_from( {
+				environment: "production",
+				flag: "yes",
+			} )
+
+			expect( refusal?.message ).toContain(
+				"ADMIN_SHOW_DEVELOPER_FIELDS",
+			)
+		} finally {
+			schema.__ = original
+		}
+	})
+})
