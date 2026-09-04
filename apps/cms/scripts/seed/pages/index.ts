@@ -130,7 +130,6 @@ export async function write_pages (
 			} ),
 		],
 		page_shell: page_shells.primary.documentId,
-		standfirst: "The people taking part this year.",
 		title: "Collaborators",
 		color_scheme: "contributor",
 	} )
