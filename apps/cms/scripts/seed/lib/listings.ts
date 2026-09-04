@@ -55,10 +55,14 @@ export function session_listing (
  | narrows it down themselves.
  |
  */
-export function session_listing_with_filtration ( category: string ) {
+export function session_listing_with_filtration (
+	category: string,
+	style_and_transition?: string,
+) {
 	return {
 		__component: "list.session-listing-with-filtration-v1",
 		category,
+		...( style_and_transition ? { style_and_transition } : {} ),
 	}
 }
 
