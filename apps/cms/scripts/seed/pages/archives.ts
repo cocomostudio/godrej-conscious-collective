@@ -84,14 +84,6 @@ const SNAPSHOTS = [
 		+ "approaches, and highlight the role of design, architecture, "
 		+ "and art in shaping more just and climate-responsive futures.",
 	] ),
-	responsive_image_block( {
-		alt: "",
-		caption:
-			"Sound waves do not bounce off these walls, keeping the chamber "
-			+ "cool and echo-less.",
-		small:
-			"https://images.unsplash.com/photo-1597738755960-aeab75744b5e?q=80&w=720&auto=format&fit=crop",
-	} ),
 	{
 		__component: "container.image-and-content-v1",
 		content: [
@@ -186,6 +178,7 @@ export async function write_archives_page (
 			// the top edge.
 			section( "The timeline", {
 				blocks: [ archive_timeline_listing( entries ) ],
+				spacing_around: "above",
 			} ),
 		],
 		page_layout: "two-column",
