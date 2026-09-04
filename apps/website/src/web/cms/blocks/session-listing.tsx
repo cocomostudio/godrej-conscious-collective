@@ -154,7 +154,7 @@ function Wrapping ( { sessions, style_and_transition }: Rendering_Props ) {
 				key={ session.documentId }>
 				<Card
 					className={ `${
-						index === 0 ? "card--featured !flex" : ""
+						index === 0 ? "card--featured md:flex" : ""
 					} select-none` }
 					session={ session }
 					style_and_transition={ style_and_transition } />
