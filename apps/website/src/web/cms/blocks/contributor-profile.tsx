@@ -76,7 +76,7 @@ export function Contributor_Profile (
 			<div className="pt-6 md:p-0 md:w-3c1g shrink-0 bg-gradient-to-b from-context to-[rgba(255,255,255,0)] md:bg-none">
 				{ picture && <figure className="w-full shrink-0">
 					<Picture_Image
-						className="w-full aspect-square rounded-full object-cover grayscale"
+						className="w-full aspect-square rounded-full object-cover"
 						picture={ {
 							...picture,
 							alt: picture.alt || name,
