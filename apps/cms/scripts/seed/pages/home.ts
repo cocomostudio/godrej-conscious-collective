@@ -150,8 +150,7 @@ export async function write_home_page (
 				),
 				link: link( "View All", "/showcases", "plain", "white" ),
 				opening_line: plain_string_component(
-					"Installations and concept designs, sited across the "
-						+ "grounds for all three days.",
+					"Our theme for Conscious Collective 2027, is a movement for heat-resilient design, equitable futures, and climate-responsive living.",
 					"white",
 				),
 				register_with_toc: true,
@@ -176,7 +175,7 @@ export async function write_home_page (
 				),
 				link: link( "View All", "/experiences", "plain", "black" ),
 				opening_line: plain_string_component(
-					"Things to walk through, touch and take part in.",
+					"Our theme for Conscious Collective 2027, is a movement for heat-resilient design, equitable futures, and climate-responsive living.",
 				),
 				register_with_toc: true,
 			} ),
@@ -195,7 +194,7 @@ export async function write_home_page (
 				),
 				link: link( "View All", "/conversations", "plain", "white" ),
 				opening_line: plain_string_component(
-					"Talks and panels with the people making the work.",
+					"Talks and panels with the people doing the work.",
 					"white",
 				),
 				register_with_toc: true,
@@ -217,7 +216,7 @@ export async function write_home_page (
 				),
 				link: link( "View All", "/workshops", "plain", "black" ),
 				opening_line: plain_string_component(
-					"Hands-on sessions, with places to book.",
+					"Hands-on sessions and masterclasses with the people who know their craft.",
 				),
 				register_with_toc: true,
 			} ),
