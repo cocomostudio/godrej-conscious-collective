@@ -74,7 +74,7 @@ export function Contributor_Profile (
 		style={ { "--linear-gradient": linear_gradient } as CSSProperties }>
 		<article className="md:flex md:gap-16 md:p-16">
 			<div className="pt-6 md:p-0 md:w-3c1g shrink-0 bg-gradient-to-b from-context to-[rgba(255,255,255,0)] md:bg-none">
-				{ picture && <figure className="w-full shrink-0">
+				{ picture && <figure className="mx-auto max-md:cc">
 					<Picture_Image
 						className="w-full aspect-square rounded-full object-cover"
 						picture={ {
@@ -91,7 +91,7 @@ export function Contributor_Profile (
 					</p> }
 			</div>
 
-			{ prose && <div className="mt-8 pb-8 md:m-0 md:pb-0 space-y-4">
+			{ prose && <div className="mt-8 mx-auto cc pb-8 md:m-0 md:pb-0 space-y-4">
 				<Level>
 					{
 						/*
