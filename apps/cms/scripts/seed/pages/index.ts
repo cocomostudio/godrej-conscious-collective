@@ -168,7 +168,6 @@ export async function write_pages (
 							style_and_transition,
 						),
 					],
-					spacing_around: "below",
 					background_gradient: "context",
 				} ),
 			],
