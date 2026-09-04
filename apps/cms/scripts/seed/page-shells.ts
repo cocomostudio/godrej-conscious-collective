@@ -54,7 +54,8 @@ export async function write_page_shells (
 					link( "Workshops", "/workshops" ),
 					link( "Schedule", "/schedule" ),
 					link( "Collaborators", "/collaborators" ),
-					link( "About", "/about" ),
+					link( "Archive", "/archives" ),
+					link( "About Us", "/about" ),
 				],
 				site_description:
 					"An annual gathering of designers, architects and makers, "
