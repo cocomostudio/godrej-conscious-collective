@@ -60,7 +60,7 @@ export function Image_Stack_And_Content (
 			LAYOUTS[layout] ?? LAYOUTS["images-left"]
 		}` }>
 		{ pictures.length > 0
-			&& <div className="md:py-24 lg:py-36 md:w-6c shrink-0">
+			&& <div className="md:py-20 md:w-6c shrink-0">
 				<div className="relative aspect-[2/1.76]">
 					<div className="absolute top-0 w-full h-full">
 						{ pictures.map( ( picture, index ) =>

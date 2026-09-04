@@ -174,9 +174,11 @@ function Wrapping ( { sessions, style_and_transition }: Rendering_Props ) {
  */
 const RENDERINGS: Record<Category, ComponentType<Rendering_Props>> = {
 	Conversation: ( props ) =>
-		<Turning { ...props } className="mt-8 pb-8 md:pb-16" />,
+		<Turning { ...props } className="mt-8 -mb-8 md:-mb-16 pb-8 md:pb-16" />,
 	Experience: Rows,
 	Showcase: ( props ) =>
-		<Turning { ...props } className="pt-8 pb-6 md:pb-16" />,
+		<Turning
+			{ ...props }
+			className="-mt-8 -mb-6 md:-mb-16 pt-8 pb-6 md:pb-16" />,
 	Workshop: Wrapping,
 }

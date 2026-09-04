@@ -197,7 +197,7 @@ function Cards ( { style_and_transition }: Treatment_Props ) {
 		return <No_Matches />
 	}
 
-	return <ul className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+	return <ul className="md:mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
 		{ showing.map( ( session ) =>
 			<li key={ session.documentId }>
 				<Card

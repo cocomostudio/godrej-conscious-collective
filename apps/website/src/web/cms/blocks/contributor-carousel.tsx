@@ -481,7 +481,7 @@ export function Contributor_Carousel (
 	// edges rather than stopping at the twelve-column container and showing
 	// where the loop ends.
 	return <div
-		className={ `${full_bleed} -mt-4 overflow-hidden pt-[calc(var(--cc-overflow)+48px)] pb-[calc(var(--cc-overflow)+var(--cc-drop))] [--caption-opacity:1] [--cc-overflow:32px] md:[--cc-overflow:56px] [--cc-drop:0px] md:[--cc-drop:312px] [--cc-centre-scale:1.3764706] md:[--cc-centre-scale:1.5]` }
+		className={ `${full_bleed} -mt-10 md:-mt-12 md:-mb-14 overflow-hidden pt-[calc(var(--cc-overflow)+48px)] pb-[calc(var(--cc-overflow)+var(--cc-drop))] [--caption-opacity:1] [--cc-overflow:32px] md:[--cc-overflow:56px] [--cc-drop:0px] md:[--cc-drop:312px] [--cc-centre-scale:1.3764706] md:[--cc-centre-scale:1.5]` }
 		ref={ viewport_ref }>
 		<div
 			className="flex items-start gap-4 md:gap-8 [&>*:first-child]:ml-4 md:[&>*:first-child]:ml-8 [touch-action:pan-y]"

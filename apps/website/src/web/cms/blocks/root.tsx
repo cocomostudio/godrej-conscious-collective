@@ -312,7 +312,7 @@ function Sidebar (
 			}
 			<div
 				className={ title_at_every_width
-					? "mt-4"
+					? "mt-4 md:mt-8"
 					: "mt-4 md:sr-only" }>
 				<Page_Title
 					at_every_width={ title_at_every_width }
@@ -357,7 +357,7 @@ function Sidebar (
 			     against the bottom of the screen. */
 			}
 			<When_And_Where_On_Sidebar
-				className="max-w-68 pb-8"
+				className="max-w-68 py-8"
 				event={ main_event }
 				footer_ref={ footer_ref } />
 		</div>
