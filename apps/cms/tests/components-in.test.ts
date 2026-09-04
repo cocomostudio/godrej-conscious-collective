@@ -35,7 +35,10 @@ const SCHEMAS: Record<string, Runtime_Schema> = {
 	},
 	"container.map-and-content-v1": {
 		attributes: {
-			content: { components: [ "text.plain-string-v1" ], type: "dynamiczone" },
+			content: {
+				components: [ "text.plain-string-v1" ],
+				type: "dynamiczone",
+			},
 			map: { component: MAP, type: "component" },
 		},
 	},
@@ -45,7 +48,11 @@ const SCHEMAS: Record<string, Runtime_Schema> = {
 				components: [ "container.map-and-content-v1", MAP ],
 				type: "dynamiczone",
 			},
-			gallery: { component: "media.gallery-v1", repeatable: true, type: "component" },
+			gallery: {
+				component: "media.gallery-v1",
+				repeatable: true,
+				type: "component",
+			},
 		},
 	},
 	"media.gallery-v1": {
@@ -90,7 +97,10 @@ describe("finding a component in a write", () => {
 				{
 					__component: "container.section-v1",
 					content: [
-						{ __component: "container.map-and-content-v1", map },
+						{
+							__component: "container.map-and-content-v1",
+							map,
+						},
 					],
 				},
 			],
@@ -147,9 +157,15 @@ describe("what it walks past", () => {
 	it("finds nothing in a write that holds none", () => {
 		const data = {
 			main_region: [
-				{ __component: "container.section-v1", content: [
-					{ __component: "text.plain-string-v1", text: "hello" },
-				] },
+				{
+					__component: "container.section-v1",
+					content: [
+						{
+							__component: "text.plain-string-v1",
+							text: "hello",
+						},
+					],
+				},
 			],
 			title: "About",
 		}

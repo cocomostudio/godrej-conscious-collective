@@ -14,7 +14,10 @@
 import fs from "node:fs"
 import path from "node:path"
 
-import { DIRECTORY_PLACEHOLDER, uploads_directory } from "../../scripts/seed/guards.ts"
+import {
+	DIRECTORY_PLACEHOLDER,
+	uploads_directory,
+} from "../../scripts/seed/guards.ts"
 import type { Strapi } from "../../scripts/seed/lib/strapi.ts"
 
 export const CMS_DIR = path.resolve( import.meta.dirname, "..", ".." )
@@ -101,7 +104,9 @@ export async function uploads_written_to ( strapi: Strapi ) {
 	const names: string[] = []
 
 	for ( const file of files ) {
-		const formats = Object.values( file.formats ?? {} ) as { url?: string }[]
+		const formats = Object.values( file.formats ?? {} ) as {
+			url?: string
+		}[]
 
 		for ( const url of [ file.url, ...formats.map( ( f ) => f?.url ) ] ) {
 			if ( typeof url === "string" ) {
@@ -131,7 +136,9 @@ export function remove_uploads (
 	directory = uploads_directory(),
 ) {
 	for ( const name of names ) {
-		if ( name === DIRECTORY_PLACEHOLDER || path.basename( name ) !== name ) {
+		if (
+			name === DIRECTORY_PLACEHOLDER || path.basename( name ) !== name
+		) {
 			continue
 		}
 

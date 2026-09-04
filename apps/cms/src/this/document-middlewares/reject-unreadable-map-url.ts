@@ -39,8 +39,7 @@ const COMPLAINTS: Record<Refusal, string> = {
 		"This Google Maps address does not point at any one place. Search for "
 		+ "the place, or click the map to drop a pin on it, and copy the "
 		+ "address again once the map has moved to it.",
-	not_a_map:
-		`This is not a Google Maps address. ${HOW_TO_COPY_ONE}`,
+	not_a_map: `This is not a Google Maps address. ${HOW_TO_COPY_ONE}`,
 	// The one an editor will actually hit, and the only one that is their
 	// tool's doing rather than their own: Share hands out a short link, and
 	// what it stands for is only known to Google's redirector.
@@ -60,7 +59,9 @@ export function reject_unreadable_map_url ( strapi: Core.Strapi ) {
 			const reading = read_maps_url( map.place_url )
 
 			if ( reading.outcome !== "read" ) {
-				throw new errors.ValidationError( COMPLAINTS[reading.outcome] )
+				throw new errors.ValidationError(
+					COMPLAINTS[reading.outcome],
+				)
 			}
 		}
 

@@ -130,7 +130,8 @@ function as_entries ( value: unknown ): unknown[] {
 }
 
 function is_object ( value: unknown ): value is Record<string, unknown> {
-	return typeof value === "object" && value !== null && !Array.isArray( value )
+	return typeof value === "object" && value !== null
+		&& !Array.isArray( value )
 }
 
 /**
