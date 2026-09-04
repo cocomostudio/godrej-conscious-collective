@@ -62,8 +62,7 @@ export function Google_Map (
 				: <Embedded_Map
 					latitude={ latitude }
 					longitude={ longitude }
-					zoom={ zoom } />
-			}
+					zoom={ zoom } /> }
 		</Opens_In_Maps>
 
 		{ picture && <Picture_Caption className="mt-4" picture={ picture } /> }

@@ -32,7 +32,7 @@ export function Vanilla_Carousel (
 		return null
 	}
 
-	return <div className={ `${ BLOCK_SPACING } md:-mx-2g` }>
+	return <div className={ `${BLOCK_SPACING} md:-mx-2g` }>
 		<ul className="flex gap-4 md:gap-8 overflow-auto scrollbar-none pt-6 md:pt-8 px-1ccm md:pl-16 md:pr-0 md:*-last:pr-16">
 			{ slides.map( ( slide, index ) => {
 				const pictures = responsive_picture_of(
