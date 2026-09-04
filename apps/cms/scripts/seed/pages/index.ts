@@ -126,8 +126,6 @@ export async function write_pages (
 		main_region: [
 			section( "Collaborators", {
 				blocks: [ contributor_listing( "grid", 10 ) ],
-				heading: heading_component( "Collaborators", "h2" ),
-				register_with_toc: true,
 				background_gradient: "context",
 			} ),
 		],
