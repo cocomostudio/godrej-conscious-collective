@@ -28,9 +28,15 @@ export type Fetched =
  | why the question is answered here, in the one module that already knows the
  | CMS exists and is guaranteed never to reach the browser bundle.
  |
+ | `CMS_PUBLIC_URL` rather than `CMS_URL`, and the distinction is the whole
+ | point: `CMS_URL` is where **this process** dials the CMS, which on a machine
+ | running both is a loopback port no visitor can resolve. This value ends up in
+ | an `src` attribute in someone else's browser, so it has to be an address that
+ | browser can reach.
+ |
  */
 export function media_origin () {
-	return Environment.get( "CMS_URL" )
+	return Environment.get( "CMS_PUBLIC_URL" )
 }
 
 /**

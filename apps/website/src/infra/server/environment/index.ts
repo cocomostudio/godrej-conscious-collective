@@ -18,6 +18,7 @@ type ApplicationEnvironment = typeof ENVIRONMENTS[keyof typeof ENVIRONMENTS]
 type Env = {
 	APP_ENV: ApplicationEnvironment
 	CMS_URL: string
+	CMS_PUBLIC_URL: string
 	CMS_API_TOKEN: string
 	REGISTRATION_TOKEN_SECRET: string
 	CALENDAR_LINK_SECRET: string
@@ -27,13 +28,40 @@ type Env = {
 	CLIENT_BUILD_DIR: string
 }
 
+/**
+ |
+ | The CMS's origin **as this server reaches it**. A default is carried here,
+ | unlike the secrets, which have none: this one names a machine rather than
+ | granting access, and a deployment that forgets it fails on the first page
+ | with a connection error rather than quietly working with something insecure.
+ |
+ | Only this process ever dials it, so it is free to be an address only this
+ | process can resolve — a loopback port, a container name, a private host.
+ |
+ */
+const cms_url = process.env.CMS_URL ?? "http://localhost:1337"
+
 const _env: Env = {
 	APP_ENV: read_application_environment(),
-	// The CMS's origin. A default is carried here, unlike the secrets, which
-	// have none: this one names a machine rather than granting access, and a
-	// deployment that forgets it fails on the first page with a connection
-	// error rather than quietly working with something insecure.
-	CMS_URL: process.env.CMS_URL ?? "http://localhost:1337",
+	CMS_URL: cms_url,
+	/**
+	 |
+	 | The CMS's origin **as a browser reaches it**, which is a different
+	 | question and frequently a different answer: `CMS_URL` may be a loopback
+	 | port on the deployment's own machine, and a visitor's browser cannot
+	 | resolve that. This is the one that goes in front of every `/uploads/…`
+	 | path the CMS hands back.
+	 |
+	 | Unset, it falls back to `CMS_URL` — which is right in development, where
+	 | the two are the same machine and the same address.
+	 |
+	 | Set to the **empty string** deliberately, uploads are addressed relative
+	 | to the website's own origin. That is the setting for a deployment whose
+	 | reverse proxy forwards `/uploads/` to the CMS: same origin, no second
+	 | hostname to publish, and nothing to change when the CMS moves.
+	 |
+	 */
+	CMS_PUBLIC_URL: process.env.CMS_PUBLIC_URL ?? cms_url,
 	/**
 	 |
 	 | The API token the registration relay presents to the CMS, scoped to
