@@ -171,7 +171,7 @@ describe("the sidebar", () => {
 			( await website.get( "/collaborators/debasmita-ghosh" ) ).html,
 		)
 
-		expect( body ).toContain( "Back to Collaborators" )
+		expect( body ).toContain( "All Collaborators" )
 		expect( body ).toContain( `href="/collaborators"` )
 	})
 
@@ -261,7 +261,7 @@ describe("a collaborator", () => {
 			( await website.get( "/collaborators/no-picture" ) ).html,
 		)
 
-		expect( body ).toContain( "Back to Collaborators" )
+		expect( body ).toContain( "All Collaborators" )
 	})
 })
 

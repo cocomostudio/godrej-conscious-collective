@@ -399,7 +399,7 @@ function of_a_contributor (
 	// match, and `main` is deliberately empty so nothing else appears beneath
 	// it.
 	return {
-		back_link: { label: "Back to Collaborators", url: "/collaborators" },
+		back_link: { label: "All Collaborators", url: "/collaborators" },
 		collects_a_toc: false,
 		color_scheme: "contributor",
 		main: [],
