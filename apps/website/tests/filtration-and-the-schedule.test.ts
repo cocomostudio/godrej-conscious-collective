@@ -155,7 +155,7 @@ beforeAll( async () => {
 				} ),
 			],
 			page_layout: "one-column",
-			standfirst: "Things to walk through, touch and take part in.",
+			standfirst: "Our theme for Conscious Collective 2027, is a movement for heat-resilient design, equitable futures, and climate-responsive living.",
 			title: "Experiences",
 		} ),
 
@@ -234,7 +234,7 @@ beforeAll( async () => {
 					) ],
 				} ),
 			],
-			standfirst: "Installations and concept designs across four days.",
+			standfirst: "Our theme for Conscious Collective 2027, is a movement for heat-resilient design, equitable futures, and climate-responsive living.",
 			title: "Showcases",
 		} ),
 	} )
