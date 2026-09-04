@@ -135,11 +135,13 @@ export async function write_pages (
 				blocks: [ contributor_listing( "grid", 10 ) ],
 				heading: heading_component( "Collaborators", "h2" ),
 				register_with_toc: true,
+				background_gradient: "context",
 			} ),
 		],
 		page_shell: page_shells.primary.documentId,
 		standfirst: "The people taking part this year.",
 		title: "Collaborators",
+		color_scheme: "contributor",
 	} )
 
 	// The four category listing pages, each holding the whole of its category.
