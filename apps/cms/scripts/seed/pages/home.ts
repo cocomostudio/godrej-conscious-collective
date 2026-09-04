@@ -102,10 +102,10 @@ export async function write_home_page (
 						content: [
 							heading( "Reclaiming Cool", "h1" ),
 							plain_string(
-								"Our theme for Conscious Collective 2027 is a movement for heat-resilient design, equitable futures, and climate-responsive living.",
+								"Our theme for Conscious Collective 2027, is a movement for heat-resilient design, equitable futures, and climate-responsive living. As temperatures rise and cities become heat traps, “cool” is no longer a comfort, it’s a right.",
 							),
 							plain_string(
-								"As temperatures rise and cities become heat traps, “cool” is no longer a comfort, it’s a right.",
+								"This year we bring together architects, urban planners, artists, conservationists, and communities to reenvision our environments with climate intelligence, cultural sensitivity, & planetary care",
 							),
 						],
 						images: [
