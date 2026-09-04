@@ -215,6 +215,7 @@ function compose_linear_vignette_gradient () {
 	const linear_gradient = [
 		"to bottom",
 		"rgb( var( --ctx-context-color ) )",
+		"rgb( var( --ctx-context-color ) ) 5%",
 		`rgb( var( --color-white ) ) ${ span_9c }`,
 		"rgb( var( --color-white ) )",
 		`rgb( var( --color-white ) ) calc( 100% - ${ span_5c } )`,
