@@ -158,7 +158,16 @@ export async function write_home_page (
 			} ),
 			section( "Experiences", {
 				background_gradient: "light",
-				blocks: [ session_listing( "Experience", 3 ) ],
+				// The rows seeded onto the other treatment, so that both
+				// branches of `style_and_transition` are on a page somebody
+				// can look at rather than only one of them.
+				blocks: [
+					session_listing(
+						"Experience",
+						3,
+						"change-fill-on-hover",
+					),
+				],
 				heading: heading_component(
 					"Experiences",
 					"h1",
@@ -175,15 +184,8 @@ export async function write_home_page (
 				background_gradient: "conversation-to-light",
 				background_pattern: "spider-web-2",
 				background_position: "bottom-right",
-				// The one row seeded onto the other treatment, so that both
-				// branches of `style_and_transition` are on a page somebody
-				// can look at rather than only one of them.
 				blocks: [
-					session_listing(
-						"Conversation",
-						5,
-						"change-fill-on-hover",
-					),
+					session_listing( "Conversation", 5 ),
 				],
 				heading: heading_component(
 					"Conversations",
@@ -200,7 +202,13 @@ export async function write_home_page (
 			} ),
 			section( "Workshops", {
 				background_gradient: "light",
-				blocks: [ session_listing( "Workshop", 4 ) ],
+				blocks: [
+					session_listing(
+						"Workshop",
+						4,
+						"change-fill-on-hover",
+					),
+				],
 				heading: heading_component(
 					"Workshops",
 					"h1",
