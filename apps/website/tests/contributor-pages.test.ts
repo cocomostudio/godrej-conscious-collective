@@ -7,7 +7,13 @@
  | The contributor is the second content type whose page is not simply its
  | regions: like a session it carries a block with no component behind it,
  | built from top-level attributes. The ContributorProfile in the main column
- | owns the portrait-and-prose split; the sidebar carries only the back link.
+ | owns the portrait-and-prose split; the sidebar carries the back link, the
+ | name and the role.
+ |
+ | **The name and the role are written twice and each copy is hidden at one
+ | width** — the sidebar's below the medium breakpoint, the profile's above it.
+ | The tests below read the classes, because that is where the whole of the
+ | arrangement is: two copies in the markup, one on screen.
  |
  | `body_of` strips the hydration payload, for the same reason `session-pages`
  | strips it: React Router streams the loader's data back down as a script, so
@@ -80,6 +86,11 @@ beforeAll( async () => {
 			role: "Curator",
 		} ),
 
+		"/collaborators/no-role": contributor_envelope( {
+			name: "No Role",
+			role: null,
+		} ),
+
 		"/collaborators/other-year": contributor_envelope( {
 			name: "Kaveri Nair",
 			role: "Curator",
@@ -116,13 +127,20 @@ describe("the profile", () => {
 		expect( body ).toContain( "three years with the Kondh community" )
 	})
 
-	it("carries the page's only h1, and it is the collaborator's name", async () => {
+	it("draws the name and the role under the portrait as prose", async () => {
+		// Prose, not headings: the sidebar carries the document's h1 at every
+		// width, and these two are what a visitor reads in its place from the
+		// medium breakpoint up.
 		const body = body_of(
 			( await website.get( "/collaborators/debasmita-ghosh" ) ).html,
 		)
 
-		expect( [ ...body.matchAll( /<h1[\s>]/g ) ].length ).toBe( 1 )
-		expect( body ).toMatch( /<h1[^>]*>Debasmita Ghosh<\/h1>/ )
+		expect( body ).toMatch(
+			/<p class="max-md:hidden[^"]*"[^>]*>Debasmita Ghosh<\/p>/,
+		)
+		expect( body ).toMatch(
+			/<p class="max-md:hidden[^"]*"[^>]*>Installation artist<\/p>/,
+		)
 	})
 
 	it("names the document after the collaborator", async () => {
@@ -166,15 +184,50 @@ describe("the sidebar", () => {
 		expect( body ).not.toContain( "Add to Calendar" )
 	})
 
-	it("does not say the collaborator's name twice", async () => {
-		// The name is in the ContributorProfile's h1. Root assembly leaves the
-		// sidebar's own title empty on a contributor for the same reason a
-		// session's masthead does — one document, one h1, one name.
+	it("carries the page's only h1, and it is the collaborator's name", async () => {
+		// The name is written twice — here and under the portrait — and only
+		// one of the two is a heading. The other is prose, so a second copy of
+		// the words is not a second first heading.
 		const body = body_of(
 			( await website.get( "/collaborators/debasmita-ghosh" ) ).html,
 		)
 
-		expect( [ ...body.matchAll( />Debasmita Ghosh</g ) ].length ).toBe( 1 )
+		expect( [ ...body.matchAll( /<h1[\s>]/g ) ].length ).toBe( 1 )
+		expect( body ).toMatch( /<h1[^>]*>Debasmita Ghosh<\/h1>/ )
+		expect( [ ...body.matchAll( />Debasmita Ghosh</g ) ].length ).toBe( 2 )
+	})
+
+	it("shows the name and the role only below the medium breakpoint", async () => {
+		const body = body_of(
+			( await website.get( "/collaborators/debasmita-ghosh" ) ).html,
+		)
+
+		// `sr-only` rather than `hidden`: the h1 stops being painted up there,
+		// it does not leave the accessibility tree.
+		expect( body ).toContain( `class="mt-4 md:sr-only"` )
+		expect( body ).toMatch(
+			/<p class="mt-4 text-p [^"]*"[^>]*>Installation artist<\/p>/,
+		)
+	})
+
+	it("draws its band in the contributor colour at that width", async () => {
+		// White words on the contributor colour below the medium breakpoint,
+		// grey beside the content above it — and the back link goes with them.
+		const body = body_of(
+			( await website.get( "/collaborators/debasmita-ghosh" ) ).html,
+		)
+
+		expect( body ).toContain( "max-md:bg-context md:bg-gray-light" )
+		expect( body ).toContain( "max-md:text-white md:text-context" )
+	})
+
+	it("renders without a role", async () => {
+		const { html, status } = await website.get(
+			"/collaborators/no-role",
+		)
+
+		expect( status ).toBe( 200 )
+		expect( body_of( html ) ).toMatch( /<h1[^>]*>No Role<\/h1>/ )
 	})
 })
 

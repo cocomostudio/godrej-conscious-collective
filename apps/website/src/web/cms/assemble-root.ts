@@ -100,14 +100,32 @@ export type Root = Block & {
 	 | The page's name, shown at the top of the sidebar — **or null when a
 	 | masthead carries it instead.**
 	 |
-	 | A page's name has to appear exactly once, as the document's `h1`. A Page
-	 | shows it in the sidebar; a session shows it in the masthead, where the
-	 | design puts it against the cover. Two of them would be two `h1`s saying
-	 | the same thing.
+	 | A page's name has to appear exactly once as the document's `h1`, and the
+	 | sidebar is where that `h1` lives on every content type that has one. A
+	 | Page shows it there at every width. A session shows it in the masthead
+	 | against the cover and leaves this null. A contributor shows it here below
+	 | the medium breakpoint and under the portrait above it — see
+	 | `title_at_every_width`.
 	 |
 	 */
 	title: string | null
 	standfirst: string | null
+	/**
+	 |
+	 | **Whether that name and the line beneath it are drawn above the medium
+	 | breakpoint.**
+	 |
+	 | A Page's are: the sidebar is the one place its name appears. A
+	 | contributor's are not — above that width the design puts the name and the
+	 | role under the portrait, centred, and the sidebar carries the back link
+	 | alone.
+	 |
+	 | Where it is false the heading does not leave the document, it stops being
+	 | painted. It is still the page's only `h1`, and `display: none` would take
+	 | it out of the accessibility tree along with the pixels.
+	 |
+	 */
+	title_at_every_width: boolean
 	/**
 	 |
 	 | The chrome, and the colours it sits inside.
@@ -225,6 +243,7 @@ export function assemble_root (
 				&& contribution.sidebar_takes_the_context_colour,
 			standfirst: contribution.standfirst,
 			title: contribution.title,
+			title_at_every_width: contribution.title_at_every_width,
 		},
 		table_of_contents,
 	}
@@ -261,6 +280,18 @@ type Content_Type_Contribution = {
 	 |
 	 */
 	standfirst: string | null
+	/**
+	 |
+	 | Whether the sidebar is where that name lives at every width, or only
+	 | below the medium breakpoint because the main column carries it above.
+	 |
+	 | **A Page's is true and a contributor's is false**, and it decides two
+	 | things rather than one: whether the sidebar paints the name up there, and
+	 | what the line beneath it is set in. A Page's line is a standfirst and a
+	 | contributor's is a role, and the design gives them different sizes.
+	 |
+	 */
+	title_at_every_width: boolean
 	back_link: { label: string; url: string }
 	masthead: Block[]
 	/**
@@ -296,11 +327,17 @@ type Content_Type_Contribution = {
 	 | breakpoint, where it stacks above the content rather than sitting beside
 	 | it.
 	 |
-	 | **A Page's, and only where an editor chose a scheme.** The colour is the
+	 | **A Page's, but only where an editor chose a scheme.** The colour is the
 	 | editor's statement about what the page is, and a page that made no such
 	 | statement falls back to the theme — which every page would then wear,
-	 | turning a statement into the default. A contributor's colour is not a
-	 | choice either, and a session hides its sidebar at that width entirely.
+	 | turning a statement into the default.
+	 |
+	 | **A contributor's always.** Its colour is not a statement an editor made,
+	 | but it is never absent either: every collaborator page is the contributor
+	 | colour, so there is no silence here to mistake for a choice — and the
+	 | name and the role are drawn white on that band.
+	 |
+	 | A session's never: it hides its sidebar at that width entirely.
 	 |
 	 */
 	sidebar_takes_the_context_colour: boolean
@@ -331,10 +368,20 @@ type Content_Type_Contribution = {
  | A contributor's page.
  |
  | Two-column by construction — a contributor page in one column would have no
- | way back to the listing — and the sidebar carries the back link and nothing
- | else. There is no side region, no table of contents, and no standfirst;
- | the ContributorProfile in the main column carries the name as the
- | document's `h1` and the role beneath it.
+ | way back to the listing — and the sidebar carries the back link, the name and
+ | the role. There is no side region and no table of contents.
+ |
+ | **The name and the role are in two places, and the width decides which one a
+ | visitor sees.** Below the medium breakpoint they are in the sidebar, white on
+ | a band of the contributor colour; above it they are under the portrait,
+ | centred, inside the ContributorProfile. The two columns are too far apart for
+ | one copy to move between them, so the words are written twice and each copy
+ | is hidden at the other width — the same bargain `sidebar_repeat` strikes on a
+ | session.
+ |
+ | **The sidebar's copy is the heading, at every width**, and above the medium
+ | breakpoint it is `sr-only` rather than gone. The profile's copy is prose. One
+ | `h1`, always in the accessibility tree, wherever the pixels went.
  |
  | The block owns the portrait-and-prose split. That arrangement is the whole
  | shape of the page, and the CMS holds it as four flat attributes rather than
@@ -347,10 +394,10 @@ function of_a_contributor (
 ): Content_Type_Contribution {
 	// The ContributorProfile occupies the masthead slot rather than the main
 	// region — because the masthead is the one place in the main column that
-	// sits **outside** the `<Level>` a section's headings nest inside, and the
-	// contributor's name has to render as the document's `h1`. It draws its
-	// own padded container to match, and `main` is deliberately empty so
-	// nothing else appears beneath it.
+	// sits **outside** the `<Level>` a section's headings nest inside, and
+	// nothing it holds is a heading. It draws its own padded container to
+	// match, and `main` is deliberately empty so nothing else appears beneath
+	// it.
 	return {
 		back_link: { label: "Back to Collaborators", url: "/collaborators" },
 		collects_a_toc: false,
@@ -367,12 +414,10 @@ function of_a_contributor (
 		sidebar: [],
 		sidebar_at_every_width: true,
 		sidebar_repeat: [],
-		sidebar_takes_the_context_colour: false,
-		// The ContributorProfile in the masthead slot carries the name, and
-		// the role sits beneath it there. Repeating either in the sidebar
-		// would be two `h1`s, or the role in two places.
-		standfirst: null,
-		title: null,
+		sidebar_takes_the_context_colour: true,
+		standfirst: entry.role,
+		title: entry.name,
+		title_at_every_width: false,
 	}
 }
 
@@ -393,6 +438,7 @@ function of_a_page ( entry: Page_Entry ): Content_Type_Contribution {
 		sidebar_takes_the_context_colour: color_scheme !== DEFAULT_SCHEME,
 		standfirst: entry.standfirst,
 		title: entry.title,
+		title_at_every_width: true,
 	}
 }
 
@@ -451,6 +497,7 @@ function of_a_session (
 		// than a sidebar that is quieter than a Page's.
 		standfirst: null,
 		title: null,
+		title_at_every_width: true,
 	}
 }
 

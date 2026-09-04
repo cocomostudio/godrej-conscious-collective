@@ -58,6 +58,21 @@ type Root_Props = {
 	page_layout: Page_Layout
 	/** Null on a content type whose masthead carries the name instead. */
 	title: string | null
+	/**
+	 |
+	 | **Whether that title and the line beneath it are painted above the medium
+	 | breakpoint.**
+	 |
+	 | A Page's are — the sidebar is the one place its name appears. A
+	 | contributor's are not: the ContributorProfile carries a second copy of
+	 | both under the portrait up there, and the design shows that one instead.
+	 |
+	 | The heading is still the document's only `h1` either way, so what hides it
+	 | is `sr-only` rather than `hidden` — the pixels go, the name stays in the
+	 | accessibility tree.
+	 |
+	 */
+	title_at_every_width: boolean
 	standfirst?: string | null
 	colours: Record<string, string>
 	main_event: Event | null
@@ -118,6 +133,7 @@ export function Root (
 		sidebar_takes_the_context_colour,
 		standfirst,
 		title,
+		title_at_every_width,
 	}: Root_Props,
 ) {
 	const two_column = page_layout !== ONE_COLUMN
@@ -178,7 +194,8 @@ export function Root (
 							main_event={ main_event }
 							standfirst={ standfirst }
 							takes_the_context_colour={ sidebar_takes_the_context_colour }
-							title={ title }>
+							title={ title }
+							title_at_every_width={ title_at_every_width }>
 							{ sidebar }
 						</Sidebar> }
 
@@ -262,6 +279,7 @@ function Sidebar (
 		standfirst,
 		takes_the_context_colour,
 		title,
+		title_at_every_width,
 	}: {
 		at_every_width: boolean
 		back_link: ReactNode
@@ -271,6 +289,7 @@ function Sidebar (
 		standfirst?: string | null
 		takes_the_context_colour: boolean
 		title: string | null
+		title_at_every_width: boolean
 	},
 ) {
 	return <div
@@ -284,8 +303,19 @@ function Sidebar (
 		<div className="cc mx-auto sticky top-0 flex flex-col items-start pt-6 md:pt-8 md:pb-6">
 			{ back_link }
 
-			<div className="mt-4">
+			{
+				/* `md:sr-only` on the wrapper rather than on the heading: the
+			     spacing has to leave with the words, and `sr-only` takes the
+			     box out of flow, so the margin below the back link goes with
+			     it. `md:hidden` would do the same to the layout and take the
+			     `h1` out of the accessibility tree along with it. */
+			}
+			<div
+				className={ title_at_every_width
+					? "mt-4"
+					: "mt-4 md:sr-only" }>
 				<Page_Title
+					at_every_width={ title_at_every_width }
 					on_the_context_colour={ takes_the_context_colour }
 					standfirst={ standfirst }
 					title={ title } />
@@ -341,9 +371,16 @@ function Sidebar (
  | The sidebar is the one place it appears, which makes it a two-column page's
  | alone: a one-column page renders no sidebar and no title with it.
  |
+ | The line beneath it is a Page's standfirst or a contributor's role, and the
+ | design sets the two at different sizes. `at_every_width` is what tells them
+ | apart, because the contributor is the one content type whose name is here
+ | only below the medium breakpoint.
+ |
  */
 function Page_Title (
-	{ on_the_context_colour, standfirst, title }: {
+	{ at_every_width, on_the_context_colour, standfirst, title }: {
+		/** Whether this is the page's only copy of its name, or the narrow one. */
+		at_every_width: boolean
 		/** Whether the band behind it is the context colour, below `md`. */
 		on_the_context_colour: boolean
 		standfirst?: string | null
@@ -366,7 +403,9 @@ function Page_Title (
 
 		{ standfirst
 			&& <p
-				className={ `mt-2 text-caption ${
+				className={ `${
+					at_every_width ? "mt-2 text-caption" : "mt-4 text-p"
+				} ${
 					on_the_context_colour
 						? "max-md:text-white md:text-black"
 						: "text-black"

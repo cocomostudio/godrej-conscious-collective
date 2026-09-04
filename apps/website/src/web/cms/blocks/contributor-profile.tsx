@@ -8,9 +8,10 @@
  | from an entry's top-level attributes. This is the third of those: the
  | Masthead and the Session Details are the other two.
  |
- | It carries the document's `h1`, which is why root assembly leaves the
- | sidebar's title empty on a contributor — a name said twice is two first
- | headings saying the same thing.
+ | **The name and the role under the portrait are prose, not headings.** The
+ | sidebar carries the document's `h1` at every width — painted there below the
+ | medium breakpoint, and `sr-only` above it, where these two are what a visitor
+ | reads instead. One `h1`, whichever copy is on screen.
  |
  | It owns the portrait-and-prose split. A contributor's page is defined by
  | that arrangement, and there is no version of it that does not have one, so
@@ -33,10 +34,7 @@ import { Picture_Image } from "../pictures.tsx"
 
 import { with_nested_lists_normalised } from "./rich-text-nesting.ts"
 
-import {
-	H,
-	Level,
-} from "#infra/lib/ui/react/headings.tsx"
+import { Level } from "#infra/lib/ui/react/headings.tsx"
 
 type Contributor_Profile_Props = {
 	name: string
@@ -67,9 +65,10 @@ export function Contributor_Profile (
 	// the same inset inside them. The block lives in the masthead slot, above
 	// where any section sits, so it draws that itself.
 	//
-	// **Portrait on top, then the name and role, then the prose** — the same
-	// stack at every width. The static site does exactly this on the single
-	// collaborator page: the picture leads, and the words fall below it.
+	// **Portrait on top, then the name and role, then the prose.** The name and
+	// the role are drawn here only from the medium breakpoint up; below it the
+	// sidebar's band carries them and this column opens with the picture. The
+	// static site does exactly this on the single collaborator page.
 	return <div
 		className="md:w-9c text-black md:bg-[linear-gradient(var(--linear-gradient))]"
 		style={ { "--linear-gradient": linear_gradient } as CSSProperties }>
@@ -83,9 +82,9 @@ export function Contributor_Profile (
 							alt: picture.alt || name,
 						} } />
 				</figure> }
-				<H className="max-md:hidden mt-8 text-h4 font-semibold text-black text-center">
+				<p className="max-md:hidden mt-8 text-h4 font-semibold text-black text-center">
 					{ name }
-				</H>
+				</p>
 				{ role
 					&& <p className="max-md:hidden mt-2 text-h5 text-black text-center">
 						{ role }
