@@ -60,26 +60,19 @@ import { write_privacy_policy_page } from "./privacy-policy.ts"
 const CATEGORY_LISTING_PAGES = [
 	{
 		category: "Showcase",
-		standfirst:
-			"Our theme for Conscious Collective 2027, is a movement for heat-resilient design, equitable futures, and climate-responsive living.",
 		title: "Showcases",
 	},
 	{
 		category: "Experience",
-		standfirst:
-			"Our theme for Conscious Collective 2027, is a movement for heat-resilient design, equitable futures, and climate-responsive living.",
 		title: "Experiences",
 		style_and_transition: "change-fill-on-hover",
 	},
 	{
 		category: "Conversation",
-		standfirst: "Talks and panels with the people doing the work.",
 		title: "Conversations",
 	},
 	{
 		category: "Workshop",
-		standfirst:
-			"Hands-on sessions and masterclasses with the people who know their craft.",
 		title: "Workshops",
 		style_and_transition: "change-fill-on-hover",
 	},
@@ -166,7 +159,7 @@ export async function write_pages (
 	// the block declines the space rather than the section, and either of them
 	// declining is enough.
 	for (
-		const { category, standfirst, style_and_transition, title }
+		const { category, style_and_transition, title }
 			of CATEGORY_LISTING_PAGES
 	) {
 		await create_entry( strapi, "api::page.page", {
@@ -183,7 +176,6 @@ export async function write_pages (
 				} ),
 			],
 			page_shell: page_shells.primary.documentId,
-			standfirst,
 			title,
 			color_scheme: category.toLowerCase(),
 		} )
