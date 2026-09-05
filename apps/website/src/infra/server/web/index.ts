@@ -123,7 +123,9 @@ export const WebServer = {
 		const express_app = build_express_server()
 		configure_express_server( express_app )
 
-		if ( Environment.is_development() ) {
+		if (
+			Environment.get( "SERVE_MODE" ) === Environment.SERVE_MODES.VITE
+		) {
 			const vite_dev_server = await build_vite_server()
 			register_vite_middleware( express_app, vite_dev_server )
 			register_react_router_middleware( express_app, vite_dev_server )

@@ -15,6 +15,22 @@ const ENVIRONMENTS = {
 
 type ApplicationEnvironment = typeof ENVIRONMENTS[keyof typeof ENVIRONMENTS]
 
+/**
+ |
+ | How the browser's assets are produced and served.
+ |
+ | `vite` mounts a Vite development server in this process — transforming on
+ | demand, with hot module replacement. `static` serves what
+ | `react-router build` already wrote.
+ |
+ */
+const SERVE_MODES = {
+	VITE: "vite",
+	STATIC: "static",
+} as const
+
+type ServeMode = typeof SERVE_MODES[keyof typeof SERVE_MODES]
+
 type Env = {
 	APP_ENV: ApplicationEnvironment
 	CMS_URL: string
@@ -23,6 +39,7 @@ type Env = {
 	REGISTRATION_TOKEN_SECRET: string
 	CALENDAR_LINK_SECRET: string
 	TRUST_PROXY: string | number | boolean
+	SERVE_MODE: ServeMode
 	HTTP_SERVER_PORT: number
 	SERVER_BUILD_DIR: string
 	CLIENT_BUILD_DIR: string
@@ -41,8 +58,10 @@ type Env = {
  */
 const cms_url = process.env.CMS_URL ?? "http://localhost:1337"
 
+const application_environment = read_application_environment()
+
 const _env: Env = {
-	APP_ENV: read_application_environment(),
+	APP_ENV: application_environment,
 	CMS_URL: cms_url,
 	/**
 	 |
@@ -121,6 +140,23 @@ const _env: Env = {
 	 |
 	 */
 	TRUST_PROXY: read_trust_proxy( process.env.TRUST_PROXY ),
+	/**
+	 |
+	 | Whether this process builds the browser's assets or merely serves them.
+	 |
+	 | Its own variable rather than a reading of the environment, because both
+	 | overrides are things somebody needs. Serving the built output on a
+	 | developer's machine is how a rendering fault that only appears in the
+	 | production bundle gets reproduced, and it should not require claiming to
+	 | be production — which would move `APP_ENV` and everything that ever comes
+	 | to depend on it. The reverse, a Vite server in a production-mode process,
+	 | is rarer and deliberately still possible.
+	 |
+	 | The environment supplies only the default: built assets in production,
+	 | a Vite server everywhere else.
+	 |
+	 */
+	SERVE_MODE: read_serve_mode( process.env.SERVE_MODE ),
 	HTTP_SERVER_PORT: read_port( process.env.HTTP_SERVER_PORT, 9001 ),
 	SERVER_BUILD_DIR: process.env.SERVER_BUILD_DIR ?? "./build/server",
 	CLIENT_BUILD_DIR: process.env.CLIENT_BUILD_DIR ?? "./build/client",
@@ -129,15 +165,11 @@ const _env: Env = {
 export const Environment = {
 	get,
 	ENVIRONMENTS,
-	is_development,
+	SERVE_MODES,
 }
 
 function get<T extends keyof Env> ( key: T ): Env[T] {
 	return _env[key]
-}
-
-function is_development () {
-	return _env.APP_ENV === ENVIRONMENTS.DEVELOPMENT
 }
 
 function read_application_environment (): ApplicationEnvironment {
@@ -167,6 +199,36 @@ function read_trust_proxy ( raw: string | undefined ) {
 	const hops = Number.parseInt( raw, 10 )
 
 	return String( hops ) === raw ? hops : raw
+}
+
+/**
+ |
+ | Unset and empty both mean unset, so a deployment can hand the decision back
+ | to the environment by emptying the variable rather than by deleting the line.
+ |
+ | **Refuses the boot on an unrecognised value**, unlike `read_port`, which
+ | falls back. The asymmetry is deliberate: a port that cannot be parsed is
+ | visible on the first request, whereas a misspelt serve mode read as its
+ | default is not visible at all — the override silently did not take, and every
+ | symptom afterwards points somewhere other than the typo.
+ |
+ */
+function read_serve_mode ( raw: string | undefined ): ServeMode {
+	if ( raw === undefined || raw === "" ) {
+		return application_environment === ENVIRONMENTS.PRODUCTION
+			? SERVE_MODES.STATIC
+			: SERVE_MODES.VITE
+	}
+
+	if ( raw === SERVE_MODES.VITE || raw === SERVE_MODES.STATIC ) {
+		return raw
+	}
+
+	throw new Error(
+		`SERVE_MODE is "${raw}", which is neither "${SERVE_MODES.VITE}" nor `
+			+ `"${SERVE_MODES.STATIC}". Set it to one of those, or empty it to let `
+			+ `the environment decide.`,
+	)
 }
 
 function read_port ( raw: string | undefined, fallback: number ) {
