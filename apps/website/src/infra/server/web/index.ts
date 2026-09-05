@@ -98,6 +98,8 @@ function start_listening ( express_app: Express.Application ) {
 		console.log(
 			`HTTP server is up and running on http://localhost:${port}`,
 		)
+
+		process.send?.( "ready" )
 	} )
 
 	for ( const signal of [ "SIGTERM", "SIGINT" ] ) {
