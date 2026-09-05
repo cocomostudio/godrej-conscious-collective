@@ -34,5 +34,10 @@ export default {
 		// the application that would be refusing to start.
 		await prune_public_lead_permissions( strapi )
 		await configure_admin_roles( strapi )
+
+		// For PM2
+		strapi.server.httpServer.once( "listening", () => {
+			process.send?.( "ready" )
+		} )
 	},
 }
