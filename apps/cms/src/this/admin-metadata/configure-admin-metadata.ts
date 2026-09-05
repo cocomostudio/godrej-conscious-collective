@@ -1,6 +1,7 @@
 
 import type { Core } from "@strapi/strapi"
 
+import { is_production } from "../environment"
 import { deep_merge_replacing_arrays } from "./deep-merge-replacing-arrays"
 import {
 	ADMIN_METADATA_KEY,
@@ -171,7 +172,7 @@ function metadatas_to_apply ( declaration, show_developer_fields: boolean ) {
  */
 function should_show_developer_fields () {
 	return read_developer_fields_flag( process.env.ADMIN_SHOW_DEVELOPER_FIELDS )
-		?? outside_production()
+		?? !is_production()
 }
 
 /**
@@ -208,19 +209,4 @@ function read_developer_fields_flag ( raw: string | undefined ) {
 			+ `is quietly not read would show an editor the fields it was set to `
 			+ `hide.`,
 	)
-}
-
-/**
- |
- | Whether this is anything other than a production environment.
- |
- | An unset `NODE_ENV` is a developer's shell, so it counts as development —
- | the same reading `scripts/seed/guards.ts` takes. The test is for production
- | rather than for development because `strapi develop`, `vitest` and a bare
- | `node` each name themselves differently, and only one name has to be right
- | for a field to stay hidden from an editor.
- |
- */
-function outside_production () {
-	return ( process.env.NODE_ENV ?? "development" ) !== "production"
 }

@@ -1,6 +1,8 @@
 
 import path from "path"
 
+import { database_client } from "../src/this/environment"
+
 /**
  |
  | Database connection.
@@ -10,12 +12,20 @@ import path from "path"
  | at a local SQLite file, which is exactly the failure the seed script's own
  | client check exists to prevent.
  |
- | SQLite in development, Postgres in production. Nothing else is supported.
+ | Unset is not an unknown value. It resolves to Postgres in production and
+ | SQLite elsewhere — and either can be asked for anywhere, because pointing a
+ | production-mode instance at SQLite on purpose, to reproduce a fault against a
+ | copy of the data, is a thing somebody needs to be able to do.
+ |
+ | That resolution lives in src/this/database-client.ts rather than here, so
+ | that the seed's guard cannot come to disagree with it about what unset means.
+ |
+ | SQLite and Postgres. Nothing else is supported.
  |
  */
 
 export default function ( { env } ) {
-	const client = env( "DATABASE_CLIENT", "sqlite" )
+	const client = database_client()
 
 	return {
 		connection: {

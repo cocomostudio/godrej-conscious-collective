@@ -16,6 +16,7 @@
 
 import fs from "node:fs"
 import path from "node:path"
+import { database_client } from "../../src/this/environment.ts"
 
 export const CMS_DIR = path.resolve( import.meta.dirname, "..", ".." )
 
@@ -29,7 +30,7 @@ export const CMS_DIR = path.resolve( import.meta.dirname, "..", ".." )
  |
  */
 export function refuse_unless_sqlite () {
-	const client = process.env.DATABASE_CLIENT ?? "sqlite"
+	const client = database_client()
 
 	if ( client !== "sqlite" ) {
 		refuse(
