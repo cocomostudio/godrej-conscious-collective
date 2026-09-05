@@ -80,6 +80,22 @@ export async function boot_website (
 	envelopes: Record<string, Envelope> = {},
 ): Promise<Website> {
 	process.env.CMS_URL = CMS_ORIGIN
+	/**
+	 |
+	 | Pinned as well, rather than left to the fallback from `CMS_URL`.
+	 |
+	 | The two answer different questions — where this process dials the CMS,
+	 | and where a browser reaches it — and the second one is meaningful when
+	 | it is **empty**: that is how a deployment behind a reverse proxy asks for
+	 | uploads addressed relative to the website's own origin. Vitest loads the
+	 | developer's `.env`, so a machine set up that way would hand these tests
+	 | an empty origin, and every `src` a test asserts on would lose its host.
+	 |
+	 | So the harness names it, and the suite says the same thing on every
+	 | machine.
+	 |
+	 */
+	process.env.CMS_PUBLIC_URL = CMS_ORIGIN
 
 	const cms: Cms_Stub = {
 		envelopes,
