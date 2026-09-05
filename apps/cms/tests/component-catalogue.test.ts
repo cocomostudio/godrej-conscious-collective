@@ -146,7 +146,6 @@ describe("the archive timeline", () => {
 		expect( newest.content.map( ( block: any ) => block.__component ) )
 			.toEqual( [
 				"text.wysiwyg-v1",
-				"media.responsive-image-v1",
 				"container.image-and-content-v1",
 				"media.responsive-image-v1",
 				"container.image-and-content-v1",
@@ -256,16 +255,16 @@ describe("what a card does when it is pointed at", () => {
 	it("travels with the listing that carries it", async () => {
 		const { body } = await cms.get( "/api/envelope?path=/home" )
 
-		const conversations = find_section(
+		const experiences = find_section(
 			body.data.entry.main_region,
-			"Conversations",
+			"Experiences",
 		)
 
 		// A scalar on the listing, not something the website infers from the
-		// category. The home page's conversations row is the one seeded onto
-		// the treatment that is not the default.
+		// category. The home page's experiences and workshops rows are the
+		// ones seeded onto the treatment that is not the default.
 		expect(
-			find_block( conversations.content, "list.session-listing-v1" )
+			find_block( experiences.content, "list.session-listing-v1" )
 				.style_and_transition,
 		)
 			.toBe( "change-fill-on-hover" )
