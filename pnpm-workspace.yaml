@@ -12,6 +12,12 @@ onlyBuiltDependencies:
  - "esbuild"
  - "sharp"
 
+allowBuilds:
+ '@swc/core': true
+ better-sqlite3: false
+ core-js-pure: true
+ esbuild: true
+
 supportedArchitectures:
  cpu:
   - "x64"
@@ -20,3 +26,4 @@ supportedArchitectures:
  os:
   - "linux"
   - "darwin"
+
