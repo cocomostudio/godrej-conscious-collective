@@ -1,4 +1,6 @@
+
 const path = require( "node:path" )
+const os = require( "node:os" )
 
 /**
  |
@@ -70,7 +72,7 @@ module.exports = {
 			// --- Launcher ---
 			script: "pnpm",
 			args: "-F app.website run start",
-			interpreter: "none",
+			interpreter: `${ os.homedir() }/.nvm/versions/node/v24.20.0/bin/node`,
 
 			// --- Process model ---
 			exec_mode: "fork",
