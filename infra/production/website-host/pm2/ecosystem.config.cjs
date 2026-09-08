@@ -42,6 +42,7 @@ catch {
 }
 
 const repository_root = path.resolve( __dirname, "..", "..", "..", ".." )
+const NODE_VERSION = "24.20.0"
 
 /**
  |
@@ -70,9 +71,9 @@ module.exports = {
 			cwd: repository_root,
 
 			// --- Launcher ---
-			script: "pnpm",
+			script: `${ os.homedir() }/.nvm/versions/node/v${ NODE_VERSION }/bin/pnpm`,
 			args: "-F app.website run start",
-			interpreter: `${ os.homedir() }/.nvm/versions/node/v24.20.0/bin/node`,
+			interpreter: `${ os.homedir() }/.nvm/versions/node/v${ NODE_VERSION }/bin/node`,
 
 			// --- Process model ---
 			exec_mode: "fork",
