@@ -23,6 +23,12 @@ import type { Submission } from "./submission.ts"
 
 import { consent_wording } from "./submission.ts"
 
+import {
+	answered_well,
+	cms_url,
+	request_from_cms,
+} from "../request.server.ts"
+
 import { Environment } from "#infra/server/environment/index.ts"
 
 export type Relayed =
@@ -44,9 +50,7 @@ export async function relay_submission (
 		return { reason: "unconfigured", recorded: false }
 	}
 
-	const url = new URL( "/api/leads", Environment.get( "CMS_URL" ) )
-
-	const response = await fetch( url, {
+	const response = await request_from_cms( cms_url( "/api/leads" ), {
 		body: JSON.stringify( {
 			data: {
 				// Stamped here, never taken from the browser. The browser's
@@ -76,14 +80,14 @@ export async function relay_submission (
 		method: "POST",
 	} )
 
-	if ( !response.ok ) {
+	if ( !answered_well( response ) ) {
 		// The body is read and logged rather than forwarded. A CMS validation
 		// message is written for whoever wrote the caller, not for somebody
 		// filling in a registration form, and passing it through would hand a
 		// stranger a description of the content model.
 		console.error(
 			`The CMS answered ${response.status} to a registration: `
-				+ `${await response.text()}`,
+				+ `${response.body}`,
 		)
 
 		return { reason: "refused", recorded: false }
