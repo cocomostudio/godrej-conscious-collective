@@ -2,7 +2,7 @@
 /**
  |
  | Listings, rendered end to end, driven over HTTP with the CMS stubbed at the
- | fetch boundary.
+ | socket.
  |
  | Two things are worth asserting here and nowhere else.
  |

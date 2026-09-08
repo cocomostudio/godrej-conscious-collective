@@ -1,7 +1,7 @@
 
 /**
  |
- | Rich text, rendered end to end with the CMS stubbed at the fetch boundary.
+ | Rich text, rendered end to end with the CMS stubbed at the socket.
  |
  | Everything an editor can produce inside a text block is observable here — the
  | spacing between two nodes, the treatment a list gets, the shape a nested list

@@ -2,7 +2,7 @@
 /**
  |
  | A page rendered end to end, driven over HTTP with the CMS stubbed at the
- | fetch boundary.
+ | socket.
  |
  */
 
@@ -15,6 +15,7 @@ import {
 } from "vitest"
 
 import {
+	CMS_HOST_NAME,
 	type Website,
 	boot_website,
 } from "./support/boot-website.ts"
@@ -291,6 +292,15 @@ describe("paths", () => {
 		await website.get( "/about?status=draft" )
 
 		expect( website.cms.requests.at( -1 ) ).toBe( "/about?status=draft" )
+	})
+
+	it("names the CMS in the Host, and not only in the address", async () => {
+		await website.get( "/about" )
+
+		// The CMS shares its machine with other applications and the machine
+		// is dialled by address, so this is the only thing in the request that
+		// says which of them it is for.
+		expect( website.cms.host_names.at( -1 ) ).toBe( CMS_HOST_NAME )
 	})
 })
 

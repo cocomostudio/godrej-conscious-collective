@@ -2,7 +2,7 @@
 /**
  |
  | The Archive's two listings, rendered end to end with the CMS stubbed at the
- | fetch boundary.
+ | socket.
  |
  | Both of them draw most of what they draw in the browser — a ring that turns,
  | a dialog that opens, a set of slides that only exists above a size — and none

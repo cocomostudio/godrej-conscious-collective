@@ -2,7 +2,7 @@
 /**
  |
  | When and Where, at the foot of a two-column page's sidebar, driven over HTTP
- | with the CMS stubbed at the fetch boundary.
+ | with the CMS stubbed at the socket.
  |
  | The static site put it in the category listing's sidebar alone. Here it is a
  | property of the **arrangement** rather than of one page: every two-column

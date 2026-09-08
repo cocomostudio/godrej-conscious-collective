@@ -2,7 +2,7 @@
 /**
  |
  | The component catalogue, rendered end to end with the CMS stubbed at the
- | fetch boundary.
+ | socket.
  |
  | The CMS's own tests hold the shape of what arrives. These hold what the
  | website does with it: that every component in the catalogue reaches a block,

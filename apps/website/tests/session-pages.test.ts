@@ -2,7 +2,7 @@
 /**
  |
  | A session page, rendered end to end, driven over HTTP with the CMS stubbed at
- | the fetch boundary.
+ | the socket.
  |
  | A session is the first content type whose page is not simply its regions: a
  | Masthead built from its top-level attributes stands at the head of the main

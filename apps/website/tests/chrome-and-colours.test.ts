@@ -2,7 +2,7 @@
 /**
  |
  | The site chrome and the context colours, driven over HTTP with the CMS
- | stubbed at the fetch boundary.
+ | stubbed at the socket.
  |
  | Two rules are under test and they deliberately disagree with each other:
  |

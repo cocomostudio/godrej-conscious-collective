@@ -2,7 +2,7 @@
 /**
  |
  | A collaborator page, rendered end to end, driven over HTTP with the CMS
- | stubbed at the fetch boundary.
+ | stubbed at the socket.
  |
  | The contributor is the second content type whose page is not simply its
  | regions: like a session it carries a block with no component behind it,

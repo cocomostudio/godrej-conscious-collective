@@ -35,6 +35,7 @@ type Env = {
 	APP_ENV: ApplicationEnvironment
 	CMS_URL: string
 	CMS_PUBLIC_URL: string
+	CMS_HOST_NAME: string
 	CMS_API_TOKEN: string
 	REGISTRATION_TOKEN_SECRET: string
 	CALENDAR_LINK_SECRET: string
@@ -81,6 +82,21 @@ const _env: Env = {
 	 |
 	 */
 	CMS_PUBLIC_URL: process.env.CMS_PUBLIC_URL ?? cms_url,
+	/**
+	 |
+	 | The name the CMS answers to, when the address in `CMS_URL` is not one.
+	 |
+	 | The CMS is no longer alone on its machine, and that machine is reached
+	 | over a private network by IP — so the address dialled says which host
+	 | answers and nothing about which application on it should. `Host` is what
+	 | the server in front of them routes on, and this is what goes in it.
+	 |
+	 | Unset, the request carries the `Host` its address implies, which is the
+	 | right answer wherever the CMS is the only thing listening — a developer's
+	 | machine, or a deployment with a name of its own.
+	 |
+	 */
+	CMS_HOST_NAME: process.env.CMS_HOST_NAME ?? "",
 	/**
 	 |
 	 | The API token the registration relay presents to the CMS, scoped to

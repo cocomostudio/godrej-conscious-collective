@@ -12,6 +12,10 @@
 
 import type { Envelope } from "./envelope.ts"
 
+import type { Answer } from "./request.server.ts"
+
+import { answered_well, cms_url, request_from_cms } from "./request.server.ts"
+
 import { Environment } from "#infra/server/environment/index.ts"
 
 export type Fetched =
@@ -49,26 +53,44 @@ export async function fetch_envelope (
 	path: string,
 	{ status }: { status?: string | null } = {},
 ): Promise<Fetched> {
-	const url = new URL( "/api/envelope", Environment.get( "CMS_URL" ) )
+	const url = cms_url( "/api/envelope" )
 	url.searchParams.set( "path", path )
 
 	if ( status ) {
 		url.searchParams.set( "status", status )
 	}
 
-	const response = await fetch( url )
+	const response = await request_from_cms( url )
 
 	if ( response.status === 404 ) {
 		return { found: false }
 	}
 
-	if ( !response.ok ) {
+	if ( !answered_well( response ) ) {
 		throw new Error(
 			`The CMS answered ${response.status} for ${path}.`,
 		)
 	}
 
-	const { data } = await response.json() as { data: Envelope }
+	return { envelope: read_envelope( response, path ), found: true }
+}
 
-	return { envelope: data, found: true }
+/**
+ |
+ | A body that does not parse is reported with the beginning of what did
+ | arrive, because the likeliest cause of one is that the request reached the
+ | wrong application — a `Host` naming something else on the machine, answering
+ | perfectly well with a page of HTML. The first line of it says which.
+ |
+ */
+function read_envelope ( response: Answer, path: string ): Envelope {
+	try {
+		return ( JSON.parse( response.body ) as { data: Envelope } ).data
+	}
+	catch {
+		throw new Error(
+			`The CMS answered ${response.status} for ${path} with a body that `
+				+ `is not JSON: ${response.body.slice( 0, 200 )}`,
+		)
+	}
 }
