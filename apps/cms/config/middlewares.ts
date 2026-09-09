@@ -1,5 +1,5 @@
 
-import { upload_provider } from "../src/this/upload-provider"
+import { upload_provider } from "../src/this/environment"
 import { get_website_urls } from "../src/this/website-urls"
 
 /**
