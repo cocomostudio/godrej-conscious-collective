@@ -17,7 +17,7 @@ which is why every server block below names an explicit host and why
 |---|---|---|
 | Runs | Strapi, via `pnpm -F app.cms run start` | React Router on Express, via `pnpm -F app.website run start` |
 | Proxy | nginx → `127.0.0.1:$CMS_PORT` | nginx → `127.0.0.1:$WEBSITE_PORT` |
-| App reads | `apps/cms/.env` | `apps/website/.env.production` |
+| App reads | `apps/cms/.env.production` | `apps/website/.env.production` |
 | Host facts | `production/cms-host/.env` | `production/website-host/.env` |
 
 The two machines are coupled in exactly two places, and both are configuration
@@ -126,7 +126,12 @@ Neither `.env` under `infra/` configures an app. Each machine also needs the
 app's own env file, which is gitignored and therefore never arrives with a
 deploy:
 
-**`cms-host` — `apps/cms/.env`**
+**`cms-host` — `apps/cms/.env.production`**
+
+Note the filename, for the same reason the website's host has one: PM2 starts
+the CMS with `ENV_PATH=.env.production`, so a file named `.env` is read only
+outside production — and `scripts/ensure-local-env.js` writes exactly that file
+from the development example whenever `pnpm dev` or `pnpm test` is run.
 
 - `PORT`, equal to `CMS_PORT` in the host's `.env`. Nothing reconciles the two;
   set them apart and nginx proxies to a closed port.
