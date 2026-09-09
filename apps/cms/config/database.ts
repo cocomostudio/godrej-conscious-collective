@@ -17,8 +17,8 @@ import { database_client } from "../src/this/environment"
  | production-mode instance at SQLite on purpose, to reproduce a fault against a
  | copy of the data, is a thing somebody needs to be able to do.
  |
- | That resolution lives in src/this/database-client.ts rather than here, so
- | that the seed's guard cannot come to disagree with it about what unset means.
+ | That resolution lives in src/this/environment.ts rather than here, so that
+ | the seed's guard cannot come to disagree with it about what unset means.
  |
  | SQLite and Postgres. Nothing else is supported.
  |
