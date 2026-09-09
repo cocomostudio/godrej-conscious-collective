@@ -15,7 +15,7 @@ which is why every server block below names an explicit host and why
 
 | | `cms-host` | `website-host` |
 |---|---|---|
-| Runs | Strapi, via `pnpm -F app.cms run start` | React Router on Express, via `pnpm -F app.website run start` |
+| Runs | Strapi | React Router on Express |
 | Proxy | nginx → `127.0.0.1:$CMS_PORT` | nginx → `127.0.0.1:$WEBSITE_PORT` |
 | App reads | `apps/cms/.env.production` | `apps/website/.env.production` |
 | Host facts | `production/cms-host/.env` | `production/website-host/.env` |
@@ -141,7 +141,7 @@ from the development example whenever `pnpm dev` or `pnpm test` is run.
 
 **`website-host` — `apps/website/.env.production`**
 
-Note the filename. The `start` script passes `--env-file-if-exists
+Note the filename. PM2 launches the app with `--env-file-if-exists
 .env.production`, so a file named `.env` is ignored in production.
 
 - `HTTP_SERVER_PORT`, equal to `WEBSITE_PORT` in the host's `.env`.
