@@ -5,18 +5,24 @@
  |
  | The seed is written for an empty database. It does not reconcile, so running
  | it over content somebody made is not a top-up — it is a deletion followed by
- | a rebuild of something else. The refusals in `guards.ts` keep it away from
- | anything that is not local SQLite; this keeps it away from a local database
- | its owner still wanted, which no environment variable can tell it.
+ | a rebuild of something else.
+ |
+ | This is now the *only* thing between the seed and any database it can reach,
+ | production included. It used to be the second line of defence behind a
+ | client check and a `NODE_ENV` check, and it is worth knowing that it is not
+ | any more: what a person reads here is what they get.
  |
  | So it asks, every time, and the answer has to be typed. `-y` is for the
- | person who is running it for the fifth time this afternoon and means it.
+ | person who is running it for the fifth time this afternoon and means it —
+ | and it is a real edge, because the same flag is what a script would pass.
  |
  */
 
 import readline from "node:readline/promises"
 
 import { refuse } from "./guards.ts"
+
+import type { Target } from "./target.ts"
 
 /**
  |
@@ -48,12 +54,23 @@ export function consent_from (
 
 /**
  |
- | What is about to happen, named rather than summarised: a person deciding
- | whether to answer yes is deciding about that file and that directory, so
- | both are printed as paths.
+ | What is about to happen, named rather than summarised.
+ |
+ | A person deciding whether to answer yes is deciding about a specific
+ | database and a specific media store, so both are printed as the addresses
+ | somebody would use to find them — a path for a file, host and schema for a
+ | server, a bucket and region for S3. Nothing here restates configuration:
+ | every line is the *resolved* answer, because the gap between what a variable
+ | says and what it resolves to is exactly where a wipe lands on the wrong
+ | machine.
+ |
+ | The `.env` is named too. "No .env, so the defaults" and "the .env beside
+ | this one, which names production" are the two cases a person has to be able
+ | to tell apart before they type anything, and only one of them is visible
+ | from the prompt.
  |
  */
-export function disclaimer ( database: string, uploads: string ) {
+export function disclaimer ( target: Target, environment_file: string | null ) {
 	const rule = "─".repeat( 72 )
 
 	return [
@@ -64,9 +81,14 @@ export function disclaimer ( database: string, uploads: string ) {
 		"",
 		rule,
 		"",
-		`  Deletes   ${database}`,
-		`  Empties   ${uploads}`,
-		"  Rebuilds  both, from the seed.",
+		`  Reading    ${
+			environment_file ?? "no .env — every value is a default"
+		}`,
+		"",
+		`  Empties    ${target.database}`,
+		`             ${empties( target )}`,
+		`  Clears     ${target.media.where}`,
+		"  Rebuilds   both, from the seed.",
 		"",
 		"  The seed is written for an empty database. It does not merge with",
 		"  what is already there and it does not skip it — every page, every",
@@ -79,6 +101,19 @@ export function disclaimer ( database: string, uploads: string ) {
 		rule,
 		"",
 	].join( "\n" )
+}
+
+/**
+ |
+ | The difference matters to whoever owns the server. Dropping the tables
+ | leaves the database, its owner and its grants alone; a reader who assumed
+ | otherwise would go looking for a database that never went anywhere.
+ |
+ */
+function empties ( target: Target ) {
+	return target.client === "sqlite"
+		? "by deleting the file"
+		: "by dropping every table in it — the database itself stays"
 }
 
 /**

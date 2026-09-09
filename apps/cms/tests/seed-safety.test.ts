@@ -24,8 +24,39 @@ import {
 	consent_from,
 	disclaimer,
 } from "../scripts/seed/confirmation.ts"
+import { qualified } from "../scripts/seed/database.ts"
 import { delete_uploads } from "../scripts/seed/guards.ts"
+import {
+	record_failure,
+	recorded_failures,
+	reset_failures,
+} from "../scripts/seed/report.ts"
+import { resolve_target } from "../scripts/seed/target.ts"
 import { remove_uploads } from "./support/strapi-lifecycle.ts"
+
+import type { Target } from "../scripts/seed/target.ts"
+
+const A_SQLITE_TARGET: Target = {
+	client: "sqlite",
+	database: "/somewhere/.tmp/data.db",
+	file: "/somewhere/.tmp/data.db",
+	media: {
+		provider: "local",
+		where: "/somewhere/public/uploads",
+		clearable_from_disk: true,
+	},
+}
+
+const A_POSTGRES_TARGET: Target = {
+	client: "postgres",
+	database: "db.example.com:5433/gcc_strapi_db (schema public, as someone)",
+	media: {
+		provider: "aws-s3",
+		where: "the S3 bucket gcc-media in ap-south-1",
+		clearable_from_disk: false,
+	},
+	postgres: { schema: "public", connection: {} },
+}
 
 function a_directory_holding ( ...entries: string[] ) {
 	const directory = fs.mkdtempSync(
@@ -72,19 +103,226 @@ describe("consent", () => {
 })
 
 describe("the disclaimer", () => {
-	const text = disclaimer(
-		"/somewhere/.tmp/data.db",
-		"/somewhere/public/uploads",
+	const sqlite = disclaimer( A_SQLITE_TARGET, "/somewhere/.env" )
+	const postgres = disclaimer(
+		A_POSTGRES_TARGET,
+		"/somewhere/.env.production",
 	)
 
-	// Both are named because both are deleted, and a person deciding whether to
+	// Both are named because both are cleared, and a person deciding whether to
 	// answer yes is deciding about the two of them.
 	it("names the database file it deletes", () => {
-		expect( text ).toContain( "/somewhere/.tmp/data.db" )
+		expect( sqlite ).toContain( "/somewhere/.tmp/data.db" )
 	})
 
 	it("names the uploads directory it empties", () => {
-		expect( text ).toContain( "/somewhere/public/uploads" )
+		expect( sqlite ).toContain( "/somewhere/public/uploads" )
+	})
+
+	// A remote target is the case where a person cannot tell what they are
+	// about to destroy from anything else on the screen.
+	it("names the postgres host, database and schema", () => {
+		expect( postgres ).toContain(
+			"db.example.com:5433/gcc_strapi_db (schema public, as someone)",
+		)
+	})
+
+	it("names the bucket when the media is not on this machine", () => {
+		expect( postgres ).toContain( "the S3 bucket gcc-media in ap-south-1" )
+	})
+
+	// The distinction matters to whoever owns the server: the seed drops what
+	// is in the schema and leaves the database, its owner and its grants.
+	it("says the database itself survives a postgres wipe", () => {
+		expect( postgres ).toContain( "the database itself stays" )
+	})
+
+	it("says the file goes for a sqlite wipe", () => {
+		expect( sqlite ).toContain( "by deleting the file" )
+	})
+
+	// Which `.env` was read decides everything above it, and it is the one
+	// thing not visible from the prompt.
+	it("names the .env it read", () => {
+		expect( postgres ).toContain( "/somewhere/.env.production" )
+	})
+
+	it("says so when there was no .env to read", () => {
+		expect( disclaimer( A_SQLITE_TARGET, null ) ).toContain( "no .env" )
+	})
+})
+
+describe("resolving the target", () => {
+	/**
+	 |
+	 | Clears the variables a target is resolved from, sets the ones this case
+	 | is about, and hands back the undo.
+	 |
+	 | It restores key by key rather than putting a saved copy back over
+	 | `process.env`. Assigning to `process.env` replaces Node's live
+	 | environment with an ordinary object, and anything reading the
+	 | environment natively afterwards — a child process, `loadEnvFile` — is
+	 | then reading something else. Vitest gives each file its own process, so
+	 | the blast radius would have been this file; that is why it went
+	 | unnoticed, not a reason it was alright.
+	 |
+	 */
+	function with_environment ( variables: Record<string, string> ) {
+		const touched = new Set( [
+			...Object.keys( process.env ).filter( ( key ) =>
+				key.startsWith( "DATABASE_" ) || key === "UPLOAD_PROVIDER"
+			),
+			...Object.keys( variables ),
+		] )
+
+		const saved = new Map(
+			[ ...touched ].map( ( key ) =>
+				[ key, process.env[key] ] as const
+			),
+		)
+
+		for ( const key of touched ) {
+			delete process.env[key]
+		}
+
+		Object.assign( process.env, variables )
+
+		return () => {
+			for ( const [ key, value ] of saved ) {
+				if ( value === undefined ) {
+					delete process.env[key]
+				} else {
+					process.env[key] = value
+				}
+			}
+		}
+	}
+
+	it("is sqlite outside production, with no variables set", () => {
+		const restore = with_environment( {} )
+
+		try {
+			const target = resolve_target()
+
+			expect( target.client ).toBe( "sqlite" )
+			expect( target.file ).toContain( ".tmp/data.db" )
+			expect( target.media.clearable_from_disk ).toBe( true )
+		} finally {
+			restore()
+		}
+	})
+
+	it("describes a postgres target by host, database and schema", () => {
+		const restore = with_environment( {
+			DATABASE_CLIENT: "postgres",
+			DATABASE_HOST: "db.example.com",
+			DATABASE_PORT: "5433",
+			DATABASE_NAME: "gcc_strapi_db",
+			DATABASE_USERNAME: "someone",
+			DATABASE_SCHEMA: "public",
+		} )
+
+		try {
+			expect( resolve_target().database ).toBe(
+				"db.example.com:5433/gcc_strapi_db (schema public, as someone)",
+			)
+		} finally {
+			restore()
+		}
+	})
+
+	// `pg` lets a connection string win over the keys beside it, so a
+	// disclaimer built from those keys would name a host nothing was about to
+	// touch.
+	it("describes DATABASE_URL rather than the keys it overrides", () => {
+		const restore = with_environment( {
+			DATABASE_CLIENT: "postgres",
+			DATABASE_URL: "postgres://someone@real.example.com:6000/real_db",
+			DATABASE_HOST: "ignored.example.com",
+			DATABASE_NAME: "ignored_db",
+		} )
+
+		try {
+			const described = resolve_target().database
+
+			expect( described ).toContain( "real.example.com:6000/real_db" )
+			expect( described ).not.toContain( "ignored" )
+		} finally {
+			restore()
+		}
+	})
+
+	// An S3 library cannot be emptied by deleting anything on this machine,
+	// and that is the fact the whole run order hangs off.
+	it("knows an S3 library cannot be cleared from disk", () => {
+		const restore = with_environment( {
+			UPLOAD_PROVIDER: "aws-s3",
+			AWS_BUCKET_NAME: "gcc-media",
+			AWS_REGION: "ap-south-1",
+		} )
+
+		try {
+			const { media } = resolve_target()
+
+			expect( media.clearable_from_disk ).toBe( false )
+			expect( media.where ).toContain( "gcc-media" )
+		} finally {
+			restore()
+		}
+	})
+})
+
+// The one string in the seed that is built into DDL rather than sent as a
+// parameter, because postgres has no placeholder for an identifier.
+describe("quoting identifiers for the drop", () => {
+	it("qualifies every name with its schema", () => {
+		expect( qualified( "public", [ "files", "up_users" ] ) ).toBe(
+			"\"public\".\"files\", \"public\".\"up_users\"",
+		)
+	})
+
+	it("doubles a quote inside a name rather than closing on it", () => {
+		expect( qualified( "public", [ "od\"d" ] ) ).toBe(
+			"\"public\".\"od\"\"d\"",
+		)
+	})
+})
+
+describe("the report of what could not be seeded", () => {
+	it("keeps what it is given", () => {
+		reset_failures()
+
+		record_failure( {
+			what: "A picture",
+			where: "Page Shell — the Form slideshow field",
+			why: "the download timed out",
+			how: [
+				"Download it from somewhere",
+				"Upload it in Media Library",
+			],
+		} )
+
+		const [ failure ] = recorded_failures()
+
+		expect( failure.what ).toBe( "A picture" )
+		expect( failure.how ).toHaveLength( 2 )
+
+		reset_failures()
+	})
+
+	// The harness runs the seed more than once in a process, and a report
+	// carrying the last run's failures would be a report about nothing.
+	it("can be emptied", () => {
+		record_failure( {
+			what: "A picture",
+			where: "somewhere",
+			why: "a reason",
+			how: [],
+		} )
+
+		reset_failures()
+
+		expect( recorded_failures() ).toHaveLength( 0 )
 	})
 })
 

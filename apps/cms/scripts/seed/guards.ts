@@ -1,83 +1,43 @@
 
 /**
  |
- | The refusals that keep `index.ts` on a developer's own machine, and the two
- | deletions it makes once it is allowed to run.
+ | Where the seed's destruction is bounded, and the one deletion it can make
+ | without an application to help.
  |
  | The seed deletes the database before it rebuilds it. That is its whole
  | design — schema iteration is cheap only when a rebuild is one command — and
- | it means the difference between a developer's own machine and anything else
- | has to be a wall rather than a warning. Both checks run before anything is
- | deleted and both exit the process. Neither prompts: where the seed is running
- | is not something to negotiate about. The one thing it does ask about is the
- | content in front of it, and that lives in `confirmation.ts`.
+ | for a long time the bound on it was the client: SQLite and nothing else,
+ | refused as an exit rather than a warning.
+ |
+ | That bound is gone, because the seed is now the thing that populates
+ | production. What replaces it is not a smaller wall but a different one: the
+ | run resolves its target, prints it — host, database, schema, and where the
+ | media actually lives — and asks. See `target.ts` and `confirmation.ts`. The
+ | thing being destroyed is named, rather than being assumed from an
+ | environment.
+ |
+ | This keeps its shape from `src/this/environment.ts`, which argues that an
+ | environment is a bag of defaults and that nothing should branch on it. The
+ | seed used to be that file's stated exception. It no longer needs to be.
  |
  */
 
 import fs from "node:fs"
 import path from "node:path"
-import { database_client } from "../../src/this/environment.ts"
 
 export const CMS_DIR = path.resolve( import.meta.dirname, "..", ".." )
 
 /**
  |
- | Refuses unless the database client is SQLite.
- |
- | Postgres is the production client. Nothing about this script inspects where
- | a Postgres connection points, so it cannot tell a colleague's laptop from the
- | real thing — which is exactly why it declines to look.
- |
- */
-export function refuse_unless_sqlite () {
-	const client = database_client()
-
-	if ( client !== "sqlite" ) {
-		refuse(
-			`DATABASE_CLIENT is "${client}". The seed wipes the database it is `
-				+ `pointed at, so it runs against local SQLite and nothing else.`,
-		)
-	}
-}
-
-/**
- |
- | Refuses in production, whatever the client says.
- |
- */
-export function refuse_in_production () {
-	const environment = process.env.NODE_ENV ?? "development"
-
-	if ( environment === "production" ) {
-		refuse(
-			`NODE_ENV is "production". The seed deletes every row it can reach `
-				+ `and must be unable to touch real content, not merely `
-				+ `discouraged from it.`,
-		)
-	}
-}
-
-/**
- |
- | Where the SQLite file lives, mirroring `config/database.ts`: a path relative
- | to the CMS directory, defaulting to `.tmp/data.db`.
- |
- */
-export function database_file () {
-	return path.join(
-		CMS_DIR,
-		process.env.DATABASE_FILENAME ?? ".tmp/data.db",
-	)
-}
-
-/**
- |
- | Where the media library keeps its files.
+ | Where the media library keeps its files, when it keeps them here.
  |
  | Not configurable, and not for want of trying: Strapi's local upload provider
  | resolves this from `strapi.dirs.static.public` itself and ignores the
  | `directory` handed to it in `config/plugins.ts`. Everything that boots this
  | application writes here — the seed, the admin, and the test suite.
+ |
+ | An instance configured for S3 has no such directory, and emptying this one
+ | would tell it nothing. See `media-library.ts`.
  |
  */
 export function uploads_directory () {
@@ -86,25 +46,6 @@ export function uploads_directory () {
 
 /** The one file in the uploads directory that is committed. */
 export const DIRECTORY_PLACEHOLDER = ".gitkeep"
-
-/**
- |
- | Deletes the database file and the two sidecars SQLite leaves beside it in
- | write-ahead-logging mode. Strapi rebuilds the schema from the models on the
- | next boot.
- |
- */
-export function delete_database () {
-	const file = database_file()
-
-	for ( const suffix of [ "", "-shm", "-wal" ] ) {
-		fs.rmSync( `${file}${suffix}`, { force: true } )
-	}
-
-	fs.mkdirSync( path.dirname( file ), { recursive: true } )
-
-	return file
-}
 
 /**
  |
@@ -140,8 +81,8 @@ export function delete_uploads ( directory = uploads_directory() ) {
 /**
  |
  | One wording and one exit for every refusal in the seed, wherever it is
- | decided — `confirmation.ts` refuses through this too, so a person who has hit
- | one of these has hit all of them.
+ | decided — `confirmation.ts`, `target.ts` and `database.ts` all refuse
+ | through this, so a person who has hit one of these has hit all of them.
  |
  */
 export function refuse ( reason: string ): never {
