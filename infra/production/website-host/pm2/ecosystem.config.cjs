@@ -68,12 +68,27 @@ module.exports = {
 		{
 			// --- Identity ---
 			name: "godrej-conscious-collective__website",
-			cwd: repository_root,
+			cwd: path.join( repository_root, "apps", "website" ),
+			// ↑ the application's own directory rather than the checkout's
+			// 	root, because everything the process resolves by relative path
+			// 	is relative to this: the `.env.production` named below, and the
+			// 	SERVER_BUILD_DIR / CLIENT_BUILD_DIR defaults the server reads
+			// 	its build output from.
 
 			// --- Launcher ---
-			script: `${ os.homedir() }/.nvm/versions/node/v${ NODE_VERSION }/bin/pnpm`,
-			args: "-F app.website run start",
+			script: "entry-point.ts",
+			// ↑ naming pnpm by its full path makes PM2 interpret it as a
+			// 	JavaScript file, and not a binary. Hence, we're pointing at the
+			// 	application's entry point directly and letting the interpreter
+			// 	below run it.
 			interpreter: `${ os.homedir() }/.nvm/versions/node/v${ NODE_VERSION }/bin/node`,
+			interpreter_args: "--env-file-if-exists .env.production",
+			// ↑ the script, interpreter and interpreter_args properties
+			// 	combined together are functionally equivalent to
+			// 	`pnpm -F app.website run start`. The env-file flag has to be
+			// 	here because it is an argument to node, not to the application
+			// 	— and without it the process starts with none of
+			// 	`.env.production` in it.
 
 			// --- Process model ---
 			exec_mode: "fork",
@@ -110,13 +125,13 @@ module.exports = {
 			// --- Environments ---
 			//
 			// Deliberately no HTTP_SERVER_PORT here, and no TRUST_PROXY. The app
-			// reads apps/website/.env.production — note the name; the `start`
-			// script passes `--env-file-if-exists .env.production`. A value set
-			// in this block would win over that file, because Node's env-file
-			// loading lets an already-set variable stand, so PM2 setting the
-			// port would make the app's own file silently dead. WEBSITE_PORT in
-			// this host's .env exists so nginx knows where to reach the app, and
-			// the two have to be kept equal by hand.
+			// reads apps/website/.env.production — note the name, which the
+			// launcher above spells out. A value set in this block would win
+			// over that file, because Node's env-file loading lets an
+			// already-set variable stand, so PM2 setting the port would make the
+			// app's own file silently dead. WEBSITE_PORT in this host's .env
+			// exists so nginx knows where to reach the app, and the two have to
+			// be kept equal by hand.
 			env: {
 				NODE_ENV: "development",
 			},
