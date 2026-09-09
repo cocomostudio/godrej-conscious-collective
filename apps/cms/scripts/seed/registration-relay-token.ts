@@ -41,6 +41,8 @@
  |
  */
 
+import { record_failure } from "./report.ts"
+
 import type { Strapi } from "./lib/strapi.ts"
 
 export async function write_registration_relay_token ( strapi: Strapi ) {
@@ -50,9 +52,31 @@ export async function write_registration_relay_token ( strapi: Strapi ) {
 		console.warn(
 			`\nREGISTRATION_RELAY_TOKEN is unset, so no API token was created `
 				+ `for the registration relay. The form will answer 500 until `
-				+ `one exists. Copy apps/cms/.env.example across, or create a `
-				+ `token scoped to Lead create in the admin panel.\n`,
+				+ `one exists. See the report at the end of this run.\n`,
 		)
+
+		// Reported and not merely warned about, because this is the one
+		// omission here that a person cannot see by looking at the site: every
+		// page renders, and the registration form fails only when somebody
+		// tries to submit it.
+		record_failure( {
+			what: "The registration relay's API token",
+			where:
+				"Settings → API Tokens — a token named \"Registration relay\"",
+			why: "REGISTRATION_RELAY_TOKEN was unset in the .env this run read",
+			how: [
+				`Set REGISTRATION_RELAY_TOKEN in the CMS env file and run the `
+				+ `seed again, which is the only way the website's own copy of `
+				+ `the token and this one end up equal.`,
+				`Or, to avoid a reseed: create a custom token in Settings → `
+				+ `API Tokens, named "Registration relay", with no expiry and `
+				+ `a single permission — Lead: create.`,
+				`Either way the same plaintext has to be the website's `
+				+ `REGISTRATION_RELAY_TOKEN, or the form answers 401 instead `
+				+ `of 500.`,
+			],
+		} )
+
 		return
 	}
 
