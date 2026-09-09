@@ -68,11 +68,21 @@ module.exports = {
 		{
 			// --- Identity ---
 			name: "godrej-conscious-collective__cms",
-			cwd: repository_root,
+			cwd: path.join( repository_root, "apps", "cms" ),
+			// ↑ the application's own directory rather than the checkout's
+			// 	root, because everything else here is relative to it: the
+			// 	script below, the `ENV_PATH` further down, and Strapi's own
+			// 	idea of where the application it is booting lives, which it
+			// 	takes from the working directory.
 
 			// --- Launcher ---
-			script: `${ os.homedir() }/.nvm/versions/node/v${ NODE_VERSION }/bin/pnpm`,
-			args: "-F app.cms run start",
+			script: "node_modules/@strapi/strapi/bin/strapi.js",
+			// ↑ invoking pnpm by specifying its full path makes PM2 interpret
+			// 	it as a JavaScript file, and not a binary. Hence, we're just
+			// 	reaching in and executing the strapi.js file directly.
+			args: "start",
+			// ↑ the script and args properties combined together are
+			//  functionally equivalent to `pnpm -F app.cms run start`
 			interpreter: `${ os.homedir() }/.nvm/versions/node/v${ NODE_VERSION }/bin/node`,
 
 			// --- Process model ---
@@ -127,11 +137,11 @@ module.exports = {
 				// file is the *development* one, written by
 				// scripts/ensure-local-env.js from the example on every fresh
 				// clone. Production therefore has to name its own file, which
-				// also matches how the website's `start` script picks up
-				// `.env.production`.
+				// also matches the `.env.production` the website's host is
+				// pointed at.
 				//
-				// Relative to the app's cwd, which is apps/cms because pnpm
-				// runs the script there.
+				// Relative to the app's cwd, which the launcher above sets to
+				// apps/cms.
 				ENV_PATH: ".env.production",
 			},
 		},
