@@ -85,6 +85,22 @@ function upload_config ( env ) {
 					region: env( "AWS_REGION" ),
 					params: {
 						Bucket: env( "AWS_BUCKET_NAME" ),
+
+						/**
+						 |
+						 | Present and falsy, deliberately. The provider defaults
+						 | the ACL to `public-read` when the key is absent, and a
+						 | bucket whose Object Ownership is "bucket owner enforced"
+						 | rejects an ACL header outright — the upload fails with
+						 | AccessControlListNotSupported. Null rather than
+						 | undefined so the key survives a config merge that drops
+						 | undefined values.
+						 |
+						 | Nothing is lost by it: the bucket is read through the
+						 | CloudFront distribution at `CDN_URL`, not by object ACL.
+						 |
+						 */
+						ACL: null,
 					},
 				},
 			},
