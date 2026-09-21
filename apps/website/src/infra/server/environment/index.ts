@@ -41,6 +41,7 @@ type Env = {
 	CALENDAR_LINK_SECRET: string
 	TRUST_PROXY: string | number | boolean
 	SERVE_MODE: ServeMode
+	HTTP_SERVER_HOST: string
 	HTTP_SERVER_PORT: number
 	SERVER_BUILD_DIR: string
 	CLIENT_BUILD_DIR: string
@@ -173,6 +174,24 @@ const _env: Env = {
 	 |
 	 */
 	SERVE_MODE: read_serve_mode( process.env.SERVE_MODE ),
+	/**
+	 |
+	 | The interface the server binds to, and **loopback unless a deployment
+	 | says otherwise.**
+	 |
+	 | The two mistakes are not symmetric. A loopback default that is too
+	 | narrow fails on the first request from a phone on the same network, and
+	 | the developer sets `0.0.0.0` once. An all-interfaces default that is too
+	 | wide fails silently: on a machine with a public address and no proxy in
+	 | front, everything on the internet can reach a development server, and
+	 | nothing says so. So the safe direction is to answer nobody but this
+	 | machine until told — the same reasoning as `TRUST_PROXY`.
+	 |
+	 | Production needs nothing here: nginx proxies to `127.0.0.1:<PORT>` on
+	 | the same host, which is exactly what the default answers on.
+	 |
+	 */
+	HTTP_SERVER_HOST: read_host( process.env.HTTP_SERVER_HOST ),
 	HTTP_SERVER_PORT: read_port( process.env.HTTP_SERVER_PORT, 9001 ),
 	SERVER_BUILD_DIR: process.env.SERVER_BUILD_DIR ?? "./build/server",
 	CLIENT_BUILD_DIR: process.env.CLIENT_BUILD_DIR ?? "./build/client",
@@ -245,6 +264,17 @@ function read_serve_mode ( raw: string | undefined ): ServeMode {
 			+ `"${SERVE_MODES.STATIC}". Set it to one of those, or empty it to let `
 			+ `the environment decide.`,
 	)
+}
+
+/**
+ |
+ | Unset and empty both mean loopback, so a deployment can hand the decision
+ | back by emptying the variable rather than by deleting the line.
+ |
+ */
+function read_host ( raw: string | undefined ): string {
+	const trimmed = raw?.trim()
+	return trimmed === undefined || trimmed === "" ? "127.0.0.1" : trimmed
 }
 
 function read_port ( raw: string | undefined, fallback: number ) {

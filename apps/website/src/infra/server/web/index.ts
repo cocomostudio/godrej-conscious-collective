@@ -92,11 +92,12 @@ async function register_static_middleware ( express_app: Express.Application ) {
 }
 
 function start_listening ( express_app: Express.Application ) {
+	const host = Environment.get( "HTTP_SERVER_HOST" )
 	const port = Environment.get( "HTTP_SERVER_PORT" )
 
-	const server = express_app.listen( port, () => {
+	const server = express_app.listen( port, host, () => {
 		console.log(
-			`HTTP server is up and running on http://localhost:${port}`,
+			`HTTP server is up and running on http://${host}:${port}`,
 		)
 
 		process.send?.( "ready" )
