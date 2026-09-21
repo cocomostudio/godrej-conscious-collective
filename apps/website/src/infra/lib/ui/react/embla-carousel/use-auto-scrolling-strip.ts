@@ -8,10 +8,11 @@
  | auto-scroll plugin. Two copies of this in this catalogue would be two places
  | for the loop's settings to drift apart.
  |
- | **A pointer resting on the strip does not stop it.** Two things do: the
- | strip leaving the screen, and the page becoming hidden. They are held as one
- | answer rather than as two switches, so that a tab coming back cannot restart
- | a strip that has scrolled away.
+ | **A pointer resting on the strip does not stop it.** Three things do: the
+ | strip leaving the screen, the page becoming hidden, and focus landing inside
+ | the strip. They are held as one answer rather than as three switches, so
+ | that focus leaving a slide cannot restart a strip that is off screen, and a
+ | tab coming back cannot restart one that has scrolled away.
  |
  | It hands back the two refs the caller has to attach — the viewport it
  | measures and the track it counts children of — and the number of times the
@@ -31,6 +32,7 @@ import { use_repetitions_needed_for_looping } from "./use-repetitions-needed-for
 
 // Every one of these has to hold for the strip to move.
 type Playing_Conditions = {
+	focus_is_inside: boolean
 	page_is_visible: boolean
 	strip_is_on_screen: boolean
 }
@@ -51,12 +53,14 @@ export function use_auto_scrolling_strip ( slide_count: number ) {
 			playOnInit: false,
 			speed: 1,
 			startDelay: 0,
+			stopOnFocusIn: false,
 			stopOnInteraction: false,
 			stopOnMouseEnter: false,
 		} ),
 	] )
 
 	const conditions = useRef<Playing_Conditions>( {
+		focus_is_inside: false,
 		page_is_visible: true,
 		strip_is_on_screen: false,
 	} )
@@ -72,11 +76,13 @@ export function use_auto_scrolling_strip ( slide_count: number ) {
 			return
 		}
 
-		const { page_is_visible, strip_is_on_screen } = conditions.current
+		const { focus_is_inside, page_is_visible, strip_is_on_screen } =
+			conditions.current
 
-		strip_is_on_screen && page_is_visible
-			? auto_scroll.play()
-			: auto_scroll.stop()
+		const may_play = strip_is_on_screen && page_is_visible
+			&& !focus_is_inside
+
+		may_play ? auto_scroll.play() : auto_scroll.stop()
 	}, [ embla_api ] )
 
 	const set_conditions = useCallback(
@@ -100,6 +106,35 @@ export function use_auto_scrolling_strip ( slide_count: number ) {
 
 		return () => set_conditions( { page_is_visible: true } )
 	} )
+
+	useEffect( () => {
+		if ( !viewport_node ) {
+			return
+		}
+
+		const on_focus_in = () => set_conditions( { focus_is_inside: true } )
+
+		// `focusout` fires for a move from one slide to the next as well as for
+		// focus leaving altogether, and the strip has not been released until
+		// focus has landed somewhere outside it.
+		const on_focus_out = ( event: FocusEvent ) => {
+			if (
+				viewport_node.contains( event.relatedTarget as Node | null )
+			) {
+				return
+			}
+
+			set_conditions( { focus_is_inside: false } )
+		}
+
+		viewport_node.addEventListener( "focusin", on_focus_in )
+		viewport_node.addEventListener( "focusout", on_focus_out )
+
+		return () => {
+			viewport_node.removeEventListener( "focusin", on_focus_in )
+			viewport_node.removeEventListener( "focusout", on_focus_out )
+		}
+	}, [ set_conditions, viewport_node ] )
 
 	// Embla arrives a render late, so whatever the conditions had already
 	// settled to is handed over as soon as it does.
