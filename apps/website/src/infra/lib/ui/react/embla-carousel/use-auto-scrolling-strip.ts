@@ -40,13 +40,16 @@ export function use_auto_scrolling_strip ( slide_count: number ) {
 		AutoScroll( {
 			playOnInit: false,
 			speed: 1,
+			startDelay: 0,
 			stopOnInteraction: false,
 			stopOnMouseEnter: false,
 		} ),
 	] )
 
 	// Off screen it stops entirely: a strip nobody can see should not be
-	// animating, and on a long page there may be two of them.
+	// animating, and on a long page there may be two of them. Any sliver on
+	// screen counts, so that it is already moving by the time there is enough
+	// of it to read.
 	const in_view_ref = useOnInView( ( in_view ) => {
 		const auto_scroll = embla_api?.plugins().autoScroll
 
@@ -55,7 +58,7 @@ export function use_auto_scrolling_strip ( slide_count: number ) {
 		}
 
 		in_view ? auto_scroll.play() : auto_scroll.stop()
-	}, { threshold: 0.5 } )
+	}, { threshold: 0 } )
 
 	// One node, three consumers: Embla drives it, the intersection observer
 	// watches it, and the repeat count measures against it.
