@@ -48,7 +48,7 @@ function get_connection ( client: string, env ) {
 						__dirname,
 						"..",
 						"..",
-						env( "DATABASE_FILENAME", ".tmp/data.db" ),
+						env( "DATABASE_FILENAME", "env/database/data.db" ),
 					),
 				},
 				useNullAsDefault: true,
