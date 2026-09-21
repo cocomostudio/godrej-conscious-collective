@@ -7,13 +7,17 @@
  | The same shape as `use_media_query_event`: an effect that runs on the two
  | crossings that mean something rather than on every change of a value.
  |
- | One caller, the slideshow beside the registration form, which stops
- | advancing while nobody is looking at it. A slideshow that ran in a
- | background tab would burn a timer for nothing and come back having moved on
- | several slides.
+ | **Hidden means the tab is in the background, or the window is minimised,
+ | or — in Chrome and Safari, though not Firefox — the window is fully covered
+ | by another.** A browser that merely loses focus to another application while
+ | its window stays on screen is *not* hidden. There is no web API that reports
+ | occlusion any more accurately than this, so a fully covered Firefox window
+ | is a case nothing here can see.
  |
- | Lifted from the static site, narrowed to the one direction anything here
- | uses.
+ | For anything that would otherwise burn a timer, or an animation frame, for a
+ | visitor who is not there.
+ |
+ | Narrowed to the one direction anything here uses.
  |
  */
 
