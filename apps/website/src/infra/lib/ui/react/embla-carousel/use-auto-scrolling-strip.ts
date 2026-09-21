@@ -5,10 +5,11 @@
  |
  | The marquee and the sponsors list are the same mechanism with different
  | contents: an Embla carousel that cannot be dragged, looping, driven by the
- | auto-scroll plugin, playing only while it is on screen and stopping while a
- | pointer rests on it. The static site had one copy per section; two copies of
- | this in this catalogue would be two places for the loop's settings to drift
+ | auto-scroll plugin, playing only while it is on screen. Two copies of this
+ | in this catalogue would be two places for the loop's settings to drift
  | apart.
+ |
+ | **A pointer resting on the strip does not stop it.**
  |
  | It hands back the two refs the caller has to attach — the viewport it
  | measures and the track it counts children of — and the number of times the
@@ -40,7 +41,7 @@ export function use_auto_scrolling_strip ( slide_count: number ) {
 			playOnInit: false,
 			speed: 1,
 			stopOnInteraction: false,
-			stopOnMouseEnter: true,
+			stopOnMouseEnter: false,
 		} ),
 	] )
 
