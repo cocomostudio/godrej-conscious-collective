@@ -6,9 +6,9 @@
  |
  | Prefer the sibling `use_media_query_event` when a crossing only has to *do*
  | something — it fires a callback without re-rendering. Reach for this one only
- | when the query decides what gets RENDERED, which in this build is one place:
- | the registration form is housed in a drawer below the medium breakpoint and a
- | dialog from it up, and exactly one of the two may be mounted at a time.
+ | when the query decides what gets RENDERED — a component that is mounted on
+ | one side of a breakpoint and not the other, or a value read during the
+ | render itself.
  |
  | `change` fires on crossings, not on resizes: dragging a window from 400px to
  | 1900px produces one event, not hundreds.

@@ -14,6 +14,10 @@
  | that focus leaving a slide cannot restart a strip that is off screen, and a
  | tab coming back cannot restart one that has scrolled away.
  |
+ | **Under `prefers-reduced-motion` the strip slows rather than stops.** It
+ | takes the new speed the moment the setting changes, at the cost of jumping
+ | back to the nearest slide as it does.
+ |
  | It hands back the two refs the caller has to attach — the viewport it
  | measures and the track it counts children of — and the number of times the
  | caller should repeat its own slides so that the loop always has something to
@@ -26,9 +30,14 @@ import AutoScroll from "embla-carousel-auto-scroll"
 import useEmblaCarousel from "embla-carousel-react"
 import { useOnInView } from "react-intersection-observer"
 
+import { use_media_query_matches } from "../use-media-query-matches.ts"
 import { use_when_page_is_hidden } from "../use-when-page-is-hidden.ts"
 
 import { use_repetitions_needed_for_looping } from "./use-repetitions-needed-for-looping.ts"
+
+const FULL_SPEED = 1
+const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)"
+const REDUCED_SPEED = FULL_SPEED * 0.75
 
 // Every one of these has to hold for the strip to move.
 type Playing_Conditions = {
@@ -43,6 +52,10 @@ export function use_auto_scrolling_strip ( slide_count: number ) {
 	)
 	const [ track_node, set_track_node ] = useState<HTMLElement | null>( null )
 
+	const prefers_reduced_motion = use_media_query_matches(
+		REDUCED_MOTION_QUERY,
+	)
+
 	const [ embla_ref, embla_api ] = useEmblaCarousel( {
 		align: "start",
 		containScroll: false,
@@ -51,7 +64,7 @@ export function use_auto_scrolling_strip ( slide_count: number ) {
 	}, [
 		AutoScroll( {
 			playOnInit: false,
-			speed: 1,
+			speed: prefers_reduced_motion ? REDUCED_SPEED : FULL_SPEED,
 			startDelay: 0,
 			stopOnFocusIn: false,
 			stopOnInteraction: false,
@@ -93,10 +106,8 @@ export function use_auto_scrolling_strip ( slide_count: number ) {
 		[ settle_motion ],
 	)
 
-	// Off screen it stops entirely: a strip nobody can see should not be
-	// animating, and on a long page there may be two of them. Any sliver on
-	// screen counts, so that it is already moving by the time there is enough
-	// of it to read.
+	// Any sliver on screen counts, so that the strip is already moving by the
+	// time there is enough of it to read.
 	const in_view_ref = useOnInView( ( in_view ) => {
 		set_conditions( { strip_is_on_screen: in_view } )
 	}, { threshold: 0 } )
@@ -136,11 +147,23 @@ export function use_auto_scrolling_strip ( slide_count: number ) {
 		}
 	}, [ set_conditions, viewport_node ] )
 
-	// Embla arrives a render late, so whatever the conditions had already
-	// settled to is handed over as soon as it does.
+	// Embla reads the auto-scroll speed only as it initialises, so a change to
+	// `prefers-reduced-motion` re-initialises the carousel — and the plugin
+	// comes back stopped.
 	useEffect( () => {
-		settle_motion()
-	}, [ settle_motion ] )
+		if ( !embla_api ) {
+			return
+		}
+
+		const resettle = () => settle_motion()
+
+		resettle()
+		embla_api.on( "reInit", resettle )
+
+		return () => {
+			embla_api.off( "reInit", resettle )
+		}
+	}, [ embla_api, settle_motion ] )
 
 	// One node, three consumers: Embla drives it, the intersection observer
 	// watches it, and the repeat count measures against it.
