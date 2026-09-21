@@ -136,8 +136,12 @@ from the development example whenever `pnpm dev` or `pnpm test` is run.
 - `PORT`, equal to `CMS_PORT` in the host's `.env`. Nothing reconciles the two;
   set them apart and nginx proxies to a closed port.
 - `WEBSITE_URL` / `WEBSITE_URLS` pointing at the website machine, not localhost.
-- The Postgres and S3 blocks, a `REGISTRATION_RELAY_TOKEN` minted in the admin,
-  and fresh values for every key the example carries a development literal for.
+- The Postgres and S3 blocks, and fresh values for every key the example
+  carries a development literal for, `REGISTRATION_RELAY_TOKEN` included — the
+  seed reads it, and the seed now runs against this machine's Postgres, so the
+  value here is the one that ends up in the database. The relay's token lives in
+  this machine's database as a row, and its plaintext belongs in the website's
+  env, below.
 
 **`website-host` — `apps/website/.env.production`**
 
@@ -151,7 +155,11 @@ Note the filename. PM2 launches the app with `--env-file-if-exists
   appends the client and nginx appends the ALB, so the app sees two hops.
 - `CMS_URL`. The code defaults to `http://localhost:1337`, which is wrong the
   moment the CMS is on another machine.
-- `CMS_API_TOKEN`, `REGISTRATION_TOKEN_SECRET`, `CALENDAR_LINK_SECRET`.
+- `CMS_API_TOKEN`, the access key of an API token minted in the CMS admin under
+  Settings → Global Settings → API Tokens: token type Custom, duration
+  Unlimited, and `create` on Lead ticked and nothing else. The plaintext is
+  shown once, on the page that follows saving.
+- `REGISTRATION_TOKEN_SECRET`, `CALENDAR_LINK_SECRET`.
 
 ## Amazon Linux 2023 notes
 
