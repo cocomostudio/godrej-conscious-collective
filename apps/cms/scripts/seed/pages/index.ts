@@ -152,9 +152,8 @@ export async function write_pages (
 	//
 	// The section pads below itself and not above: the listing opens the page,
 	// and its own header is what a visitor should meet at the top edge. The
-	// schedule page below asks for the same thing from the other side — there
-	// the block declines the space rather than the section, and either of them
-	// declining is enough.
+	// schedule page below asks for the same thing, and says so in the same
+	// place — on the section.
 	for (
 		const { category, style_and_transition, title }
 			of CATEGORY_LISTING_PAGES
@@ -185,14 +184,15 @@ export async function write_pages (
 	// standfirst rather than a block, because it is a caveat about the page
 	// rather than about anything in it.
 	//
-	// The list asks for spacing below itself and none above: it opens the page,
+	// The section pads below itself and none above: the list opens the page,
 	// and its own sticky headers are what a visitor should meet at the top
-	// edge. That declines the section's top padding as well as the block's own
-	// margin — see `pads_at_top` on the website.
+	// edge. The list has no say of its own here — see `pads_at_top` on the
+	// website.
 	await create_entry( strapi, "api::page.page", {
 		main_region: [
 			section( "The schedule", {
-				blocks: [ session_schedule_list( "below" ) ],
+				blocks: [ session_schedule_list() ],
+				spacing_around: "below",
 			} ),
 		],
 		page_shell: page_shells.primary.documentId,

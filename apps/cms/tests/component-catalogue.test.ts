@@ -239,7 +239,7 @@ describe("spacing around a block", () => {
 		expect( bled.spacing_around ).toBe( "normal" )
 	})
 
-	it("is what the schedule page's list uses to open flush", async () => {
+	it("is the section's to decline on the schedule page", async () => {
 		const { body } = await cms.get( "/api/envelope?path=/schedule" )
 
 		const list = find_block(
@@ -247,7 +247,17 @@ describe("spacing around a block", () => {
 			"list.session-schedule-list-v1",
 		)
 
-		expect( list.spacing_around ).toBe( "below" )
+		// The schedule list carries no `spacing_around` of its own. The page
+		// opens flush because the section holding it pads below and not
+		// above — the section's say alone is enough.
+		expect( list ).not.toHaveProperty( "spacing_around" )
+
+		const holder = find_section(
+			body.data.entry.main_region,
+			"The schedule",
+		)
+
+		expect( holder.spacing_around ).toBe( "below" )
 	})
 })
 

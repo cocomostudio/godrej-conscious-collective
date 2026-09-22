@@ -68,16 +68,13 @@ export function session_listing_with_filtration (
 
 /**
  |
- | The schedule page's list. **It stores almost nothing**: which sessions it
- | holds and which document it links to both follow from the event the page
- | resolved to, and `spacing_around` is the whole of what an editor decides.
+ | The schedule page's list. **It stores nothing**: which sessions it holds and
+ | which document it links to both follow from the event the page resolved to.
+ | The space around it is the section's to decide.
  |
  */
-export function session_schedule_list ( spacing_around?: string ) {
-	return {
-		__component: "list.session-schedule-list-v1",
-		...( spacing_around ? { spacing_around } : {} ),
-	}
+export function session_schedule_list () {
+	return { __component: "list.session-schedule-list-v1" }
 }
 
 export function session_list ( sessions: any[] ) {
