@@ -6,8 +6,8 @@
  | A registration is the one row in this CMS a member of the public creates,
  | and it is created by the **website's server** rather than by a browser: the
  | form posts to the website, which relays it here carrying this token. A
- | development database without this row has a registration form that answers
- | 500, which is why the seed plants one.
+ | database without this row has a registration form that answers 500, which is
+ | why the seed plants one.
  |
  | Scoped to `api::lead.lead.create` and nothing else, which is the whole of
  | what the relay does. It stays on the website's **server** — the browser never
@@ -23,17 +23,24 @@
  | and the registration form would be broken until somebody copied a new
  | 256-character string across.
  |
- | So the key is taken from `REGISTRATION_RELAY_TOKEN` — a development value
- | carried in `.env.example` beside the application keys and the token salt,
- | which are development literals for the same reason — and the row is written
- | with `strapi.db.query`. The hashing and the encryption are still the token
- | service's own (`hash` and the encryption service), so nothing here is a copy
- | of logic the service is free to change; only the key's ORIGIN differs.
+ | So the key is taken from `REGISTRATION_RELAY_TOKEN`, and the row is written
+ | with `strapi.db.query`. `.env.example` carries that key as a literal beside
+ | the application keys and the token salt, which are literals for the same
+ | reason. The hashing and the encryption are still the token service's own
+ | (`hash` and the encryption service), so nothing here is a copy of logic the
+ | service is free to change; only the key's ORIGIN differs.
  |
- | Nothing about this reaches production. The seed refuses to run against
- | anything but local SQLite and refuses outright when `NODE_ENV` is
- | production — see `guards.ts` — so the only database this token can ever be
- | planted in is a developer's own.
+ | ─── THIS REACHES PRODUCTION ────────────────────────────────────────────────
+ |
+ | The seed was once bounded to local SQLite, and it refused outright under a
+ | production `NODE_ENV`. That bound is gone, because the seed is now what
+ | populates production. What stands in its place is the typed confirmation in
+ | `confirmation.ts`, which resolves the target — host, database, schema, and
+ | where the media goes — prints it, and asks before anything is destroyed.
+ |
+ | So the value read here is a real secret on a real host, and the plaintext in
+ | that env file is the one that ends up in the database. It has to equal the
+ | website's `CMS_API_TOKEN`, or the form answers 401 rather than 500.
  |
  | It is skipped, loudly, when the variable is unset. A missing token is a
  | registration form that answers 500, and finding that out at seed time is
