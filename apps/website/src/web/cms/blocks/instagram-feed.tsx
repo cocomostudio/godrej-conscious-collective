@@ -35,8 +35,6 @@ import useEmblaCarousel from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 
 import { use_repetitions_needed_for_looping } from "#infra/lib/ui/react/embla-carousel/use-repetitions-needed-for-looping.ts"
-import { H } from "#infra/lib/ui/react/headings.tsx"
-import { Chevron_Right } from "#infra/lib/ui/react/icons/chevron-right.tsx"
 import { use_media_query_event } from "#infra/lib/ui/react/use-media-query-event.tsx"
 
 import type { Image_Link_Attribute } from "./image-link.tsx"
@@ -51,9 +49,6 @@ import { Responsive_Picture } from "../pictures.tsx"
 
 import { BLOCK_SPACING } from "./block-spacing.ts"
 import { use_full_bleed } from "./section-frame.tsx"
-
-const HANDLE = "@godrejdesignlab"
-const PROFILE_URL = "https://www.instagram.com/godrejdesignlab"
 
 // A slide at rest, and the same slide at the centre of the strip. Both pairs
 // are the design's own measurements; the ratio between them is what the tween
@@ -218,8 +213,7 @@ export function Instagram_Feed (
 	}
 
 	// The strip loops and runs off both edges, so the block takes the
-	// section's full width — and puts its own heading back inside the
-	// container, which is the one part of it that lines up with the grid.
+	// section's full width.
 	return <div className={ `${BLOCK_SPACING} ${full_bleed}` }>
 		<div
 			className="mt-8 py-6 md:py-11 overflow-hidden"
