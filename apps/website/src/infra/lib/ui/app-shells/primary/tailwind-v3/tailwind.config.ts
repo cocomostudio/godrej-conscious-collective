@@ -24,6 +24,7 @@ import { state_variants_plugin } from "./state-variants.ts"
 import { screens } from "./screens.ts"
 import { screens_height_plugin } from "./screens-height.ts"
 import { webkit_plugin } from "./webkit.ts"
+import { pointer_plugin } from "./pointer.ts"
 import { aspect_ratio } from "./aspect-ratio.ts"
 import { transition_delay, transition_duration } from "./transitions.ts"
 import { translate } from "./translate.ts"
@@ -82,6 +83,9 @@ const config: Config = {
 		// `webkit:` / `ios-webkit:` (+ `not-` twins) — @supports feature-query
 		// hacks that match only WebKit / only iOS WebKit.
 		webkit_plugin,
+		// `can-hover:` — the rule stacked under it applies only where a
+		// pointer can hover, so a tap on a touch screen cannot fire it.
+		pointer_plugin,
 		// Colours: addBase RGB-triplet static palette on :root.
 		colors_base_plugin,
 		// Typography: addBase base + lg responsive --text-* vars.
