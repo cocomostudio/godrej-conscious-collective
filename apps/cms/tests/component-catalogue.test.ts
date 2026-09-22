@@ -259,6 +259,26 @@ describe("spacing around a block", () => {
 
 		expect( holder.spacing_around ).toBe( "below" )
 	})
+
+	it("is declined at the top of every page a listing opens", async () => {
+		// The four category pages and the collaborators page each open with a
+		// listing that carries a header of its own, and the section holding
+		// it pads below and not above. The listing keeps its own gap there.
+		for ( const path of [
+			"/showcases",
+			"/experiences",
+			"/conversations",
+			"/workshops",
+			"/collaborators",
+		] ) {
+			const { body } = await cms.get( `/api/envelope?path=${path}` )
+
+			const [ opener ] = body.data.entry.main_region
+
+			expect( opener.__component ).toBe( "container.section-v1" )
+			expect( opener.spacing_around ).toBe( "below" )
+		}
+	})
 })
 
 describe("what a card does when it is pointed at", () => {

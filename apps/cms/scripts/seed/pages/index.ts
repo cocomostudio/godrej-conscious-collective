@@ -122,11 +122,16 @@ export async function write_pages (
 	// The collaborators page: the grid, filled from the event this page
 	// resolves to. It is the third of the three layouts, and the second of the
 	// two ways a contributor listing is filled.
+	//
+	// The section pads below itself and not above, like the category pages
+	// beneath: the grid opens the page with a header of its own, and keeps a
+	// gap of its own under the top of the column.
 	await create_entry( strapi, "api::page.page", {
 		main_region: [
 			section( "Collaborators", {
 				blocks: [ contributor_listing( "grid", 10 ) ],
 				background_gradient: "context",
+				spacing_around: "below",
 			} ),
 		],
 		page_shell: page_shells.primary.documentId,
@@ -152,8 +157,9 @@ export async function write_pages (
 	//
 	// The section pads below itself and not above: the listing opens the page,
 	// and its own header is what a visitor should meet at the top edge. The
-	// schedule page below asks for the same thing, and says so in the same
-	// place — on the section.
+	// listing keeps a gap of its own there from the medium breakpoint — see
+	// `PADDING_AT_A_FLUSH_EDGE` on the website. The schedule page below asks
+	// for the same thing, and says so in the same place — on the section.
 	for (
 		const { category, style_and_transition, title }
 			of CATEGORY_LISTING_PAGES
@@ -168,6 +174,7 @@ export async function write_pages (
 						),
 					],
 					background_gradient: "context",
+					spacing_around: "below",
 				} ),
 			],
 			page_shell: page_shells.primary.documentId,
