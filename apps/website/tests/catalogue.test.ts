@@ -561,6 +561,21 @@ describe("spacing around a block", () => {
 		expect( below.outer ).toContain( "last-of-type" )
 	})
 
+	it("marks each edge it declined, for the block there to read", async () => {
+		const [ normal, flush, below ] = await section_frames( "/spacing" )
+
+		// A block cannot see an ancestor's padding from inside, so a section
+		// that laid none down says so on itself — one mark per declined edge,
+		// and none where it padded. See `section_edge_marks`.
+		expect( normal.attributes ).not.toContain( "data-flush-" )
+
+		expect( flush.attributes ).toContain( "data-flush-top" )
+		expect( flush.attributes ).toContain( "data-flush-bottom" )
+
+		expect( below.attributes ).toContain( "data-flush-top" )
+		expect( below.attributes ).not.toContain( "data-flush-bottom" )
+	})
+
 	it("keeps the top padding where the section has words at that edge", async () => {
 		const [ , , , headed ] = await section_frames( "/spacing" )
 
@@ -866,9 +881,10 @@ async function section_frames ( path: string ) {
 	// stands between the `<section>` and the box it pads with.
 	const frames = [
 		...html.matchAll(
-			/<section class="([^"]*scroll-mt-4[^"]*)"[^>]*><div class="([^"]*)"/g,
+			/<section class="([^"]*scroll-mt-4[^"]*)"([^>]*)><div class="([^"]*)"/g,
 		),
-	].map( ( [ , outer, padding ] ) => ( { outer, padding } ) )
+	].map( ( [ , outer, attributes, padding ] ) =>
+		( { attributes, outer, padding } ) )
 
 	expect( frames.length ).toBeGreaterThan( 0 )
 

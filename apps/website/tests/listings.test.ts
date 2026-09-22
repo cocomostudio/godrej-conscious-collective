@@ -408,6 +408,25 @@ describe("the three collaborator layouts", () => {
 		expect( natural ).not.toContain( "Collaborator" )
 	})
 
+	// The collaborators page opens with the grid and its section pads below
+	// and not above, so the grid keeps a gap of its own at that edge — and
+	// only the grid: the other two sit under a heading and take the ordinary
+	// spacing. See `PADDING_AT_A_FLUSH_EDGE`.
+	it("keep a gap at a flush edge only when they are a grid", async () => {
+		const grid = body_of( ( await website.get( "/collaborators" ) ).html )
+		const natural = body_of( ( await website.get( "/who" ) ).html )
+
+		// Padding on the box that paints, not margin on the block: a margin
+		// collapses out through a section that declined its padding, and the
+		// gap then fills with the grey behind the column instead of the
+		// listing's own colour.
+		expect( grid ).toContain(
+			"group-data-[flush-top]/section:group-first/block:pt-8",
+		)
+		expect( grid ).toContain( "group/block" )
+		expect( natural ).not.toContain( "group-data-[flush-top]" )
+	})
+
 	it("turn a ring when the layout is a carousel", async () => {
 		const body = body_of( ( await website.get( "/" ) ).html )
 

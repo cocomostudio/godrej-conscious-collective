@@ -30,7 +30,11 @@ import type {
 } from "../envelope.ts"
 import type { Style_And_Transition } from "../cards.tsx"
 
-import { BLOCK_SPACING } from "./block-spacing.ts"
+import {
+	BLOCK_AT_A_SECTION_EDGE,
+	BLOCK_SPACING,
+	PADDING_AT_A_FLUSH_EDGE,
+} from "./block-spacing.ts"
 import { Card } from "../cards.tsx"
 import { facets_for } from "../filtration/facets.ts"
 import { Filtration_Trigger } from "../filtration/filtration-trigger.tsx"
@@ -73,7 +77,11 @@ export function Session_Listing_With_Filtration (
 	{ sessions = [], style_and_transition }:
 		Session_Listing_With_Filtration_Props,
 ) {
-	return <div className={ BLOCK_SPACING }>
+	// The category pages open with this block and their section lays down no
+	// padding at the top, so the gradient below keeps 32px of its own there
+	// from the medium breakpoint. This box is the one at the section's edge,
+	// and it says so for that gradient to read. See `block-spacing.ts`.
+	return <div className={ `${BLOCK_SPACING} ${BLOCK_AT_A_SECTION_EDGE}` }>
 		<Sessions sessions={ sessions }>
 			<Listing style_and_transition={ style_and_transition } />
 		</Sessions>
@@ -116,7 +124,9 @@ function Listing ( { style_and_transition }: Treatment_Props ) {
 	 | the colour.
 	 */
 	return <div
-		className={ `${use_column_bleed()} ${gradient_classname}` }
+		className={
+			`${use_column_bleed()} ${gradient_classname} ${PADDING_AT_A_FLUSH_EDGE}`
+		}
 		style={ gradient_style }>
 		<div className={ use_column_inset() }>
 			<Header facets={ facets } on_open={ filtration.show } />

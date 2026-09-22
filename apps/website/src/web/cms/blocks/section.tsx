@@ -30,6 +30,9 @@
  | section opens flush to the top. The decision is here rather than in
  | the block because a negative margin on a child is clamped at the padding box:
  | padding can only be declined where it is laid down. See `section-frame.tsx`.
+ | Where an edge was declined, the section marks itself, so that a block
+ | which keeps a gap of its own at a flush edge can tell — see
+ | `section_edge_marks`.
  |
  | Its `title` is not shown. The title names the section in the table of
  | contents; the heading is what a reader sees.
@@ -71,6 +74,7 @@ import {
 	pads_at_bottom,
 	pads_at_top,
 	section_container,
+	section_edge_marks,
 	section_padding,
 	section_rule_inset,
 } from "./section-frame.tsx"
@@ -190,6 +194,11 @@ export function Section (
 
 	const padding = section_padding( { one_column, pad_bottom, pad_top } )
 
+	// Where the padding went, the section says so on itself, for the block at
+	// that edge to read. See `section_edge_marks`.
+	const { className: group, ...marks } =
+		section_edge_marks( { pad_bottom, pad_top } )
+
 	// Sections own the outer spacing at the top and bottom of the main
 	// column now: the two-column main column carries no vertical padding
 	// of its own, so the first and last section absorb what the column
@@ -210,9 +219,10 @@ export function Section (
 
 	return <>
 		<section
-			className={ `scroll-mt-4 ${outer_edges}` }
+			className={ `scroll-mt-4 ${group} ${outer_edges}` }
 			id={ anchor }
 			style={ background }
+			{ ...marks }
 		>
 			<div className={ padding }>
 				<div className={ section_container( { one_column } ) }>

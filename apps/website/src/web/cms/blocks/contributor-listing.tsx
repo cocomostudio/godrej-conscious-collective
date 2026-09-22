@@ -23,6 +23,13 @@
  | width, in the smaller of the two sizes below the medium breakpoint. The
  | other two arrangements sit under a section heading and need no header.
  |
+ | **The grid keeps a gap at a flush edge.** The collaborators page opens with
+ | the grid and the section holding it lays down no padding at the top, so the
+ | gradient keeps 32px of its own there from the medium breakpoint — see
+ | `PADDING_AT_A_FLUSH_EDGE`. The gap is inside the paint rather than above it,
+ | which is why the grid is two boxes here and one everywhere else. The other
+ | two arrangements take the ordinary spacing.
+ |
  */
 
 import type {
@@ -34,7 +41,11 @@ import type { Contributor_Card } from "../envelope.ts"
 
 import { Portrait } from "../cards.tsx"
 
-import { BLOCK_SPACING } from "./block-spacing.ts"
+import {
+	BLOCK_AT_A_SECTION_EDGE,
+	BLOCK_SPACING,
+	PADDING_AT_A_FLUSH_EDGE,
+} from "./block-spacing.ts"
 import { Contributor_Carousel } from "./contributor-carousel.tsx"
 import { use_column_bleed, use_column_inset } from "./section-frame.tsx"
 
@@ -75,15 +86,27 @@ export function Contributor_Listing (
 	// escape is applied inside that arrangement rather than around all three
 	// here. The grid takes the column's width instead, for the paint alone:
 	// its header and its cards are put back on the grid by `use_column_inset`.
-	return <div
-		className={ `${BLOCK_SPACING} ${
-			is_grid_layout
-				? "bg-[linear-gradient(var(--linear-gradient))] " + use_column_bleed()
-				: ""
-		}` }
-		style={ { "--linear-gradient": linear_gradient } as CSSProperties }>
-		{ is_grid_layout && <Header count={ contributors.length } /> }
-		<Rendering contributors={ contributors } />
+	if ( !is_grid_layout ) {
+		return <div className={ BLOCK_SPACING }>
+			<Rendering contributors={ contributors } />
+		</div>
+	}
+
+	// The outer box is the one at the section's edge, and the inner one is the
+	// one that paints — so the gap the grid keeps at a flush edge is padding
+	// on the second, read off the position of the first. See
+	// `PADDING_AT_A_FLUSH_EDGE`.
+	return <div className={ `${BLOCK_SPACING} ${BLOCK_AT_A_SECTION_EDGE}` }>
+		<div
+			className={
+				`bg-[linear-gradient(var(--linear-gradient))] ${
+					use_column_bleed()
+				} ${PADDING_AT_A_FLUSH_EDGE}`
+			}
+			style={ { "--linear-gradient": linear_gradient } as CSSProperties }>
+			<Header count={ contributors.length } />
+			<Rendering contributors={ contributors } />
+		</div>
 	</div>
 }
 

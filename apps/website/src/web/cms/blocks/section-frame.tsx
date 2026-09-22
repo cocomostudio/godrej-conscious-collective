@@ -52,6 +52,9 @@
 import type { Spacing_Around } from "./block-spacing.ts"
 
 import {
+	FLUSH_BOTTOM_MARK,
+	FLUSH_TOP_MARK,
+	SECTION_GROUP,
 	wants_space_above,
 	wants_space_below,
 } from "./block-spacing.ts"
@@ -164,6 +167,26 @@ export function section_padding (
 	}
 
 	return `${one_column ? "pt-12 md:pt-16" : "pt-6 md:pt-8"} ${bottom}`
+}
+
+/**
+ |
+ | What a section writes on its own element so that a block at an edge can tell
+ | whether the padding there was laid down.
+ |
+ | The group class is always on; a mark is on only for an edge the section
+ | declined. See `PADDING_AT_A_FLUSH_EDGE` in `block-spacing.ts`,
+ | which is the reader.
+ |
+ */
+export function section_edge_marks (
+	{ pad_bottom, pad_top }: Omit<Section_Padding, "one_column">,
+) {
+	return {
+		className: SECTION_GROUP,
+		...( pad_top ? {} : { [FLUSH_TOP_MARK]: "" } ),
+		...( pad_bottom ? {} : { [FLUSH_BOTTOM_MARK]: "" } ),
+	}
 }
 
 type Section_Edges = {
