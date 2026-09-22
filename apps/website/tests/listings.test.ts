@@ -398,6 +398,16 @@ describe("the three collaborator layouts", () => {
 		expect( occurrences( body, "Iris Han" ) ).toBe( 1 )
 	})
 
+	// The grid says how many it lists, the way the filtration listing does.
+	// The plain row sits under a section heading and says nothing of its own.
+	it("count themselves in a header only when they are a grid", async () => {
+		const grid = body_of( ( await website.get( "/collaborators" ) ).html )
+		const natural = body_of( ( await website.get( "/who" ) ).html )
+
+		expect( grid ).toContain( "2 Collaborators" )
+		expect( natural ).not.toContain( "Collaborator" )
+	})
+
 	it("turn a ring when the layout is a carousel", async () => {
 		const body = body_of( ( await website.get( "/" ) ).html )
 

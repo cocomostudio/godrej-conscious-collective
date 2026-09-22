@@ -18,6 +18,11 @@
  | As with the session listing, the heading, the opening line and the "View All"
  | link belong to the **section** that holds this.
  |
+ | **The grid alone carries a header of its own**, saying how many are listed,
+ | the way the category pages' filtration listing does. It is drawn at every
+ | width, in the smaller of the two sizes below the medium breakpoint. The
+ | other two arrangements sit under a section heading and need no header.
+ |
  */
 
 import type {
@@ -68,9 +73,37 @@ export function Contributor_Listing (
 	// **Which of the three takes the section's full width is the
 	// arrangement's own business**, and only the carousel takes it. So the
 	// escape is applied inside that arrangement rather than around all three
-	// here.
-	return <div className={ `${ BLOCK_SPACING } ${ is_grid_layout ? "bg-[linear-gradient(var(--linear-gradient))] " + use_column_bleed() : "" }` } style={{ "--linear-gradient": linear_gradient }}>
+	// here. The grid takes the column's width instead, for the paint alone:
+	// its header and its cards are put back on the grid by `use_column_inset`.
+	return <div
+		className={ `${BLOCK_SPACING} ${
+			is_grid_layout
+				? "bg-[linear-gradient(var(--linear-gradient))] " + use_column_bleed()
+				: ""
+		}` }
+		style={ { "--linear-gradient": linear_gradient } as CSSProperties }>
+		{ is_grid_layout && <Header count={ contributors.length } /> }
 		<Rendering contributors={ contributors } />
+	</div>
+}
+
+/**
+ |
+ | How many are listed. The grid's alone, at every width.
+ |
+ | Drawn against the context colour the gradient opens in, so the words are
+ | white. From the medium breakpoint the 32px beneath it is the gap to the
+ | grid, the same as the one the filtration listing leaves under its header.
+ | Below that breakpoint it takes the tighter treatment the other sticky
+ | headers on the site take: the smaller size, and 16px of its own above and
+ | below.
+ |
+ */
+function Header ( { count }: { count: number } ) {
+	return <div className={ `md:mb-8 max-md:px-1ccm max-md:py-4 ${ use_column_inset() }` }>
+		<p className="text-h6 md:text-h3 md:font-semibold font-light text-white">
+			{ `${count} ${count === 1 ? "Collaborator" : "Collaborators"}` }
+		</p>
 	</div>
 }
 
