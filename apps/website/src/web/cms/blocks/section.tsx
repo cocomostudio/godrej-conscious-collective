@@ -26,8 +26,8 @@
  | **Padding at each edge is a decision two parties can veto.** The section's
  | own `spacing_around` is one; the `spacing_around` of the block at that edge
  | is the other. Either can decline the space and neither can put it back, which
- | is how the ticker butts against its neighbours and how the schedule list sits
- | flush to the top of the page it opens. The decision is here rather than in
+ | is how the ticker butts against its neighbours and how the schedule page's
+ | section opens flush to the top. The decision is here rather than in
  | the block because a negative margin on a child is clamped at the padding box:
  | padding can only be declined where it is laid down. See `section-frame.tsx`.
  |

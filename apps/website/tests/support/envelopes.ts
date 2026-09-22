@@ -289,7 +289,7 @@ export function full_bleed_image_block (
  |
  | The same block, with an editor's `spacing_around` on it.
  |
- | Three components in the catalogue carry the attribute and one builder over
+ | Two components in the catalogue carry the attribute and one builder over
  | all of them keeps the tests from growing a spacing argument each — it is one
  | scalar and it means the same thing wherever it sits.
  |

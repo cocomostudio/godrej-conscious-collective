@@ -26,6 +26,12 @@
  | only stay put while the list scrolls under it as long as all three live there
  | together. `order-last` pins the list below whichever way they are reordered.
  |
+ | **It carries no `spacing_around` of its own.** The schedule page has the
+ | list opening flush at the top edge, so that its sticky headers are what a
+ | visitor meets first — and that is the section's decision to make, through
+ | the section's own `spacing_around`, rather than this block's. See
+ | `section-frame.tsx`.
+ |
  */
 
 import type { RefObject } from "react"
@@ -42,9 +48,7 @@ import type {
 } from "../envelope.ts"
 import type { Schedule_Entry } from "./schedule-entries.ts"
 
-import type { Spacing_Around } from "./block-spacing.ts"
-
-import { block_spacing } from "./block-spacing.ts"
+import { BLOCK_SPACING } from "./block-spacing.ts"
 import { is_over } from "../calendar-links.ts"
 import { context_colour_of } from "../context-colours.ts"
 import {
@@ -94,14 +98,6 @@ type Session_Schedule_List_Props = {
 	sessions?: Session_Schedule_Row[]
 	/**
 	 |
-	 | The gap this block leaves above and below itself. The schedule page sets
-	 | it to "below": the list opens the page and its own sticky headers are
-	 | what a visitor should meet at the top edge, with nothing above them.
-	 |
-	 */
-	spacing_around?: Spacing_Around
-	/**
-	 |
 	 | The resolved event's schedule document, spliced onto this node by the
 	 | CMS. Null where the event has none, and the download link is not drawn
 	 | at all — a link to a document nobody uploaded is worse than no link.
@@ -111,10 +107,9 @@ type Session_Schedule_List_Props = {
 }
 
 export function Session_Schedule_List (
-	{ schedule = null, sessions = [], spacing_around }:
-		Session_Schedule_List_Props,
+	{ schedule = null, sessions = [] }: Session_Schedule_List_Props,
 ) {
-	return <div className={ block_spacing( spacing_around ) }>
+	return <div className={ BLOCK_SPACING }>
 		<Sessions sessions={ sessions }>
 			<Schedule schedule={ schedule } />
 		</Sessions>
