@@ -70,9 +70,13 @@ export function Instagram_Feed (
 	const origin = use_media_origin()
 	const full_bleed = use_full_bleed()
 
-	const pictures = slides
-		.map( ( slide ) => responsive_picture_of( slide?.image, origin ) )
-		.filter( ( picture ) => picture !== null )
+	const pictures = slides.flatMap( ( slide ) => {
+		const picture = responsive_picture_of( slide?.image, origin )
+
+		return picture
+			? [ { label: slide?.label, picture, url: slide?.url } ]
+			: []
+	} )
 
 	const [ embla_ref, embla_api ] = useEmblaCarousel( {
 		dragFree: true,
@@ -226,11 +230,10 @@ export function Instagram_Feed (
 				{ Array.from( { length: repeat_count } ).flatMap( (
 					_unused,
 					repetition,
-				) => pictures.map( ( picture, index ) =>
-					<div
-						className="shrink-0"
-						aria-hidden={ repetition > 0 }
-						key={ `${repetition}-${index}` }>
+				) => pictures.map( ( { label, picture, url }, index ) => {
+					const is_copy = repetition > 0
+
+					const figure =
 						<figure className="relative w-full select-none origin-center js_slide__inner">
 							<div className="relative w-50.5 aspect-3/4 md:w-76 rounded-lg overflow-hidden">
 								<Responsive_Picture
@@ -238,8 +241,26 @@ export function Instagram_Feed (
 									pictures={ picture } />
 							</div>
 						</figure>
+
+					// The copies that fill the loop are already hidden from
+					// assistive technology; keeping them out of the tab order
+					// means a keyboard visitor meets each slide once.
+					return <div
+						className="shrink-0"
+						aria-hidden={ is_copy }
+						key={ `${repetition}-${index}` }>
+						{ url
+							? <Nav_Link
+								aria-label={ label || undefined }
+								className="block"
+								tabIndex={ is_copy ? -1 : undefined }
+								target="_blank"
+								url={ url }>
+								{ figure }
+							</Nav_Link>
+							: figure }
 					</div>
-				) ) }
+				} ) ) }
 			</div>
 		</div>
 	</div>
