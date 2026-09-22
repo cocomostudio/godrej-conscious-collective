@@ -121,20 +121,20 @@ const CHANGE_FILL_ON_HOVER = "change-fill-on-hover"
  */
 const TREATMENTS = {
 	"fill": {
-		details: "bg-white group-hover:bg-context",
-		points: "text-context group-hover:text-black",
-		rule: "border-context group-hover:border-black",
+		details: "bg-white can-hover:group-hover:bg-context",
+		points: "text-context can-hover:group-hover:text-black",
+		rule: "border-context can-hover:group-hover:border-black",
 	},
 	// Both ends black, so neither carries a `group-hover:` at all: the panel
 	// behind them is the only thing that moves.
 	"fill, normalised": {
-		details: "bg-white group-hover:bg-context",
+		details: "bg-white can-hover:group-hover:bg-context",
 		points: "text-black",
 		rule: "border-black",
 	},
 	"stroke": {
 		details: "bg-white",
-		points: "text-black group-hover:text-context",
+		points: "text-black can-hover:group-hover:text-context",
 		// One class rather than two. Under the stroke the rule is the
 		// category's colour at both ends, and `group-hover:` onto the colour
 		// already showing is a transition to nowhere.
@@ -145,8 +145,8 @@ const TREATMENTS = {
 	// and this is where it gains the hover state it does not otherwise have.
 	"stroke, normalised": {
 		details: "bg-white",
-		points: "text-black group-hover:text-context",
-		rule: "border-black group-hover:border-context",
+		points: "text-black can-hover:group-hover:text-context",
+		rule: "border-black can-hover:group-hover:border-context",
 	},
 } as const
 
