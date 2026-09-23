@@ -296,7 +296,7 @@ function Sidebar (
 	return <div
 		className={ `${
 			at_every_width ? "" : "max-md:hidden "
-		}layout__1-4__col-1 md:pl-1ccm pb-6 ${
+		}layout__1-4__col-1 md:pl-1ccm pb-4 md:pb-6 ${
 			takes_the_context_colour
 				? "max-md:bg-context md:bg-gray-light"
 				: "bg-gray-light"
