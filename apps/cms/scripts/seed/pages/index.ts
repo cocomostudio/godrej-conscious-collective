@@ -95,8 +95,6 @@ export async function write_pages (
 	await create_entry( strapi, "api::page.page", {
 		main_region: [
 			section( "Legal Disclaimer", {
-				heading: heading_component( "Legal Disclaimer", "h2" ),
-				register_with_toc: true,
 				strings: [
 					"The contents of this website are for general information only and are subject to change without notice.",
 				],
