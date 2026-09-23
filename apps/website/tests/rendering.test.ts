@@ -216,6 +216,16 @@ describe("the table of contents", () => {
 		expect( toc_entries( html ) ).toEqual( [ "The heading's own label" ] )
 	})
 
+	it("is hidden below the medium breakpoint", async () => {
+		// Hidden with the box that holds everything below the title, rather
+		// than on its own: that box's top margin would outlive it otherwise.
+		const { html } = await website.get( "/about" )
+
+		expect( html ).toMatch(
+			/<div class="max-md:hidden [^"]*"><nav aria-label="On this page"/,
+		)
+	})
+
 	it("is absent when the page asked for none", async () => {
 		const { html } = await website.get( "/no-toc" )
 

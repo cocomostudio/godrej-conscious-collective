@@ -84,8 +84,8 @@ type Root_Props = {
 	 |
 	 | **Whether the sidebar column exists below the medium breakpoint.**
 	 |
-	 | A Page's does: the design shows its back link and its table of contents
-	 | on a phone, stacked above the content. A session's does not — the design
+	 | A Page's does: the design shows its back link and its title on a phone,
+	 | stacked above the content. A session's does not — the design
 	 | puts the masthead first there and repeats the sidebar's contents
 	 | underneath it, which is what `sidebar_repeat` carries.
 	 |
@@ -252,10 +252,11 @@ export function Root (
  | where it is a band across the top of the page rather than a column beside
  | it. Everything in it that is drawn in a colour has a second one for that
  | band — the back link its own, the title and the line beneath it white.
- | What the sidebar holds below that width is those three and nothing else:
- | the filtration widget's inline copy and When and Where are both hidden
- | there, and each is a `max-md:hidden` of its own rather than anything this
- | arranges.
+ | What the sidebar holds below that width is those three and nothing else.
+ | Everything the content type and the components contribute — the table of
+ | contents, the filtration widget's inline copy — is hidden there along with
+ | the box that holds it, and When and Where carries a `max-md:hidden` of its
+ | own.
  |
  | **When and Where sits at the foot of it, pinned to the bottom of the visible
  | area.** That is why the column itself is the flex container from the medium
@@ -329,9 +330,14 @@ function Sidebar (
 			     column's width with `w-full` — the filtration widget does.
 			     The wrapper made that `w-full` resolve against a
 			     shrink-to-fit box instead, and the widget collapsed to its
-			     widest row. */
+			     widest row.
+
+			     **Hidden below the medium breakpoint as a whole**, because
+			     nothing in it is drawn there. A box whose contents hide
+			     themselves is not `:empty`, so it would keep its top margin
+			     and push the band's rule a further 24px from the title. */
 			}
-			<div className="empty:hidden mt-6 self-stretch">
+			<div className="max-md:hidden empty:hidden mt-6 self-stretch">
 				<Level>
 					{ children }
 
