@@ -206,7 +206,7 @@ describe("the sidebar", () => {
 		// it does not leave the accessibility tree.
 		expect( body ).toContain( `class="mt-4 md:sr-only"` )
 		expect( body ).toMatch(
-			/<p class="mt-4 text-p [^"]*"[^>]*>Installation artist<\/p>/,
+			/<p class="mt-2 text-p [^"]*"[^>]*>Installation artist<\/p>/,
 		)
 	})
 

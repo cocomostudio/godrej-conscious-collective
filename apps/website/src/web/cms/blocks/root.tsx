@@ -409,8 +409,8 @@ function Page_Title (
 
 		{ standfirst
 			&& <p
-				className={ `${
-					at_every_width ? "mt-2 text-caption" : "mt-4 text-p"
+				className={ `mt-2 ${
+					at_every_width ? "text-caption" : "text-p"
 				} ${
 					on_the_context_colour
 						? "max-md:text-white md:text-black"
