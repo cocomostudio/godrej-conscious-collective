@@ -2,7 +2,7 @@
 	"collectionName": "components_list_archive_timeline_listing_v1",
 	"info": {
 		"displayName": "Archive timeline listing",
-		"description": "Every past edition on a spine, newest first. A strip a visitor scrolls sideways on a phone, and a stack of rows from 1024 pixels wide."
+		"description": "Every past edition on a spine, newest first. A strip a visitor scrolls sideways on a phone, and a stack of rows from 1440 pixels wide."
 	},
 	"options": {},
 	"attributes": {
