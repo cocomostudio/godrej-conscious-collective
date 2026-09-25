@@ -64,6 +64,16 @@ export default function ( { env } ) {
 		"color-picker": {
 			enabled: true,
 		},
+
+		/**
+		 |
+		 | Switched on here and set up nowhere else in code. The plugin reads its
+		 | own EXPORT_ENTRIES_* env vars — see .env.example.
+		 |
+		 */
+		"export-entries": {
+			enabled: true,
+		},
 	}
 }
 

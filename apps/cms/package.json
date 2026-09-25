@@ -5,14 +5,15 @@
 	"description": "The Strapi CMS behind the Godrej Conscious Collective website.",
 	"license": "ISC",
 	"scripts": {
-		"build": "strapi build",
+		"build": "pnpm run build:plugins && strapi build",
+		"build:plugins": "pnpm --filter strapi-plugin-export-entries run build",
 		"console": "strapi console",
-		"dev": "strapi develop",
-		"develop": "strapi develop",
+		"dev": "pnpm run build:plugins && strapi develop",
+		"develop": "pnpm run dev",
 		"seed": "node scripts/seed/index.ts",
 		"start": "strapi start",
 		"strapi": "strapi",
-		"test": "vitest run",
+		"test": "pnpm run build:plugins && vitest run",
 		"test:watch": "vitest",
 		"typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.tests.json"
 	},
@@ -33,6 +34,7 @@
 		"react": "18.3.1",
 		"react-dom": "18.3.1",
 		"react-router-dom": "6.30.3",
+		"strapi-plugin-export-entries": "workspace:*",
 		"strapi-plugin-webtools": "1.10.3",
 		"styled-components": "6.1.19",
 		"webtools-addon-sitemap": "1.3.1"
