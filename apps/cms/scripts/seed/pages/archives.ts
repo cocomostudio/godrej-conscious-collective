@@ -37,37 +37,6 @@ import { create_entry } from "../lib/strapi.ts"
 import type { Strapi } from "../lib/strapi.ts"
 import type { Seeded_Page_Shells } from "../page-shells.ts"
 
-/**
- |
- | A WYSIWYG opening with a heading.
- |
- | The archive entry list holds no heading component — every member of it has to
- | stand alone as a slide, and a lone heading is not one — so a slide that opens
- | with a title says so inside its own rich text. That is the WYSIWYG's job
- | anyway: the editor's level picks how large it looks, and its rank in the
- | document follows from how deeply it sits.
- |
- */
-function titled_wysiwyg (
-	title: string,
-	level: number,
-	paragraphs: string[],
-) {
-	const body = wysiwyg( paragraphs )
-
-	return {
-		...body,
-		rich_text: [
-			{
-				children: [ { text: title, type: "text" } ],
-				level,
-				type: "heading",
-			},
-			...body.rich_text,
-		],
-	}
-}
-
 const SNAPSHOTS = [
 	titled_wysiwyg( "Reclaiming Cool", 2, [
 		"Over three days, this event brought together designers, architects, "
@@ -188,4 +157,35 @@ export async function write_archives_page (
 			+ "the years.",
 		title: "Archives",
 	} )
+}
+
+/**
+ |
+ | A WYSIWYG opening with a heading.
+ |
+ | The archive entry list holds no heading component — every member of it has to
+ | stand alone as a slide, and a lone heading is not one — so a slide that opens
+ | with a title says so inside its own rich text. That is the WYSIWYG's job
+ | anyway: the editor's level picks how large it looks, and its rank in the
+ | document follows from how deeply it sits.
+ |
+ */
+function titled_wysiwyg (
+	title: string,
+	level: number,
+	paragraphs: string[],
+) {
+	const body = wysiwyg( paragraphs )
+
+	return {
+		...body,
+		rich_text: [
+			{
+				children: [ { text: title, type: "text" } ],
+				level,
+				type: "heading",
+			},
+			...body.rich_text,
+		],
+	}
 }

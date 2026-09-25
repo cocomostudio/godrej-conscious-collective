@@ -36,28 +36,6 @@ afterAll( async () => {
 	await cms?.destroy()
 } )
 
-function find_block ( blocks: any[], name: string ): any {
-	for ( const block of blocks ?? [] ) {
-		if ( block?.__component === name ) {
-			return block
-		}
-
-		const found = Array.isArray( block?.content )
-			? find_block( block.content, name )
-			: undefined
-
-		if ( found ) {
-			return found
-		}
-	}
-
-	return undefined
-}
-
-function find_section ( blocks: any[], title: string ): any {
-	return ( blocks ?? [] ).find( ( block: any ) => block?.title === title )
-}
-
 describe("the deepest legal path in the render tree", () => {
 	it("arrives intact: entry region, section, composite, leaf", async () => {
 		const { body, status } = await cms.get( "/api/envelope?path=/home" )
@@ -545,3 +523,25 @@ describe("the page shell's injected code", () => {
 		expect( hooks.before_body_closing ).toEqual( [] )
 	})
 })
+
+function find_block ( blocks: any[], name: string ): any {
+	for ( const block of blocks ?? [] ) {
+		if ( block?.__component === name ) {
+			return block
+		}
+
+		const found = Array.isArray( block?.content )
+			? find_block( block.content, name )
+			: undefined
+
+		if ( found ) {
+			return found
+		}
+	}
+
+	return undefined
+}
+
+function find_section ( blocks: any[], title: string ): any {
+	return ( blocks ?? [] ).find( ( block: any ) => block?.title === title )
+}
