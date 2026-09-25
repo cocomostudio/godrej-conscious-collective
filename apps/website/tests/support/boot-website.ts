@@ -91,6 +91,13 @@ export type Website = {
 
 export async function boot_website (
 	envelopes: Record<string, Envelope> = {},
+	/**
+	 |
+	 | The website's port. Any free one unless named: the browser tests name
+	 | it, because Playwright waits on a fixed URL before a test runs.
+	 |
+	 */
+	{ port = 0 }: { port?: number } = {},
 ): Promise<Website> {
 	const cms: Cms_Stub = {
 		envelopes,
@@ -129,11 +136,10 @@ export async function boot_website (
 
 	const express_app = await WebServer.build()
 	const server: Server = await new Promise( ( resolve ) => {
-		const listening = express_app.listen( 0, () => resolve( listening ) )
+		const listening = express_app.listen( port, () => resolve( listening ) )
 	} )
 
-	const { port } = server.address() as AddressInfo
-	const url = `http://127.0.0.1:${port}`
+	const url = `http://127.0.0.1:${( server.address() as AddressInfo ).port}`
 
 	return {
 		cms,

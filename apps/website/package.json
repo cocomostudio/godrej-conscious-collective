@@ -15,6 +15,7 @@
 		"dev": "NODE_ENV=development node --conditions development --env-file-if-exists .env entry-point.ts",
 		"test": "vitest run",
 		"test:watch": "vitest",
+		"test:browser": "playwright test",
 		"start": "NODE_ENV=production node --env-file-if-exists .env.production entry-point.ts",
 		"typecheck": "react-router typegen && tsc"
 	},
@@ -46,6 +47,7 @@
 		"valibot": "1.2.0"
 	},
 	"devDependencies": {
+		"@playwright/test": "1.63.0",
 		"@react-router/dev": "8.3.0",
 		"@types/express": "5.0.6",
 		"@types/node": "22.20.1",
