@@ -3,8 +3,8 @@
  |
  | Archive timeline listing — a leaf. Every past edition on a spine.
  |
- | **Below the medium breakpoint it is a strip a visitor scrolls sideways**;
- | from it, a stack of rows. Both are the same ordered list with different
+ | **Below the large breakpoint it is a strip a visitor scrolls sideways**;
+ | from it, a stack of entries. Both are the same ordered list with different
  | classes on it — no carousel library, no snapping and no drag handling,
  | because plain overflow scrolling is what the design asks for and what a
  | thumb already knows how to use. The same argument the vanilla carousel makes.
@@ -20,9 +20,9 @@
  | The line down the timeline has to stop being a line at its first end, and it
  | fades rather than stopping square. Which direction it fades in depends on
  | which way the timeline is laid out, so there are two gradients — sideways
- | below the medium breakpoint and downward from it — and both are declared
- | here, on the list, because a row cannot know which end of the spine it is on
- | while a list can. They reach the rows as custom properties and are used by
+ | below the large breakpoint and downward from it — and both are set
+ | here, on the list, because an entry cannot know which end of the spine it is on
+ | while a list can. They reach the entries as custom properties and are used by
  | `group-first`.
  |
  | The context colour is read as an RGB triplet, which is how every colour in
@@ -42,20 +42,20 @@ import type { CSSProperties } from "react"
 
 import type { Archive_Entry_Attribute } from "./archive-entry.tsx"
 
-import { Archive_Entry } from "./archive-entry.tsx"
-import { BLOCK_SPACING } from "./block-spacing.ts"
+import {
+	Archive_Entry,
+	FADE_DOWN,
+} from "./archive-entry.tsx"
+import {
+	BLOCK_AT_A_SECTION_EDGE,
+	BLOCK_SPACING,
+} from "./block-spacing.ts"
 
-/** Transparent → the context colour, in the two directions the design uses. */
+/** Transparent → the context colour, for the strip. `FADE_DOWN` is the stack's. */
 const FADE_SIDEWAYS = [
 	"to right",
 	"rgba( var( --ctx-context-color ), 0 )",
 	"rgb( var( --ctx-context-color ) )",
-].join( ", " )
-
-const FADE_DOWN = [
-	"to bottom",
-	"rgba( var( --ctx-context-color ), 0 )",
-	"rgb( var( --ctx-context-color ) ) 50%",
 ].join( ", " )
 
 export function Archive_Timeline_Listing (
@@ -65,24 +65,37 @@ export function Archive_Timeline_Listing (
 		return null
 	}
 
+	// At a section edge the section left bare, the block keeps 32px of its own:
+	// below itself at every width, and above itself from the large breakpoint.
+	// Below it, the 32px above the strip sits under the count instead.
 	return <div
-		className={ BLOCK_SPACING }
+		className={ `${BLOCK_SPACING} ${BLOCK_AT_A_SECTION_EDGE} lg:group-data-[flush-top]/section:first:pt-8 group-data-[flush-bottom]/section:last:pb-8` }
 		style={ {
 			"--archive-spine-fade-down": FADE_DOWN,
 			"--archive-spine-fade-sideways": FADE_SIDEWAYS,
 		} as CSSProperties }>
 		<List_Header
-			className="md:hidden sticky top-0 z-40 -mx-1ccm"
+			className="lg:hidden sticky top-0 z-[1] -mx-1ccm"
 			entries_count={ entries.length } />
 
 		{
-			/* The whole of the responsive behaviour is here. Below the medium
+			/* The whole of the responsive behaviour is here. Below the large
 		     breakpoint: a horizontal strip, natively scrolled with its
-		     scrollbar hidden, rows capped in width and overlapping slightly.
-		     From it: `md:flex-wrap` turns every row full-width, which stacks
-		     them. */
+		     scrollbar hidden, each entry three quarters of the screen wide up
+		     to 400px, but never narrower than its widest part (the fan), and
+		     overlapping the next slightly, 32px below the count.
+		     From it: a column of full-width entries, 32px apart.
+
+		     The list is a stacking context of its own, so that the count can
+		     sit above everything in it and still below the site header, whose
+		     shadow falls across the count. The count is `z-[1]` for that
+		     reason: above the list, below the header's `z-10`.
+
+		     From the large breakpoint the list keeps 32px of its own above
+		     the first entry where the section laid none down, because the
+		     first entry's line reaches 32px above that entry to fade out. */
 		}
-		<ol className="flex max-md:overflow-auto max-md:scrollbar-none md:flex-wrap *:w-full *:max-w-89.5 md:*:max-w-none *:shrink-0 *:grow md:*:px-0 md:*:py-4 *-first:pt-0 *-last:pb-0 max-md:*-but-first:-ml-4">
+		<ol className="isolate flex max-lg:pt-8 max-lg:overflow-auto max-lg:scrollbar-none lg:flex-col lg:gap-8 max-lg:*:min-w-min max-lg:*:w-[75vw] max-lg:*:max-w-100 lg:*:w-full *:shrink-0 max-lg:*-but-first:-ml-4 lg:group-data-[flush-top]/section:group-first/block:pt-8">
 			{ entries.map( ( entry, index ) =>
 				<Archive_Entry entry={ entry } key={ index } />
 			) }
@@ -108,8 +121,8 @@ function List_Header (
      nothing can search for. */
 
 	return <div
-		className={ `max-md:px-1ccm max-md:py-4 max-md:bg-gray-light ${className}` }>
-		<p className="text-h6 md:text-h3 md:font-semibold font-light text-context md:text-black">
+		className={ `max-lg:px-1ccm max-lg:py-4 max-lg:bg-gray-light ${className}` }>
+		<p className="text-h6 lg:text-h3 lg:font-semibold font-light text-context lg:text-black">
 			{ `${entries_count} ${entries_count === 1 ? "Event" : "Events"}` }
 		</p>
 	</div>

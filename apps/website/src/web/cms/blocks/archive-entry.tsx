@@ -1,7 +1,7 @@
 
 /**
  |
- | One past edition, as a row on the Archive's timeline.
+ | One past edition, as an entry on the Archive's timeline.
  |
  | A node on the spine, the year, a fan of three photographs, the edition's name
  | and a description, and — where an editor wrote any — a button that opens its
@@ -15,8 +15,8 @@
  |
  | # The two ways in
  |
- | Pressing anywhere on the row opens the snapshots, and so does the button.
- | That is one behaviour with two entrances rather than two behaviours: the row
+ | Pressing anywhere on the entry opens the snapshots, and so does the button.
+ | That is one behaviour with two entrances rather than two behaviours: the entry
  | is a pointer-only convenience laid over the button, which is the real
  | control and the only one a keyboard sees. `use_click_without_drag` is what
  | keeps the convenience from firing on a drag, on a text selection, or on a
@@ -25,16 +25,16 @@
  |
  | # The spine
  |
- | The connector between two rows runs **horizontally below the medium
+ | The connector between two entries runs **horizontally below the large
  | breakpoint** and vertically from it, because the timeline itself turns from a
- | strip a visitor scrolls sideways into a stack of rows. Its two gradients
+ | strip a visitor scrolls sideways into a stack of entries. Its two gradients
  | arrive as custom properties from the listing above, which is the only place
  | that can know which end of the spine fades out.
  |
  | # The fan
  |
- | Three photographs, absolutely stacked and each rotated. Pointing at the row
- | from the medium breakpoint upward spreads them. The schema asks for exactly
+ | Three photographs, absolutely stacked and each rotated. Pointing at the entry
+ | from the large breakpoint upward spreads them. The schema asks for exactly
  | three, and each of the three is placed by hand rather than by a rule, because
  | what makes it a fan rather than a pile is that no two of them agree.
  |
@@ -80,23 +80,37 @@ export type Archive_Entry_Attribute = {
 const FAN = [
 	{
 		figure:
-			"w-full translate-y-[24%] md:translate-y-0 md:group-hover:translate-y-[25%]",
-		image: "mx-auto w-41 aspect-3/4 rounded-lg",
+			"w-full translate-y-[24%] lg:translate-y-0 lg:group-hover:translate-y-8",
+		image: "mx-auto w-41 lg:w-auto lg:h-55 aspect-3/4 rounded-lg",
 		layer: "z-30",
 	},
 	{
 		figure:
-			"w-full -translate-y-[5%] rotate-[15deg] translate-x-[6%] md:translate-x-0 md:translate-y-0 md:rotate-[30deg] md:group-hover:translate-x-[15%] md:group-hover:translate-y-[15%] md:group-hover:rotate-[15deg]",
-		image: "mx-auto max-md:self-start w-55 aspect-4/3 rounded-lg",
+			"w-full -translate-y-[5%] rotate-[15deg] translate-x-[6%] lg:translate-x-0 lg:translate-y-0 lg:rotate-[30deg] lg:group-hover:translate-x-[15%] lg:group-hover:translate-y-[15%] lg:group-hover:rotate-[15deg]",
+		image: "mx-auto max-lg:self-start w-55 aspect-4/3 rounded-lg",
 		layer: "z-20",
 	},
 	{
 		figure:
-			"w-full -translate-y-[40%] -rotate-[7.5deg] -translate-x-[8%] md:translate-x-0 md:translate-y-0 md:-rotate-[30deg] md:group-hover:-translate-x-[15%] md:group-hover:-translate-y-[15%] md:group-hover:-rotate-[7.5deg]",
-		image: "mx-auto max-md:self-start w-55 aspect-4/3 rounded-lg",
+			"w-full -translate-y-[40%] -rotate-[7.5deg] -translate-x-[8%] lg:translate-x-0 lg:translate-y-0 lg:-rotate-[30deg] lg:group-hover:-translate-x-[15%] lg:group-hover:-translate-y-[15%] lg:group-hover:-rotate-[7.5deg]",
+		image: "mx-auto max-lg:self-start w-55 aspect-4/3 rounded-lg",
 		layer: "z-10",
 	},
 ]
+
+/**
+ |
+ | The first entry's line, transparent at its top and solid from the top of the
+ | node down. The stop is measured from the top of the line — see the numbers
+ | on `Spine`, which this has to agree with. The listing sets it as a custom
+ | property, because only the list knows which entry is first.
+ |
+ */
+export const FADE_DOWN = [
+	"to bottom",
+	"rgba( var( --ctx-context-color ), 0 )",
+	"rgb( var( --ctx-context-color ) ) 158px",
+].join( ", " )
 
 export function Archive_Entry ( { entry }: { entry: Archive_Entry_Attribute } ) {
 	const origin = use_media_origin()
@@ -127,23 +141,29 @@ export function Archive_Entry ( { entry }: { entry: Archive_Entry_Attribute } ) 
 	const title = `${entry.name} | ${entry.year}`
 
 	return <li
-		className={ `relative group flex flex-col md:flex-row gap-4 pr-4 md:pr-0 rounded-lg focus-within:outline focus-within:outline-1 focus-within:outline-offset-8 focus-within:outline-context ${
+		className={ `relative group flex flex-col lg:flex-row gap-4 pr-4 lg:pr-0 rounded-lg focus-within:outline focus-within:outline-1 focus-within:outline-offset-8 focus-within:outline-context ${
 			has_snapshots ? "cursor-pointer" : ""
 		}` }
 		{ ...row_handlers }>
 		<Spine />
 
-		<H className="ml-4 w-[5ex] shrink-0 text-h4 text-black md:m-0 md:order-first md:self-center md:text-right">
+		{
+			/* From the large breakpoint the year, the node and the fan are
+		     pinned to the top of the entry rather than centred in it, so that a
+		     long description grows the entry downwards without moving them.
+		     The year is centred on the fan, on the same line as the node. */
+		}
+		<H className="ml-4 w-[5ex] shrink-0 text-h4 text-black lg:m-0 lg:order-first lg:h-71 lg:flex lg:items-center lg:justify-end">
 			{ entry.year }
 		</H>
 
 		{ pictures.length > 0
-			&& <ul className="md:m-0 max-md:size-81.5 md:w-95 md:h-71.5 shrink-0 relative">
+			&& <ul className="lg:m-0 max-lg:size-81.5 lg:w-95 lg:h-71 shrink-0 relative">
 				{ pictures.map( ( picture, index ) => {
 					const place = FAN[index] ?? FAN[FAN.length - 1]
 
 					return <li
-						className={ `absolute top-0 bottom-0 flex items-center w-full ${place.layer}` }
+						className={ `absolute top-0 bottom-0 lg:top-8 lg:bottom-8 flex items-center w-full ${place.layer}` }
 						key={ index }>
 						<figure
 							className={ `origin-center transition-transform duration-750 ${place.figure}` }>
@@ -156,7 +176,7 @@ export function Archive_Entry ( { entry }: { entry: Archive_Entry_Attribute } ) 
 			</ul> }
 
 		{
-			/* **One level down from the year**, which is the row's own
+			/* **One level down from the year**, which is the entry's own
 		     heading. The two are the same size in the design and different
 		     things in the document: the year is what the timeline is indexed
 		     by, and the name is what that edition was called. The level is
@@ -164,8 +184,8 @@ export function Archive_Entry ( { entry }: { entry: Archive_Entry_Attribute } ) 
 		     ranks below the year too. */
 		}
 		<Level>
-			<div className="ml-4 md:ml-0 md:py-4">
-				<H className="mt-4 md:m-0 text-h4 text-black line-clamp-2">
+			<div className="ml-4 lg:ml-0 lg:py-4">
+				<H className="mt-4 lg:m-0 text-h4 text-black line-clamp-2">
 					{ entry.name }
 				</H>
 
@@ -183,7 +203,7 @@ export function Archive_Entry ( { entry }: { entry: Archive_Entry_Attribute } ) 
 				{ has_snapshots
 					&& <button
 						aria-label={ `View more info about ${entry.name} held in ${entry.year}` }
-						className="mt-4 md:mt-8 flex gap-1 items-center text-button font-medium text-context cursor-pointer md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100 transition-opacity"
+						className="mt-4 lg:mt-8 flex gap-1 items-center text-button font-medium text-context cursor-pointer lg:opacity-0 lg:group-hover:opacity-100 lg:focus-visible:opacity-100 transition-opacity"
 						onClick={ () => set_open( true ) }
 						type="button">
 						See Snapshots
@@ -232,21 +252,43 @@ export function Archive_Entry ( { entry }: { entry: Archive_Entry_Attribute } ) 
  | Entirely decoration, so it is hidden from assistive technology: the timeline
  | is an ordered list and the order is already in the markup.
  |
- | The line is horizontal below the medium breakpoint and vertical from it. Two
- | of its four states belong to the ends — the first row's line fades in out of
- | nothing, and the last row's stops half way rather than running on to a row
- | that is not there — and both are asked for with `group-first` and
- | `group-last` rather than passed in, because a row does not know where it sits.
+ | The line is horizontal below the large breakpoint and vertical from it. Two
+ | of its four states belong to the ends — the first entry's line fades in out
+ | of nothing, and the last entry's stops at its node rather than running on to
+ | an entry that is not there — and both are asked for with `group-first` and
+ | `group-last` rather than passed in, because an entry does not know where it
+ | sits.
+ |
+ | **From the large breakpoint each entry owns the line above it.** The line
+ | runs across the gap the list leaves above the entry, then down to the
+ | entry's bottom edge, where the next entry's line takes over. The node sits
+ | level with the middle of the fan. The first entry's fade turns solid at the
+ | top of the node, and the last entry's line stops at the node's centre.
+ |
+ | The numbers behind those classes:
+ |
+ |   the gap above the entry      32px  (`lg:-top-8`)
+ |   the node's top               126px into the entry  (`lg:mt-31.5`)
+ |   the node's centre            142px, half of the fan's 284px
+ |   the last entry's line        32 + 142 = 174px  (`lg:group-last:h-43.5`)
+ |   the first entry's solid stop 32 + 126 = 158px down the line  (`FADE_DOWN`)
+ |
+ | The test ids are for the browser tests. The spine is hidden from assistive
+ | technology, so it has no role or name to be found by.
  |
  */
 function Spine () {
 	return <div
 		aria-hidden={ true }
-		className="relative ml-4 md:m-0 md:flex md:items-center before:content-[''] before:absolute before:right-full before:top-1/2 before:-translate-y-1/2 before:w-4 before:h-0.5 before:bg-[linear-gradient(var(--archive-spine-fade-sideways))] before:hidden max-md:group-first:before:block">
-		<span className="relative block size-8 rounded-full border-2 border-context bg-white z-10">
+		className="relative ml-4 lg:m-0 lg:flex lg:flex-col lg:items-center before:content-[''] before:absolute before:right-full before:top-1/2 before:-translate-y-1/2 before:w-4 before:h-0.5 before:bg-[linear-gradient(var(--archive-spine-fade-sideways))] before:hidden max-lg:group-first:before:block">
+		<span
+			className="relative block size-8 lg:mt-31.5 rounded-full border-2 border-context bg-white z-10"
+			data-testid="spine-node">
 		</span>
 
-		<span className="absolute top-1/2 -translate-y-1/2 ml-8 w-full h-0.5 md:-top-4 md:-bottom-4 md:translate-y-0 md:left-1/2 md:-translate-x-1/2 md:ml-0 md:w-0.5 md:h-auto md:group-last:h-1/2 bg-context md:group-first:bg-transparent md:group-first:bg-[linear-gradient(var(--archive-spine-fade-down))]">
+		<span
+			className="absolute top-1/2 -translate-y-1/2 ml-8 w-full h-0.5 lg:-top-8 lg:bottom-0 lg:translate-y-0 lg:left-1/2 lg:-translate-x-1/2 lg:ml-0 lg:w-0.5 lg:h-auto max-lg:group-last:hidden lg:group-last:h-43.5 bg-context lg:group-first:bg-transparent lg:group-first:bg-[linear-gradient(var(--archive-spine-fade-down))]"
+			data-testid="spine-line">
 		</span>
 	</div>
 }
