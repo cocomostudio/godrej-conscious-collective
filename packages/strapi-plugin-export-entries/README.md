@@ -1,6 +1,6 @@
 # strapi-plugin-export-entries
 
-Adds an **Export** button to the list page of chosen collection types in the Strapi 5 admin panel. The button opens a modal that lists the content-type's fields under the labels the edit view shows.
+Adds an **Export** button to the list page of chosen collection types in the Strapi 5 admin panel. The button opens a modal where an admin picks which entries and which fields to export. The entries download as a CSV file that opens cleanly in Excel and Google Sheets.
 
 The plugin knows nothing about the project it is installed in. Three settings decide where the button shows and how dates are read.
 
@@ -72,3 +72,64 @@ The modal leaves out:
 - private fields
 - password fields
 - relation and media fields
+
+## Choosing which entries
+
+The modal offers two groups of presets:
+
+- **Latest N**: the N most recently created entries, one choice for each size in the presets setting.
+- **A calendar period**: Today, Yesterday, This week, Last week, This month, Last month, This year or Last year.
+
+A calendar period follows these rules:
+
+- Its days are read in the timezone setting.
+- A week runs from Monday to Sunday.
+- "This week", "This month" and "This year" run up to today.
+- The days are fixed when the admin clicks Export, so an export that runs past midnight still covers the days the admin asked for.
+
+When no entry matches, the modal says "No entries match" and nothing downloads.
+
+## The CSV file
+
+The file is named after the content-type's plural name and the selection:
+
+- Latest N: `<plural>_latest-<N>_<today>.csv`, such as `leads_latest-100_2026-09-25.csv`
+- A calendar period: `<plural>_<start>_to_<end>.csv`, such as `leads_2026-09-01_to_2026-09-25.csv`
+
+### Rows and columns
+
+- Rows come newest first, by creation time.
+- The columns are the ticked fields, in edit-view order, under their edit-view labels. "Created at" and "Updated at" follow them.
+
+### Encoding
+
+- The file is UTF-8 and starts with a byte-order mark, so that Excel shows non-English letters correctly.
+- Lines end with CRLF.
+- Every cell is wrapped in double quotes. A double quote inside a cell is doubled.
+
+### Values
+
+| Field type | Written as |
+| --- | --- |
+| Boolean | `TRUE` or `FALSE` |
+| Date and time | `YYYY-MM-DD HH:mm`, in the timezone setting |
+| Date | `YYYY-MM-DD` |
+| JSON and rich text (blocks) | the stored JSON |
+| Anything empty | an empty cell |
+
+### The formula guard
+
+A spreadsheet runs a cell as a formula when the cell starts with certain characters. A registrant could plant such a cell in a form, and it would run on the machine of the admin who opens the file. The guard stops this.
+
+A cell that starts with `=`, `+`, `-`, `@`, a tab or a carriage return gets a leading `'`. The spreadsheet then shows the cell as text.
+
+Two kinds of cell are left alone:
+
+- a cell made only of digits, spaces, `+`, `-`, `(` and `)`, such as the phone number `+91 98765 43210`, because it cannot call a function
+- a number from a number field, such as `-5` or `-1.5`, so that it stays a number
+
+## How the file reaches the disk
+
+The server reads the entries in batches of 500 and sends each batch only once the connection has taken the one before. The browser saves the file straight to disk through a plain download link. So a large export raises the memory use of neither the server nor the browser.
+
+Each download writes one line to the Strapi log. The line names the admin, the content-type, the selection, the fields and the row count.

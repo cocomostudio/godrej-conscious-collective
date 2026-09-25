@@ -19,19 +19,26 @@ import { type Description, Export_Modal } from "./export-modal"
 export function Export_Button () {
 	const { slug } = useParams<{ slug: string }>()
 	const description = use_description( slug )
+	const [ open, set_open ] = useState( false )
 
 	if ( !slug || !description ) {
 		return null
 	}
 
 	return (
-		<Modal.Root>
+		<Modal.Root onOpenChange={ set_open } open={ open }>
 			<Modal.Trigger>
 				<Button startIcon={ <Download /> } variant="tertiary">
 					Export
 				</Button>
 			</Modal.Trigger>
-			<Export_Modal description={ description } />
+			{ open && (
+				<Export_Modal
+					description={ description }
+					on_started={ () => set_open( false ) }
+					uid={ slug }
+				/>
+			) }
 		</Modal.Root>
 	)
 }
