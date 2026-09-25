@@ -5,6 +5,7 @@ import { errors } from "@strapi/utils"
 import {
 	type Day_Range,
 	day_in,
+	is_day,
 	type Period,
 	PERIODS,
 	resolve_period,
@@ -17,6 +18,10 @@ import type { Settings } from "./settings"
  | Which entries an export reads. A calendar period is resolved to its days
  | when the ticket is requested, so an export that runs past midnight still
  | reads the days the admin asked for.
+ |
+ | A calendar period is read from the day the modal showed it on, when the
+ | request names one. So a modal left open past midnight exports the days its
+ | labels show.
  |
  */
 export type Selection =
@@ -85,11 +90,16 @@ function check_selection (
 			)
 		}
 
+		const as_of = selection.as_of ?? day_in( settings.timezone, now )
+
+		if ( !is_day( as_of ) ) {
+			throw new errors.ValidationError(
+				`"${as_of}" is not a day written as YYYY-MM-DD.`,
+			)
+		}
+
 		return {
-			days: resolve_period(
-				selection.period,
-				day_in( settings.timezone, now ),
-			),
+			days: resolve_period( selection.period, as_of ),
 			kind: "period",
 			period: selection.period,
 		}

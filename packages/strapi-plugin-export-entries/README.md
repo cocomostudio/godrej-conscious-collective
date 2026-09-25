@@ -87,6 +87,7 @@ A calendar period follows these rules:
 - Its days are read in the timezone setting.
 - A week runs from Monday to Sunday.
 - "This week", "This month" and "This year" run up to today.
+- The days are the ones the modal showed. A modal left open past midnight still exports the days its labels name.
 - The days are fixed when the admin clicks Export, so an export that runs past midnight still covers the days the admin asked for.
 
 When no entry matches, the modal says "No entries match" and nothing downloads.

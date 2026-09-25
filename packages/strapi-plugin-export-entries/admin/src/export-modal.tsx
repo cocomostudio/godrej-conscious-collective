@@ -19,6 +19,8 @@ export type Description = {
 	draft_and_publish: boolean
 	timezone: string
 	presets: number[]
+	/** The day the periods are seen from, as `YYYY-MM-DD`. */
+	today: string
 	periods: Period_Days[]
 }
 
@@ -81,7 +83,7 @@ export function Export_Modal (
 					fields: description.fields
 						.filter( ( field ) => chosen.has( field.name ) )
 						.map( ( field ) => field.name ),
-					selection: selection_of( preset ),
+					selection: selection_of( preset, description.today ),
 					uid,
 				},
 			)
@@ -244,13 +246,19 @@ const MONTH_NAMES = [
 	"December",
 ]
 
-/** Turns a picker value, such as `latest:50`, into a Request ticket selection. */
-function selection_of ( preset: string ) {
+/**
+ |
+ | Turns a picker value, such as `latest:50`, into a Request ticket selection.
+ | A calendar period carries the day its label was worked out from, so that
+ | the export reads the days the label shows, even after midnight.
+ |
+ */
+function selection_of ( preset: string, today: string ) {
 	const [ kind, value ] = preset.split( ":" )
 
 	return kind === "latest"
 		? { count: Number( value ), kind: "latest" }
-		: { kind: "period", period: value }
+		: { as_of: today, kind: "period", period: value }
 }
 
 /**

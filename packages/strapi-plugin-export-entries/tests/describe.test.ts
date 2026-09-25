@@ -285,6 +285,7 @@ describe("Describe, for the calendar periods", () => {
 				{ token: await cms.login( SUPER_ADMIN.email ) },
 			)
 
+			expect( body.data.today ).toBe( "2026-09-24" )
 			expect( body.data.periods ).toEqual( [
 				{ end: "2026-09-24", period: "today", start: "2026-09-24" },
 				{ end: "2026-09-23", period: "yesterday", start: "2026-09-23" },

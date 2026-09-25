@@ -70,6 +70,17 @@ export function instants_of ( range: Day_Range, timezone: string ) {
 	}
 }
 
+/** Whether `value` names a real day, written as `YYYY-MM-DD`. */
+export function is_day ( value: unknown ): value is string {
+	if ( typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test( value ) ) {
+		return false
+	}
+
+	const { year, month, day } = parse_day( value )
+
+	return format_day( year, month, day ) === value
+}
+
 /** The day `instant` falls on in `timezone`, as `YYYY-MM-DD`. */
 export function day_in ( timezone: string, instant: Date ): string {
 	const { year, month, day } = wall_clock( instant, timezone )

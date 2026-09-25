@@ -516,6 +516,38 @@ describe("Exporting a calendar period, in a timezone ahead of UTC", () => {
 		expect( body.data.file_name ).toBe( `gadgets_${start}_to_${end}.csv` )
 	})
 
+	it("exports the days the modal showed, when the modal was opened the day before", async () => {
+		// The modal was opened on 23 September, and Export is clicked after
+		// midnight. "Today" still means the day the modal showed.
+		const { body } = await request_ticket( cms, token, {
+			fields: [ "title" ],
+			selection: { as_of: "2026-09-23", kind: "period", period: "today" },
+			uid: GADGET_UID,
+		} )
+		const { bytes } = await download( cms, body.data.ticket )
+
+		expect( body.data.file_name ).toBe(
+			"gadgets_2026-09-23_to_2026-09-23.csv",
+		)
+		expect( titles_of( bytes.toString( "utf8" ) ) ).toEqual( [
+			"2026-09-23 23:59",
+			"2026-09-23 00:00",
+		] )
+	})
+
+	it.each( [ "2026-02-30", "yesterday", "2026-9-1" ] )(
+		"refuses %j as the day a period is read from",
+		async ( as_of ) => {
+			const { status } = await request_ticket( cms, token, {
+				fields: [ "title" ],
+				selection: { as_of, kind: "period", period: "today" },
+				uid: GADGET_UID,
+			} )
+
+			expect( status ).toBe( 400 )
+		},
+	)
+
 	it("keeps the days fixed when the ticket was requested", async () => {
 		const { body } = await request_ticket( cms, token, {
 			fields: [ "title" ],

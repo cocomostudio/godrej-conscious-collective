@@ -23,7 +23,9 @@ export type Description = {
 	draft_and_publish: boolean
 	timezone: string
 	presets: number[]
-	/** The days each calendar period covers, as of now. */
+	/** Today, in the timezone setting, as `YYYY-MM-DD`. */
+	today: string
+	/** The days each calendar period covers, as seen from `today`. */
 	periods: ( { period: Period } & Day_Range )[]
 }
 
@@ -69,6 +71,7 @@ export async function describe_content_type (
 		} ) ),
 		presets: settings.presets,
 		timezone: settings.timezone,
+		today,
 	}
 }
 
