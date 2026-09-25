@@ -154,27 +154,6 @@ const TREATMENTS = {
 
 /**
  |
- | **Every class is written out whole**, rather than composed from the colour
- | it names, for the reason `context-colours.ts` gives about `ROLE_BACKGROUND`:
- | Tailwind scans the source for complete class names, so `border-${colour}` is
- | a class that never gets compiled and a rule that never gets drawn.
- |
- */
-function treatment_of (
-	style_and_transition: Style_And_Transition,
-	normalise_colors: boolean,
-) {
-	const stroke = style_and_transition !== CHANGE_FILL_ON_HOVER
-
-	return TREATMENTS[
-		`${stroke ? "stroke" : "fill"}${
-			normalise_colors ? ", normalised" : ""
-		}` as keyof typeof TREATMENTS
-	]
-}
-
-/**
- |
  | One session, as a listing draws it.
  |
  | `className` is the frame the track wants around it — a width, a shrink rule,
@@ -291,6 +270,98 @@ export function Card (
 
 /**
  |
+ | One collaborator: a round picture with a name and a role under it.
+ |
+ | All three collaborator layouts draw this and differ only in how they arrange
+ | it.
+ |
+ | **The name is not a heading**, for the reason the card gives above: this is a
+ | link to the collaborator's own page rather than a section of the page being
+ | read, and a grid of ten of them would bury the section headings a reader
+ | navigates by. The static site's grid does use an `h3`; its home carousel uses
+ | a `p` for the same words, and the `p` is the one that is right.
+ |
+ */
+export function Portrait (
+	{
+		caption_className = "",
+		className = "",
+		contributor,
+		figure_className = "",
+		image_className = "",
+	}: {
+		/**
+		 |
+		 | The three inner frames a layout may want a hold of. The carousel
+		 | tweens all three every frame and needs its own hooks on them; the
+		 | other two layouts pass nothing and get the portrait as it is.
+		 |
+		 */
+		caption_className?: string
+		className?: string
+		contributor: Contributor_Card
+		figure_className?: string
+		image_className?: string
+	},
+) {
+	const origin = use_media_origin()
+	const picture = picture_of( contributor.image, origin )
+
+	return <Card_Link
+		className={ `flex flex-col items-center w-full ${className}` }
+		path={ contributor.path }>
+		<figure className={ `w-full select-none ${figure_className}` }>
+			{ picture
+				? <Picture_Image
+					className={ `w-full aspect-square rounded-full object-cover ${image_className}` }
+					picture={ {
+						...picture,
+						alt: picture.alt || contributor.name,
+					} }
+					sizes={ `( min-width: ${breakpoints.md} ) 14rem, 10.5rem` } />
+				// An empty frame rather than a stand-in picture, as the card
+				// does. It keeps its shape so a grid row stays level and the
+				// captions beside it stay in line.
+				: <div
+					className={ `w-full aspect-square rounded-full ${image_className}` } /> }
+
+			<figcaption className={ `mt-4 text-center ${caption_className}` }>
+				<p className="text-h5 font-semibold text-black line-clamp-2">
+					{ contributor.name }
+				</p>
+
+				{ contributor.role
+					&& <p className="mt-1 md:mt-2 text-h6 text-black line-clamp-2">
+						{ contributor.role }
+					</p> }
+			</figcaption>
+		</figure>
+	</Card_Link>
+}
+
+/**
+ |
+ | **Every class is written out whole**, rather than composed from the colour
+ | it names, for the reason `context-colours.ts` gives about `ROLE_BACKGROUND`:
+ | Tailwind scans the source for complete class names, so `border-${colour}` is
+ | a class that never gets compiled and a rule that never gets drawn.
+ |
+ */
+function treatment_of (
+	style_and_transition: Style_And_Transition,
+	normalise_colors: boolean,
+) {
+	const stroke = style_and_transition !== CHANGE_FILL_ON_HOVER
+
+	return TREATMENTS[
+		`${stroke ? "stroke" : "fill"}${
+			normalise_colors ? ", normalised" : ""
+		}` as keyof typeof TREATMENTS
+	]
+}
+
+/**
+ |
  | A card links to the session it names, unless there is nothing to link to.
  |
  | A session with no alias is a real state — an entry whose URL has not been
@@ -376,75 +447,4 @@ function When (
 			</> }
 		</p>
 	</div>
-}
-
-/**
- |
- | One collaborator: a round picture with a name and a role under it.
- |
- | All three collaborator layouts draw this and differ only in how they arrange
- | it.
- |
- | **The name is not a heading**, for the reason the card gives above: this is a
- | link to the collaborator's own page rather than a section of the page being
- | read, and a grid of ten of them would bury the section headings a reader
- | navigates by. The static site's grid does use an `h3`; its home carousel uses
- | a `p` for the same words, and the `p` is the one that is right.
- |
- */
-export function Portrait (
-	{
-		caption_className = "",
-		className = "",
-		contributor,
-		figure_className = "",
-		image_className = "",
-	}: {
-		/**
-		 |
-		 | The three inner frames a layout may want a hold of. The carousel
-		 | tweens all three every frame and needs its own hooks on them; the
-		 | other two layouts pass nothing and get the portrait as it is.
-		 |
-		 */
-		caption_className?: string
-		className?: string
-		contributor: Contributor_Card
-		figure_className?: string
-		image_className?: string
-	},
-) {
-	const origin = use_media_origin()
-	const picture = picture_of( contributor.image, origin )
-
-	return <Card_Link
-		className={ `flex flex-col items-center w-full ${className}` }
-		path={ contributor.path }>
-		<figure className={ `w-full select-none ${figure_className}` }>
-			{ picture
-				? <Picture_Image
-					className={ `w-full aspect-square rounded-full object-cover ${image_className}` }
-					picture={ {
-						...picture,
-						alt: picture.alt || contributor.name,
-					} }
-					sizes={ `( min-width: ${breakpoints.md} ) 14rem, 10.5rem` } />
-				// An empty frame rather than a stand-in picture, as the card
-				// does. It keeps its shape so a grid row stays level and the
-				// captions beside it stay in line.
-				: <div
-					className={ `w-full aspect-square rounded-full ${image_className}` } /> }
-
-			<figcaption className={ `mt-4 text-center ${caption_className}` }>
-				<p className="text-h5 font-semibold text-black line-clamp-2">
-					{ contributor.name }
-				</p>
-
-				{ contributor.role
-					&& <p className="mt-1 md:mt-2 text-h6 text-black line-clamp-2">
-						{ contributor.role }
-					</p> }
-			</figcaption>
-		</figure>
-	</Card_Link>
 }

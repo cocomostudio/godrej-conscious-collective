@@ -242,14 +242,6 @@ afterAll( async () => {
 	await website?.stop()
 } )
 
-async function body ( path: string ) {
-	const { html, status } = await website.get( path )
-
-	expect( status ).toBe( 200 )
-
-	return html.replace( /<script[\s\S]*?<\/script>/g, "" )
-}
-
 describe("a category listing page", () => {
 	// The cap is ten everywhere else in the catalogue. Twelve cards is the
 	// whole point of this component existing separately from the home page's
@@ -480,3 +472,11 @@ describe("the schedule's day tabs", () => {
 		}
 	})
 })
+
+async function body ( path: string ) {
+	const { html, status } = await website.get( path )
+
+	expect( status ).toBe( 200 )
+
+	return html.replace( /<script[\s\S]*?<\/script>/g, "" )
+}

@@ -107,15 +107,9 @@ const FADE_MS = 250
 // after the captions come back, this is the number to nudge.
 const FRAME_MS = 17
 
-const embla_duration = ( milliseconds: number ) =>
-	Math.max( 5, Math.round( milliseconds / FRAME_MS ) )
-
 /** What counts as a swipe rather than a tap that wandered. */
 const SWIPE_DISTANCE = 20
 const SWIPE_VELOCITY = 0.2
-
-const ease_in_out_cubic = ( t: number ) =>
-	t < 0.5 ? 4 * t * t * t : 1 - Math.pow( -2 * t + 2, 3 ) / 2
 
 type Wave = {
 	centre_scale: number
@@ -535,4 +529,12 @@ function at_rest ( index: number, count: number ): CSSProperties {
 			: "calc( -1 * var(--cc-overflow) )",
 		"--from-y": trough ? "var(--cc-drop)" : "0px",
 	} as CSSProperties
+}
+
+function embla_duration ( milliseconds: number ) {
+	return Math.max( 5, Math.round( milliseconds / FRAME_MS ) )
+}
+
+function ease_in_out_cubic ( t: number ) {
+	return t < 0.5 ? 4 * t * t * t : 1 - Math.pow( -2 * t + 2, 3 ) / 2
 }

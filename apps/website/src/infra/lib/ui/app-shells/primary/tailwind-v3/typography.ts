@@ -92,25 +92,6 @@ const roles: Record<string, type_role> = {
 	nav: { base: { fs: "1rem", lh: "1.5" } },
 }
 
-// `fontSize` tokens reference the per-role vars. The third tuple slot carries
-// line-height plus, for `button`, letter-spacing and font-weight.
-function build_font_size () {
-	const font_size: Record<string, [ string, Record<string, string> ]> = {}
-	for ( const [ role, spec ] of Object.entries( roles ) ) {
-		const options: Record<string, string> = {
-			lineHeight: `var( --text-${role}-lh )`,
-		}
-		if ( spec.base.ls !== undefined ) {
-			options.letterSpacing = `var( --text-${role}-ls )`
-		}
-		if ( spec.base.fw !== undefined ) {
-			options.fontWeight = `var( --text-${role}-fw )`
-		}
-		font_size[role] = [ `var( --text-${role}-fs )`, options ]
-	}
-	return font_size
-}
-
 export const font_size = build_font_size()
 
 // Emits the base `--text-*` vars on `:root`, then the lg overrides inside an
@@ -140,3 +121,22 @@ export const typography_base_plugin = plugin( ( { addBase } ) => {
 		[`@media (min-width: ${breakpoints.lg})`]: { ":root": lg_vars },
 	} )
 } )
+
+// `fontSize` tokens reference the per-role vars. The third tuple slot carries
+// line-height plus, for `button`, letter-spacing and font-weight.
+function build_font_size () {
+	const font_size: Record<string, [ string, Record<string, string> ]> = {}
+	for ( const [ role, spec ] of Object.entries( roles ) ) {
+		const options: Record<string, string> = {
+			lineHeight: `var( --text-${role}-lh )`,
+		}
+		if ( spec.base.ls !== undefined ) {
+			options.letterSpacing = `var( --text-${role}-ls )`
+		}
+		if ( spec.base.fw !== undefined ) {
+			options.fontWeight = `var( --text-${role}-fw )`
+		}
+		font_size[role] = [ `var( --text-${role}-fs )`, options ]
+	}
+	return font_size
+}
