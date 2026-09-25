@@ -11,12 +11,11 @@
  |
  | # The gate
  |
- | `(min-width: 1440px) and (min-height: 836px)` — the large breakpoint and the
- | tall one, together, lifted from the static site. The height is what the
- | width alone cannot say: a slide is a column as tall as the viewport, and 836
- | is what the design's own measurements add up to — a 612px slide, 64px of gap,
- | 32px of controls and 64px of air at each end. Below that a slide would be
- | shorter than the thing inside it.
+ | The large breakpoint and the `tall` height, together, lifted from the static
+ | site. The height is what the width alone cannot say: a slide is a column as
+ | tall as the viewport, and 836 is what the design's own measurements add up
+ | to — a 612px slide, 64px of gap, 32px of controls and 64px of air at each
+ | end. Below that a slide would be shorter than the thing inside it.
  |
  | Three things are gated on it, and each has to be gated separately:
  |
@@ -70,17 +69,17 @@ import { Chevron_Right } from "#infra/lib/ui/react/icons/chevron-right.tsx"
 import { X_Mark } from "#infra/lib/ui/react/icons/x-mark.tsx"
 import { Level } from "#infra/lib/ui/react/headings.tsx"
 import { use_media_query_event } from "#infra/lib/ui/react/use-media-query-event.tsx"
+import {
+	breakpoints,
+	tall,
+} from "#infra/lib/ui/app-shells/primary/breakpoints.ts"
 
 import type { Block } from "../envelope.ts"
 
 import { Dark_Surface } from "../dark-surface.tsx"
-import { LARGE_FROM } from "../media.ts"
 import { render_block } from "../render-block.tsx"
 
-/** The design's minimum height for a slide, worked out in the static site. */
-const TALL_FROM = 836
-
-const AS_SLIDES = `(min-width: ${LARGE_FROM}px) and (min-height: ${TALL_FROM}px)`
+const AS_SLIDES = `( min-width: ${breakpoints.lg} ) and ( min-height: ${tall} )`
 
 type Archive_Snapshots_Props = {
 	/** The entry's region. Each block becomes a slide above the gate. */

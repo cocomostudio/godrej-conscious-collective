@@ -36,14 +36,12 @@ import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 
 import { use_repetitions_needed_for_looping } from "#infra/lib/ui/react/embla-carousel/use-repetitions-needed-for-looping.ts"
 import { use_media_query_event } from "#infra/lib/ui/react/use-media-query-event.tsx"
+import { breakpoints } from "#infra/lib/ui/app-shells/primary/breakpoints.ts"
 
 import type { Image_Link_Attribute } from "./image-link.tsx"
 
 import { use_media_origin } from "../media-origin.tsx"
-import {
-	MEDIUM_FROM,
-	responsive_picture_of,
-} from "../media.ts"
+import { responsive_picture_of } from "../media.ts"
 import { Nav_Link } from "../nav-link.tsx"
 import { Responsive_Picture } from "../pictures.tsx"
 
@@ -142,7 +140,7 @@ export function Instagram_Feed (
 	// Both queries switch at the medium breakpoint, which is where the slide's
 	// own width switches. In the static site the scale switched at 1320 and the
 	// width at 1024, so between the two the ratio was wrong.
-	use_media_query_event( `( max-width: ${MEDIUM_FROM - 1}px )`, () => {
+	use_media_query_event( `not all and ( min-width: ${breakpoints.md} )`, () => {
 		scale_factor.current = SCALE_BELOW_MEDIUM
 
 		if ( embla_api ) {
@@ -150,7 +148,7 @@ export function Instagram_Feed (
 		}
 	} )
 
-	use_media_query_event( `( min-width: ${MEDIUM_FROM}px )`, () => {
+	use_media_query_event( `( min-width: ${breakpoints.md} )`, () => {
 		scale_factor.current = SCALE_FROM_MEDIUM
 
 		if ( embla_api ) {

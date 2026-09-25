@@ -21,7 +21,7 @@ import type { Config } from "tailwindcss"
 import { spacing } from "./spacing.ts"
 import { selectors_plugin } from "./selectors.ts"
 import { state_variants_plugin } from "./state-variants.ts"
-import { screens } from "./screens.ts"
+import { breakpoints } from "../breakpoints.ts"
 import { screens_height_plugin } from "./screens-height.ts"
 import { webkit_plugin } from "./webkit.ts"
 import { pointer_plugin } from "./pointer.ts"
@@ -48,8 +48,8 @@ const config: Config = {
 	},
 
 	theme: {
-		// Replace the default breakpoints with the project's three.
-		screens,
+		// Replace the default breakpoints with the project's five.
+		screens: breakpoints,
 
 		extend: {
 			// Theme scales.
@@ -78,7 +78,7 @@ const config: Config = {
 		// mobile nav; stock `peer-*` is sibling-only.
 		state_variants_plugin,
 		// Height-aware screen variants (`tall:`). Kept out of theme.screens —
-		// see the warning block in screens.ts.
+		// see the warning block in ../breakpoints.ts.
 		screens_height_plugin,
 		// `webkit:` / `ios-webkit:` (+ `not-` twins) — @supports feature-query
 		// hacks that match only WebKit / only iOS WebKit.

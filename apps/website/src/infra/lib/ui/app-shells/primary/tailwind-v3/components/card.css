@@ -38,7 +38,7 @@
 	/* _____
 	 | card--featured (md+)
 	 */
-	@media (min-width: 1024px) {
+	@media screen(md) {
 		.card--featured { @apply flex w-full h-121.5; }
 		.card--featured .points { @apply mt-4; }
 		.card--featured .additional-details { display: block; }

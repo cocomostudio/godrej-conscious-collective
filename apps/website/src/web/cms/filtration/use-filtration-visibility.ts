@@ -20,9 +20,8 @@ import {
 	useState,
 } from "react"
 
-import { FROM_THE_MEDIUM_BREAKPOINT } from "./breakpoint.ts"
-
 import { use_media_query_event } from "#infra/lib/ui/react/use-media-query-event.tsx"
+import { breakpoints } from "#infra/lib/ui/app-shells/primary/breakpoints.ts"
 
 export function use_filtration_visibility () {
 	const [ visible, set_visible ] = useState( false )
@@ -30,7 +29,7 @@ export function use_filtration_visibility () {
 	const show = useCallback( () => set_visible( true ), [] )
 	const hide = useCallback( () => set_visible( false ), [] )
 
-	use_media_query_event( FROM_THE_MEDIUM_BREAKPOINT, hide )
+	use_media_query_event( `( min-width: ${breakpoints.md} )`, hide )
 
 	return { hide, show, visible }
 }

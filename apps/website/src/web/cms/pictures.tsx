@@ -10,13 +10,11 @@
  |
  */
 
+import { breakpoints } from "#infra/lib/ui/app-shells/primary/breakpoints.ts"
+
 import type { Picture } from "./media.ts"
 
 import { use_dark_surface } from "./dark-surface.tsx"
-import {
-	LARGE_FROM,
-	MEDIUM_FROM,
-} from "./media.ts"
 
 /**
  |
@@ -63,16 +61,16 @@ export function Responsive_Picture (
 	const { large, medium, small } = pictures
 
 	return <picture>
-		{ LARGE_FROM && <source
-			media={ `( min-width: ${LARGE_FROM}px )` }
+		<source
+			media={ `( min-width: ${breakpoints.lg} )` }
 			srcSet={ large.src_set ?? large.src }
 			sizes={ large.src_set ? sizes : undefined }
-		/> }
-		{ MEDIUM_FROM && <source
-			media={ `( min-width: ${MEDIUM_FROM}px )` }
+		/>
+		<source
+			media={ `( min-width: ${breakpoints.md} )` }
 			srcSet={ medium.src_set ?? medium.src }
 			sizes={ medium.src_set ? sizes : undefined }
-		/> }
+		/>
 
 		<Picture_Image
 			className={ className }

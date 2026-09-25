@@ -50,11 +50,11 @@ import useEmblaCarousel from "embla-carousel-react"
 
 import { use_repetitions_needed_for_looping } from "#infra/lib/ui/react/embla-carousel/use-repetitions-needed-for-looping.ts"
 import { use_media_query_event } from "#infra/lib/ui/react/use-media-query-event.tsx"
+import { breakpoints } from "#infra/lib/ui/app-shells/primary/breakpoints.ts"
 
 import type { Contributor_Card } from "../envelope.ts"
 
 import { Portrait } from "../cards.tsx"
-import { MEDIUM_FROM } from "../media.ts"
 
 import { use_full_bleed } from "./section-frame.tsx"
 
@@ -141,7 +141,7 @@ export function Contributor_Carousel (
 	const full_bleed = use_full_bleed()
 	const travel = useRef( TRAVEL_MS )
 
-	use_media_query_event( `( min-width: ${MEDIUM_FROM}px )`, () => {
+	use_media_query_event( `( min-width: ${breakpoints.md} )`, () => {
 		travel.current = TRAVEL_MS_FROM_MEDIUM
 
 		return () => {
@@ -152,7 +152,7 @@ export function Contributor_Carousel (
 	const [ embla_ref, embla_api ] = useEmblaCarousel( {
 		align: "center",
 		breakpoints: {
-			[`( min-width: ${MEDIUM_FROM}px )`]: {
+			[`( min-width: ${breakpoints.md} )`]: {
 				duration: embla_duration( TRAVEL_MS_FROM_MEDIUM ),
 			},
 		},
@@ -181,7 +181,7 @@ export function Contributor_Carousel (
 	// re-render of ten portraits.
 	const wave = useRef<Wave>(
 		typeof window !== "undefined"
-			&& window.matchMedia( `( min-width: ${MEDIUM_FROM}px )` ).matches
+			&& window.matchMedia( `( min-width: ${breakpoints.md} )` ).matches
 			? WAVE_FROM_MEDIUM
 			: WAVE_BELOW_MEDIUM,
 	)
@@ -279,7 +279,7 @@ export function Contributor_Carousel (
 		} )
 	}, [ apply_tween ] )
 
-	use_media_query_event( `( max-width: ${MEDIUM_FROM - 1}px )`, () => {
+	use_media_query_event( `not all and ( min-width: ${breakpoints.md} )`, () => {
 		wave.current = WAVE_BELOW_MEDIUM
 
 		if ( embla_api ) {
@@ -287,7 +287,7 @@ export function Contributor_Carousel (
 		}
 	} )
 
-	use_media_query_event( `( min-width: ${MEDIUM_FROM}px )`, () => {
+	use_media_query_event( `( min-width: ${breakpoints.md} )`, () => {
 		wave.current = WAVE_FROM_MEDIUM
 
 		if ( embla_api ) {

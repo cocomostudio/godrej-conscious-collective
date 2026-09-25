@@ -40,15 +40,6 @@ export type Picture = {
 	caption: string | null
 }
 
-/**
- |
- | The two widths the design changes at. The small picture covers everything
- | below the first.
- |
- */
-export const MEDIUM_FROM = 1024
-export const LARGE_FROM = 1440
-
 export function picture_of (
 	image: Image_Attribute | null | undefined,
 	origin: string,

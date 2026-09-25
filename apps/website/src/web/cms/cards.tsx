@@ -34,6 +34,8 @@ import {
 	Fragment,
 } from "react"
 
+import { breakpoints } from "#infra/lib/ui/app-shells/primary/breakpoints.ts"
+
 import type {
 	Contributor_Card,
 	Session_Card,
@@ -239,7 +241,7 @@ export function Card (
 			{ cover && <Responsive_Picture
 				className="size-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
 				pictures={ cover }
-				sizes="( min-width: 1024px ) 24rem, 18rem" /> }
+				sizes={ `( min-width: ${breakpoints.md} ) 24rem, 18rem` } /> }
 
 			<When
 				className="absolute top-2 right-2 px-1.25 md:px-1.5 py-1 md:py-0"
@@ -426,7 +428,7 @@ export function Portrait (
 						...picture,
 						alt: picture.alt || contributor.name,
 					} }
-					sizes="( min-width: 1024px ) 14rem, 10.5rem" />
+					sizes={ `( min-width: ${breakpoints.md} ) 14rem, 10.5rem` } />
 				// An empty frame rather than a stand-in picture, as the card
 				// does. It keeps its shape so a grid row stays level and the
 				// captions beside it stay in line.

@@ -36,8 +36,7 @@ import useEmblaCarousel from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 
 import { use_repetitions_needed_for_looping } from "#infra/lib/ui/react/embla-carousel/use-repetitions-needed-for-looping.ts"
-
-import { MEDIUM_FROM } from "../media.ts"
+import { breakpoints } from "#infra/lib/ui/app-shells/primary/breakpoints.ts"
 
 type Looping_Track_Props = {
 	/** The viewport's own spacing, which is what the two rows differ in. */
@@ -57,7 +56,7 @@ export function Looping_Track (
 	const [ embla_ref ] = useEmblaCarousel( {
 		align: "center",
 		breakpoints: {
-			[`( min-width: ${MEDIUM_FROM}px )`]: {
+			[`( min-width: ${breakpoints.md} )`]: {
 				align: () => content_margin( sentinel.current ),
 			},
 		},

@@ -39,8 +39,9 @@
  | commit itself. The gate is a ref rather than state for the same reason the
  | draft is: crossing the breakpoint should not re-render the form.
  |
- | **The breakpoint is 1024, not 768** — see `breakpoint.ts` for the defect this
- | fixes.
+ | The gate is the medium breakpoint because the submit button is hidden by a
+ | `md:` class. At any other width there would be a band where a visitor ticks
+ | a box, presses nothing, and nothing commits.
  |
  */
 
@@ -58,7 +59,6 @@ import type {
 } from "./facets.ts"
 import type { Filters } from "./filter-sessions.ts"
 
-import { FROM_THE_MEDIUM_BREAKPOINT } from "./breakpoint.ts"
 import { ROLE_BACKGROUND } from "../context-colours.ts"
 import { role_of_category } from "../sessions.ts"
 
@@ -67,6 +67,7 @@ import { Check_Mark } from "#infra/lib/ui/react/icons/check-mark.tsx"
 import { Chevron_Up } from "#infra/lib/ui/react/icons/chevron-up.tsx"
 import { Icon_Button } from "#infra/lib/ui/react/buttons/icon-button.tsx"
 import { use_media_query_event } from "#infra/lib/ui/react/use-media-query-event.tsx"
+import { breakpoints } from "#infra/lib/ui/app-shells/primary/breakpoints.ts"
 import { X_Mark } from "#infra/lib/ui/react/icons/x-mark.tsx"
 
 type Filtration_Props = {
@@ -117,7 +118,7 @@ export function Filtration (
 
 	const auto_applies = useRef( false )
 
-	use_media_query_event( FROM_THE_MEDIUM_BREAKPOINT, () => {
+	use_media_query_event( `( min-width: ${breakpoints.md} )`, () => {
 		auto_applies.current = true
 
 		return () => {

@@ -61,11 +61,7 @@ import { Fill } from "#infra/lib/ui/react/slot-and-fill.tsx"
 import { Plus } from "#infra/lib/ui/react/icons/plus.tsx"
 import { use_media_query_matches } from "#infra/lib/ui/react/use-media-query-matches.ts"
 import { X_Mark } from "#infra/lib/ui/react/icons/x-mark.tsx"
-
-// Read off the breakpoint constant rather than hard-coded. The header's
-// Register Now is a `md:` variant, and if the two ever disagree there is a band
-// of viewport widths with a visible trigger and no container for it to open.
-const DIALOG_QUERY = "( min-width: 1024px )"
+import { breakpoints } from "#infra/lib/ui/app-shells/primary/breakpoints.ts"
 
 // Above the site header, which raises itself to `max-md:z-50` while its own nav
 // overlay is open. The screen channel renders ahead of the page content, so at
@@ -219,7 +215,10 @@ export function Registration_Form_Host (
 	const origin = use_media_origin()
 	const slides = slides_of( page_shell, origin )
 
-	const as_dialog = use_media_query_matches( DIALOG_QUERY )
+	// The medium breakpoint, because the header's Register Now is a `md:`
+	// variant: if the two ever disagree there is a band of viewport widths with
+	// a visible trigger and no container for it to open.
+	const as_dialog = use_media_query_matches( `( min-width: ${breakpoints.md} )` )
 	const [ container, set_container ] = useState<HTMLDivElement | null>( null )
 
 	const headline = registration_headline( main_event )

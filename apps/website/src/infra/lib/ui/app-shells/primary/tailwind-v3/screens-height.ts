@@ -1,6 +1,8 @@
 
 import plugin from "tailwindcss/plugin"
 
+import { tall } from "../breakpoints.ts"
+
 /**
  |
  | Height-aware screen variants.
@@ -13,7 +15,7 @@ import plugin from "tailwindcss/plugin"
  | plain string (`areSimpleScreens` in corePlugins.js); one object value
  | (`{ raw }`) drops all `max-*` variants and disables min-width sorting for
  | `xs:`/`sm:`/`md:`/`lg:`/`xl:`. Registering here keeps `screens` simple, so both
- | keep working. See the warning block in screens.ts.
+ | keep working. See the warning block in ../breakpoints.ts.
  |
  | The `max-` counterpart must be registered BY HAND, here. Tailwind's `max-*`
  | is a single `matchVariant("max", …)` in corePlugins.js whose named values are
@@ -46,7 +48,7 @@ import plugin from "tailwindcss/plugin"
 
 /** name → the media condition, minus the `@media` keyword. */
 const heights: Record<string, string> = {
-	tall: "(min-height: 836px)",
+	tall: `(min-height: ${tall})`,
 }
 
 export const screens_height_plugin = plugin( ( { addVariant } ) => {

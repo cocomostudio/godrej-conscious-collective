@@ -9,7 +9,7 @@
  | page, always, including archived ones. A visitor who arrives on an old page
  | through an old link still has a route to the event that is running.
  |
- | ─── MOBILE NAVIGATION ( below md / 1024px ) ────────────────────────────────
+ | ─── MOBILE NAVIGATION ( below md ) ─────────────────────────────────────────
  |
  | Ships in two layers.
  |
@@ -63,6 +63,7 @@ import { Hamburger_Menu } from "#infra/lib/ui/react/icons/hamburger-menu.tsx"
 import { X_Mark } from "#infra/lib/ui/react/icons/x-mark.tsx"
 import { Conscious_Collective_Logo } from "#infra/lib/ui/react/logos/conscious-collective-logo.tsx"
 import { use_media_query_event } from "#infra/lib/ui/react/use-media-query-event.tsx"
+import { breakpoints } from "#infra/lib/ui/app-shells/primary/breakpoints.ts"
 
 const TOGGLE_ID = "site-nav-toggle"
 const OVERLAY_ID = "site-nav-overlay"
@@ -177,7 +178,7 @@ export function Site_Header ( { main_event, page_shell }: Site_Header_Props ) {
 	}, [ is_enhanced, is_open ] )
 
 	// ── Close when the viewport crosses into desktop ───────────────────────
-	use_media_query_event( "( min-width: 1024px )", () => set_is_open( false ) )
+	use_media_query_event( `( min-width: ${breakpoints.md} )`, () => set_is_open( false ) )
 
 	// ── Esc to close, and a focus trap ─────────────────────────────────────
 	useEffect( () => {

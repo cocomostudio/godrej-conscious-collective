@@ -20,7 +20,7 @@
 
 import plugin from "tailwindcss/plugin"
 
-import { screens } from "./screens.ts"
+import { breakpoints } from "../breakpoints.ts"
 
 // Public Sans + the system fallback stack (was v4's `--font-sans`).
 export const font_family = {
@@ -137,6 +137,6 @@ export const typography_base_plugin = plugin( ( { addBase } ) => {
 
 	addBase( {
 		":root": base_vars,
-		[`@media (min-width: ${screens.lg})`]: { ":root": lg_vars },
+		[`@media (min-width: ${breakpoints.lg})`]: { ":root": lg_vars },
 	} )
 } )

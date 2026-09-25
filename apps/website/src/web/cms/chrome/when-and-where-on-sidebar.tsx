@@ -30,10 +30,10 @@ import { observe } from "react-intersection-observer"
 
 import type { Event } from "../envelope.ts"
 
-import { MEDIUM_FROM } from "../media.ts"
 import { When_And_Where } from "./when-and-where.tsx"
 
 import { use_media_query_event } from "#infra/lib/ui/react/use-media-query-event.tsx"
+import { breakpoints } from "#infra/lib/ui/app-shells/primary/breakpoints.ts"
 
 /**
  |
@@ -53,15 +53,6 @@ const NEAR_FOOTER_MARGIN_PX = 900
  |
  */
 const COLLAPSE_LEAD_PX = 650
-
-/**
- |
- | This copy is medium-and-up only (`max-md:hidden` at the call site), so there
- | is nothing to hide below the breakpoint. Every bit of observation is gated on
- | it.
- |
- */
-const FROM_THE_MEDIUM_BREAKPOINT = `( min-width: ${MEDIUM_FROM}px )`
 
 /**
  |
@@ -88,10 +79,12 @@ export function When_And_Where_On_Sidebar (
 	const [ collapsed, set_collapsed ] = useState( false )
 
 	// Register the observer and the scroll listener only from the medium
-	// breakpoint upwards. The hook runs the cleanup we return when the query
-	// stops matching, or on unmount, so neither the IntersectionObserver nor
-	// the scroll handler exists on viewports where there is nothing to hide.
-	use_media_query_event( FROM_THE_MEDIUM_BREAKPOINT, () => {
+	// breakpoint upwards: this copy is medium-and-up only (`max-md:hidden` at
+	// the call site), so there is nothing to hide below it. The hook runs the
+	// cleanup we return when the query stops matching, or on unmount, so
+	// neither the IntersectionObserver nor the scroll handler exists on
+	// viewports where there is nothing to hide.
+	use_media_query_event( `( min-width: ${breakpoints.md} )`, () => {
 		const footer = footer_ref.current
 
 		if ( !footer ) {

@@ -39,8 +39,6 @@ import {
 	it,
 } from "vitest"
 
-import { FROM_THE_MEDIUM_BREAKPOINT } from "../src/web/cms/filtration/breakpoint.ts"
-import { screens } from "../src/infra/lib/ui/app-shells/primary/tailwind-v3/screens.ts"
 import {
 	type Website,
 	boot_website,
@@ -459,17 +457,6 @@ describe("where the widget is served", () => {
 		expect( html ).toMatch(
 			/<div class="contents"><div class="max-md:hidden/,
 		)
-	})
-})
-
-describe("the widget's own breakpoint", () => {
-	// The static site gates auto-apply at 768 while the design's medium
-	// breakpoint is 1024, so between those two widths its submit button is
-	// hidden and nothing commits. The two copies of that number live in
-	// different modules; this is what keeps them agreeing.
-	it("is the design's medium breakpoint, not the static site's", () => {
-		expect( FROM_THE_MEDIUM_BREAKPOINT ).toContain( screens.md )
-		expect( FROM_THE_MEDIUM_BREAKPOINT ).not.toContain( "768" )
 	})
 })
 

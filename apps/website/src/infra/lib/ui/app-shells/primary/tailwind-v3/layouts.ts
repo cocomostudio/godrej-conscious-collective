@@ -8,7 +8,7 @@
  | plugin:
  |   • `addBase` emits the container/grid CSS vars on `:root` — the static base
  |     plus the md/lg/xl responsive overrides inside `@media (min-width: …)`
- |     blocks (driven off `screens`), reproducing the v4 `@variant` reassignment.
+ |     blocks (driven off `breakpoints`).
  |   • `addComponents` registers the `cc` content-container utility and the 1:4
  |     two-column layout (`layout__1-4__col-1/2`). Both are eligible for variants
  |     in v3 JIT, so `md:cc` (used in markup) still compiles.
@@ -28,7 +28,7 @@
 
 import plugin from "tailwindcss/plugin"
 
-import { screens } from "./screens.ts"
+import { breakpoints } from "../breakpoints.ts"
 
 export const layouts_plugin = plugin( ( { addBase, addComponents } ) => {
 	addBase( {
@@ -52,7 +52,7 @@ export const layouts_plugin = plugin( ( { addBase, addComponents } ) => {
 			// Column count + gutter per breakpoint (sm → 3 cols, md/lg/xl → 12).
 			// Wrapped in min-width media so they only apply from the sm floor up,
 			// matching the v4 `@variant sm/md/lg` blocks.
-			[`@media (min-width: ${screens.sm})`]: {
+			[`@media (min-width: ${breakpoints.sm})`]: {
 				"--columns": "3",
 				"--gutter-x": "1rem",
 			},
@@ -66,7 +66,7 @@ export const layouts_plugin = plugin( ( { addBase, addComponents } ) => {
 			// container stays fluid; margins fix at 4rem and the width
 			// tracks the viewport (`100vw - 2 * 4rem`), so the container grows
 			// with the screen rather than sitting at a static cap.
-			[`@media (min-width: ${screens.md})`]: {
+			[`@media (min-width: ${breakpoints.md})`]: {
 				"--cc-max-width": "calc( var( --100vw ) - ( 2 * 4rem ) )",
 				"--cc-margin-width": "max( var( --safe-margin-x ), 4rem )",
 				"--columns": "12",
@@ -75,10 +75,10 @@ export const layouts_plugin = plugin( ( { addBase, addComponents } ) => {
 
 			// lg: things stay the same
 
-			// xl: max width becomes static again at the 1440px design width and
+			// xl: max width becomes static again at the large breakpoint and
 			// the container re-centres (margin width back to dynamic).
-			[`@media (min-width: ${screens.xl})`]: {
-				"--cc-max-width": "calc( 1440px - ( 2 * 4rem ) )",
+			[`@media (min-width: ${breakpoints.xl})`]: {
+				"--cc-max-width": `calc( ${breakpoints.lg} - ( 2 * 4rem ) )`,
 				"--cc-margin-width":
 					"max( var( --safe-margin-x ), ( var( --100vw ) - var( --cc-max-width ) ) / 2 )",
 				"--columns": "12",
@@ -97,7 +97,7 @@ export const layouts_plugin = plugin( ( { addBase, addComponents } ) => {
 		// 1:4 two-column layout (md+).
 		// Column 1 = left margin + 3 columns + 1 additional gutter (= 3 gutters).
 		".layout__1-4__col-1": {
-			[`@media (min-width: ${screens.md})`]: {
+			[`@media (min-width: ${breakpoints.md})`]: {
 				flexGrow: "0",
 				flexShrink: "0",
 				flexBasis:
@@ -108,7 +108,7 @@ export const layouts_plugin = plugin( ( { addBase, addComponents } ) => {
 		},
 		// Column 2 = the remaining flexible track.
 		".layout__1-4__col-2": {
-			[`@media (min-width: ${screens.md})`]: {
+			[`@media (min-width: ${breakpoints.md})`]: {
 				flexGrow: "1",
 				flexShrink: "1",
 				flexBasis: "0",
