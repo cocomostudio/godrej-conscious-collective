@@ -1,0 +1,72 @@
+{
+	"name": "strapi-plugin-export-entries",
+	"version": "0.1.0",
+	"private": true,
+	"description": "Exports the entries of chosen collection types from the Strapi admin panel as a CSV file.",
+	"license": "UNLICENSED",
+	"type": "commonjs",
+	"exports": {
+		"./package.json": "./package.json",
+		"./strapi-admin": {
+			"types": "./dist/admin/src/index.d.ts",
+			"source": "./admin/src/index.ts",
+			"import": "./dist/admin/index.mjs",
+			"require": "./dist/admin/index.js",
+			"default": "./dist/admin/index.js"
+		},
+		"./strapi-server": {
+			"types": "./dist/server/src/index.d.ts",
+			"source": "./server/src/index.ts",
+			"import": "./dist/server/index.mjs",
+			"require": "./dist/server/index.js",
+			"default": "./dist/server/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"scripts": {
+		"build": "strapi-plugin build",
+		"verify": "strapi-plugin verify",
+		"test": "vitest run",
+		"typecheck": "tsc --noEmit -p server/tsconfig.json && tsc --noEmit -p admin/tsconfig.json && tsc --noEmit -p tests/tsconfig.json"
+	},
+	"engines": {
+		"node": ">=22.22.0"
+	},
+	"peerDependencies": {
+		"@strapi/design-system": "^2.0.0",
+		"@strapi/icons": "^2.0.0",
+		"@strapi/strapi": "^5.0.0",
+		"@strapi/utils": "^5.0.0",
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0",
+		"react-router-dom": "^6.0.0",
+		"styled-components": "^6.0.0"
+	},
+	"strapi": {
+		"kind": "plugin",
+		"name": "export-entries",
+		"displayName": "Export entries",
+		"description": "Exports the entries of chosen collection types as a CSV file."
+	},
+	"devDependencies": {
+		"@strapi/design-system": "2.2.4",
+		"@strapi/icons": "2.2.4",
+		"@strapi/sdk-plugin": "6.1.1",
+		"@strapi/strapi": "5.52.1",
+		"@strapi/typescript-utils": "5.52.1",
+		"@strapi/utils": "5.52.1",
+		"@types/node": "22.20.1",
+		"@types/react": "18.3.31",
+		"@types/react-dom": "18.3.7",
+		"better-sqlite3": "13.0.3",
+		"react": "18.3.1",
+		"react-dom": "18.3.1",
+		"react-router-dom": "6.30.3",
+		"styled-components": "6.1.19",
+		"typescript": "5.9.3",
+		"vitest": "4.1.11"
+	}
+}
