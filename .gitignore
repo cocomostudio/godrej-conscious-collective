@@ -22,3 +22,18 @@ pnpm-lock.yaml
 # Operating system
 ## MacOS
 .DS_Store
+
+# The website
+/apps/website/.react-router/
+/apps/website/test-results/
+/apps/website/playwright-report/
+
+# The CMS
+/apps/cms/.tmp/
+/apps/cms/.cache/
+/apps/cms/.strapi/
+/apps/cms/.strapi-updater.json
+/apps/cms/exports/
+/apps/cms/public/uploads/*
+!/apps/cms/public/uploads/.gitkeep
+/apps/cms/types/generated/
