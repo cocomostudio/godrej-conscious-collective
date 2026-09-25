@@ -228,6 +228,9 @@ function write_fixture_app ( options: Fixture_Options ) {
 		`module.exports = () => ( {\n`
 			+ `\tapiToken: { salt: "fixture-api-token-salt" },\n`
 			+ `\tauth: { secret: "fixture-admin-jwt-secret" },\n`
+			// The login limit's window is measured on the clock, and a test that
+			// freezes the clock would never see the window close.
+			+ `\trateLimit: { enabled: false },\n`
 			+ `\tsecrets: { encryptionKey: "fixture-encryption-key-0123456789" },\n`
 			+ `\ttransfer: { token: { salt: "fixture-transfer-token-salt" } },\n`
 			+ `} )\n`,
