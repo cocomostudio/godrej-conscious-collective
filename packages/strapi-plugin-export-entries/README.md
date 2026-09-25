@@ -80,6 +80,8 @@ The modal offers two groups of presets:
 - **Latest N**: the N most recently created entries, one choice for each size in the presets setting.
 - **A calendar period**: Today, Yesterday, This week, Last week, This month, Last month, This year or Last year.
 
+Each calendar period shows the days it covers, as of the moment the modal opens: "Today (24/09)", "This week (21/09 to 24/09)", "Last month (August 2026)", "Last year (2025)".
+
 A calendar period follows these rules:
 
 - Its days are read in the timezone setting.

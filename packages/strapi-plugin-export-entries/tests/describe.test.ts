@@ -17,6 +17,7 @@ import {
 	describe,
 	expect,
 	it,
+	vi,
 } from "vitest"
 
 import {
@@ -251,6 +252,51 @@ describe("Describe, when no content-type is set up", () => {
 
 			expect( status ).toBe( 404 )
 		} finally {
+			await cms.destroy()
+		}
+	})
+})
+
+/**
+ |
+ | "Now" is 01:00 on Thursday 24 September 2026 in Kolkata. That is still
+ | 23 September in UTC, so days read in UTC would be off by one.
+ |
+ */
+describe("Describe, for the calendar periods", () => {
+	it("answers the days each period covers today, in the timezone setting", async () => {
+		const cms = await boot_fixture_strapi( {
+			content_types: { gadget: GADGET },
+			env: {
+				EXPORT_ENTRIES_CONTENT_TYPES: "api::gadget.gadget",
+				EXPORT_ENTRIES_TIMEZONE: "Asia/Kolkata",
+			},
+		} )
+
+		try {
+			vi.useFakeTimers( {
+				now: new Date( "2026-09-24T01:00:00+05:30" ),
+				toFake: [ "Date" ],
+			} )
+
+			const { body } = await cms.request(
+				"GET",
+				"/export-entries/content-types/api::gadget.gadget",
+				{ token: await cms.login( SUPER_ADMIN.email ) },
+			)
+
+			expect( body.data.periods ).toEqual( [
+				{ end: "2026-09-24", period: "today", start: "2026-09-24" },
+				{ end: "2026-09-23", period: "yesterday", start: "2026-09-23" },
+				{ end: "2026-09-24", period: "this_week", start: "2026-09-21" },
+				{ end: "2026-09-20", period: "last_week", start: "2026-09-14" },
+				{ end: "2026-09-24", period: "this_month", start: "2026-09-01" },
+				{ end: "2026-08-31", period: "last_month", start: "2026-08-01" },
+				{ end: "2026-09-24", period: "this_year", start: "2026-01-01" },
+				{ end: "2025-12-31", period: "last_year", start: "2025-01-01" },
+			] )
+		} finally {
+			vi.useRealTimers()
 			await cms.destroy()
 		}
 	})

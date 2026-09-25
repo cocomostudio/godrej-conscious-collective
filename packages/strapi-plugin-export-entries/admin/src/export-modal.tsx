@@ -19,22 +19,26 @@ export type Description = {
 	draft_and_publish: boolean
 	timezone: string
 	presets: number[]
+	periods: Period_Days[]
 }
+
+/** The days a calendar period covers, as of now, as `YYYY-MM-DD`. */
+type Period_Days = { period: Period; start: string; end: string }
+
+type Period =
+	| "today"
+	| "yesterday"
+	| "this_week"
+	| "last_week"
+	| "this_month"
+	| "last_month"
+	| "this_year"
+	| "last_year"
 
 type Ticket_Answer =
 	| { outcome: "no_entries" }
 	| { outcome: "ticket"; ticket: string; count: number; file_name: string }
 
-const PERIODS = [
-	[ "today", "Today" ],
-	[ "yesterday", "Yesterday" ],
-	[ "this_week", "This week" ],
-	[ "last_week", "Last week" ],
-	[ "this_month", "This month" ],
-	[ "last_month", "Last month" ],
-	[ "this_year", "This year" ],
-	[ "last_year", "Last year" ],
-] as const
 
 export function Export_Modal (
 	{ uid, description, on_started }: {
@@ -48,7 +52,7 @@ export function Export_Modal (
 	const [ preset, set_preset ] = useState<string>(
 		() => description.presets.length > 0
 			? `latest:${description.presets[0]}`
-			: `period:${PERIODS[0][0]}`,
+			: `period:${description.periods[0]?.period}`,
 	)
 	const [ chosen, set_chosen ] = use_remembered_fields( uid, description )
 	const [ message, set_message ] = useState<string | null>( null )
@@ -125,12 +129,12 @@ export function Export_Modal (
 									Latest { count }
 								</SingleSelectOption>
 							) ) }
-							{ PERIODS.map( ( [ period, label ] ) => (
+							{ description.periods.map( ( period_days ) => (
 								<SingleSelectOption
-									key={ period }
-									value={ `period:${period}` }
+									key={ period_days.period }
+									value={ `period:${period_days.period}` }
 								>
-									{ label }
+									{ label_of( period_days ) }
 								</SingleSelectOption>
 							) ) }
 						</SingleSelect>
@@ -176,6 +180,69 @@ export function Export_Modal (
 		</Modal.Content>
 	)
 }
+
+/**
+ |
+ | A calendar period's name, followed by the days it covers in the words that
+ | suit its length: "Today (24/09)", "This week (21/09 to 24/09)",
+ | "Last month (August 2026)", "Last year (2025)".
+ |
+ */
+function label_of ( { period, start, end }: Period_Days ) {
+	const { name, span } = PERIODS[period]
+	const [ year, month ] = start.split( "-" )
+
+	switch ( span ) {
+		case "year":
+			return `${name} (${year})`
+		case "month":
+			return `${name} (${MONTH_NAMES[Number( month ) - 1]} ${year})`
+		case "day":
+			return `${name} (${day_and_month( start )})`
+		case "week":
+			return start === end
+				? `${name} (${day_and_month( start )})`
+				: `${name} (${day_and_month( start )} to ${
+					day_and_month( end )
+				})`
+	}
+}
+
+const PERIODS: Record<
+	Period,
+	{ name: string; span: "day" | "week" | "month" | "year" }
+> = {
+	last_month: { name: "Last month", span: "month" },
+	last_week: { name: "Last week", span: "week" },
+	last_year: { name: "Last year", span: "year" },
+	this_month: { name: "This month", span: "month" },
+	this_week: { name: "This week", span: "week" },
+	this_year: { name: "This year", span: "year" },
+	today: { name: "Today", span: "day" },
+	yesterday: { name: "Yesterday", span: "day" },
+}
+
+/** `2026-09-24` as `24/09`. */
+function day_and_month ( day: string ) {
+	const [ , month, date ] = day.split( "-" )
+
+	return `${date}/${month}`
+}
+
+const MONTH_NAMES = [
+	"January",
+	"February",
+	"March",
+	"April",
+	"May",
+	"June",
+	"July",
+	"August",
+	"September",
+	"October",
+	"November",
+	"December",
+]
 
 /** Turns a picker value, such as `latest:50`, into a Request ticket selection. */
 function selection_of ( preset: string ) {

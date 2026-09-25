@@ -2,6 +2,13 @@
 import type { Core } from "@strapi/strapi"
 import { contentTypes } from "@strapi/utils"
 
+import {
+	type Day_Range,
+	day_in,
+	type Period,
+	PERIODS,
+	resolve_period,
+} from "./calendar"
 import type { Settings } from "./settings"
 
 export type Field = {
@@ -16,6 +23,8 @@ export type Description = {
 	draft_and_publish: boolean
 	timezone: string
 	presets: number[]
+	/** The days each calendar period covers, as of now. */
+	periods: ( { period: Period } & Day_Range )[]
 }
 
 /**
@@ -49,9 +58,15 @@ export async function describe_content_type (
 			name,
 		} ) )
 
+	const today = day_in( settings.timezone, new Date() )
+
 	return {
 		draft_and_publish: contentTypes.hasDraftAndPublish( content_type ),
 		fields,
+		periods: PERIODS.map( ( period ) => ( {
+			period,
+			...resolve_period( period, today ),
+		} ) ),
 		presets: settings.presets,
 		timezone: settings.timezone,
 	}
