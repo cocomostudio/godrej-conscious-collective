@@ -261,15 +261,16 @@ describe("spacing around a block", () => {
 	})
 
 	it("is declined at the top of every page a listing opens", async () => {
-		// The four category pages and the collaborators page each open with a
-		// listing that carries a header of its own, and the section holding
-		// it pads below and not above. The listing keeps its own gap there.
+		// The four category pages, the collaborators page and the Archive each
+		// open with a listing, and the section holding it pads below and not
+		// above. The listing keeps its own gap there.
 		for ( const path of [
 			"/showcases",
 			"/experiences",
 			"/conversations",
 			"/workshops",
 			"/collaborators",
+			"/archives",
 		] ) {
 			const { body } = await cms.get( `/api/envelope?path=${path}` )
 

@@ -173,12 +173,12 @@ export async function write_archives_page (
 			// the editor's label for the row in the admin, which is what that
 			// attribute is for.
 			//
-			// The timeline declines the space above itself: it opens the
-			// column, and the count it draws is what a visitor should meet at
-			// the top edge.
+			// The section pads below itself and not above: the timeline opens
+			// the column, and keeps a gap of its own there from the large
+			// breakpoint.
 			section( "The timeline", {
 				blocks: [ archive_timeline_listing( entries ) ],
-				spacing_around: "above",
+				spacing_around: "below",
 			} ),
 		],
 		page_layout: "two-column",
