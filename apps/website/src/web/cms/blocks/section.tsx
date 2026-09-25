@@ -212,9 +212,15 @@ export function Section (
 	// because a positional selector that stops matching is not an error. A main
 	// region holds nothing but sections, so the last `<section>` is the last
 	// section however many rules are drawn between them.
+	//
+	// **The last section's bottom spacing is this, and only this.** The
+	// padding `section_padding` lays down inside it is dropped there
+	// (`>div:pb-0`), so the page does not close on the two stacked together.
 	const outer_edges = one_column ? "" : [
 		pad_top ? "[&:first-of-type]:md:pt-16" : "",
-		pad_bottom ? "[&:last-of-type]:pb-8 [&:last-of-type]:md:pb-16" : "",
+		pad_bottom
+			? "[&:last-of-type]:pb-8 [&:last-of-type]:md:pb-16 [&:last-of-type>div]:pb-0"
+			: "",
 	].filter( Boolean ).join( " " )
 
 	return <>
