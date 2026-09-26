@@ -120,6 +120,16 @@ describe("Request ticket", () => {
 		} )
 	})
 
+	it("answers a ticket of 32 random bytes, encoded for a URL", async () => {
+		const first = await request_ticket( cms, token, latest( 50 ) )
+		const second = await request_ticket( cms, token, latest( 50 ) )
+		const ticket = first.body.data.ticket
+
+		expect( ticket ).toMatch( /^[A-Za-z0-9_-]{43}$/ )
+		expect( Buffer.from( ticket, "base64url" ) ).toHaveLength( 32 )
+		expect( second.body.data.ticket ).not.toBe( ticket )
+	})
+
 	it("answers \"no entries match\", and issues no ticket, when none match", async () => {
 		const { body, status } = await request_ticket( cms, token, {
 			fields: [ "title" ],
@@ -195,6 +205,32 @@ describe("Download", () => {
 		const { status } = await download( cms, body.data.ticket )
 
 		expect( status ).toBe( 401 )
+	})
+
+	describe("with the clock stopped", () => {
+		afterEach( () => {
+			vi.useRealTimers()
+		} )
+
+		it("accepts a ticket used 60 seconds after issue", async () => {
+			vi.useFakeTimers( { now: Date.now(), toFake: [ "Date" ] } )
+			const { body } = await request_ticket( cms, token, latest( 2 ) )
+
+			vi.setSystemTime( Date.now() + 60_000 )
+			const { status } = await download( cms, body.data.ticket )
+
+			expect( status ).toBe( 200 )
+		})
+
+		it("refuses a ticket used more than 60 seconds after issue", async () => {
+			vi.useFakeTimers( { now: Date.now(), toFake: [ "Date" ] } )
+			const { body } = await request_ticket( cms, token, latest( 2 ) )
+
+			vi.setSystemTime( Date.now() + 60_001 )
+			const { status } = await download( cms, body.data.ticket )
+
+			expect( status ).toBe( 401 )
+		})
 	})
 
 	it("logs the admin, the content-type, the selection, the fields and the row count", async () => {
@@ -549,13 +585,18 @@ describe("Exporting a calendar period, in a timezone ahead of UTC", () => {
 	)
 
 	it("keeps the days fixed when the ticket was requested", async () => {
+		const midnight = kolkata( "2026-09-25 00:00" ).getTime()
+
+		vi.setSystemTime( midnight - 30_000 )
+		// The login from 01:00 has expired by 23:59.
+		token = await cms.login( SUPER_ADMIN.email )
 		const { body } = await request_ticket( cms, token, {
 			fields: [ "title" ],
 			selection: { kind: "period", period: "today" },
 			uid: GADGET_UID,
 		} )
 
-		vi.setSystemTime( kolkata( "2026-09-25 00:00" ) )
+		vi.setSystemTime( midnight + 10_000 )
 		const { bytes } = await download( cms, body.data.ticket )
 
 		expect( titles_of( bytes.toString( "utf8" ) ) ).toEqual( [

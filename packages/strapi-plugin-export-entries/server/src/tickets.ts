@@ -19,15 +19,32 @@ export type Ticket = {
 
 /**
  |
+ | How long a ticket waits to be used. The limit covers only the wait: a
+ | download that starts in time runs to its end.
+ |
+ */
+const LIFETIME_MS = 60_000
+
+/**
+ |
  | The tickets issued by one Strapi instance, held in memory. A ticket can be
- | redeemed once.
+ | redeemed once, within its lifetime.
  |
  */
 export const tickets = () => {
 	const issued = new Map<string, Ticket>()
 
+	const is_expired = ( ticket: Ticket ) =>
+		Date.now() - ticket.issued_at > LIFETIME_MS
+
 	return {
 		issue ( ticket: Ticket ): string {
+			for ( const [ id, earlier ] of issued ) {
+				if ( is_expired( earlier ) ) {
+					issued.delete( id )
+				}
+			}
+
 			const id = randomBytes( 32 ).toString( "base64url" )
 			issued.set( id, ticket )
 
@@ -38,7 +55,7 @@ export const tickets = () => {
 			const ticket = issued.get( id )
 			issued.delete( id )
 
-			return ticket
+			return ticket && !is_expired( ticket ) ? ticket : undefined
 		},
 	}
 }
