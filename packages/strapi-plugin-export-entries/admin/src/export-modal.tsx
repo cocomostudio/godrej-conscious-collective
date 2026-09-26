@@ -2,6 +2,7 @@
 import {
 	Button,
 	Checkbox,
+	DatePicker,
 	Field,
 	Flex,
 	Modal,
@@ -37,6 +38,9 @@ type Period =
 	| "this_year"
 	| "last_year"
 
+/** Whether the admin picks a preset or a custom date range. */
+type Mode = "preset" | "range"
+
 type Ticket_Answer =
 	| { outcome: "no_entries" }
 	| { outcome: "export_running" }
@@ -57,9 +61,18 @@ export function Export_Modal (
 			? `latest:${description.presets[0]}`
 			: `period:${description.periods[0]?.period}`,
 	)
+	const [ mode, set_mode ] = useState<Mode>( "preset" )
+	const [ start, set_start ] = useState<string>()
+	const [ end, set_end ] = useState<string>()
 	const [ chosen, set_chosen ] = use_remembered_fields( uid, description )
 	const [ message, set_message ] = useState<string | null>( null )
 	const [ busy, set_busy ] = useState( false )
+
+	const both_days_picked = start !== undefined && end !== undefined
+	// Days written as `YYYY-MM-DD` sort the same as text and as dates.
+	const end_before_start = both_days_picked && end < start
+	const can_export = mode === "preset"
+		|| ( both_days_picked && !end_before_start )
 
 	const toggle = ( name: string, ticked: boolean ) => {
 		const next = new Set( chosen )
@@ -84,7 +97,9 @@ export function Export_Modal (
 					fields: description.fields
 						.filter( ( field ) => chosen.has( field.name ) )
 						.map( ( field ) => field.name ),
-					selection: selection_of( preset, description.today ),
+					selection: mode === "preset"
+						? selection_of( preset, description.today )
+						: { end, kind: "range", start },
 					uid,
 				},
 			)
@@ -115,38 +130,67 @@ export function Export_Modal (
 			</Modal.Header>
 			<Modal.Body>
 				<Flex alignItems="stretch" direction="column" gap={ 6 }>
-					<Radio.Group value="preset" aria-label="Which entries">
+					<Radio.Group
+						aria-label="Which entries"
+						onValueChange={ ( value ) =>
+							set_mode( value as Mode ) }
+						value={ mode }
+					>
 						<Radio.Item value="preset">Preset</Radio.Item>
-						<Radio.Item disabled value="range">
-							Custom date range
-						</Radio.Item>
+						<Radio.Item value="range">Custom date range</Radio.Item>
 					</Radio.Group>
 
-					<Field.Root>
-						<Field.Label>Entries</Field.Label>
-						<SingleSelect
-							onChange={ ( value ) =>
-								set_preset( String( value ) ) }
-							value={ preset }
-						>
-							{ description.presets.map( ( count ) => (
-								<SingleSelectOption
-									key={ count }
-									value={ `latest:${count}` }
-								>
-									Latest { count }
-								</SingleSelectOption>
-							) ) }
-							{ description.periods.map( ( period_days ) => (
-								<SingleSelectOption
-									key={ period_days.period }
-									value={ `period:${period_days.period}` }
-								>
-									{ label_of( period_days ) }
-								</SingleSelectOption>
-							) ) }
-						</SingleSelect>
-					</Field.Root>
+					{ mode === "range" ? (
+						<Flex alignItems="flex-start" gap={ 4 }>
+							<Field.Root required>
+								<Field.Label>Start date</Field.Label>
+								<Day_Picker
+									on_change={ set_start }
+									value={ start }
+								/>
+							</Field.Root>
+							<Field.Root
+								error={ end_before_start
+									? "The end date falls before the start date."
+									: undefined }
+								required
+							>
+								<Field.Label>End date</Field.Label>
+								<Day_Picker
+									min={ start }
+									on_change={ set_end }
+									value={ end }
+								/>
+								<Field.Error />
+							</Field.Root>
+						</Flex>
+					) : (
+						<Field.Root>
+							<Field.Label>Entries</Field.Label>
+							<SingleSelect
+								onChange={ ( value ) =>
+									set_preset( String( value ) ) }
+								value={ preset }
+							>
+								{ description.presets.map( ( count ) => (
+									<SingleSelectOption
+										key={ count }
+										value={ `latest:${count}` }
+									>
+										Latest { count }
+									</SingleSelectOption>
+								) ) }
+								{ description.periods.map( ( period_days ) => (
+									<SingleSelectOption
+										key={ period_days.period }
+										value={ `period:${period_days.period}` }
+									>
+										{ label_of( period_days ) }
+									</SingleSelectOption>
+								) ) }
+							</SingleSelect>
+						</Field.Root>
+					) }
 
 					<Flex alignItems="stretch" direction="column" gap={ 2 }>
 						<Typography variant="sigma">Fields</Typography>
@@ -181,12 +225,62 @@ export function Export_Modal (
 				<Modal.Close>
 					<Button variant="tertiary">Close</Button>
 				</Modal.Close>
-				<Button loading={ busy } onClick={ start_export }>
+				<Button
+					disabled={ !can_export }
+					loading={ busy }
+					onClick={ start_export }
+				>
 					Export
 				</Button>
 			</Modal.Footer>
 		</Modal.Content>
 	)
+}
+
+/**
+ |
+ | A design-system date picker that holds a day as `YYYY-MM-DD`. The day it
+ | shows is the day it holds, whatever the browser's timezone.
+ |
+ | The design-system picker reads the day of its `value` and `minDate` in
+ | UTC, but hands `onChange` the first moment of the picked day in the
+ | browser's timezone. So a day goes in as UTC midnight, and comes out
+ | through the browser's calendar.
+ |
+ */
+function Day_Picker (
+	{ value, min, on_change }: {
+		value?: string
+		min?: string
+		on_change: ( day: string | undefined ) => void
+	},
+) {
+	return (
+		<DatePicker
+			// Writes and reads days as DD/MM/YYYY, the order the period labels
+			// use.
+			locale="en-GB"
+			minDate={ min === undefined ? undefined : utc_midnight_of( min ) }
+			onChange={ ( date ) =>
+				on_change( date === undefined ? undefined : local_day_of( date ) ) }
+			onClear={ () => on_change( undefined ) }
+			value={ value === undefined ? undefined : utc_midnight_of( value ) }
+		/>
+	)
+}
+
+function utc_midnight_of ( day: string ) {
+	const [ year, month, date ] = day.split( "-" ).map( Number )
+
+	return new Date( Date.UTC( year, month - 1, date ) )
+}
+
+function local_day_of ( date: Date ) {
+	return [
+		String( date.getFullYear() ),
+		String( date.getMonth() + 1 ).padStart( 2, "0" ),
+		String( date.getDate() ).padStart( 2, "0" ),
+	].join( "-" )
 }
 
 /**

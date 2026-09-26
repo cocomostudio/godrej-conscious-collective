@@ -23,10 +23,13 @@ import type { Settings } from "./settings"
  | request names one. So a modal left open past midnight exports the days its
  | labels show.
  |
+ | A date range includes both its start day and its end day.
+ |
  */
 export type Selection =
 	| { kind: "latest"; count: number }
 	| { kind: "period"; period: Period; days: Day_Range }
+	| { kind: "range"; days: Day_Range }
 
 /** A request for an export, checked and ready to run. */
 export type Export_Request = {
@@ -90,13 +93,9 @@ function check_selection (
 			)
 		}
 
-		const as_of = selection.as_of ?? day_in( settings.timezone, now )
-
-		if ( !is_day( as_of ) ) {
-			throw new errors.ValidationError(
-				`"${as_of}" is not a day written as YYYY-MM-DD.`,
-			)
-		}
+		const as_of = check_day(
+			selection.as_of ?? day_in( settings.timezone, now ),
+		)
 
 		return {
 			days: resolve_period( selection.period, as_of ),
@@ -105,9 +104,33 @@ function check_selection (
 		}
 	}
 
+	if ( selection?.kind === "range" ) {
+		const start = check_day( selection.start )
+		const end = check_day( selection.end )
+
+		// Days written as `YYYY-MM-DD` sort the same as text and as dates.
+		if ( end < start ) {
+			throw new errors.ValidationError(
+				`The end date ${end} falls before the start date ${start}.`,
+			)
+		}
+
+		return { days: { end, start }, kind: "range" }
+	}
+
 	throw new errors.ValidationError(
-		"The selection must be a preset or a calendar period.",
+		"The selection must be a preset, a calendar period or a date range.",
 	)
+}
+
+function check_day ( value: unknown ): string {
+	if ( !is_day( value ) ) {
+		throw new errors.ValidationError(
+			`"${value}" is not a day written as YYYY-MM-DD.`,
+		)
+	}
+
+	return value
 }
 
 /** Answers the chosen fields in the order the exportable fields come. */

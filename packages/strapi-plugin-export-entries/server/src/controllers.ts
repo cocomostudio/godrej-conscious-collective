@@ -210,7 +210,14 @@ function tickets_of ( strapi: Core.Strapi ): Tickets {
 }
 
 function describe_selection ( selection: Selection ) {
-	return selection.kind === "latest"
-		? `latest ${selection.count}`
-		: `${selection.period}, ${selection.days.start} to ${selection.days.end}`
+	switch ( selection.kind ) {
+		case "latest":
+			return `latest ${selection.count}`
+		case "period":
+			return `${selection.period}, ${selection.days.start} to ${
+				selection.days.end
+			}`
+		case "range":
+			return `${selection.days.start} to ${selection.days.end}`
+	}
 }

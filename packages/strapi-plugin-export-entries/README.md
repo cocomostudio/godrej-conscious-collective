@@ -75,7 +75,9 @@ The modal leaves out:
 
 ## Choosing which entries
 
-The modal offers two groups of presets:
+The modal offers a choice between "Preset" and "Custom date range".
+
+"Preset" offers two groups of presets:
 
 - **Latest N**: the N most recently created entries, one choice for each size in the presets setting.
 - **A calendar period**: Today, Yesterday, This week, Last week, This month, Last month, This year or Last year.
@@ -90,6 +92,12 @@ A calendar period follows these rules:
 - The days are the ones the modal showed. A modal left open past midnight still exports the days its labels name.
 - The days are fixed when the admin clicks Export, so an export that runs past midnight still covers the days the admin asked for.
 
+"Custom date range" offers a start date and an end date. It follows these rules:
+
+- Both days are included. An end date of 30 September includes the entries created on 30 September.
+- Both days are read in the timezone setting, which the modal names.
+- The end date cannot fall before the start date. The modal blocks such a range, and the server refuses it.
+
 When no entry matches, the modal says "No entries match" and nothing downloads.
 
 ## The CSV file
@@ -97,7 +105,7 @@ When no entry matches, the modal says "No entries match" and nothing downloads.
 The file is named after the content-type's plural name and the selection:
 
 - Latest N: `<plural>_latest-<N>_<today>.csv`, such as `leads_latest-100_2026-09-25.csv`
-- A calendar period: `<plural>_<start>_to_<end>.csv`, such as `leads_2026-09-01_to_2026-09-25.csv`
+- A calendar period or a custom date range: `<plural>_<start>_to_<end>.csv`, such as `leads_2026-09-01_to_2026-09-25.csv`
 
 ### Rows and columns
 

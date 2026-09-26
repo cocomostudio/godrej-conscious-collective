@@ -668,6 +668,109 @@ describe("Exporting a calendar period, in a timezone ahead of UTC", () => {
 
 /**
  |
+ | Each entry is named after the moment it was created, on the wall clock in
+ | Kolkata, which runs 5½ hours ahead of UTC. The entries sit on either side of
+ | the first moment of 21 September and the last moment of 23 September.
+ |
+ */
+describe("Exporting a custom date range, in a timezone ahead of UTC", () => {
+	const ENTRIES = [
+		"2026-09-24 00:00",
+		"2026-09-23 23:59",
+		"2026-09-22 12:00",
+		"2026-09-21 00:00",
+		"2026-09-20 23:59",
+	]
+
+	let cms: Fixture_Strapi
+	let token: string
+
+	beforeAll( async () => {
+		cms = await boot_fixture_strapi( {
+			content_types: { gadget: GADGET },
+			env: {
+				EXPORT_ENTRIES_CONTENT_TYPES: GADGET_UID,
+				EXPORT_ENTRIES_TIMEZONE: "Asia/Kolkata",
+			},
+		} )
+		token = await cms.login( SUPER_ADMIN.email )
+
+		await seed(
+			cms,
+			GADGET_UID,
+			ENTRIES.map( ( title ) => ( {
+				createdAt: kolkata( title ).toISOString(),
+				title,
+			} ) ),
+		)
+	} )
+
+	afterAll( async () => {
+		await cms?.destroy()
+	} )
+
+	it("exports every entry created on or between both days, newest first", async () => {
+		const { body } = await request_ticket(
+			cms,
+			token,
+			range( "2026-09-21", "2026-09-23" ),
+		)
+		const { bytes } = await download( cms, body.data.ticket )
+
+		expect( body.data.file_name ).toBe(
+			"gadgets_2026-09-21_to_2026-09-23.csv",
+		)
+		expect( titles_of( bytes.toString( "utf8" ) ) ).toEqual( [
+			"2026-09-23 23:59",
+			"2026-09-22 12:00",
+			"2026-09-21 00:00",
+		] )
+	})
+
+	it("exports a single day when the start and end dates are the same", async () => {
+		const { body } = await request_ticket(
+			cms,
+			token,
+			range( "2026-09-23", "2026-09-23" ),
+		)
+		const { bytes } = await download( cms, body.data.ticket )
+
+		expect( body.data.file_name ).toBe(
+			"gadgets_2026-09-23_to_2026-09-23.csv",
+		)
+		expect( titles_of( bytes.toString( "utf8" ) ) ).toEqual( [
+			"2026-09-23 23:59",
+		] )
+	})
+
+	it("refuses an end date before the start date", async () => {
+		const { status } = await request_ticket(
+			cms,
+			token,
+			range( "2026-09-23", "2026-09-22" ),
+		)
+
+		expect( status ).toBe( 400 )
+	})
+
+	it.each( [
+		[ "2026-02-30", "2026-03-01" ],
+		[ "2026-9-1", "2026-09-02" ],
+		[ "2026-09-01", undefined ],
+		[ undefined, "2026-09-02" ],
+	] )( "refuses %j to %j", async ( start, end ) => {
+		const { status } = await request_ticket( cms, token, {
+			fields: [ "title" ],
+			selection: { end, kind: "range", start },
+			uid: GADGET_UID,
+		} )
+
+		expect( status ).toBe( 400 )
+	})
+})
+
+/**
+ |
  | A running export is one whose download the test holds open. The export is
  | far larger than the buffers between the server and the test, so the server
  | cannot finish it while the test holds it.
@@ -878,6 +981,15 @@ function latest ( count: number ): Ticket_Request {
 	return {
 		fields: [ "title" ],
 		selection: { count, kind: "latest" },
+		uid: GADGET_UID,
+	}
+}
+
+/** A request for the gadgets created from `start` to `end`, with the title. */
+function range ( start: string, end: string ): Ticket_Request {
+	return {
+		fields: [ "title" ],
+		selection: { end, kind: "range", start },
 		uid: GADGET_UID,
 	}
 }
