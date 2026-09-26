@@ -12,7 +12,7 @@ export function csv_line ( cells: string[] ): string {
 
 /**
  |
- | The text a spreadsheet should show for one stored value of an attribute of
+ | The cell a spreadsheet should show for one stored value of an attribute of
  | the given type.
  |
  */
@@ -21,6 +21,39 @@ export function cell_of (
 	type: string,
 	timezone: string,
 ): string {
+	const text = text_of( value, type, timezone )
+
+	// A number cannot run as a formula, and guarding one would turn a
+	// negative number into text.
+	return NUMBER_TYPES.includes( type ) ? text : guard_formula( text )
+}
+
+/**
+ |
+ | One cell for several stored values, such as the entries of a relation to
+ | many. The values are joined with `; `, and the formula guard looks at the
+ | joined text, because only the start of a cell can run as a formula.
+ |
+ */
+export function joined_cell (
+	values: unknown[],
+	type: string,
+	timezone: string,
+): string {
+	if ( values.length === 1 ) {
+		return cell_of( values[0], type, timezone )
+	}
+
+	return guard_formula(
+		values.map( ( value ) => text_of( value, type, timezone ) )
+			.filter( ( text ) => text !== "" )
+			.join( "; " ),
+	)
+}
+
+const NUMBER_TYPES = [ "integer", "biginteger", "float", "decimal" ]
+
+function text_of ( value: unknown, type: string, timezone: string ): string {
 	if ( value === null || value === undefined || value === "" ) {
 		return ""
 	}
@@ -37,17 +70,10 @@ export function cell_of (
 				: String( value )
 		case "json":
 		case "blocks":
-			return guard_formula( JSON.stringify( value ) )
-		// A number cannot run as a formula, and guarding one would turn a
-		// negative number into text.
-		case "integer":
-		case "biginteger":
-		case "float":
-		case "decimal":
-			return String( value )
+			return JSON.stringify( value )
 	}
 
-	return guard_formula( String( value ) )
+	return String( value )
 }
 
 /**

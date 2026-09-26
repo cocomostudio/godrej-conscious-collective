@@ -4,7 +4,8 @@ import { Readable } from "node:stream"
 import type { Core } from "@strapi/strapi"
 
 import { instants_of } from "./calendar"
-import { BYTE_ORDER_MARK, cell_of, csv_line } from "./csv"
+import { columns_of } from "./columns"
+import { BYTE_ORDER_MARK, csv_line } from "./csv"
 import type { Export_Request } from "./request"
 
 const BATCH_SIZE = 500
@@ -47,16 +48,13 @@ async function* csv_chunks (
 	request: Export_Request,
 	timezone: string,
 ) {
-	const attributes = strapi.contentTypes[request.uid as any].attributes
-	const columns = [
-		...request.fields.map( ( field ) => ( {
-			label: field.label,
-			name: field.name,
-			type: attributes[field.name].type,
-		} ) ),
-		{ label: "Created at", name: "createdAt", type: "datetime" },
-		{ label: "Updated at", name: "updatedAt", type: "datetime" },
-	]
+	const columns = await columns_of( strapi, request, timezone )
+	const select = columns.filter( ( column ) => !column.populate )
+		.map( ( column ) => column.name )
+	const populate = Object.fromEntries(
+		columns.filter( ( column ) => column.populate )
+			.map( ( column ) => [ column.name, column.populate ] ),
+	)
 
 	yield BYTE_ORDER_MARK + csv_line( columns.map( ( column ) => column.label ) )
 
@@ -68,7 +66,8 @@ async function* csv_chunks (
 		const rows = await strapi.db.query( request.uid as any ).findMany( {
 			limit: Math.min( BATCH_SIZE, remaining ),
 			orderBy: [ { createdAt: "desc" }, { id: "desc" } ],
-			select: [ "id", ...columns.map( ( column ) => column.name ) ],
+			populate,
+			select: [ "id", ...select ],
 			where: last ? { $and: [ where, after( last ) ] } : where,
 		} )
 
@@ -77,9 +76,7 @@ async function* csv_chunks (
 		}
 
 		yield rows.map( ( row ) =>
-			csv_line( columns.map( ( column ) =>
-				cell_of( row[column.name], column.type, timezone )
-			) )
+			csv_line( columns.map( ( column ) => column.cell( row ) ) )
 		).join( "" )
 
 		remaining -= rows.length

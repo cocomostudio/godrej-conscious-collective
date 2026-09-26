@@ -132,3 +132,63 @@ export const WIDGET = {
 	},
 	options: { draftAndPublish: false },
 }
+
+/** The target of Crate's relations. */
+export const MAKER = {
+	attributes: {
+		code: { type: "string" },
+		name: { type: "string" },
+	},
+	collectionName: "makers",
+	info: {
+		displayName: "Maker",
+		pluralName: "makers",
+		singularName: "maker",
+	},
+	options: { draftAndPublish: false },
+}
+
+/**
+ |
+ | A collection type holding a relation to one entry, a relation to many, a
+ | single media field and a multiple media field. It has no Draft & Publish,
+ | but one relation targets Article, which does.
+ |
+ */
+export const CRATE = {
+	attributes: {
+		label: { type: "string" },
+		maker: {
+			type: "relation",
+			relation: "manyToOne",
+			target: "api::maker.maker",
+		},
+		suppliers: {
+			type: "relation",
+			relation: "manyToMany",
+			target: "api::maker.maker",
+		},
+		photo: {
+			type: "media",
+			multiple: false,
+			allowedTypes: [ "images", "files" ],
+		},
+		gallery: {
+			type: "media",
+			multiple: true,
+			allowedTypes: [ "images", "files" ],
+		},
+		articles: {
+			type: "relation",
+			relation: "manyToMany",
+			target: "api::article.article",
+		},
+	},
+	collectionName: "crates",
+	info: {
+		displayName: "Crate",
+		pluralName: "crates",
+		singularName: "crate",
+	},
+	options: { draftAndPublish: false },
+}

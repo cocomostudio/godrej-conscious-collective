@@ -26,7 +26,7 @@ import {
 	SUPER_ADMIN,
 } from "./support/boot-fixture-strapi.ts"
 import { configure_edit_view } from "./support/edit-view.ts"
-import { ARTICLE, GADGET, WIDGET } from "./support/schemas.ts"
+import { ARTICLE, CRATE, GADGET, MAKER, WIDGET } from "./support/schemas.ts"
 
 const READ = "plugin::content-manager.explorer.read"
 
@@ -38,12 +38,14 @@ describe("Describe", () => {
 		cms = await boot_fixture_strapi( {
 			content_types: {
 				article: ARTICLE,
+				crate: CRATE,
 				gadget: GADGET,
+				maker: MAKER,
 				widget: WIDGET,
 			},
 			env: {
 				EXPORT_ENTRIES_CONTENT_TYPES:
-					"api::gadget.gadget, api::article.article",
+					"api::gadget.gadget, api::article.article, api::crate.crate",
 				EXPORT_ENTRIES_PRESETS: undefined,
 				EXPORT_ENTRIES_TIMEZONE: "Asia/Kolkata",
 			},
@@ -58,6 +60,11 @@ describe("Describe", () => {
 			},
 			order: [ "stock", "title", "contact" ],
 			removed: [ "summary", "barcode" ],
+		} )
+		await configure_edit_view( cms, super_token, "api::crate.crate", {
+			labels: { maker: "Made by", photo: "Photo" },
+			order: [ "photo", "label", "maker" ],
+			removed: [],
 		} )
 	} )
 
@@ -139,6 +146,23 @@ describe("Describe", () => {
 			{ label: "specs", name: "specs" },
 			{ label: "Short summary", name: "summary" },
 			{ label: "barcode", name: "barcode" },
+		] )
+	})
+
+	it("lists relation and media fields alongside the other fields, in edit-view order", async () => {
+		const { body } = await cms.request(
+			"GET",
+			"/export-entries/content-types/api::crate.crate",
+			{ token: super_token },
+		)
+
+		expect( body.data.fields ).toEqual( [
+			{ label: "Photo", name: "photo" },
+			{ label: "label", name: "label" },
+			{ label: "Made by", name: "maker" },
+			{ label: "suppliers", name: "suppliers" },
+			{ label: "gallery", name: "gallery" },
+			{ label: "articles", name: "articles" },
 		] )
 	})
 

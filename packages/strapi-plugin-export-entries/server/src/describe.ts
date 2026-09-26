@@ -77,15 +77,26 @@ export async function describe_content_type (
 
 /**
  |
- | Only scalar fields are exported. A password is never exported, because the
- | content API never hands one out either.
+ | Scalar, relation and media fields are exported. A password is never
+ | exported, because the content API never hands one out either. A polymorphic
+ | relation is not exported, because its entries have no one display field.
  |
  */
 function is_exportable ( content_type: any, name: string ) {
 	const attribute = content_type.attributes[name]
 
-	return Boolean( attribute )
-		&& contentTypes.isScalarAttribute( attribute )
+	if ( !attribute || contentTypes.isPrivateAttribute( content_type, name ) ) {
+		return false
+	}
+
+	if ( contentTypes.isMediaAttribute( attribute ) ) {
+		return true
+	}
+
+	if ( contentTypes.isRelationalAttribute( attribute ) ) {
+		return !contentTypes.isMorphToRelationalAttribute( attribute )
+	}
+
+	return contentTypes.isScalarAttribute( attribute )
 		&& attribute.type !== "password"
-		&& !contentTypes.isPrivateAttribute( content_type, name )
 }

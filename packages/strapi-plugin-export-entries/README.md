@@ -71,7 +71,9 @@ The modal leaves out:
 - internal IDs and the document ID
 - private fields
 - password fields
-- relation and media fields
+- polymorphic relations, because their entries have no single display field
+
+Components and dynamic zones are not supported. A content-type holding either one refuses the boot, as listed above.
 
 ## Choosing which entries
 
@@ -126,13 +128,27 @@ The file is named after the content-type's plural name and the selection:
 | Date and time | `YYYY-MM-DD HH:mm`, in the timezone setting |
 | Date | `YYYY-MM-DD` |
 | JSON and rich text (blocks) | the stored JSON |
+| Relation | the related entry's display field |
+| Media | the file's URL |
 | Anything empty | an empty cell |
+
+### Relations and media
+
+A relation cell holds the related entry's **display field**. The display field is the field that the content manager shows for the relation. It is set per relation, under "Configure the view" on the edit view. By default, the display field is the related content-type's first text field.
+
+The export reads only the display field. It never follows the related entry's own relations.
+
+A media cell holds the file's URL. A file kept on the Strapi server has a URL that starts with `/uploads/`. Such a URL is prefixed with the server's public URL, which is the `url` in `config/server.ts`, so that the link opens from the spreadsheet.
+
+A relation to many entries, or a media field holding many files, writes all of its values in one cell, joined with `; `. An empty relation or media field gives an empty cell.
+
+A related entry that has Draft & Publish is written once, as its draft, which is what the edit view shows.
 
 ### The formula guard
 
 A spreadsheet runs a cell as a formula when the cell starts with certain characters. A registrant could plant such a cell in a form, and it would run on the machine of the admin who opens the file. The guard stops this.
 
-A cell that starts with `=`, `+`, `-`, `@`, a tab or a carriage return gets a leading `'`. The spreadsheet then shows the cell as text.
+A cell that starts with `=`, `+`, `-`, `@`, a tab or a carriage return gets a leading `'`. The spreadsheet then shows the cell as text. Relation and media cells are guarded in the same way.
 
 Two kinds of cell are left alone:
 
@@ -141,7 +157,7 @@ Two kinds of cell are left alone:
 
 ## How the file reaches the disk
 
-The server reads the entries in batches of 500 and sends each batch only once the connection has taken the one before. The browser saves the file straight to disk through a plain download link. So a large export raises the memory use of neither the server nor the browser.
+The server reads the entries in batches of 500 and sends each batch only once the connection has taken the one before. The relations and media of a batch are read along with that batch. The browser saves the file straight to disk through a plain download link. So a large export raises the memory use of neither the server nor the browser.
 
 Each download writes one line to the Strapi log. The line names the admin, the content-type, the selection, the fields and the row count.
 

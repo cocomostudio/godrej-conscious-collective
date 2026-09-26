@@ -25,9 +25,12 @@ import {
 	SUPER_ADMIN,
 } from "./support/boot-fixture-strapi.ts"
 import { configure_edit_view } from "./support/edit-view.ts"
-import { GADGET, WIDGET } from "./support/schemas.ts"
+import { ARTICLE, CRATE, GADGET, MAKER, WIDGET } from "./support/schemas.ts"
 
 const GADGET_UID = "api::gadget.gadget"
+const CRATE_UID = "api::crate.crate"
+const MAKER_UID = "api::maker.maker"
+const ARTICLE_UID = "api::article.article"
 const READ = "plugin::content-manager.explorer.read"
 
 describe("Request ticket", () => {
@@ -436,6 +439,173 @@ describe("The CSV", () => {
 			],
 			[ "", "", "", "", "", "FALSE", "2026-09-19 15:30", "2026-09-19 15:30" ],
 		] )
+	})
+})
+
+describe("Relations and media in the CSV", () => {
+	let cms: Fixture_Strapi
+	let token: string
+
+	beforeAll( async () => {
+		cms = await boot_fixture_strapi( {
+			content_types: { article: ARTICLE, crate: CRATE, maker: MAKER },
+			env: {
+				EXPORT_ENTRIES_CONTENT_TYPES: CRATE_UID,
+				EXPORT_ENTRIES_PRESETS: "50,1200",
+				EXPORT_ENTRIES_TIMEZONE: "Asia/Kolkata",
+			},
+			server_url: "http://cms.example.test",
+		} )
+		token = await cms.login( SUPER_ADMIN.email )
+
+		// A maker's code comes first, so it is the display field by default.
+		// Pointing the relations at the name proves the setting is honoured.
+		await configure_edit_view( cms, token, CRATE_UID, {
+			labels: {},
+			main_fields: { articles: "headline", maker: "name", suppliers: "name" },
+			order: [],
+			removed: [],
+		} )
+	} )
+
+	afterAll( async () => {
+		await cms?.destroy()
+	} )
+
+	beforeEach( async () => {
+		await cms.strapi.db.query( CRATE_UID ).deleteMany( {} )
+		await cms.strapi.db.query( MAKER_UID ).deleteMany( {} )
+		await cms.strapi.db.query( ARTICLE_UID ).deleteMany( {} )
+		await cms.strapi.db.query( "plugin::upload.file" ).deleteMany( {} )
+	} )
+
+	it("writes a related entry's display field", async () => {
+		const maker = await create_maker( cms, "M-1", "Acme Works" )
+		await create_crate( cms, { label: "Crate", maker } )
+
+		const csv = await export_csv( cms, token, crates( [ "label", "maker" ] ) )
+
+		expect( rows_of( csv ) ).toEqual( [
+			[ "label", "maker", "Created at", "Updated at" ],
+			[ "Crate", "Acme Works", expect.any( String ), expect.any( String ) ],
+		] )
+	})
+
+	it("joins the display fields of many related entries with \"; \"", async () => {
+		const acme = await create_maker( cms, "M-1", "Acme Works" )
+		const bolt = await create_maker( cms, "M-2", "Bolt & Sons" )
+		await create_crate( cms, { suppliers: [ bolt, acme ] } )
+
+		const csv = await export_csv( cms, token, crates( [ "suppliers" ] ) )
+
+		expect( rows_of( csv )[1][0] ).toBe( "Bolt & Sons; Acme Works" )
+	})
+
+	it("writes a file's URL, prefixing a file kept on the server with the server's URL", async () => {
+		await create_crate( cms, {
+			photo: await create_file( cms, "/uploads/front.png" ),
+		} )
+		await create_crate( cms, {
+			photo: await create_file( cms, "https://cdn.example.com/side.png" ),
+		} )
+
+		const csv = await export_csv( cms, token, crates( [ "photo" ] ) )
+
+		expect( titles_of( csv ) ).toEqual( [
+			"https://cdn.example.com/side.png",
+			"http://cms.example.test/uploads/front.png",
+		] )
+	})
+
+	it("joins the URLs of many files with \"; \"", async () => {
+		const back = await create_file( cms, "https://cdn.example.com/back.png" )
+		const top = await create_file( cms, "/uploads/top.png" )
+		await create_crate( cms, { gallery: [ back, top ] } )
+
+		const csv = await export_csv( cms, token, crates( [ "gallery" ] ) )
+
+		expect( rows_of( csv )[1][0] ).toBe(
+			"https://cdn.example.com/back.png; http://cms.example.test/uploads/top.png",
+		)
+	})
+
+	it("writes an empty cell for an empty relation or media field", async () => {
+		await create_crate( cms, { label: "Empty" } )
+
+		const csv = await export_csv( cms, token, crates( [
+			"label",
+			"maker",
+			"suppliers",
+			"photo",
+			"gallery",
+		] ) )
+
+		expect( rows_of( csv )[1].slice( 0, 5 ) ).toEqual( [
+			"Empty",
+			"",
+			"",
+			"",
+			"",
+		] )
+	})
+
+	it("writes a related entry with Draft & Publish once, as its draft", async () => {
+		// Strapi links an entry without Draft & Publish to both versions.
+		const documentId = crypto.randomUUID().replace( /-/g, "" )
+		const articles = cms.strapi.db.query( ARTICLE_UID )
+		const draft = await articles.create( {
+			data: { documentId, headline: "Edited headline", publishedAt: null },
+		} )
+		const published = await articles.create( {
+			data: { documentId, headline: "Published headline", publishedAt: new Date() },
+		} )
+		await create_crate( cms, { articles: [ published.id, draft.id ] } )
+
+		const csv = await export_csv( cms, token, crates( [ "articles" ] ) )
+
+		expect( rows_of( csv )[1][0] ).toBe( "Edited headline" )
+	})
+
+	it("guards a related entry's display field against running as a formula", async () => {
+		const formula = await create_maker( cms, "M-1", "=1+2" )
+		const acme = await create_maker( cms, "M-2", "Acme Works" )
+		await create_crate( cms, { maker: formula, suppliers: [ formula, acme ] } )
+
+		const csv = await export_csv( cms, token, crates( [ "maker", "suppliers" ] ) )
+
+		expect( rows_of( csv )[1].slice( 0, 2 ) ).toEqual( [
+			"'=1+2",
+			"'=1+2; Acme Works",
+		] )
+	})
+
+	it("writes the relations and media of every row, across several batches", async () => {
+		const acme = await create_maker( cms, "M-1", "Acme Works" )
+		const bolt = await create_maker( cms, "M-2", "Bolt & Sons" )
+		const expected: string[][] = []
+
+		for ( let index = 0; index < 1_100; index += 1 ) {
+			const label = String( index ).padStart( 4, "0" )
+			const maker = index % 2 === 0 ? acme : bolt
+			await create_crate( cms, {
+				label,
+				maker,
+				photo: await create_file( cms, `/uploads/${label}.png` ),
+			} )
+			expected.unshift( [
+				label,
+				maker === acme ? "Acme Works" : "Bolt & Sons",
+				`http://cms.example.test/uploads/${label}.png`,
+			] )
+		}
+
+		const csv = await export_csv( cms, token, {
+			...crates( [ "label", "maker", "photo" ] ),
+			selection: { count: 1200, kind: "latest" },
+		} )
+
+		expect( rows_of( csv ).slice( 1 ).map( ( row ) => row.slice( 0, 3 ) ) )
+			.toEqual( expected )
 	})
 })
 
@@ -983,6 +1153,60 @@ function latest ( count: number ): Ticket_Request {
 		selection: { count, kind: "latest" },
 		uid: GADGET_UID,
 	}
+}
+
+/** A request for the latest 50 crates, with the given fields. */
+function crates ( fields: string[] ): Ticket_Request {
+	return {
+		fields,
+		selection: { count: 50, kind: "latest" },
+		uid: CRATE_UID,
+	}
+}
+
+async function create_maker ( cms: Fixture_Strapi, code: string, name: string ) {
+	const maker = await cms.strapi.db.query( MAKER_UID ).create( {
+		data: { code, documentId: crypto.randomUUID().replace( /-/g, "" ), name },
+	} )
+
+	return maker.id as number
+}
+
+/** Records an uploaded file, as the media library would, at `url`. */
+async function create_file ( cms: Fixture_Strapi, url: string ) {
+	const name = url.split( "/" ).pop()
+	const file = await cms.strapi.db.query( "plugin::upload.file" ).create( {
+		data: {
+			documentId: crypto.randomUUID().replace( /-/g, "" ),
+			ext: `.${name.split( "." ).pop()}`,
+			hash: crypto.randomUUID(),
+			mime: "image/png",
+			name,
+			provider: "local",
+			size: 1,
+			url,
+		},
+	} )
+
+	return file.id as number
+}
+
+/**
+ |
+ | Writes one crate straight into the database, linked to the given makers and
+ | files by their IDs. A crate created later sorts first in an export.
+ |
+ */
+async function create_crate (
+	cms: Fixture_Strapi,
+	data: Record<string, unknown>,
+) {
+	await cms.strapi.db.query( CRATE_UID ).create( {
+		data: {
+			documentId: crypto.randomUUID().replace( /-/g, "" ),
+			...data,
+		},
+	} )
 }
 
 /** A request for the gadgets created from `start` to `end`, with the title. */

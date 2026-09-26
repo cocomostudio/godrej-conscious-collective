@@ -51,6 +51,8 @@ type Fixture_Options = {
 	plugin_config?: Record<string, unknown>
 	/** Environment variables to set for the boot, and put back afterwards. */
 	env?: Record<string, string | undefined>
+	/** The public URL the server is reached at, as `config/server.ts` sets it. */
+	server_url?: string
 }
 
 export type Fixture_Strapi = {
@@ -219,6 +221,9 @@ function write_fixture_app ( options: Fixture_Options ) {
 			+ `\tapp: { keys: [ "fixture-key-one", "fixture-key-two" ] },\n`
 			+ `\thost: "127.0.0.1",\n`
 			+ `\tport: 0,\n`
+			+ ( options.server_url
+				? `\turl: ${JSON.stringify( options.server_url )},\n`
+				: "" )
 			+ `} )\n`,
 	)
 
