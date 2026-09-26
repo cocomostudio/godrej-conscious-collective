@@ -666,6 +666,123 @@ describe("Exporting a calendar period, in a timezone ahead of UTC", () => {
 	})
 })
 
+/**
+ |
+ | A running export is one whose download the test holds open. The export is
+ | far larger than the buffers between the server and the test, so the server
+ | cannot finish it while the test holds it.
+ |
+ */
+describe("A running export", () => {
+	const ROWS = 4000
+
+	let cms: Fixture_Strapi
+	let token: string
+
+	beforeAll( async () => {
+		cms = await boot_fixture_strapi( {
+			content_types: { gadget: GADGET },
+			env: {
+				EXPORT_ENTRIES_CONTENT_TYPES: GADGET_UID,
+				EXPORT_ENTRIES_PRESETS: String( ROWS ),
+			},
+		} )
+		token = await cms.login( SUPER_ADMIN.email )
+
+		await seed(
+			cms,
+			GADGET_UID,
+			Array.from( { length: ROWS }, ( _, index ) => ( {
+				createdAt: new Date(
+					Date.UTC( 2026, 0, 1 ) + index * 60_000,
+				).toISOString(),
+				title: "x".repeat( 10_000 ),
+			} ) ),
+		)
+	} )
+
+	afterAll( async () => {
+		await cms?.destroy()
+	} )
+
+	it("answers \"An export is already running\" to the same admin", async () => {
+		const held = await hold_download( cms, token, ROWS )
+
+		try {
+			const { body, status } = await request_ticket(
+				cms,
+				token,
+				latest( ROWS ),
+			)
+
+			expect( status ).toBe( 200 )
+			expect( body.data ).toEqual( { outcome: "export_running" } )
+		} finally {
+			held.disconnect()
+		}
+	})
+
+	it("refuses a second download by the same admin, before any bytes", async () => {
+		const { body } = await request_ticket( cms, token, latest( ROWS ) )
+		const held = await hold_download( cms, token, ROWS )
+
+		try {
+			const { bytes, status } = await download( cms, body.data.ticket )
+
+			expect( status ).toBe( 409 )
+			expect( bytes.toString( "utf8" ) ).not.toContain( "xxx" )
+		} finally {
+			held.disconnect()
+		}
+	})
+
+	it("lets another admin export meanwhile", async () => {
+		const held = await hold_download( cms, token, ROWS )
+
+		try {
+			const role = await cms.create_role( "Gadget readers", [
+				{ action: READ, conditions: [], subject: GADGET_UID },
+			] )
+			const email = await cms.create_admin( "other@example.com", role )
+			const { body } = await request_ticket(
+				cms,
+				await cms.login( email ),
+				latest( ROWS ),
+			)
+
+			expect( body.data.outcome ).toBe( "ticket" )
+		} finally {
+			held.disconnect()
+		}
+	})
+
+	it("lets the admin export again once the browser disconnects", async () => {
+		const held = await hold_download( cms, token, ROWS )
+		held.disconnect()
+
+		await expect_can_export_again( cms, token, ROWS )
+	})
+
+	it("runs a download that started in time to its end, however long it takes", async () => {
+		const held = await hold_download( cms, token, ROWS )
+
+		try {
+			vi.useFakeTimers( { now: Date.now() + 10 * 60_000, toFake: [ "Date" ] } )
+
+			await expect( read_to_end( held.reader ) ).resolves.toBeUndefined()
+		} finally {
+			vi.useRealTimers()
+		}
+	})
+
+	it("lets the admin export again once the download ends", async () => {
+		const held = await hold_download( cms, token, ROWS )
+		await read_to_end( held.reader )
+
+		await expect_can_export_again( cms, token, ROWS )
+	})
+})
+
 describe("Reading in batches", () => {
 	let cms: Fixture_Strapi
 	let token: string
@@ -781,6 +898,53 @@ async function download ( cms: Fixture_Strapi, ticket: string ) {
 	const bytes = Buffer.from( await response.arrayBuffer() )
 
 	return { bytes, headers: response.headers, status: response.status }
+}
+
+/**
+ |
+ | Starts the download of the latest entries, and waits for its first bytes
+ | without reading any further.
+ |
+ */
+async function hold_download (
+	cms: Fixture_Strapi,
+	token: string,
+	count: number,
+) {
+	const { body } = await request_ticket( cms, token, latest( count ) )
+	const connection = new AbortController()
+	const response = await fetch(
+		`${cms.url}/export-entries/download?ticket=${
+			encodeURIComponent( body.data.ticket )
+		}`,
+		{ signal: connection.signal },
+	)
+	const reader = response.body!.getReader()
+	await reader.read()
+
+	return {
+		disconnect: () => connection.abort(),
+		reader,
+	}
+}
+
+/** Waits until the admin's running export has cleared. */
+async function expect_can_export_again (
+	cms: Fixture_Strapi,
+	token: string,
+	count: number,
+) {
+	await vi.waitFor( async () => {
+		const { body } = await request_ticket( cms, token, latest( count ) )
+
+		expect( body.data.outcome ).toBe( "ticket" )
+	} )
+}
+
+async function read_to_end ( reader: ReadableStreamDefaultReader ) {
+	while ( !( await reader.read() ).done ) {
+		// Reads the rest of the file.
+	}
 }
 
 /** Requests a ticket, downloads with it, and answers the file's text. */

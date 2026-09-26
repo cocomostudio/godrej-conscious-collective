@@ -39,6 +39,7 @@ type Period =
 
 type Ticket_Answer =
 	| { outcome: "no_entries" }
+	| { outcome: "export_running" }
 	| { outcome: "ticket"; ticket: string; count: number; file_name: string }
 
 
@@ -90,6 +91,11 @@ export function Export_Modal (
 
 			if ( data.data.outcome === "no_entries" ) {
 				set_message( "No entries match." )
+				return
+			}
+
+			if ( data.data.outcome === "export_running" ) {
+				set_message( "An export is already running." )
 				return
 			}
 

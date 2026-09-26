@@ -38,6 +38,11 @@ export const controllers = {
 				return
 			}
 
+			if ( tickets_of( strapi ).is_running( ctx.state.user.id ) ) {
+				ctx.body = { data: { outcome: "export_running" } }
+				return
+			}
+
 			const { fields } = await describe_content_type(
 				strapi,
 				body.uid,
@@ -95,6 +100,10 @@ export const controllers = {
 				return
 			}
 
+			if ( tickets_of( strapi ).is_running( admin.id ) ) {
+				return ctx.throw( 409, "An export is already running." )
+			}
+
 			const { timezone } = read_settings( strapi )
 
 			strapi.log.info(
@@ -112,7 +121,11 @@ export const controllers = {
 				"X-Content-Type-Options": "nosniff",
 			} )
 			ctx.type = "text/csv; charset=utf-8"
-			ctx.body = csv_stream( strapi, request, timezone )
+
+			const stream = csv_stream( strapi, request, timezone )
+			tickets_of( strapi ).run( admin.id, stream )
+
+			ctx.body = stream
 		},
 	} ),
 }
