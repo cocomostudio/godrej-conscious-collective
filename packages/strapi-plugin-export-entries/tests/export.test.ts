@@ -763,6 +763,22 @@ describe("A running export", () => {
 		await expect_can_export_again( cms, token, ROWS )
 	})
 
+	it("cuts the download off when reading fails midway, so the browser marks it as failed", async () => {
+		const held = await hold_download( cms, token, ROWS )
+		const database = cms.strapi.db.connection
+
+		// The batches still to come can no longer be read.
+		await database.schema.renameTable( "gadgets", "gadgets_away" )
+
+		try {
+			await expect( read_to_end( held.reader ) ).rejects.toThrow()
+		} finally {
+			await database.schema.renameTable( "gadgets_away", "gadgets" )
+		}
+
+		await expect_can_export_again( cms, token, ROWS )
+	}, 20_000 )
+
 	it("runs a download that started in time to its end, however long it takes", async () => {
 		const held = await hold_download( cms, token, ROWS )
 

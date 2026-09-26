@@ -125,6 +125,11 @@ export const controllers = {
 			const stream = csv_stream( strapi, request, timezone )
 			tickets_of( strapi ).run( admin.id, stream )
 
+			// Koa leaves the response open when its body fails after the
+			// headers have gone out. Cutting the connection before the last
+			// chunk is what makes the browser mark the download as failed.
+			stream.once( "error", () => ctx.res.destroy() )
+
 			ctx.body = stream
 		},
 	} ),
