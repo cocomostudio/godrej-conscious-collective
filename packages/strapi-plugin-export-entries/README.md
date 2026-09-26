@@ -136,3 +136,22 @@ Two kinds of cell are left alone:
 The server reads the entries in batches of 500 and sends each batch only once the connection has taken the one before. The browser saves the file straight to disk through a plain download link. So a large export raises the memory use of neither the server nor the browser.
 
 Each download writes one line to the Strapi log. The line names the admin, the content-type, the selection, the fields and the row count.
+
+A download that fails midway shows as "Failed" in the browser. The server cuts the connection before the file's end, so the browser never saves half a file as a whole one.
+
+### One export at a time
+
+Each admin may run one export at a time. While an admin's export is running, a second Export click shows "An export is already running". The admin can export again once the first download ends, whether that download finishes, fails or is cancelled in the browser.
+
+## Why the download link carries a ticket
+
+The browser saves the file through a plain download link, because only a plain link streams straight to disk. However, a plain link cannot carry the admin's login header. So the admin panel first asks the server for a ticket, and the link carries that ticket in its place.
+
+A ticket is 32 random bytes, and it stands in for the admin's login. Four rules keep a leaked link useless:
+
+- A ticket belongs to the admin who asked for it.
+- A ticket works once. A second use is refused.
+- A ticket must be used within 60 seconds of being issued. The limit covers only the wait before the download starts, so a slow download still runs to its end.
+- When the ticket is used, the server checks the admin again. A deleted admin, a blocked admin, or an admin who has lost read permission gets nothing.
+
+The server keeps tickets in its own memory. So the plugin supports a single Strapi process. Several processes behind one load balancer would need a shared ticket store.
