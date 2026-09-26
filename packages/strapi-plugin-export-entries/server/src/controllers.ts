@@ -7,6 +7,8 @@ import { count_rows, csv_stream } from "./rows"
 import { PLUGIN_ID, read_settings, type Settings } from "./settings"
 import type { Tickets } from "./tickets"
 
+const INVALID_LINK = "The download link is not valid."
+
 export const controllers = {
 	export: ( { strapi }: { strapi: Core.Strapi } ) => ( {
 		async describe ( ctx: any ) {
@@ -84,10 +86,15 @@ export const controllers = {
 			)
 
 			if ( !redeemed ) {
-				return ctx.unauthorized( "The download link is not valid." )
+				return ctx.unauthorized( INVALID_LINK )
 			}
 
 			const { admin, count, request } = redeemed
+
+			if ( !await can_still_export( ctx, strapi, admin.id, request.uid ) ) {
+				return
+			}
+
 			const { timezone } = read_settings( strapi )
 
 			strapi.log.info(
@@ -128,9 +135,7 @@ function can_export (
 		return false
 	}
 
-	const checker = strapi.plugin( "content-manager" )
-		.service( "permission-checker" )
-		.create( { model: uid, userAbility: ctx.state.userAbility } )
+	const checker = checker_of( strapi, uid as string, ctx.state.userAbility )
 
 	if ( checker.cannot.read() ) {
 		ctx.forbidden()
@@ -138,6 +143,48 @@ function can_export (
 	}
 
 	return true
+}
+
+/**
+ |
+ | Whether the admin behind a ticket may still export the content-type. Access
+ | can be lost between asking for a ticket and using it. Answers the refusal
+ | itself when not: a 401 for an admin who has been deleted or blocked, and a
+ | 403 for an admin who can no longer read the content-type.
+ |
+ */
+async function can_still_export (
+	ctx: any,
+	strapi: Core.Strapi,
+	admin_id: number,
+	uid: string,
+) {
+	const user = await strapi.db.query( "admin::user" ).findOne( {
+		populate: [ "roles" ],
+		where: { id: admin_id },
+	} )
+
+	if ( !user || user.isActive !== true || user.blocked === true ) {
+		ctx.unauthorized( INVALID_LINK )
+		return false
+	}
+
+	const ability = await strapi.service( "admin::permission" )
+		.engine.generateUserAbility( user )
+
+	if ( checker_of( strapi, uid, ability ).cannot.read() ) {
+		ctx.forbidden()
+		return false
+	}
+
+	return true
+}
+
+/** The content manager's permission checker for one admin's ability. */
+function checker_of ( strapi: Core.Strapi, uid: string, ability: unknown ) {
+	return strapi.plugin( "content-manager" )
+		.service( "permission-checker" )
+		.create( { model: uid, userAbility: ability } )
 }
 
 function tickets_of ( strapi: Core.Strapi ): Tickets {

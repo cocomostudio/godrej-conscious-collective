@@ -28,6 +28,7 @@ import { configure_edit_view } from "./support/edit-view.ts"
 import { GADGET, WIDGET } from "./support/schemas.ts"
 
 const GADGET_UID = "api::gadget.gadget"
+const READ = "plugin::content-manager.explorer.read"
 
 describe("Request ticket", () => {
 	let cms: Fixture_Strapi
@@ -205,6 +206,66 @@ describe("Download", () => {
 		const { status } = await download( cms, body.data.ticket )
 
 		expect( status ).toBe( 401 )
+	})
+
+	describe("for an admin who has lost access since asking", () => {
+		let reader_role: number
+
+		beforeAll( async () => {
+			reader_role = await cms.create_role( "Gadget readers", [
+				{ action: READ, conditions: [], subject: GADGET_UID },
+			] )
+		} )
+
+		it("refuses the ticket of an admin who has been deleted", async () => {
+			const email = await cms.create_admin( "deleted@example.com", reader_role )
+			const { body } = await request_ticket(
+				cms,
+				await cms.login( email ),
+				latest( 2 ),
+			)
+
+			await cms.strapi.service( "admin::user" )
+				.deleteById( await admin_id_of( cms, email ) )
+			const { bytes, status } = await download( cms, body.data.ticket )
+
+			expect( status ).toBe( 401 )
+			expect( bytes.toString( "utf8" ) ).not.toContain( "One" )
+		})
+
+		it("refuses the ticket of an admin who has been blocked", async () => {
+			const email = await cms.create_admin( "blocked@example.com", reader_role )
+			const { body } = await request_ticket(
+				cms,
+				await cms.login( email ),
+				latest( 2 ),
+			)
+
+			await cms.strapi.service( "admin::user" )
+				.updateById( await admin_id_of( cms, email ), { blocked: true } )
+			const { bytes, status } = await download( cms, body.data.ticket )
+
+			expect( status ).toBe( 401 )
+			expect( bytes.toString( "utf8" ) ).not.toContain( "One" )
+		})
+
+		it("refuses the ticket of an admin who can no longer read the content-type", async () => {
+			const role = await cms.create_role( "Former readers", [
+				{ action: READ, conditions: [], subject: GADGET_UID },
+			] )
+			const email = await cms.create_admin( "former@example.com", role )
+			const { body } = await request_ticket(
+				cms,
+				await cms.login( email ),
+				latest( 2 ),
+			)
+
+			await cms.strapi.service( "admin::role" ).assignPermissions( role, [] )
+			const { bytes, status } = await download( cms, body.data.ticket )
+
+			expect( status ).toBe( 403 )
+			expect( bytes.toString( "utf8" ) ).not.toContain( "One" )
+		})
 	})
 
 	describe("with the clock stopped", () => {
@@ -670,6 +731,13 @@ async function seed (
 			updatedAt: new Date( ( row.updatedAt ?? row.createdAt ) as string ),
 		} ) ),
 	} )
+}
+
+async function admin_id_of ( cms: Fixture_Strapi, email: string ) {
+	const admin = await cms.strapi.db.query( "admin::user" )
+		.findOne( { where: { email } } )
+
+	return admin.id as number
 }
 
 /** A request for the latest `count` gadgets, with only the title. */
