@@ -140,7 +140,7 @@ type Layout_Props = { contributors: Contributor_Card[] }
  |
  */
 function Natural ( { contributors }: Layout_Props ) {
-	return <ul className="flex flex-wrap justify-center md:justify-start gap-4 md:gap-8">
+	return <ul className="flex flex-wrap gap-4 md:gap-8">
 		{ contributors.map( ( person ) =>
 			<li
 				className="w-42.5 md:w-56"
