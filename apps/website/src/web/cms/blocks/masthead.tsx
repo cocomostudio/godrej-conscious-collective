@@ -22,6 +22,12 @@
  | design's other colour for it, and root assembly leaves it out on the one
  | arrangement that has no sidebar to be the first.
  |
+ | **The cover is drawn as it was uploaded, never cropped.** An editor supplies
+ | a square picture for phones and a 4:3 one from the medium breakpoint. From
+ | that breakpoint the masthead is a fixed height, so the space for the picture
+ | is pinned to the right edge and made 4:3 at that height. The picture fills
+ | it exactly, whatever the width of the window.
+ |
  */
 
 import type { Responsive_Image_Attribute } from "../media.ts"
@@ -72,10 +78,10 @@ export function Masthead (
 				</p> }
 		</div>
 
-		{ pictures && <div className="md:absolute top-0 left-114 size-full">
-			<figure className="mt-6 md:m-0 relative size-full max-md:aspect-square after:absolute after:top-0 after:left-0 after:size-full after:bg-linear-to-b after:from-context after:via-context/0 after:via-45% after:to-transparent md:after:bg-linear-to-r md:after:via-15%">
+		{ pictures && <div className="md:absolute md:top-0 md:right-0 md:h-full md:aspect-[4/3]">
+			<figure className="mt-6 md:m-0 relative size-full after:absolute after:top-0 after:left-0 after:size-full after:bg-linear-to-b after:from-context after:via-context/0 after:via-45% after:to-transparent md:after:bg-linear-to-r md:after:via-15%">
 				<Responsive_Picture
-					className="size-full object-cover"
+					className="block w-full h-auto"
 					pictures={ pictures } />
 			</figure>
 		</div> }
