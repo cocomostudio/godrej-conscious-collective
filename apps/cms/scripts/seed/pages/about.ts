@@ -78,6 +78,71 @@ Plant 13, Pirojshanagar
 Vikhroli, Mumbai 400079
 `
 
+/**
+ |
+ | The same map beside words of three lengths, so each way the words can sit
+ | against the map has a page to be looked at on.
+ |
+ | The lengths are judged at 1440 pixels wide, where the words beside the map
+ | run about 440 pixels across and the map is 330 pixels tall. From the medium
+ | breakpoint up to that width the words are narrower, so every passage runs
+ | taller there.
+ |
+ | - Shorter than the map: the block must end at the map, not 32px past it.
+ | - About as tall as the map: the edge case between the other two.
+ | - Taller than the map: the words wrap underneath it, 32px clear of it.
+ |
+ */
+const AROUND_PLANT_13 = {
+	shorter: [
+		"Plant 13 stands on the Godrej campus at Pirojshanagar, in Vikhroli.",
+		"The nearest station is Vikhroli, on the Central line, a short ride away.",
+	],
+	about_as_tall: [
+		"Pirojshanagar is the township the Godrej family built in Vikhroli, in the eastern suburbs of Mumbai. It is named after Pirojsha Godrej, who bought the land in the 1940s, when the city had not yet grown out this far.",
+		"The township was planned as a place to live as well as to work. Factories sit beside housing, schools and gardens, and the plant buildings that give the campus its shape are known by their numbers. Plant 13 is one of them.",
+		"The nearest station is Vikhroli, on the Central line, and the campus is a short ride from there. Allow extra time on a weekday morning, when the roads out of the station are at their busiest.",
+	],
+	taller: [
+		"Pirojshanagar is the township the Godrej family built in Vikhroli, in the eastern suburbs of Mumbai. It is named after Pirojsha Godrej, who bought the land in the 1940s, when the city had not yet grown out this far.",
+		"The township was planned as a place to live as well as to work. Factories sit beside housing, schools and gardens, and the plant buildings that give the campus its shape are known by their numbers. Plant 13 is one of them.",
+		"East of the campus, a wide belt of mangroves runs along the Thane Creek. The family has protected it for decades, and it is one of the largest stretches of mangrove left in the city.",
+		"The mangroves hold the shoreline together, shelter young fish and draw migratory birds in the winter months. A marine ecology centre on the campus studies them, and it takes visitors along the creek on guided walks.",
+		"The nearest station is Vikhroli, on the Central line, and the campus is a short ride from there. Allow extra time on a weekday morning, when the roads out of the station are at their busiest.",
+	],
+}
+
+function map_beside ( layout: "map-left" | "map-right", paragraphs: string[] ) {
+	return {
+		__component: "container.map-and-content-v1",
+		content: [ wysiwyg( paragraphs ) ],
+		layout,
+		map: google_map( { place_url: PLANT_13 } ),
+	}
+}
+
+/**
+ |
+ | One section per length, with the map on the left and then on the right. A
+ | rule sits between the two, because a rule is what an editor would put there,
+ | and the gap on either side of a rule is its own.
+ |
+ */
+function map_beside_both_ways ( title: string, paragraphs: string[] ) {
+	return section( title, {
+		blocks: [
+			map_beside( "map-left", paragraphs ),
+			{
+				__component: "miscellaneous.horizontal-rule-v1",
+				shade: "light",
+			},
+			map_beside( "map-right", paragraphs ),
+		],
+		heading: heading_component( title, "h2" ),
+		register_with_toc: true,
+	} )
+}
+
 export async function write_about_page (
 	strapi: Strapi,
 	page_shells: Seeded_Page_Shells,
@@ -264,6 +329,18 @@ export async function write_about_page (
 				horizontal_rule: true,
 				register_with_toc: true,
 			} ),
+			map_beside_both_ways(
+				"Getting to Plant 13",
+				AROUND_PLANT_13.shorter,
+			),
+			map_beside_both_ways(
+				"Pirojshanagar",
+				AROUND_PLANT_13.about_as_tall,
+			),
+			map_beside_both_ways(
+				"The campus and the creek",
+				AROUND_PLANT_13.taller,
+			),
 			// The **curated** half of the contributor listing: three people,
 			// named, in an order somebody chose. The home page's is the same
 			// component with the relation left empty.
