@@ -1,6 +1,6 @@
 
 import type { Core } from "@strapi/strapi"
-import { errors } from "@strapi/utils"
+import { contentTypes, errors } from "@strapi/utils"
 
 import {
 	type Day_Range,
@@ -31,10 +31,26 @@ export type Selection =
 	| { kind: "period"; period: Period; days: Day_Range }
 	| { kind: "range"; days: Day_Range }
 
+/**
+ |
+ | Which version of each entry of a Draft & Publish content-type an export
+ | reads:
+ |
+ | - `published`: the published version of each published entry.
+ | - `draft`: the draft of each entry that has never been published.
+ | - `all`: the draft of every entry, which is what the edit view shows.
+ |
+ */
+export type Status = "published" | "draft" | "all"
+
+const STATUSES: Status[] = [ "published", "draft", "all" ]
+
 /** A request for an export, checked and ready to run. */
 export type Export_Request = {
 	uid: string
 	selection: Selection
+	/** Unset for a content-type without Draft & Publish. */
+	status?: Status
 	/** The chosen fields, in the order their columns come. */
 	fields: Field[]
 	file_name: string
@@ -57,7 +73,12 @@ export function check_request (
 	const uid = String( body?.uid )
 	const selection = check_selection( body?.selection, settings, now )
 	const fields = check_fields( body?.fields, exportable )
-	const plural = strapi.contentTypes[uid as any].info.pluralName
+	const content_type = strapi.contentTypes[uid as any]
+	const status = check_status(
+		body?.status,
+		contentTypes.hasDraftAndPublish( content_type ),
+	)
+	const plural = content_type.info.pluralName
 
 	return {
 		fields,
@@ -67,8 +88,39 @@ export function check_request (
 			}.csv`
 			: `${plural}_${selection.days.start}_to_${selection.days.end}.csv`,
 		selection,
+		status,
 		uid,
 	}
+}
+
+/**
+ |
+ | A Draft & Publish content-type needs a status. Any other content-type has
+ | only one version of each entry, so a status there is refused rather than
+ | ignored.
+ |
+ */
+function check_status (
+	status: unknown,
+	draft_and_publish: boolean,
+): Status | undefined {
+	if ( !draft_and_publish ) {
+		if ( status !== undefined ) {
+			throw new errors.ValidationError(
+				"The content-type has no Draft & Publish, so it takes no status.",
+			)
+		}
+
+		return undefined
+	}
+
+	if ( !STATUSES.includes( status as Status ) ) {
+		throw new errors.ValidationError(
+			`The status must be one of ${STATUSES.join( ", " )}.`,
+		)
+	}
+
+	return status as Status
 }
 
 function check_selection (

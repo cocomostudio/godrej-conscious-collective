@@ -129,7 +129,9 @@ export const controllers = {
 			strapi.log.info(
 				`[${PLUGIN_ID}] Admin ${admin.id} (${admin.email}) exported `
 					+ `${count} rows of ${request.uid}. Selection: `
-					+ `${describe_selection( request.selection )}. Fields: `
+					+ `${describe_selection( request.selection )}. `
+					+ ( request.status ? `Status: ${request.status}. ` : "" )
+					+ "Fields: "
 					+ `${request.fields.map( ( field ) => field.name ).join( ", " )}.`,
 			)
 

@@ -26,7 +26,9 @@ export type Column = {
 
 /**
  |
- | The chosen fields' columns, then "Created at" and "Updated at".
+ | The chosen fields' columns, then "Created at" and "Updated at", then
+ | "Status" when the export reads every entry of a Draft & Publish
+ | content-type.
  |
  | A relation reads only the related entries' display field, which is the
  | field the content manager is configured to show for the relation. A media
@@ -78,7 +80,55 @@ export async function columns_of (
 		...columns,
 		scalar_column( "Created at", "createdAt", "datetime", timezone ),
 		scalar_column( "Updated at", "updatedAt", "datetime", timezone ),
+		...( request.status === "all"
+			? [ status_column( strapi, request.uid ) ]
+			: [] ),
 	]
+}
+
+/**
+ |
+ | Whether each draft's entry is a Draft, is Published, or "Contains
+ | un-published edits". An entry holds un-published edits when its draft was
+ | saved after its published version, which is the rule the edit view follows
+ | too.
+ |
+ | The column reads each row's document ID. It reads the row's update time
+ | from the "Updated at" column, which every export holds.
+ |
+ */
+function status_column ( strapi: Core.Strapi, uid: string ): Column {
+	let published_updated_at = new Map<string, number>()
+
+	return {
+		cell ( row ) {
+			const published = published_updated_at.get( row.documentId )
+
+			if ( published === undefined ) {
+				return "Draft"
+			}
+
+			return new Date( row.updatedAt ).getTime() > published
+				? "Contains un-published edits"
+				: "Published"
+		},
+		label: "Status",
+		name: "documentId",
+		async prepare ( rows ) {
+			const published = await strapi.db.query( uid as any ).findMany( {
+				select: [ "documentId", "updatedAt" ],
+				where: {
+					documentId: { $in: rows.map( ( row ) => row.documentId ) },
+					publishedAt: { $notNull: true },
+				},
+			} )
+
+			published_updated_at = new Map( published.map( ( entry ) => [
+				entry.documentId,
+				new Date( entry.updatedAt ).getTime(),
+			] ) )
+		},
+	}
 }
 
 function scalar_column (

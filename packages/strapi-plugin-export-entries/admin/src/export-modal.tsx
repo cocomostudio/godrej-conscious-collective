@@ -41,6 +41,9 @@ type Period =
 /** Whether the admin picks a preset or a custom date range. */
 type Mode = "preset" | "range"
 
+/** Which version of each entry a Draft & Publish content-type exports. */
+type Status = "published" | "draft" | "all"
+
 type Ticket_Answer =
 	| { outcome: "no_entries" }
 	| { outcome: "export_running" }
@@ -62,6 +65,7 @@ export function Export_Modal (
 			: `period:${description.periods[0]?.period}`,
 	)
 	const [ mode, set_mode ] = useState<Mode>( "preset" )
+	const [ status, set_status ] = useState<Status>( "published" )
 	const [ start, set_start ] = useState<string>()
 	const [ end, set_end ] = useState<string>()
 	const [ chosen, set_chosen ] = use_remembered_fields( uid, description )
@@ -100,6 +104,7 @@ export function Export_Modal (
 					selection: mode === "preset"
 						? selection_of( preset, description.today )
 						: { end, kind: "range", start },
+					...( description.draft_and_publish ? { status } : {} ),
 					uid,
 				},
 			)
@@ -192,6 +197,25 @@ export function Export_Modal (
 						</Field.Root>
 					) }
 
+					{ description.draft_and_publish && (
+						<Field.Root hint={ STATUS_HINTS[status] }>
+							<Field.Label>Status</Field.Label>
+							<Radio.Group
+								aria-label="Status"
+								onValueChange={ ( value ) =>
+									set_status( value as Status ) }
+								value={ status }
+							>
+								<Radio.Item value="published">
+									Published
+								</Radio.Item>
+								<Radio.Item value="draft">Draft</Radio.Item>
+								<Radio.Item value="all">All</Radio.Item>
+							</Radio.Group>
+							<Field.Hint />
+						</Field.Root>
+					) }
+
 					<Flex alignItems="stretch" direction="column" gap={ 2 }>
 						<Typography variant="sigma">Fields</Typography>
 						{ description.fields.map( ( field ) => (
@@ -235,6 +259,12 @@ export function Export_Modal (
 			</Modal.Footer>
 		</Modal.Content>
 	)
+}
+
+const STATUS_HINTS: Record<Status, string> = {
+	all: "Every entry once, as its draft, with a Status column.",
+	draft: "Entries that have never been published.",
+	published: "The published version of each published entry.",
 }
 
 /**

@@ -103,6 +103,15 @@ describe("Request ticket", () => {
 		expect( status ).toBe( 400 )
 	})
 
+	it("refuses a status for a content-type without Draft & Publish", async () => {
+		const { status } = await request_ticket( cms, token, {
+			...latest( 2 ),
+			status: "published",
+		} )
+
+		expect( status ).toBe( 400 )
+	})
+
 	it("refuses a field that cannot be exported", async () => {
 		const { status } = await request_ticket( cms, token, {
 			...latest( 2 ),
@@ -941,6 +950,187 @@ describe("Exporting a custom date range, in a timezone ahead of UTC", () => {
 
 /**
  |
+ | Four articles, written through Strapi's document service the way the edit
+ | view writes them, newest first:
+ |
+ | - "Edited" was published as "Edited (live)", then edited to "Edited (draft)"
+ |   without publishing again.
+ | - "Published" was published and never edited since.
+ | - "Never published" has only a draft.
+ | - "Old" was published, and was created in 2020.
+ |
+ */
+describe("Exporting a Draft & Publish content-type by status", () => {
+	let cms: Fixture_Strapi
+	let token: string
+
+	beforeAll( async () => {
+		cms = await boot_fixture_strapi( {
+			content_types: { article: ARTICLE },
+			env: {
+				EXPORT_ENTRIES_CONTENT_TYPES: ARTICLE_UID,
+				EXPORT_ENTRIES_PRESETS: "2,50",
+			},
+		} )
+		token = await cms.login( SUPER_ADMIN.email )
+
+		const articles = cms.strapi.documents( ARTICLE_UID )
+
+		const old = await articles.create( { data: { headline: "Old" } } )
+		await articles.publish( { documentId: old.documentId } )
+		await cms.strapi.db.query( ARTICLE_UID ).updateMany( {
+			data: { createdAt: new Date( "2020-01-01T10:00:00Z" ) },
+			where: { documentId: old.documentId },
+		} )
+
+		await articles.create( { data: { headline: "Never published" } } )
+
+		const published = await articles.create( {
+			data: { headline: "Published" },
+		} )
+		await articles.publish( { documentId: published.documentId } )
+
+		const edited = await articles.create( {
+			data: { headline: "Edited (live)" },
+		} )
+		await articles.publish( { documentId: edited.documentId } )
+		// The edit view marks a draft as edited only when it was saved after
+		// the published version, measured to the millisecond.
+		await new Promise( ( resolve ) => setTimeout( resolve, 5 ) )
+		await articles.update( {
+			data: { headline: "Edited (draft)" },
+			documentId: edited.documentId,
+		} )
+	} )
+
+	afterAll( async () => {
+		await cms?.destroy()
+	} )
+
+	it("exports the published version of each published entry", async () => {
+		const csv = await export_csv(
+			cms,
+			token,
+			articles_by( "published", { count: 50, kind: "latest" } ),
+		)
+
+		expect( titles_of( csv ) ).toEqual( [
+			"Edited (live)",
+			"Published",
+			"Old",
+		] )
+	})
+
+	it("exports the drafts of entries that have never been published", async () => {
+		const csv = await export_csv(
+			cms,
+			token,
+			articles_by( "draft", { count: 50, kind: "latest" } ),
+		)
+
+		expect( titles_of( csv ) ).toEqual( [ "Never published" ] )
+	})
+
+	it("exports every entry once, as its draft, with a last Status column", async () => {
+		const csv = await export_csv(
+			cms,
+			token,
+			articles_by( "all", { count: 50, kind: "latest" } ),
+		)
+		const rows = rows_of( csv )
+
+		expect( rows[0] ).toEqual( [
+			"headline",
+			"Created at",
+			"Updated at",
+			"Status",
+		] )
+		expect( rows.slice( 1 ).map( ( row ) => [ row[0], row[3] ] ) ).toEqual( [
+			[ "Edited (draft)", "Contains un-published edits" ],
+			[ "Published", "Published" ],
+			[ "Never published", "Draft" ],
+			[ "Old", "Published" ],
+		] )
+	})
+
+	it.each( [
+		[ "no status", undefined ],
+		[ "an unknown status", "modified" ],
+	] )( "refuses %s", async ( _, status ) => {
+		const { status: answer } = await request_ticket(
+			cms,
+			token,
+			{ ...articles_by( "all", { count: 50, kind: "latest" } ), status },
+		)
+
+		expect( answer ).toBe( 400 )
+	})
+
+	it("logs the status", async () => {
+		const info = vi.spyOn( cms.strapi.log, "info" )
+
+		try {
+			await export_csv(
+				cms,
+				token,
+				articles_by( "draft", { count: 50, kind: "latest" } ),
+			)
+
+			const lines = info.mock.calls.map( ( [ line ] ) => String( line ) )
+				.filter( ( line ) => line.includes( "[export-entries]" ) )
+
+			expect( lines ).toHaveLength( 1 )
+			expect( lines[0] ).toContain( "Status: draft." )
+		} finally {
+			info.mockRestore()
+		}
+	})
+
+	const LATEST_2 = { count: 2, kind: "latest" }
+	const THIS_YEAR = { kind: "period", period: "this_year" }
+	const DURING_2020 = { end: "2020-12-31", kind: "range", start: "2020-01-01" }
+
+	it.each( [
+		[ "published", "latest 2", LATEST_2, [ "Edited (live)", "Published" ] ],
+		[ "published", "this year", THIS_YEAR, [ "Edited (live)", "Published" ] ],
+		[ "published", "a 2020 date range", DURING_2020, [ "Old" ] ],
+		[ "draft", "latest 2", LATEST_2, [ "Never published" ] ],
+		[ "draft", "this year", THIS_YEAR, [ "Never published" ] ],
+		[ "draft", "a 2020 date range", DURING_2020, [] ],
+		[ "all", "latest 2", LATEST_2, [ "Edited (draft)", "Published" ] ],
+		[
+			"all",
+			"this year",
+			THIS_YEAR,
+			[ "Edited (draft)", "Published", "Never published" ],
+		],
+		[ "all", "a 2020 date range", DURING_2020, [ "Old" ] ],
+	] )( "counts and exports %s entries for %s", async (
+		status,
+		_,
+		selection,
+		expected,
+	) => {
+		const { body } = await request_ticket(
+			cms,
+			token,
+			articles_by( status, selection ),
+		)
+
+		if ( expected.length === 0 ) {
+			expect( body.data ).toEqual( { outcome: "no_entries" } )
+			return
+		}
+
+		const { bytes } = await download( cms, body.data.ticket )
+
+		expect( body.data.count ).toBe( expected.length )
+		expect( titles_of( bytes.toString( "utf8" ) ) ).toEqual( expected )
+	})
+})
+
+/**
+ |
  | A running export is one whose download the test holds open. The export is
  | far larger than the buffers between the server and the test, so the server
  | cannot finish it while the test holds it.
@@ -1414,6 +1604,7 @@ describe("Role limits", () => {
 type Ticket_Request = {
 	uid: string
 	selection: Record<string, unknown>
+	status?: string
 	fields: string[]
 }
 
@@ -1526,6 +1717,19 @@ async function create_crate (
 			...data,
 		},
 	} )
+}
+
+/** A request for the articles of a status, with the headline. */
+function articles_by (
+	status: string,
+	selection: Record<string, unknown>,
+): Ticket_Request {
+	return {
+		fields: [ "headline" ],
+		selection,
+		status,
+		uid: ARTICLE_UID,
+	}
 }
 
 /** A request for the gadgets created from `start` to `end`, with the title. */

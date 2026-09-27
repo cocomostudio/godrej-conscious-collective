@@ -19,7 +19,7 @@ export async function count_rows (
 	access: Access,
 ): Promise<number> {
 	const count = await strapi.db.query( request.uid as any ).count( {
-		where: await where_of( request, timezone, access ),
+		where: await where_of( strapi, request, timezone, access ),
 	} )
 
 	return Math.min( count, limit_of( request ) )
@@ -65,7 +65,7 @@ async function* csv_chunks (
 
 	yield BYTE_ORDER_MARK + csv_line( columns.map( ( column ) => column.label ) )
 
-	const where = await where_of( request, timezone, access )
+	const where = await where_of( strapi, request, timezone, access )
 	let remaining = limit_of( request )
 	let last: { id: number; createdAt: unknown } | undefined
 
@@ -95,21 +95,65 @@ async function* csv_chunks (
 	}
 }
 
-/** The rows the export reads: the selection's, narrowed to the readable. */
+/**
+ |
+ | The rows the export reads: the selection's, in the status's version,
+ | narrowed to the readable.
+ |
+ */
 async function where_of (
+	strapi: Core.Strapi,
 	request: Export_Request,
 	timezone: string,
 	access: Access,
 ): Promise<Where> {
 	const readable = await access.readable_rows( request.uid )
+	const version = version_of( strapi, request )
 
 	if ( request.selection.kind === "latest" ) {
-		return readable
+		return { $and: [ readable, version ] }
 	}
 
 	const { from, until } = instants_of( request.selection.days, timezone )
 
-	return { $and: [ readable, { createdAt: { $gte: from, $lt: until } } ] }
+	return {
+		$and: [ readable, version, { createdAt: { $gte: from, $lt: until } } ],
+	}
+}
+
+/** The version of each entry the status reads. */
+function version_of ( strapi: Core.Strapi, request: Export_Request ): Where {
+	switch ( request.status ) {
+		case undefined:
+			return {}
+		case "published":
+			return { publishedAt: { $notNull: true } }
+		case "all":
+			return { publishedAt: null }
+		case "draft":
+			return {
+				documentId: {
+					$notIn: published_document_ids( strapi, request.uid ),
+				},
+				publishedAt: null,
+			}
+	}
+}
+
+/**
+ |
+ | A subquery answering the document ID of every published entry. It is
+ | written in knex, because the query engine takes a knex query as the value
+ | of `$notIn`, but has no subquery of its own.
+ |
+ */
+function published_document_ids ( strapi: Core.Strapi, uid: string ) {
+	const { attributes, tableName } = strapi.db.metadata.get( uid )
+	const column = ( name: string ) => ( attributes[name] as any ).columnName
+
+	return strapi.db.connection( tableName )
+		.select( column( "documentId" ) )
+		.whereNotNull( column( "publishedAt" ) )
 }
 
 function limit_of ( request: Export_Request ) {

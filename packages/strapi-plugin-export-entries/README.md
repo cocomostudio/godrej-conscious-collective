@@ -115,6 +115,26 @@ A calendar period follows these rules:
 
 When no entry matches, the modal says "No entries match" and nothing downloads.
 
+## Choosing a status
+
+On a content-type with Draft & Publish, the modal also offers a status. A content-type without Draft & Publish shows no status choice.
+
+| Status | What it exports |
+| --- | --- |
+| Published | The published version of each published entry, which is what the public sees. |
+| Draft | The drafts of entries that have never been published. |
+| All | Every entry once, as its draft, which is what the edit view shows. |
+
+The status combines with every selection, and narrows the row count in the modal too.
+
+"All" adds a last "Status" column. It reads:
+
+- **Draft**, for an entry that has never been published
+- **Published**, for a published entry with no edits since
+- **Contains un-published edits**, for a published entry whose draft was saved after it was published
+
+Strapi's own list page labels that last kind of entry "Modified". The plugin cannot change that label, so the two names differ.
+
 ## The CSV file
 
 The file is named after the content-type's plural name and the selection:
@@ -125,7 +145,7 @@ The file is named after the content-type's plural name and the selection:
 ### Rows and columns
 
 - Rows come newest first, by creation time.
-- The columns are the ticked fields, in edit-view order, under their edit-view labels. "Created at" and "Updated at" follow them.
+- The columns are the ticked fields, in edit-view order, under their edit-view labels. "Created at" and "Updated at" follow them. The status "All" adds a last "Status" column.
 
 ### Encoding
 
@@ -172,7 +192,7 @@ Two kinds of cell are left alone:
 
 The server reads the entries in batches of 500 and sends each batch only once the connection has taken the one before. The relations and media of a batch are read along with that batch. The browser saves the file straight to disk through a plain download link. So a large export raises the memory use of neither the server nor the browser.
 
-Each download writes one line to the Strapi log. The line names the admin, the content-type, the selection, the fields and the row count.
+Each download writes one line to the Strapi log. The line names the admin, the content-type, the selection, the status, the fields and the row count.
 
 A download that fails midway shows as "Failed" in the browser. The server cuts the connection before the file's end, so the browser never saves half a file as a whole one.
 
