@@ -628,21 +628,25 @@ describe("a section's horizontal rule", () => {
 		expect( last.outer ).toContain( "last-of-type" )
 	})
 
-	it("carries no spacing of its own where an editor places one", async () => {
+	it("carries 16px, and 32px from the medium breakpoint, where an editor places one", async () => {
 		const { html } = await website.get( "/everything" )
 
 		const rules = [
 			...html.matchAll( /<hr class="([^"]*border-t-2[^"]*)"/g ),
 		].map( ( [ , classes ] ) => classes )
 
-		expect( rules.length ).toBeGreaterThan( 0 )
+		// The section's own rule, drawn below a whole section, is the one
+		// with no margin at all: the sections' padding is its gap.
+		const placed = rules.filter( ( classes ) => /\bm[ytb]-/.test( classes ) )
 
-		// The blocks on either side already leave a gap, and margins on
-		// adjacent siblings in ordinary flow collapse — so the rule's own
-		// never added to it. It only ever showed as a rule placed last in a
-		// section, pushing into the section's padding.
-		for ( const classes of rules ) {
-			expect( classes ).not.toMatch( /\bm[ytb]-/ )
+		expect( placed.length ).toBeGreaterThan( 0 )
+
+		// At either end of a section the rule sits against its padding.
+		for ( const classes of placed ) {
+			expect( classes ).toContain( "my-4" )
+			expect( classes ).toContain( "md:my-8" )
+			expect( classes ).toContain( "first:mt-0" )
+			expect( classes ).toContain( "last:mb-0" )
 		}
 	})
 })

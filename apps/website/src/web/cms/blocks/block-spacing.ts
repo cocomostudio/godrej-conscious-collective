@@ -22,8 +22,46 @@
  |
  */
 
-const ABOVE = "mt-6 md:mt-8 first:mt-0"
-const BELOW = "mb-6 md:mb-8 last:mb-0"
+/**
+ |
+ | **Beside a horizontal rule the gap is the rule's, not the block's**: 16px, and
+ | 32px from the medium breakpoint. Below that breakpoint a block leaves 24px,
+ | which would win the collapse with the rule's 16px, so each side is trimmed.
+ |
+ | - A block below a rule trims its own top margin to 16px.
+ | - A block above a rule cannot see the rule without `:has()`, which is below
+ |   the browser floor. So the block marks itself instead, and the rule reads
+ |   the mark and takes 8px off with a negative margin: 24px less 8px is 16px.
+ |
+ */
+export const ABOVE = "mt-6 md:mt-8 first:mt-0 max-md:[hr+&]:mt-4"
+const BELOW = "leaves-gap-below mb-6 md:mb-8 last:mb-0"
+
+/**
+ |
+ | **A block that declines its gap on one side declines the rule's too**, and
+ | sits against the rule. This mirrors the rule a section draws below itself,
+ | which a section that declined its padding sits against.
+ |
+ | - Below a rule, the block cancels the rule's margin with a negative one.
+ | - Above a rule, the block marks itself, and the rule drops its top margin.
+ |
+ */
+const AGAINST_A_RULE_ABOVE = "[hr+&]:-mt-4 md:[hr+&]:-mt-8"
+const AGAINST_A_RULE_BELOW = "leaves-no-gap-below"
+
+/**
+ |
+ | **The rule's own spacing**, which reads the two marks above. They are spelt
+ | out here in full because Tailwind has to see each class whole. At either end
+ | of its container the rule gives the gap up, and sits directly against
+ | whatever the container laid down, which in a section is padding.
+ |
+ */
+export const RULE_SPACING = [
+	"my-4 md:my-8 first:mt-0 last:mb-0",
+	"max-md:[.leaves-gap-below+&]:-mt-2 [.leaves-no-gap-below+&]:mt-0",
+].join( " " )
 
 export const BLOCK_SPACING = `${ABOVE} ${BELOW}`
 
@@ -126,7 +164,7 @@ export function wants_space_below ( spacing_around: Spacing_Around ) {
  */
 export function block_spacing ( spacing_around: Spacing_Around ) {
 	return [
-		wants_space_above( spacing_around ) ? ABOVE : "",
-		wants_space_below( spacing_around ) ? BELOW : "",
+		wants_space_above( spacing_around ) ? ABOVE : AGAINST_A_RULE_ABOVE,
+		wants_space_below( spacing_around ) ? BELOW : AGAINST_A_RULE_BELOW,
 	].filter( Boolean ).join( " " )
 }

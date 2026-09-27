@@ -394,14 +394,14 @@ describe("the space between two nodes", () => {
 		expect( from_the_shorthand ).toBe( from_the_component )
 	})
 
-	it("is none of a horizontal rule's own", async () => {
+	it("is a horizontal rule's own, 16px and 32px from the medium breakpoint", async () => {
 		const { html } = await website.get( "/rules" )
 
-		// A rule separates; it does not space. What sits around one is
-		// whatever its neighbours already leave — which in a passage of prose,
-		// spaced from the top and not the bottom, is nothing above it.
+		// A passage of prose is spaced from the top and not the bottom, so
+		// without margins of its own a rule would sit on the line before it.
 		for ( const rule of rules( html ) ) {
-			expect( rule ).not.toMatch( /\bm[ytb]-/ )
+			expect( rule ).toContain( "my-4" )
+			expect( rule ).toContain( "md:my-8" )
 		}
 	})
 })
