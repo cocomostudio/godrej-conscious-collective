@@ -60,8 +60,11 @@ export type Fixture_Strapi = {
 	/** Absolute base URL of the running instance. */
 	url: string
 	destroy: () => Promise<void>
-	/** Creates an active admin holding the given role, and returns its email. */
-	create_admin: ( email: string, role_id: number ) => Promise<string>
+	/** Creates an active admin holding the given roles, and returns its email. */
+	create_admin: (
+		email: string,
+		role_ids: number | number[],
+	) => Promise<string>
 	/** Creates a role holding the given permissions, and returns its id. */
 	create_role: ( name: string, permissions: unknown[] ) => Promise<number>
 	/** Logs an admin in through the admin login endpoint. */
@@ -126,7 +129,7 @@ export async function boot_fixture_strapi (
 
 	const create_admin: Fixture_Strapi["create_admin"] = async (
 		email,
-		role_id,
+		role_ids,
 	) => {
 		await strapi.service( "admin::user" ).create( {
 			email,
@@ -134,7 +137,7 @@ export async function boot_fixture_strapi (
 			isActive: true,
 			password: SUPER_ADMIN.password,
 			registrationToken: null,
-			roles: [ role_id ],
+			roles: [ role_ids ].flat(),
 		} )
 
 		return email
