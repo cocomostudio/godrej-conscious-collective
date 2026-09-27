@@ -53,7 +53,12 @@ export function joined_cell (
 
 const NUMBER_TYPES = [ "integer", "biginteger", "float", "decimal" ]
 
-function text_of ( value: unknown, type: string, timezone: string ): string {
+/** A value as text, before any guard against running as a formula. */
+export function text_of (
+	value: unknown,
+	type: string,
+	timezone: string,
+): string {
 	if ( value === null || value === undefined || value === "" ) {
 		return ""
 	}

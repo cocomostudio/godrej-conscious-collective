@@ -9,6 +9,7 @@ import {
 	PERIODS,
 	resolve_period,
 } from "./calendar"
+import type { Access } from "./permissions"
 import type { Settings } from "./settings"
 
 export type Field = {
@@ -37,11 +38,14 @@ export type Description = {
  | an admin sees there. A field removed from the edit view is still exported,
  | and is listed after the fields the edit view shows, in schema order.
  |
+ | A field the admin's role cannot read is left out.
+ |
  */
 export async function describe_content_type (
 	strapi: Core.Strapi,
 	uid: string,
 	settings: Settings,
+	access: Access,
 ): Promise<Description> {
 	const content_type = strapi.contentTypes[uid as any]
 	const { layouts, metadatas } = await strapi.plugin( "content-manager" )
@@ -55,6 +59,7 @@ export async function describe_content_type (
 
 	const fields = [ ...shown, ...removed ]
 		.filter( ( name ) => is_exportable( content_type, name ) )
+		.filter( ( name ) => access.can_read_field( uid, name ) )
 		.map( ( name ) => ( {
 			label: metadatas[name]?.edit?.label || name,
 			name,

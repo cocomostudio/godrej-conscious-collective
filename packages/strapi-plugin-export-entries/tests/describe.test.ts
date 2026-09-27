@@ -119,6 +119,27 @@ describe("Describe", () => {
 		expect( status ).toBe( 200 )
 	})
 
+	it("lists only the fields the admin's role can read", async () => {
+		const role = await cms.create_role( "Gadget title readers", [ {
+			action: READ,
+			conditions: [],
+			properties: { fields: [ "title", "contact" ] },
+			subject: "api::gadget.gadget",
+		} ] )
+		const email = await cms.create_admin( "limited@example.com", role )
+
+		const { body } = await cms.request(
+			"GET",
+			"/export-entries/content-types/api::gadget.gadget",
+			{ token: await cms.login( email ) },
+		)
+
+		expect( body.data.fields ).toEqual( [
+			{ label: "title", name: "title" },
+			{ label: "Email address", name: "contact" },
+		] )
+	})
+
 	it("lists the fields in edit-view order, under edit-view labels", async () => {
 		// "summary" and "barcode" are removed from the edit view, so they come
 		// last, in schema order, and still under their edit-view labels.

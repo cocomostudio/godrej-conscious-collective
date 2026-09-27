@@ -1112,6 +1112,305 @@ describe("Reading in batches", () => {
 	})
 })
 
+describe("Role limits", () => {
+	let cms: Fixture_Strapi
+	let super_token: string
+
+	beforeAll( async () => {
+		cms = await boot_fixture_strapi( {
+			content_types: {
+				article: ARTICLE,
+				crate: CRATE,
+				gadget: GADGET,
+				maker: MAKER,
+			},
+			env: {
+				EXPORT_ENTRIES_CONTENT_TYPES: `${GADGET_UID},${CRATE_UID}`,
+				EXPORT_ENTRIES_PRESETS: "50",
+				EXPORT_ENTRIES_TIMEZONE: "Asia/Kolkata",
+			},
+		} )
+		super_token = await cms.login( SUPER_ADMIN.email )
+	} )
+
+	afterAll( async () => {
+		await cms?.destroy()
+	} )
+
+	describe("for a role limited to some fields", () => {
+		let token: string
+
+		beforeAll( async () => {
+			const role = await cms.create_role( "Gadget title readers", [ {
+				action: READ,
+				conditions: [],
+				properties: { fields: [ "title" ] },
+				subject: GADGET_UID,
+			} ] )
+			token = await cms.login(
+				await cms.create_admin( "titles@example.com", role ),
+			)
+		} )
+
+		it("refuses a request that names a hidden field", async () => {
+			const { status } = await request_ticket( cms, token, {
+				...latest( 50 ),
+				fields: [ "title", "stock" ],
+			} )
+
+			expect( status ).toBe( 400 )
+		})
+
+		it("exports the fields it can read", async () => {
+			await create_gadget(
+				cms,
+				"Titled",
+				"2026-09-19T10:00:00Z",
+				await admin_id_of( cms, SUPER_ADMIN.email ),
+				3,
+			)
+
+			const csv = await export_csv( cms, token, latest( 50 ) )
+
+			const rows = rows_of( csv )
+
+			expect( rows[0] ).toEqual( [ "title", "Created at", "Updated at" ] )
+			expect( rows.find( ( [ title ] ) => title === "Titled" ) ).toEqual( [
+				"Titled",
+				"2026-09-19 15:30",
+				"2026-09-19 15:30",
+			] )
+		})
+	})
+
+	describe("for a role limited to the entries its admin created", () => {
+		let email: string
+		let token: string
+
+		beforeAll( async () => {
+			const role = await cms.create_role( "Own gadget readers", [ {
+				action: READ,
+				conditions: [ "admin::is-creator" ],
+				subject: GADGET_UID,
+			} ] )
+			email = await cms.create_admin( "creator@example.com", role )
+			token = await cms.login( email )
+
+			const creator = await admin_id_of( cms, email )
+			const other = await admin_id_of( cms, SUPER_ADMIN.email )
+			await create_gadget( cms, "Mine, older", "2026-09-20T10:00:00Z", creator )
+			await create_gadget( cms, "Theirs", "2026-09-21T10:00:00Z", other )
+			await create_gadget( cms, "Mine, newer", "2026-09-22T10:00:00Z", creator )
+		} )
+
+		it("counts only those entries", async () => {
+			const { body } = await request_ticket( cms, token, latest( 50 ) )
+
+			expect( body.data.count ).toBe( 2 )
+		})
+
+		it("exports only those entries", async () => {
+			const csv = await export_csv( cms, token, latest( 50 ) )
+
+			expect( titles_of( csv ) ).toEqual( [ "Mine, newer", "Mine, older" ] )
+		})
+
+		it("exports only those entries within a date range", async () => {
+			const csv = await export_csv(
+				cms,
+				token,
+				range( "2026-09-20", "2026-09-21" ),
+			)
+
+			expect( titles_of( csv ) ).toEqual( [ "Mine, older" ] )
+		})
+
+		it("leaves Super Admin exporting every entry, whoever created it", async () => {
+			const csv = await export_csv( cms, super_token, latest( 50 ) )
+
+			expect( titles_of( csv ) ).toEqual(
+				expect.arrayContaining( [ "Mine, newer", "Theirs", "Mine, older" ] ),
+			)
+		})
+	})
+
+	describe("for an admin whose roles grant a field only on their own entries", () => {
+		it("leaves that field empty on the entries other admins created", async () => {
+			const titles = await cms.create_role( "Every gadget's title", [ {
+				action: READ,
+				conditions: [],
+				properties: { fields: [ "title" ] },
+				subject: GADGET_UID,
+			} ] )
+			const own_stock = await cms.create_role( "Own gadgets' stock", [ {
+				action: READ,
+				conditions: [ "admin::is-creator" ],
+				properties: { fields: [ "stock" ] },
+				subject: GADGET_UID,
+			} ] )
+			const email = await cms.create_admin(
+				"mixed@example.com",
+				[ titles, own_stock ],
+			)
+			const creator = await admin_id_of( cms, email )
+			const other = await admin_id_of( cms, SUPER_ADMIN.email )
+			await create_gadget( cms, "Mixed, mine", "2026-09-24T10:00:00Z", creator, 7 )
+			await create_gadget( cms, "Mixed, theirs", "2026-09-25T10:00:00Z", other, 9 )
+
+			const csv = await export_csv( cms, await cms.login( email ), {
+				...latest( 50 ),
+				fields: [ "title", "stock" ],
+			} )
+			const rows = rows_of( csv ).filter( ( [ title ] ) =>
+				title.startsWith( "Mixed" )
+			)
+
+			expect( rows.map( ( [ title, stock ] ) => [ title, stock ] ) ).toEqual( [
+				[ "Mixed, theirs", "" ],
+				[ "Mixed, mine", "7" ],
+			] )
+		})
+	})
+
+	describe("for a role that cannot read a related content-type", () => {
+		let maker_document_id: string
+
+		beforeAll( async () => {
+			await configure_edit_view( cms, super_token, CRATE_UID, {
+				labels: {},
+				main_fields: { maker: "name" },
+				order: [ "label", "maker" ],
+				removed: [],
+			} )
+			const maker = await create_maker( cms, "M-1", "Acme" )
+			await create_crate( cms, { label: "Boxed", maker } )
+			const { documentId } = await cms.strapi.db.query( MAKER_UID )
+				.findOne( { where: { id: maker } } )
+			maker_document_id = documentId
+		} )
+
+		it("writes the related entry's document ID in place of its display field", async () => {
+			const role = await cms.create_role( "Crate readers", [
+				{ action: READ, conditions: [], subject: CRATE_UID },
+			] )
+			const email = await cms.create_admin( "crates@example.com", role )
+
+			const csv = await export_csv(
+				cms,
+				await cms.login( email ),
+				crates( [ "label", "maker" ] ),
+			)
+
+			const boxed = rows_of( csv ).find( ( [ label ] ) => label === "Boxed" )
+
+			expect( boxed?.slice( 0, 2 ) ).toEqual( [ "Boxed", maker_document_id ] )
+		})
+
+		it("writes the document ID of a related entry the role cannot read", async () => {
+			const role = await cms.create_role( "Crate and own maker readers", [
+				{ action: READ, conditions: [], subject: CRATE_UID },
+				{
+					action: READ,
+					conditions: [ "admin::is-creator" ],
+					subject: MAKER_UID,
+				},
+			] )
+			const email = await cms.create_admin( "own-makers@example.com", role )
+			const own = await cms.strapi.db.query( MAKER_UID ).create( {
+				data: {
+					code: "M-2",
+					createdBy: await admin_id_of( cms, email ),
+					documentId: crypto.randomUUID().replace( /-/g, "" ),
+					name: "Own maker",
+				},
+			} )
+			await create_crate( cms, { label: "Own maker's", maker: own.id } )
+
+			const csv = await export_csv(
+				cms,
+				await cms.login( email ),
+				crates( [ "label", "maker" ] ),
+			)
+			const cells = rows_of( csv ).slice( 1 ).map( ( [ label, made_by ] ) =>
+				[ label, made_by ]
+			)
+
+			expect( cells ).toEqual( [
+				[ "Own maker's", "Own maker" ],
+				[ "Boxed", maker_document_id ],
+			] )
+		})
+
+		it("writes the display field for Super Admin", async () => {
+			const csv = await export_csv(
+				cms,
+				super_token,
+				crates( [ "label", "maker" ] ),
+			)
+
+			const boxed = rows_of( csv ).find( ( [ label ] ) => label === "Boxed" )
+
+			expect( boxed?.slice( 0, 2 ) ).toEqual( [ "Boxed", "Acme" ] )
+		})
+	})
+
+	describe("for a role narrowed after the ticket was issued", () => {
+		it("exports only the entries the current role can read", async () => {
+			const role = await cms.create_role( "Narrowed to own gadgets", [
+				{ action: READ, conditions: [], subject: GADGET_UID },
+			] )
+			const email = await cms.create_admin( "narrowed@example.com", role )
+			await create_gadget(
+				cms,
+				"Narrowed admin's own",
+				"2026-09-23T10:00:00Z",
+				await admin_id_of( cms, email ),
+			)
+			const { body } = await request_ticket(
+				cms,
+				await cms.login( email ),
+				latest( 50 ),
+			)
+
+			await cms.strapi.service( "admin::role" ).assignPermissions( role, [ {
+				action: READ,
+				conditions: [ "admin::is-creator" ],
+				subject: GADGET_UID,
+			} ] )
+			const { bytes } = await download( cms, body.data.ticket )
+
+			expect( titles_of( bytes.toString( "utf8" ) ) ).toEqual( [
+				"Narrowed admin's own",
+			] )
+		})
+
+		it("refuses the ticket when a chosen field has been hidden", async () => {
+			const role = await cms.create_role( "Losing stock", [ {
+				action: READ,
+				conditions: [],
+				properties: { fields: [ "title", "stock" ] },
+				subject: GADGET_UID,
+			} ] )
+			const email = await cms.create_admin( "losing@example.com", role )
+			const { body } = await request_ticket( cms, await cms.login( email ), {
+				...latest( 50 ),
+				fields: [ "title", "stock" ],
+			} )
+
+			await cms.strapi.service( "admin::role" ).assignPermissions( role, [ {
+				action: READ,
+				conditions: [],
+				properties: { fields: [ "title" ] },
+				subject: GADGET_UID,
+			} ] )
+			const { bytes, status } = await download( cms, body.data.ticket )
+
+			expect( status ).toBe( 403 )
+			expect( bytes.toString( "utf8" ) ).not.toContain( "\uFEFF" )
+		})
+	})
+})
+
 type Ticket_Request = {
 	uid: string
 	selection: Record<string, unknown>
@@ -1144,6 +1443,26 @@ async function admin_id_of ( cms: Fixture_Strapi, email: string ) {
 		.findOne( { where: { email } } )
 
 	return admin.id as number
+}
+
+/** Writes one gadget straight into the database, as created by an admin. */
+async function create_gadget (
+	cms: Fixture_Strapi,
+	title: string,
+	created_at: string,
+	created_by: number,
+	stock?: number,
+) {
+	await cms.strapi.db.query( GADGET_UID ).create( {
+		data: {
+			createdAt: new Date( created_at ),
+			createdBy: created_by,
+			documentId: crypto.randomUUID().replace( /-/g, "" ),
+			stock,
+			title,
+			updatedAt: new Date( created_at ),
+		},
+	} )
 }
 
 /** A request for the latest `count` gadgets, with only the title. */

@@ -1,7 +1,8 @@
 import type { Core } from "@strapi/strapi"
 import { contentTypes } from "@strapi/utils"
 
-import { cell_of, joined_cell } from "./csv"
+import { cell_of, joined_cell, text_of } from "./csv"
+import type { Access, Where } from "./permissions"
 import type { Export_Request } from "./request"
 
 /** One column of the CSV, and how to read it. */
@@ -11,6 +12,14 @@ export type Column = {
 	name: string
 	/** How a relation or media column is populated. Unset for a scalar. */
 	populate?: { select: string[]; where?: Record<string, unknown> }
+	/**
+	 |
+	 | Reads what the cells of one batch of rows need beyond the rows
+	 | themselves. Runs once per batch, before `cell`. Unset when the rows are
+	 | enough.
+	 |
+	 */
+	prepare?: ( rows: any[] ) => Promise<void>
 	/** The cell for one row read from the database. */
 	cell: ( row: any ) => string
 }
@@ -23,37 +32,47 @@ export type Column = {
  | field the content manager is configured to show for the relation. A media
  | field reads only its files' URLs.
  |
+ | A field the admin can read on only some rows is left empty on the others.
+ |
  */
 export async function columns_of (
 	strapi: Core.Strapi,
 	request: Export_Request,
 	timezone: string,
+	access: Access,
 ): Promise<Column[]> {
 	const content_type = strapi.contentTypes[request.uid as any]
 	const { metadatas } = await strapi.plugin( "content-manager" )
 		.service( "content-types" )
 		.findConfiguration( content_type )
 
-	const columns = request.fields.map( ( { label, name } ) => {
+	const scopes = await access.field_scopes(
+		request.uid,
+		request.fields.map( ( field ) => field.name ),
+	)
+
+	const columns = await Promise.all( request.fields.map( async ( field ) => {
+		const { label, name } = field
 		const attribute: any = content_type.attributes[name]
 
-		if ( contentTypes.isMediaAttribute( attribute ) ) {
-			return media_column( strapi, label, name, timezone )
-		}
-
-		if ( contentTypes.isRelationalAttribute( attribute ) ) {
-			return relation_column(
+		const column = contentTypes.isMediaAttribute( attribute )
+			? media_column( strapi, label, name, timezone )
+			: contentTypes.isRelationalAttribute( attribute )
+			? await relation_column(
 				strapi,
+				access,
 				content_type,
 				label,
 				name,
 				metadatas[name]?.edit?.mainField || "id",
 				timezone,
 			)
-		}
+			: scalar_column( label, name, attribute.type, timezone )
 
-		return scalar_column( label, name, attribute.type, timezone )
-	} )
+		const scope = scopes.get( name )
+
+		return scope ? scoped( strapi, request.uid, column, scope ) : column
+	} ) )
 
 	return [
 		...columns,
@@ -77,41 +96,144 @@ function scalar_column (
 
 /**
  |
+ | A column that is left empty on the rows outside `scope`, the `where` of the
+ | rows on which the admin can read the column's field.
+ |
+ */
+function scoped (
+	strapi: Core.Strapi,
+	uid: string,
+	column: Column,
+	scope: Where,
+): Column {
+	let shown = new Set<number>()
+
+	return {
+		...column,
+		cell: ( row ) => shown.has( row.id ) ? column.cell( row ) : "",
+		async prepare ( rows ) {
+			await column.prepare?.( rows )
+			shown = await ids_within(
+				strapi,
+				uid,
+				rows.map( ( row ) => row.id ),
+				scope,
+			)
+		},
+	}
+}
+
+/**
+ |
  | A relation's display values, one per related entry.
+ |
+ | The edit view shows a related entry's display field only when the admin
+ | can read that field on that entry. Otherwise it shows the entry's document
+ | ID, and so does the export.
  |
  | Strapi links an entry without Draft & Publish to both versions of a related
  | entry that has Draft & Publish. Only the draft is read, so that each related
  | entry is written once, as the edit view shows it.
  |
  */
-function relation_column (
+async function relation_column (
 	strapi: Core.Strapi,
+	access: Access,
 	content_type: any,
 	label: string,
 	name: string,
 	main_field: string,
 	timezone: string,
-): Column {
-	const target = strapi.contentTypes[content_type.attributes[name].target]
+): Promise<Column> {
+	const target_uid = content_type.attributes[name].target
+	const target = strapi.contentTypes[target_uid]
 	const type = main_field === "id"
 		? "integer"
 		: target.attributes[main_field]?.type ?? "string"
 	const drafts_only = contentTypes.hasDraftAndPublish( target )
 		&& !contentTypes.hasDraftAndPublish( content_type )
 
+	if ( !access.can_read_field( target_uid, main_field ) ) {
+		return {
+			cell: ( row ) => joined_cell(
+				entries_of( row[name] ).map( ( entry ) => entry.documentId ),
+				"string",
+				timezone,
+			),
+			label,
+			name,
+			populate: {
+				select: [ "documentId" ],
+				...( drafts_only ? { where: { publishedAt: null } } : {} ),
+			},
+		}
+	}
+
+	const readable = await access.readable_rows( target_uid )
+	let shown: Set<number> | undefined
+
 	return {
-		cell: ( row ) => joined_cell(
-			entries_of( row[name] ).map( ( entry ) => entry[main_field] ),
-			type,
-			timezone,
-		),
+		cell ( row ) {
+			const entries = entries_of( row[name] )
+
+			const all_shown = entries.every( ( entry ) => shown?.has( entry.id ) )
+
+			if ( !shown || all_shown ) {
+				return joined_cell(
+					entries.map( ( entry ) => entry[main_field] ),
+					type,
+					timezone,
+				)
+			}
+
+			return joined_cell(
+				entries.map( ( entry ) =>
+					shown!.has( entry.id )
+						? text_of( entry[main_field], type, timezone )
+						: entry.documentId
+				),
+				"string",
+				timezone,
+			)
+		},
 		label,
 		name,
 		populate: {
-			select: [ main_field ],
+			select: [ "id", "documentId", main_field ],
 			...( drafts_only ? { where: { publishedAt: null } } : {} ),
 		},
+		prepare: Object.keys( readable ).length === 0
+			? undefined
+			: async ( rows ) => {
+				shown = await ids_within(
+					strapi,
+					target_uid,
+					rows.flatMap( ( row ) =>
+						entries_of( row[name] ).map( ( entry ) => entry.id )
+					),
+					readable,
+				)
+			},
 	}
+}
+
+/** Which of the entries with the given IDs fall within `where`. */
+async function ids_within (
+	strapi: Core.Strapi,
+	uid: string,
+	ids: number[],
+	where: Where,
+): Promise<Set<number>> {
+	if ( ids.length === 0 ) {
+		return new Set()
+	}
+
+	const within = await strapi.db.query( uid as any ).findMany( {
+		select: [ "id" ],
+		where: { $and: [ { id: { $in: ids } }, where ] },
+	} )
+
+	return new Set( within.map( ( entry ) => entry.id ) )
 }
 
 /**

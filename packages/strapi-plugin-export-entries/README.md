@@ -51,6 +51,19 @@ The button shows only when both of these hold:
 
 The plugin adds no permission of its own. Super Admin holds every read permission, so Super Admin sees the button on every set-up content-type.
 
+## What a role limits
+
+An export never shows more than the admin's role can read. A role can limit an export in two ways:
+
+- **Fields.** A field the role cannot read is left out of the modal and out of the file. A request that names such a field is refused.
+- **Entries.** A role limited to some entries, such as "only entries I created", exports only those entries. The row count in the modal counts only those entries too.
+
+An admin can hold several roles, and one role can grant a field only on some entries. For example, one role grants every field on every entry, while another role grants the "Price" field only on the admin's own entries. The file then holds every entry, but the "Price" cell stays empty on the entries other admins created.
+
+A relation writes a related entry's display field only when the admin can read that field on that related entry. Otherwise, the relation writes the related entry's document ID, as the edit view does. For example, a role that reads only its own entries of the related content-type sees the display names of those entries, and document IDs for the rest.
+
+Super Admin has neither limit, so Super Admin exports every field and every entry.
+
 ## Settings that refuse the boot
 
 The plugin checks its settings when Strapi boots. A bad setting stops the boot with an error that names the bad value. The boot is refused for each of these:
@@ -176,6 +189,6 @@ A ticket is 32 random bytes, and it stands in for the admin's login. Four rules 
 - A ticket belongs to the admin who asked for it.
 - A ticket works once. A second use is refused.
 - A ticket must be used within 60 seconds of being issued. The limit covers only the wait before the download starts, so a slow download still runs to its end.
-- When the ticket is used, the server checks the admin again. A deleted admin, a blocked admin, or an admin who has lost read permission gets nothing.
+- When the ticket is used, the server checks the admin again, against the admin's current role. A deleted admin, a blocked admin, or an admin who has lost read permission gets nothing. The same goes for an admin who can no longer read a chosen field. A role that now limits the entries narrows the file to those entries.
 
 The server keeps tickets in its own memory. So the plugin supports a single Strapi process. Several processes behind one load balancer would need a shared ticket store.
