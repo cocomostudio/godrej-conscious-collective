@@ -145,15 +145,15 @@ function Listing ( { style_and_transition }: Treatment_Props ) {
  |
  | How many are showing, the way out to the schedule, and the trigger.
  |
- | **Sticky below the medium breakpoint**, so the count and the filters stay
- | with a visitor scrolling a long category. It scrolls away from there up,
- | where the filters are in the sidebar and stay visible on their own.
+ | **Sticky at every width**, so the count and the filters stay with a visitor
+ | scrolling a long category.
  |
- | It is drawn against the context colour at both widths, and lays that
- | colour down only below the breakpoint: there it is sticky and travels over
- | the white the gradient turns into, so it has to carry its own background.
- | Above, it sits still at the top of the gradient, which opens in the same
- | colour — a background there would be the colour painted twice.
+ | It carries its own background in the context colour, because it travels
+ | over the white the gradient turns into. It also bleeds to the column's
+ | edges, so that the cards pass under the whole width of it.
+ |
+ | From the medium breakpoint up, its bottom padding is taken back by a margin
+ | of the same size, so the cards below sit where they would without it.
  |
  | **The two buttons are a pair in a box of their own**, rather than each
  | pushed to the right on a margin of its own. The trigger is gone from the
@@ -169,7 +169,7 @@ function Header (
 ) {
 	const showing = use_filtered_sessions()
 
-	return <div className="max-md:sticky max-md:top-0 max-md:z-10 max-md:-mx-1ccm max-md:px-1ccm max-md:py-4 max-md:bg-context flex items-center gap-2">
+	return <div className={ `sticky top-0 z-10 ${use_column_bleed()} ${use_column_inset()} py-4 md:-mb-4 bg-context flex items-center gap-2` }>
 		<Showing
 			className="text-h6 md:text-h3 md:font-semibold font-light text-white"
 			count={ showing.length } />
