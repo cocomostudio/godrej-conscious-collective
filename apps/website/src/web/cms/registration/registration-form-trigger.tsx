@@ -7,8 +7,9 @@
  |
  | Client-only. The popup it opens needs JavaScript, so a server-rendered
  | trigger would be a dead control until hydration. It is in flow rather than
- | fixed (`sticky bottom-0` at the call site), so its arrival shifts the page
- | content up by its own height — accepted deliberately.
+ | fixed (`sticky bottom-0` on the `Register_Now_Bar` around it), so its
+ | arrival shifts the page content up by its own height — accepted
+ | deliberately.
  |
  | It follows the **main event**, like the header's Register Now: with no event
  | running, or with the event's registrations closed, there is nothing to
@@ -63,10 +64,7 @@ const REVEAL_AT_ONCE_CLASS = "opacity-100 transition-opacity duration-0"
 const HIDE_CLASS = "opacity-0 pointer-events-none"
 
 export function Registration_Form_Trigger (
-	{ className = "", main_event }: {
-		className?: string
-		main_event: Event | null
-	},
+	{ main_event }: { main_event: Event | null },
 ) {
 	const { open } = use_registration_actions()
 	const is_open = use_registration_is_open()
@@ -89,7 +87,6 @@ export function Registration_Form_Trigger (
 				: is_submitted
 				? REVEAL_AT_ONCE_CLASS
 				: REVEAL_CLASS,
-			className,
 		].join( " " ) }>
 		<span className={ HEADLINE_INNER_CLASS }>
 			<span className="text-h4 text-white">

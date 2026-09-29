@@ -1,0 +1,29 @@
+/**
+ |
+ | The Register Now bar, in each of the two states `register-now-bar.tsx`
+ | writes onto it. While it is `hidden`, the box inside fades out and sinks a
+ | little. `visibility` goes with the opacity, so the bar also leaves the tab
+ | order and the accessibility tree.
+ |
+ | The fade runs on `opacity` and `transform`, which a browser animates off
+ | the main thread.
+ |
+ | Before the script runs there is no state, and the bar is in sight.
+ |
+ */
+
+.register-now-bar__reveal {
+	transition-property: opacity, transform, visibility;
+	transition-duration: 200ms;
+	transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+}
+
+.register-now-bar[data-register-now="hidden"] .register-now-bar__reveal {
+	opacity: 0;
+	transform: translateY(1rem);
+	visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.register-now-bar__reveal { transition: none; }
+}

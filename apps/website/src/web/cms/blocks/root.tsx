@@ -43,7 +43,7 @@ import { Site_Footer } from "../chrome/site-footer.tsx"
 import { Site_Header } from "../chrome/site-header.tsx"
 import { use_site_header_reveal } from "../chrome/use-site-header-reveal.ts"
 import { When_And_Where_On_Sidebar } from "../chrome/when-and-where-on-sidebar.tsx"
-import { Registration_Form_Trigger } from "../registration/registration-form-trigger.tsx"
+import { Register_Now_Bar } from "../registration/register-now-bar.tsx"
 import { Registration_Provider } from "../registration/registration-provider.tsx"
 
 import {
@@ -238,9 +238,7 @@ export function Root (
 					     so it holds the page's bottom 4rem open — which is what
 					     the drawer rests on when it is closed. */
 					}
-					<Registration_Form_Trigger
-						className="sticky bottom-0 md:hidden z-30"
-						main_event={ main_event } />
+					<Register_Now_Bar main_event={ main_event } />
 				</div>
 			</div>
 		</Registration_Provider>

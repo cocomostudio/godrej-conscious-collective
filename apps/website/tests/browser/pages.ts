@@ -86,6 +86,9 @@ export const CATEGORY_PATH = "/showcases"
 /** The schedule page, just as long. */
 export const SCHEDULE_PATH = "/schedule"
 
+/** A page that scrolls, but by less than a screen, at the small breakpoint. */
+export const SHORT_PATH = "/a-short-page"
+
 export const PAGES: Record<string, Envelope> = {
 	"/archives": archive_page( "below" ),
 	[BARE_SECTION_PATH]: archive_page( "none" ),
@@ -99,6 +102,7 @@ export const PAGES: Record<string, Envelope> = {
 	} ),
 	[CATEGORY_PATH]: category_page(),
 	[SCHEDULE_PATH]: schedule_page(),
+	[SHORT_PATH]: short_page(),
 }
 
 function bleeding_marquee_page (
@@ -189,6 +193,20 @@ function schedule_page () {
 		],
 		page_layout: "two-column",
 		title: "Schedule",
+	}, { page_shell: NAVIGATION } )
+}
+
+function short_page () {
+	return envelope( {
+		main_region: [
+			section( "A few words", {
+				content: [ wysiwyg(
+					...Array.from( { length: 8 }, () => "A paragraph long enough to wrap over a few lines on a phone, so that eight of them push the page past one screen." ),
+				) ],
+			} ),
+		],
+		page_layout: "one-column",
+		title: "A short page",
 	}, { page_shell: NAVIGATION } )
 }
 
