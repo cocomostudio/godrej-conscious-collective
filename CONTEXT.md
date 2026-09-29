@@ -72,6 +72,10 @@ _Avoid_: "theme" for this meaning, "page colour", "palette" — that is the even
 The narrow first column of a two-column page layout. The sidebar holds the back link, and the sidebar receives content from both the content type and from components. It also holds one piece of chrome — the **When and Where** — which is the one thing in it that follows the main event rather than the page.
 _Avoid_: "side region", "aside", "left column"
 
+**Site header**:
+The bar across the top of every page that carries the logo, the navigation and the main event's dates. It is chrome, so it follows the main event rather than the page.
+_Avoid_: "site navigation header", "nav bar", "masthead"
+
 ### The render tree
 
 **Block**:
