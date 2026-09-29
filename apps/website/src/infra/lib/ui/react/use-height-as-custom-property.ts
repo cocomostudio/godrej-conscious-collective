@@ -26,21 +26,8 @@
  */
 
 import type { RefObject } from "react"
-import {
-	useEffect,
-	useLayoutEffect,
-} from "react"
 
-/**
- |
- | `useLayoutEffect` warns during server rendering, and this app is
- | server-rendered. On the client the layout variant is the one that is wanted —
- | it runs before paint, so the fallback value is never painted.
- |
- */
-const use_isomorphic_layout_effect = typeof window === "undefined"
-	? useEffect
-	: useLayoutEffect
+import { use_isomorphic_layout_effect } from "./use-isomorphic-layout-effect.ts"
 
 export function use_height_as_custom_property (
 	{ property, source, target }: {
