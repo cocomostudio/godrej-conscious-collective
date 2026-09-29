@@ -1,8 +1,8 @@
 
 /**
  |
- | Drives the schedule's segmented scroll-progress bar, and tells the day tabs
- | which of them is current.
+ | Drives the schedule's segmented scroll-progress bar, and tells the day
+ | navigation which day is current.
  |
  | Lifted from the static site, whose `docs/schedule-page/` records the
  | derivation at length. The short version:
@@ -28,10 +28,11 @@
  |
  | # What it needs from the markup
  |
- | One CSS invariant, and it is not negotiable: the sticky `bar` and the `list`
- | must share a containing block, or the bar cannot stay stuck while the list
- | scrolls under it. Everything else — whether the container is a block or a
- | flexbox, what is stacked above the bar — is read at runtime.
+ | One CSS invariant, and it is not negotiable: the sticky `day_navigation` and
+ | the `list` must share a containing block, or the day navigation cannot stay
+ | stuck while the list scrolls under it. Everything else — whether the
+ | container is a block or a flexbox, what is stacked above the day navigation —
+ | is read at runtime.
  |
  */
 
@@ -43,9 +44,9 @@ import {
 } from "react"
 
 export function use_day_scroll_progress (
-	{ bar, days, list }: {
-		/** The sticky day-tab `<nav>`. Its `::after` reads `--scale-x`. */
-		bar: RefObject<HTMLElement | null>
+	{ day_navigation, days, list }: {
+		/** The sticky day navigation's `<nav>`. Its `::after` reads `--scale-x`. */
+		day_navigation: RefObject<HTMLElement | null>
 		/** The container holding the entries, each tagged `data-day`. */
 		list: RefObject<HTMLElement | null>
 		/**
@@ -62,10 +63,10 @@ export function use_day_scroll_progress (
 	const [ active, set_active ] = useState( -1 )
 
 	useEffect( () => {
-		const bar_element = bar.current
+		const navigation_element = day_navigation.current
 		const list_element = list.current
 
-		if ( bar_element === null || list_element === null ) {
+		if ( navigation_element === null || list_element === null ) {
 			return
 		}
 
@@ -86,15 +87,16 @@ export function use_day_scroll_progress (
 		 |
 		 */
 		function measure () {
-			// The reading line is the bottom edge of the bar where it comes to
-			// rest: its own sticky offset plus its height. Taking the offset
-			// from the computed style keeps the line right at every breakpoint
-			// without this knowing what, if anything, is stuck above the bar.
+			// The reading line is the bottom edge of the day navigation where it
+			// comes to rest: its own sticky offset plus its height. Taking the
+			// offset from the computed style keeps the line right at every
+			// breakpoint without this knowing what, if anything, is stuck above
+			// the day navigation.
 			const offset = Number.parseFloat(
-				getComputedStyle( bar_element! ).top,
+				getComputedStyle( navigation_element! ).top,
 			)
 			const horizon = ( Number.isNaN( offset ) ? 0 : offset )
-				+ bar_element!.offsetHeight
+				+ navigation_element!.offsetHeight
 			const scrolled = window.scrollY
 			const items = list_element!.querySelectorAll<HTMLElement>(
 				"[data-day]",
@@ -142,7 +144,7 @@ export function use_day_scroll_progress (
 
 		/** Arithmetic against the cached boundaries. No layout reads. */
 		function update () {
-			if ( bar.current === null || boundaries.length < 2 ) {
+			if ( day_navigation.current === null || boundaries.length < 2 ) {
 				return
 			}
 
@@ -165,7 +167,7 @@ export function use_day_scroll_progress (
 				? Math.min( Math.max( ( at - from ) / span, 0 ), 1 )
 				: 1
 
-			bar.current.style.setProperty(
+			day_navigation.current.style.setProperty(
 				"--scale-x",
 				String( ( day + through ) / count ),
 			)
@@ -209,7 +211,7 @@ export function use_day_scroll_progress (
 				cancelAnimationFrame( frame )
 			}
 		}
-	}, [ bar, days, list ] )
+	}, [ day_navigation, days, list ] )
 
 	return active
 }

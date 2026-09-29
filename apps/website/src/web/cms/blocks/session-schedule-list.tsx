@@ -10,7 +10,7 @@
  |     that downloads the event's schedule document and — below the medium
  |     breakpoint — the trigger that opens the filters;
  |
- |   • a **sticky navigation header**: one equal-width tab per day, with a
+ |   • the sticky **day navigation**: one equal-width tab per day, with a
  |     progress bar underneath that fills as a visitor scrolls through that
  |     day's entries; and
  |
@@ -91,7 +91,7 @@ import { Icon_Button } from "#infra/lib/ui/react/buttons/icon-button.tsx"
 import { use_client_now } from "#infra/lib/ui/react/use-client-now.ts"
 import { use_height_as_custom_property } from "#infra/lib/ui/react/use-height-as-custom-property.ts"
 
-/** What the list header publishes for the day tabs to sit beneath. */
+/** What the list header publishes for the day navigation to sit beneath. */
 const HEADER_HEIGHT = "--schedule-header-height"
 
 type Session_Schedule_List_Props = {
@@ -125,9 +125,9 @@ function Schedule ( { schedule }: { schedule: Media | null } ) {
 		[ loaded ],
 	)
 
-	// The tabs come from everything that was loaded rather than from what
-	// survives, so filtering narrows what sits under a day instead of taking
-	// the day away.
+	// The day navigation's tabs come from everything that was loaded rather
+	// than from what survives, so filtering narrows what sits under a day
+	// instead of taking the day away.
 	const days = useMemo(
 		() => schedule_days( schedule_entries( loaded ) ),
 		[ loaded ],
@@ -139,21 +139,22 @@ function Schedule ( { schedule }: { schedule: Media | null } ) {
 
 	const container = useRef<HTMLDivElement>( null )
 	const header = useRef<HTMLDivElement>( null )
-	const bar = useRef<HTMLElement>( null )
+	const day_navigation = useRef<HTMLElement>( null )
 	const list = useRef<HTMLDivElement>( null )
 
-	// Below the medium breakpoint the two headers stick as a pair, the tabs
-	// directly beneath the list header. The tabs' offset is therefore the list
-	// header's height, which CSS cannot read — so it is published here for the
-	// tabs to read. From the medium breakpoint up the list header does not
-	// stick and the tabs' own `md:top-0` wins.
+	// Below the medium breakpoint the list header and the day navigation stick
+	// as a pair, the day navigation directly beneath the list header. The day
+	// navigation's offset is therefore the list header's height, which CSS
+	// cannot read — so it is published here for the day navigation to read.
+	// From the medium breakpoint up the list header does not stick and the day
+	// navigation's own `md:top-0` wins.
 	use_height_as_custom_property( {
 		property: HEADER_HEIGHT,
 		source: header,
 		target: container,
 	} )
 
-	const active = use_day_scroll_progress( { bar, days, list } )
+	const active = use_day_scroll_progress( { day_navigation, days, list } )
 
 	return <div className="flex flex-col" ref={ container }>
 		<List_Header
@@ -166,7 +167,7 @@ function Schedule ( { schedule }: { schedule: Media | null } ) {
 		<Day_Navigation
 			active={ active }
 			days={ days }
-			ref={ bar } />
+			ref={ day_navigation } />
 
 		{
 			/* A sibling of the headers rather than a child of one. Where there
