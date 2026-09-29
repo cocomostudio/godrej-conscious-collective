@@ -91,8 +91,11 @@ import { Icon_Button } from "#infra/lib/ui/react/buttons/icon-button.tsx"
 import { use_client_now } from "#infra/lib/ui/react/use-client-now.ts"
 import { use_height_as_custom_property } from "#infra/lib/ui/react/use-height-as-custom-property.ts"
 
-/** What the list header publishes for the day navigation to sit beneath. */
+/** What the list header publishes for the day navigation to sit beneath, below the medium breakpoint. */
 const HEADER_HEIGHT = "--schedule-header-height"
+
+/** What the day navigation publishes for the list header to sit beneath, from the medium breakpoint up. */
+const DAY_NAVIGATION_HEIGHT = "--schedule-day-navigation-height"
 
 type Session_Schedule_List_Props = {
 	sessions?: Session_Schedule_Row[]
@@ -142,15 +145,20 @@ function Schedule ( { schedule }: { schedule: Media | null } ) {
 	const day_navigation = useRef<HTMLElement>( null )
 	const list = useRef<HTMLDivElement>( null )
 
-	// Below the medium breakpoint the list header and the day navigation stick
-	// as a pair, the day navigation directly beneath the list header. The day
-	// navigation's offset is therefore the list header's height, which CSS
-	// cannot read — so it is published here for the day navigation to read.
-	// From the medium breakpoint up the list header does not stick and the day
-	// navigation's own `md:top-0` wins.
+	// The list header and the day navigation stick as a pair, one directly
+	// beneath the other: the list header on top below the medium breakpoint,
+	// and the day navigation on top from there up. The lower one's offset is
+	// the upper one's height, which CSS cannot read — so both heights are
+	// published here, and each breakpoint reads the one it needs.
 	use_height_as_custom_property( {
 		property: HEADER_HEIGHT,
 		source: header,
+		target: container,
+	} )
+
+	use_height_as_custom_property( {
+		property: DAY_NAVIGATION_HEIGHT,
+		source: day_navigation,
 		target: container,
 	} )
 
@@ -190,10 +198,15 @@ function Schedule ( { schedule }: { schedule: Media | null } ) {
  |
  | How many are on, the way to download the schedule, and the filter trigger.
  |
- | **Sticky below the medium breakpoint**, where the list scrolls under it. The
+ | **Sticky at every width**, where the list scrolls under it: above the day
+ | navigation below the medium breakpoint, and beneath it from there up. The
  | stickiness and the backdrop go on the full-width wrapper rather than on the
  | row inside it, so the list passes under the whole width of the header rather
  | than under the words alone.
+ |
+ | From the medium breakpoint up, its padding is taken back by margins of the
+ | same size. The bar then sits where the words alone would, and the padding
+ | only shows once it is stuck.
  |
  | The count is of **entries** — one per instance — because that is how many
  | things are on, which is the question the schedule page answers.
@@ -209,7 +222,7 @@ function List_Header (
 	},
 ) {
 	return <div
-		className="max-md:sticky max-md:top-0 max-md:z-10 max-md:-mx-1ccm max-md:px-1ccm max-md:py-4 max-md:bg-gray-light"
+		className="sticky max-md:top-0 md:top-[var(--schedule-day-navigation-height,0px)] z-10 -mx-1ccm md:-mx-16 px-1ccm md:px-16 py-4 md:-my-4 max-md:bg-gray-light md:bg-white"
 		ref={ ref }>
 		<div className="flex items-center gap-2">
 			<Showing
@@ -295,7 +308,7 @@ function Day_Navigation (
 
 	return <nav
 		aria-label="Days"
-		className="sticky max-md:top-[var(--schedule-header-height,0px)] md:top-0 -mx-1ccm md:-mx-16 md:order-first md:mt-0 md:mb-8 after:absolute after:-bottom-0.25 after:w-full after:h-0.75 after:content-[''] after:bg-context after:origin-left after:scale-x-[--scale-x] after:transition-transform"
+		className="sticky max-md:top-[var(--schedule-header-height,0px)] md:top-0 z-10 -mx-1ccm md:-mx-16 md:order-first md:mt-0 md:mb-8 after:absolute after:-bottom-0.25 after:w-full after:h-0.75 after:content-[''] after:bg-context after:origin-left after:scale-x-[--scale-x] after:transition-transform"
 		ref={ ref }
 		style={ { "--scale-x": "0" } as React.CSSProperties }>
 		{
