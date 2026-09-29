@@ -60,6 +60,10 @@ export default defineConfig( {
 	reporter: [ [ "list" ], [ "json", { outputFile: "test-results/results.json" } ] ],
 	testDir: "./tests/browser",
 	testMatch: "**/*.spec.ts",
+	// Twice Playwright's default. The first test of a run meets a cold Vite
+	// server, which compiles the client bundle before the page can hydrate,
+	// and that alone can take most of 30 seconds.
+	timeout: 60_000,
 	use: {
 		baseURL: `http://127.0.0.1:${PORT}`,
 		browserName: "chromium",
