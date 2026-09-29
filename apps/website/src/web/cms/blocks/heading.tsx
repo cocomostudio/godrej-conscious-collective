@@ -70,7 +70,7 @@ export function Heading (
 	const colour = use_text_colour_class( text_color, "context" )
 
 	return <div
-		className="flex flex-wrap items-center md:items-baseline justify-between gap-4 scroll-mt-4"
+		className="flex flex-wrap items-center md:items-baseline justify-between gap-4 scroll-mt-[calc(1rem+var(--site-header-offset,0px))]"
 		id={ anchor }>
 		<H
 			className={ `${

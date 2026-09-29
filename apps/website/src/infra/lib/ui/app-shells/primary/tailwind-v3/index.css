@@ -16,6 +16,7 @@
 @import "./base.css"; /* Phase 5 — interpolate-size, @keyframes fade_in */
 @import "./components/card.css"; /* Phase 5 — card--featured/lg/md/sm/xs */
 @import "./design-policy.css"; /* Hand-written design policy (non-Tailwind-generated) */
+@import "./site-header-reveal.css"; /* The site header sliding in on scroll-up, and the sticky bars making room */
 
 @tailwind base;
 @tailwind components;

@@ -41,6 +41,7 @@ import {
 } from "../channels.ts"
 import { Site_Footer } from "../chrome/site-footer.tsx"
 import { Site_Header } from "../chrome/site-header.tsx"
+import { use_site_header_reveal } from "../chrome/use-site-header-reveal.ts"
 import { When_And_Where_On_Sidebar } from "../chrome/when-and-where-on-sidebar.tsx"
 import { Registration_Form_Trigger } from "../registration/registration-form-trigger.tsx"
 import { Registration_Provider } from "../registration/registration-provider.tsx"
@@ -53,6 +54,7 @@ import {
 	Slot,
 	Slot_Provider,
 } from "#infra/lib/ui/react/slot-and-fill.tsx"
+import { use_height_as_custom_property } from "#infra/lib/ui/react/use-height-as-custom-property.ts"
 
 type Root_Props = {
 	page_layout: Page_Layout
@@ -144,6 +146,20 @@ export function Root (
 	// leaf that owns the fade and nothing above it.
 	const footer_ref = useRef<HTMLElement>( null )
 
+	// The site header's height, for the sticky bars below it to make room by
+	// when it slides in, and the script that slides it. See
+	// `use-site-header-reveal.ts`.
+	const chrome_ref = useRef<HTMLDivElement>( null )
+	const header_ref = useRef<HTMLElement>( null )
+
+	use_height_as_custom_property( {
+		property: "--site-header-height",
+		source: header_ref,
+		target: chrome_ref,
+	} )
+
+	use_site_header_reveal( { chrome: chrome_ref, header: header_ref } )
+
 	// Custom properties are not part of React's `CSSProperties`, and widening
 	// the type is the whole of what the cast buys. The keys are this project's
 	// own, produced one line away in `context-colours.ts`.
@@ -181,8 +197,11 @@ export function Root (
 				}
 				<Slot name={ SCREEN } />
 
-				<div className="min-h-full flex flex-col bg-black">
+				<div
+					className="site-chrome min-h-full flex flex-col bg-black"
+					ref={ chrome_ref }>
 					<Site_Header
+						ref={ header_ref }
 						main_event={ main_event }
 						page_shell={ page_shell } />
 
@@ -301,7 +320,9 @@ function Sidebar (
 				? "max-md:bg-context md:bg-gray-light"
 				: "bg-gray-light"
 		} md:flex md:flex-col md:justify-between` }>
-		<div className="cc mx-auto sticky top-0 flex flex-col items-start pt-6 md:pt-8 md:pb-6">
+		<div
+			className="cc mx-auto sticky top-[var(--site-header-offset,0px)] flex flex-col items-start pt-6 md:pt-8 md:pb-6"
+			data-under-site-header>
 			{ back_link }
 
 			{

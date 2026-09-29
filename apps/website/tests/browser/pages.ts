@@ -20,8 +20,14 @@ import {
 	envelope,
 	full_bleed_image_block,
 	image,
+	instance,
 	marquee,
+	page_shell,
 	section,
+	session_card,
+	session_listing_with_filtration,
+	session_schedule_list,
+	session_schedule_row,
 	wysiwyg,
 } from "../support/envelopes.ts"
 
@@ -66,6 +72,20 @@ export const TURNED_PATTERN_PATH = "/a-turned-pattern"
 /** A section with a spider web nobody placed, coloured or turned. */
 export const PLAIN_PATTERN_PATH = "/a-plain-pattern"
 
+/** The site header's links, on every page that is not the Archive. */
+const NAVIGATION = page_shell( {
+	navigation_header: [
+		{ label: "Schedule", style: "plain", url: "/schedule" },
+		{ label: "Showcases", style: "plain", url: "/showcases" },
+	],
+} )
+
+/** A category page long enough to scroll several screens down. */
+export const CATEGORY_PATH = "/showcases"
+
+/** The schedule page, just as long. */
+export const SCHEDULE_PATH = "/schedule"
+
 export const PAGES: Record<string, Envelope> = {
 	"/archives": archive_page( "below" ),
 	[BARE_SECTION_PATH]: archive_page( "none" ),
@@ -77,6 +97,8 @@ export const PAGES: Record<string, Envelope> = {
 		background_pattern_position: "top-right",
 		background_pattern_rotation: 90,
 	} ),
+	[CATEGORY_PATH]: category_page(),
+	[SCHEDULE_PATH]: schedule_page(),
 }
 
 function bleeding_marquee_page (
@@ -115,6 +137,59 @@ function pattern_page ( placement: {
 		page_layout: "one-column",
 		title: "Patterned",
 	} )
+}
+
+/**
+ |
+ | Thirty showcases, in two age groups and at two prices, so that the listing
+ | has facets to offer and its header carries the trigger.
+ |
+ */
+function category_page () {
+	const sessions = Array.from( { length: 30 }, ( _, index ) =>
+		session_card( {
+			age_group: index % 2 === 0 ? "Adults" : "All",
+			category: "Showcase",
+			name: `Showcase ${index + 1}`,
+			path: `/sessions/showcase-${index + 1}`,
+			price: index % 3 === 0 ? 0 : 500,
+		} )
+	)
+
+	return envelope( {
+		main_region: [
+			section( "Showcases — the listing", {
+				content: [ session_listing_with_filtration( "Showcase", sessions ) ],
+			} ),
+		],
+		page_layout: "two-column",
+		title: "Showcases",
+	}, { page_shell: NAVIGATION } )
+}
+
+/** Three days, ten sessions a day. */
+function schedule_page () {
+	const days = [ "2025-12-11", "2025-12-12", "2025-12-13" ]
+	const rows = days.flatMap( ( day, day_index ) =>
+		Array.from( { length: 10 }, ( _, index ) =>
+			session_schedule_row( {
+				category: index % 2 === 0 ? "Workshop" : "Showcase",
+				instances: [ instance( day, `${10 + index}:00`, `${10 + index}:45` ) ],
+				name: `Session ${day_index + 1}.${index + 1}`,
+				path: `/sessions/session-${day_index + 1}-${index + 1}`,
+			} )
+		)
+	)
+
+	return envelope( {
+		main_region: [
+			section( "The schedule", {
+				content: [ session_schedule_list( rows ) ],
+			} ),
+		],
+		page_layout: "two-column",
+		title: "Schedule",
+	}, { page_shell: NAVIGATION } )
 }
 
 function entry_of ( { description, name, year }: typeof ARCHIVE_ENTRIES[number] ) {

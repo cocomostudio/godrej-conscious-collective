@@ -146,7 +146,8 @@ function Listing ( { style_and_transition }: Treatment_Props ) {
  | How many are showing, the way out to the schedule, and the trigger.
  |
  | **Sticky at every width**, so the count and the filters stay with a visitor
- | scrolling a long category.
+ | scrolling a long category. It sits under the site header while the site
+ | header is showing.
  |
  | It carries its own background in the context colour, because it travels
  | over the white the gradient turns into. It also bleeds to the column's
@@ -169,7 +170,9 @@ function Header (
 ) {
 	const showing = use_filtered_sessions()
 
-	return <div className={ `sticky top-0 z-10 ${use_column_bleed()} ${use_column_inset()} py-4 md:-mb-4 bg-context flex items-center gap-2` }>
+	return <div
+		className={ `sticky top-[var(--site-header-offset,0px)] z-10 ${use_column_bleed()} ${use_column_inset()} py-4 md:-mb-4 bg-context flex items-center gap-2` }
+		data-under-site-header>
 		<Showing
 			className="text-h6 md:text-h3 md:font-semibold font-light text-white"
 			count={ showing.length } />

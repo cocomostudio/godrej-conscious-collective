@@ -1,0 +1,38 @@
+/**
+ |
+ | Where the site header and the sticky bars below it sit, in each of the two
+ | states `use-site-header-reveal.ts` writes onto the site chrome.
+ |
+ |   • `parked` — the site header is sticky, parked just above the screen, so
+ |     that it scrolls away with the page and waits there. The bars stick at
+ |     the top of the screen.
+ |
+ |   • `shown` — the site header sticks at the top of the screen, and every
+ |     bar sticks directly beneath it.
+ |
+ | These are positions only. The slide between them is animated by the script.
+ |
+ | `--site-header-offset` is the one value every bar reads as its `top`: the
+ | site header's height while it is shown, and zero otherwise. The height is
+ | measured by the script and published as `--site-header-height`, because CSS
+ | cannot read one element's height from another. Until it is published, the
+ | site header parks a whole screen up, which is out of sight whatever its
+ | height.
+ |
+ | Before the script runs, or without it, there is no state at all: the site
+ | header scrolls away with the page, and the bars stick at the top.
+ |
+ */
+
+.site-chrome[data-site-header] > .site-header {
+	position: sticky;
+	top: calc(-1 * var(--site-header-height, 100vh));
+}
+
+.site-chrome[data-site-header="shown"] > .site-header {
+	top: 0;
+}
+
+.site-chrome[data-site-header="shown"] {
+	--site-header-offset: var(--site-header-height, 0px);
+}

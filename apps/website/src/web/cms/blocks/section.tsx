@@ -230,8 +230,13 @@ export function Section (
 	].filter( Boolean ).join( " " )
 
 	return <>
+		{
+			/* The scroll margin keeps a link's target 16px clear of the top of
+			   the screen, and of the site header while it is showing: a jump to
+			   a link leaves the site header where it was. */
+		}
 		<section
-			className={ `scroll-mt-4 ${
+			className={ `scroll-mt-[calc(1rem+var(--site-header-offset,0px))] ${
 				section_pattern_host( background_pattern )
 			} ${group} ${outer_edges}` }
 			id={ anchor }

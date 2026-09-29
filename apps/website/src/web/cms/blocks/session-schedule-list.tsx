@@ -199,10 +199,11 @@ function Schedule ( { schedule }: { schedule: Media | null } ) {
  | How many are on, the way to download the schedule, and the filter trigger.
  |
  | **Sticky at every width**, where the list scrolls under it: above the day
- | navigation below the medium breakpoint, and beneath it from there up. The
- | stickiness and the backdrop go on the full-width wrapper rather than on the
- | row inside it, so the list passes under the whole width of the header rather
- | than under the words alone.
+ | navigation below the medium breakpoint, and beneath it from there up. Both sit
+ | under the site header while it is showing. The stickiness and the backdrop
+ | go on the full-width wrapper rather than on the row inside it, so the list
+ | passes under the whole width of the header rather than under the words
+ | alone.
  |
  | From the medium breakpoint up, its padding is taken back by margins of the
  | same size. The bar then sits where the words alone would, and the padding
@@ -222,7 +223,8 @@ function List_Header (
 	},
 ) {
 	return <div
-		className="sticky max-md:top-0 md:top-[var(--schedule-day-navigation-height,0px)] z-10 -mx-1ccm md:-mx-16 px-1ccm md:px-16 py-4 md:-my-4 max-md:bg-gray-light md:bg-white"
+		className="sticky max-md:top-[var(--site-header-offset,0px)] md:top-[calc(var(--site-header-offset,0px)+var(--schedule-day-navigation-height,0px))] z-10 -mx-1ccm md:-mx-16 px-1ccm md:px-16 py-4 md:-my-4 max-md:bg-gray-light md:bg-white"
+		data-under-site-header
 		ref={ ref }>
 		<div className="flex items-center gap-2">
 			<Showing
@@ -308,7 +310,8 @@ function Day_Navigation (
 
 	return <nav
 		aria-label="Days"
-		className="sticky max-md:top-[var(--schedule-header-height,0px)] md:top-0 z-10 -mx-1ccm md:-mx-16 md:order-first md:mt-0 md:mb-8 after:absolute after:-bottom-0.25 after:w-full after:h-0.75 after:content-[''] after:bg-context after:origin-left after:scale-x-[--scale-x] after:transition-transform"
+		className="sticky max-md:top-[calc(var(--site-header-offset,0px)+var(--schedule-header-height,0px))] md:top-[var(--site-header-offset,0px)] z-10 -mx-1ccm md:-mx-16 md:order-first md:mt-0 md:mb-8 after:absolute after:-bottom-0.25 after:w-full after:h-0.75 after:content-[''] after:bg-context after:origin-left after:scale-x-[--scale-x] after:transition-transform"
+		data-under-site-header
 		ref={ ref }
 		style={ { "--scale-x": "0" } as React.CSSProperties }>
 		{

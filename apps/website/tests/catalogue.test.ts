@@ -1001,7 +1001,7 @@ async function section_frames ( path: string ) {
 	// stands between the `<section>` and the box it pads with.
 	const frames = [
 		...html.matchAll(
-			/<section class="([^"]*scroll-mt-4[^"]*)"([^>]*)><div class="([^"]*)"/g,
+			/<section class="([^"]*scroll-mt-[^"]*)"([^>]*)><div class="([^"]*)"/g,
 		),
 	].map( ( [ , outer, attributes, padding ] ) =>
 		( { attributes, outer, padding } ) )
@@ -1019,7 +1019,7 @@ async function section_frames ( path: string ) {
  */
 function section_markup ( html: string ) {
 	const match = html.match(
-		/<section[^>]*class="[^"]*scroll-mt-4[^"]*"[^>]*><div[^>]*>/,
+		/<section[^>]*class="[^"]*scroll-mt-[^"]*"[^>]*><div[^>]*>/,
 	)
 
 	expect( match ).not.toBeNull()

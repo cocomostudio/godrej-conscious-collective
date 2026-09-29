@@ -94,11 +94,12 @@ const TRIGGER_CLASS =
 const EXTRA_SPACE_FOR_IOS = "mobile-webkit:mb-28"
 
 type Site_Header_Props = {
+	ref?: Ref<HTMLElement>
 	main_event: Event | null
 	page_shell: Page_Shell | null
 }
 
-export function Site_Header ( { main_event, page_shell }: Site_Header_Props ) {
+export function Site_Header ( { main_event, page_shell, ref }: Site_Header_Props ) {
 	const links = page_shell?.navigation_header ?? []
 
 	const [ is_enhanced, set_is_enhanced ] = useState( false )
@@ -261,9 +262,16 @@ export function Site_Header ( { main_event, page_shell }: Site_Header_Props ) {
 
 	// `max-md:z-50` — the overlay lives inside this stacking context, so it can
 	// never paint above something the header itself loses to. Page sections use
-	// `z-10` too and win on document order, which let their content show through
+	// `z-10` and win on document order, which let their content show through
 	// the overlay. Raised only below `md`, where the overlay exists.
-	return <header className="relative z-10 max-md:z-50 grow-0 shrink-0 bg-white shadow-[0_2px_4px_0] shadow-[rgba(0,0,0,0.08)] md:shadow-[0_4px_8px_0] md:shadow-[rgba(0,0,0,0.08)]">
+	//
+	// `z-20` from `md` up, so that the header paints over the page sections
+	// once it slides in over them, and under the dialogs at `z-30` and above.
+	//
+	// `site-header` is what `site-header-reveal.css` makes sticky.
+	return <header
+		ref={ ref }
+		className="site-header relative z-20 max-md:z-50 grow-0 shrink-0 bg-white shadow-[0_2px_4px_0] shadow-[rgba(0,0,0,0.08)] md:shadow-[0_4px_8px_0] md:shadow-[rgba(0,0,0,0.08)]">
 		{
 			/* INVARIANT 1 — direct child of `<header>`, ahead of both the bar and
 		   | the overlay, so `peer-*` can reach them. */

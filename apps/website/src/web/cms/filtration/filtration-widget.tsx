@@ -128,7 +128,12 @@ export function Filtration_Widget (
 		</div>
 
 		<Fill into={ SCREEN }>
-			<div className="relative z-40" ref={ set_container }>
+			{
+				/* `z-60`, above the site header's `z-50`: the site header can
+			     be showing at any depth, and the drawer's backdrop has to
+			     cover it. */
+			}
+			<div className="relative z-60" ref={ set_container }>
 				{ container && <Drawer.Root
 					onOpenChange={ on_dismiss }
 					open={ visible }>
