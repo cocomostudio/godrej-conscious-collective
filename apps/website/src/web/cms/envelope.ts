@@ -95,6 +95,7 @@ export type Event = {
 	date_start: string | null
 	date_end: string | null
 	is_archived: boolean
+	registrations_are_open?: boolean | null
 	schedule: Media | null
 	colour_theme_rgb: string | null
 	colour_showcase_rgb: string | null

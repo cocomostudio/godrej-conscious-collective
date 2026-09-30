@@ -11,8 +11,8 @@
  | content up by its own height — accepted deliberately.
  |
  | It follows the **main event**, like the header's Register Now: with no event
- | running there is nothing to register for, so the trigger is absent rather
- | than present and inert.
+ | running, or with the event's registrations closed, there is nothing to
+ | register for, so the trigger is absent rather than present and inert.
  |
  | WHILE THE FORM IS OPEN THIS BUTTON IS INVISIBLE, and the drawer carries a
  | facsimile of it instead (see the host). That is what buys the illusion of the
@@ -40,6 +40,7 @@ import {
 	HEADLINE_ROW_CLASS,
 	registration_headline,
 } from "./registration-headline.tsx"
+import { registrations_are_open } from "./registrations-are-open.ts"
 
 import { Plus } from "#infra/lib/ui/react/icons/plus.tsx"
 import { use_is_mounted } from "#infra/lib/ui/react/use-is-mounted.ts"
@@ -72,7 +73,7 @@ export function Registration_Form_Trigger (
 	const is_submitted = use_registration_is_submitted()
 	const is_mounted = use_is_mounted()
 
-	if ( !is_mounted || !main_event ) {
+	if ( !is_mounted || !registrations_are_open( main_event ) ) {
 		return null
 	}
 

@@ -57,6 +57,7 @@ import { Event_Date_Range } from "./event-date-range.tsx"
 import { text_color_class } from "../blocks/text-color.ts"
 import { Nav_Link } from "../nav-link.tsx"
 import { use_registration_actions } from "../registration/registration-context.ts"
+import { registrations_are_open } from "../registration/registrations-are-open.ts"
 
 import { Button } from "#infra/lib/ui/react/buttons/button.tsx"
 import { Arrow_Right } from "#infra/lib/ui/react/icons/arrow-right.tsx"
@@ -358,8 +359,8 @@ export function Site_Header ( { main_event, page_shell }: Site_Header_Props ) {
  | the foot of the page.
  |
  | It follows the main event, per the decision that the chrome does: with no
- | event running there is nothing to register for, so the button is absent
- | rather than present and inert.
+ | event running, or with the event's registrations closed, there is nothing
+ | to register for, so the button is absent rather than present and inert.
  |
  | The overlay it opens is the registration form, which is not a route: it is
  | portaled through the slot-and-fill tunnel into the screen channel, so a
@@ -375,7 +376,7 @@ export function Site_Header ( { main_event, page_shell }: Site_Header_Props ) {
 function Register_Now ( { event }: { event: Event | null } ) {
 	const { open } = use_registration_actions()
 
-	if ( !event ) {
+	if ( !registrations_are_open( event ) ) {
 		return null
 	}
 

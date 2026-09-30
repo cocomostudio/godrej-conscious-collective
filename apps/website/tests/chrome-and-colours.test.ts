@@ -61,6 +61,10 @@ const OTHER_EVENT = event( {
 	name: "Conscious Collective 2027",
 } )
 
+const CLOSED = event( { ...MAIN, registrations_are_open: false } )
+
+const UNSET = event( { ...MAIN, registrations_are_open: null } )
+
 const SHELL = page_shell( {
 	navigation_footer: [
 		{ label: "Privacy Policy", style: "plain", url: "/privacy-policy" },
@@ -106,6 +110,26 @@ beforeAll( async () => {
 				main_event: MAIN,
 				page_shell: SHELL,
 				resolved_event: OTHER_EVENT,
+			},
+		),
+
+		// A main event that has closed its registrations.
+		"/registrations-closed": envelope(
+			{ main_region: [ section( "Closed" ) ], title: "Closed" },
+			{
+				main_event: CLOSED,
+				page_shell: SHELL,
+				resolved_event: CLOSED,
+			},
+		),
+
+		// What every event saved before the attribute existed comes back as.
+		"/registrations-unset": envelope(
+			{ main_region: [ section( "Unset" ) ], title: "Unset" },
+			{
+				main_event: UNSET,
+				page_shell: SHELL,
+				resolved_event: UNSET,
 			},
 		),
 
@@ -226,6 +250,21 @@ describe("the header and the footer", () => {
 
 	it("offer Register Now", async () => {
 		const { html } = await website.get( "/about" )
+
+		expect( html ).toContain( "Register Now" )
+	})
+
+	it("do not offer Register Now once the main event's registrations are closed", async () => {
+		const { html, status } = await website.get( "/registrations-closed" )
+
+		expect( status ).toBe( 200 )
+		expect( html ).not.toContain( "Register Now" )
+		// The rest of the chrome still follows the main event.
+		expect( text_of( html ) ).toContain( "11–14 Dec 2025" )
+	})
+
+	it("offer Register Now for an event saved before registrations could close", async () => {
+		const { html } = await website.get( "/registrations-unset" )
 
 		expect( html ).toContain( "Register Now" )
 	})
