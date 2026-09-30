@@ -95,6 +95,9 @@ const NOT_IN_THE_SECTION_LIST = new Set( [
 	// A session's instances are data about the session, never something an
 	// editor places in a region.
 	"session.session-instance-v1",
+	// A single component on the Event, one per palette colour. Colours are
+	// configuration an event carries, never something placed in a region.
+	"event.palette-colour-v1",
 ] )
 
 type Component = {
@@ -625,6 +628,130 @@ describe("a listing of session cards", () => {
 		expect( descriptions( "list.session-listing-v1" ) ).toMatch(
 			/carousel/i,
 		)
+	})
+})
+
+/**
+ |
+ | A palette colour — one of an event's six, with its base colour and the
+ | colours of the two buttons drawn in it.
+ |
+ */
+describe("a palette colour", () => {
+	const PALETTE_COLOUR = "event.palette-colour-v1"
+
+	const COLOURS = [
+		"base__color",
+		"outline_button_border__color",
+		"outline_button_border__hover__color",
+		"outline_button_border__active__color",
+		"outline_button_text__color",
+		"outline_button_text__hover__color",
+		"outline_button_text__active__color",
+		"solid_button_border__color",
+		"solid_button_border__hover__color",
+		"solid_button_border__active__color",
+		"solid_button_fill__color",
+		"solid_button_fill__hover__color",
+		"solid_button_fill__active__color",
+	]
+
+	it("is in the catalogue, and nowhere an editor can place it", () => {
+		const palette_colour = component( PALETTE_COLOUR )
+
+		expect( palette_colour ).toBeTruthy()
+		expect( NOT_IN_THE_SECTION_LIST.has( PALETTE_COLOUR ) ).toBe( true )
+	})
+
+	it("holds thirteen colours, each from the colour picker", () => {
+		const { attributes } = component( PALETTE_COLOUR )
+
+		for ( const name of COLOURS ) {
+			expect( { attribute: attributes[name], name } ).toMatchObject( {
+				attribute: {
+					customField: "plugin::color-picker.color",
+					type: "string",
+				},
+				name,
+			} )
+		}
+	})
+
+	it("gives every colour a sibling for its triplet, and nothing else", () => {
+		const { attributes } = component( PALETTE_COLOUR )
+
+		expect( Object.keys( attributes ).sort() ).toEqual(
+			COLOURS.flatMap( ( name ) => [ name, `${name}__rgb` ] ).sort(),
+		)
+	})
+
+	it("requires the base colour and none of the button colours", () => {
+		const { attributes } = component( PALETTE_COLOUR )
+
+		const required = Object.keys( attributes ).filter( ( name ) =>
+			attributes[name].required
+		)
+
+		expect( required ).toEqual( [ "base__color" ] )
+	})
+
+	it("hides every triplet from the form", () => {
+		const { __ } = component( PALETTE_COLOUR )
+
+		for ( const name of COLOURS ) {
+			expect( {
+				name,
+				visible: __.metadatas[`${name}__rgb`]?.edit?.visible,
+			} ).toEqual( { name, visible: false } )
+		}
+	})
+})
+
+describe("an event's palette", () => {
+	const event = content_type( "event" )
+
+	const PALETTE = [
+		"theme",
+		"showcase",
+		"experience",
+		"conversation",
+		"workshop",
+		"contributor",
+	]
+
+	it("is six palette colours, one component each", () => {
+		for ( const name of PALETTE ) {
+			expect( { attribute: event.attributes[name], name } )
+				.toMatchObject( {
+					attribute: {
+						component: "event.palette-colour-v1",
+						type: "component",
+					},
+					name,
+				} )
+			expect( event.attributes[name].repeatable ).toBeFalsy()
+		}
+	})
+
+	it("carries no flat colour attributes beside them", () => {
+		const flat = Object.keys( event.attributes ).filter( ( name ) =>
+			name.startsWith( "colour_" )
+		)
+
+		expect( flat ).toEqual( [] )
+	})
+
+	it("gives each palette colour a box of its own in the form", () => {
+		for ( const name of PALETTE ) {
+			expect( event.__.metadatas[name].edit.label ).toBeTruthy()
+			expect( named_in_the_edit_layout( event, name ) ).toBe( true )
+		}
+	})
+
+	// The same word the site uses, for the same reason as the option above.
+	it("labels the contributor box \"Collaborator\"", () => {
+		expect( event.__.metadatas.contributor.edit.label )
+			.toBe( "Collaborator" )
 	})
 })
 

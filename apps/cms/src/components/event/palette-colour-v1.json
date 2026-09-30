@@ -1,0 +1,332 @@
+{
+	"collectionName": "components_event_palette_colour_v1",
+	"info": {
+		"displayName": "Palette colour",
+		"description": "One of an event's six palette colours: its base colour, and the colours of the outline and solid buttons drawn in it at rest, on hover and while pressed."
+	},
+	"options": {},
+	"attributes": {
+		"base__color": {
+			"type": "string",
+			"customField": "plugin::color-picker.color",
+			"required": true
+		},
+		"base__color__rgb": {
+			"type": "string"
+		},
+		"outline_button_border__color": {
+			"type": "string",
+			"customField": "plugin::color-picker.color"
+		},
+		"outline_button_border__color__rgb": {
+			"type": "string"
+		},
+		"outline_button_border__hover__color": {
+			"type": "string",
+			"customField": "plugin::color-picker.color"
+		},
+		"outline_button_border__hover__color__rgb": {
+			"type": "string"
+		},
+		"outline_button_border__active__color": {
+			"type": "string",
+			"customField": "plugin::color-picker.color"
+		},
+		"outline_button_border__active__color__rgb": {
+			"type": "string"
+		},
+		"outline_button_text__color": {
+			"type": "string",
+			"customField": "plugin::color-picker.color"
+		},
+		"outline_button_text__color__rgb": {
+			"type": "string"
+		},
+		"outline_button_text__hover__color": {
+			"type": "string",
+			"customField": "plugin::color-picker.color"
+		},
+		"outline_button_text__hover__color__rgb": {
+			"type": "string"
+		},
+		"outline_button_text__active__color": {
+			"type": "string",
+			"customField": "plugin::color-picker.color"
+		},
+		"outline_button_text__active__color__rgb": {
+			"type": "string"
+		},
+		"solid_button_border__color": {
+			"type": "string",
+			"customField": "plugin::color-picker.color"
+		},
+		"solid_button_border__color__rgb": {
+			"type": "string"
+		},
+		"solid_button_border__hover__color": {
+			"type": "string",
+			"customField": "plugin::color-picker.color"
+		},
+		"solid_button_border__hover__color__rgb": {
+			"type": "string"
+		},
+		"solid_button_border__active__color": {
+			"type": "string",
+			"customField": "plugin::color-picker.color"
+		},
+		"solid_button_border__active__color__rgb": {
+			"type": "string"
+		},
+		"solid_button_fill__color": {
+			"type": "string",
+			"customField": "plugin::color-picker.color"
+		},
+		"solid_button_fill__color__rgb": {
+			"type": "string"
+		},
+		"solid_button_fill__hover__color": {
+			"type": "string",
+			"customField": "plugin::color-picker.color"
+		},
+		"solid_button_fill__hover__color__rgb": {
+			"type": "string"
+		},
+		"solid_button_fill__active__color": {
+			"type": "string",
+			"customField": "plugin::color-picker.color"
+		},
+		"solid_button_fill__active__color__rgb": {
+			"type": "string"
+		}
+	},
+
+	"__": {
+		"note": "Admin metadata for this schema. Strapi ignores this key; src/this/admin-metadata reads it and writes it into the content manager's stored configuration on every boot. Every *__rgb sibling is hidden: the `derive-colour-triplets` document middleware writes it from its colour on every save, so anything typed into it would be overwritten by the next one.",
+		"metadatas": {
+			"base__color": {
+				"edit": {
+					"label": "Base colour",
+					"description": "The palette colour itself. Any button colour below that is left empty falls back to this one."
+				},
+				"list": {
+					"label": "Base colour"
+				}
+			},
+			"outline_button_border__color": {
+				"edit": {
+					"label": "Outline button border, at rest"
+				},
+				"list": {
+					"label": "Outline button border, at rest"
+				}
+			},
+			"outline_button_border__hover__color": {
+				"edit": {
+					"label": "Outline button border, on hover",
+					"description": "Shown only on a device that can point, such as a mouse or a trackpad. A tap on a phone never shows it."
+				},
+				"list": {
+					"label": "Outline button border, on hover"
+				}
+			},
+			"outline_button_border__active__color": {
+				"edit": {
+					"label": "Outline button border, pressed"
+				},
+				"list": {
+					"label": "Outline button border, pressed"
+				}
+			},
+			"outline_button_text__color": {
+				"edit": {
+					"label": "Outline button text, at rest"
+				},
+				"list": {
+					"label": "Outline button text, at rest"
+				}
+			},
+			"outline_button_text__hover__color": {
+				"edit": {
+					"label": "Outline button text, on hover",
+					"description": "Shown only on a device that can point, such as a mouse or a trackpad. A tap on a phone never shows it."
+				},
+				"list": {
+					"label": "Outline button text, on hover"
+				}
+			},
+			"outline_button_text__active__color": {
+				"edit": {
+					"label": "Outline button text, pressed"
+				},
+				"list": {
+					"label": "Outline button text, pressed"
+				}
+			},
+			"solid_button_border__color": {
+				"edit": {
+					"label": "Solid button border, at rest"
+				},
+				"list": {
+					"label": "Solid button border, at rest"
+				}
+			},
+			"solid_button_border__hover__color": {
+				"edit": {
+					"label": "Solid button border, on hover",
+					"description": "Shown only on a device that can point, such as a mouse or a trackpad. A tap on a phone never shows it."
+				},
+				"list": {
+					"label": "Solid button border, on hover"
+				}
+			},
+			"solid_button_border__active__color": {
+				"edit": {
+					"label": "Solid button border, pressed"
+				},
+				"list": {
+					"label": "Solid button border, pressed"
+				}
+			},
+			"solid_button_fill__color": {
+				"edit": {
+					"label": "Solid button fill, at rest"
+				},
+				"list": {
+					"label": "Solid button fill, at rest"
+				}
+			},
+			"solid_button_fill__hover__color": {
+				"edit": {
+					"label": "Solid button fill, on hover",
+					"description": "Shown only on a device that can point, such as a mouse or a trackpad. A tap on a phone never shows it."
+				},
+				"list": {
+					"label": "Solid button fill, on hover"
+				}
+			},
+			"solid_button_fill__active__color": {
+				"edit": {
+					"label": "Solid button fill, pressed"
+				},
+				"list": {
+					"label": "Solid button fill, pressed"
+				}
+			},
+			"base__color__rgb": {
+				"edit": { "label": "Base colour (RGB)", "visible": false },
+				"list": { "label": "Base colour (RGB)" }
+			},
+			"outline_button_border__color__rgb": {
+				"edit": {
+					"label": "Outline button border, at rest (RGB)",
+					"visible": false
+				},
+				"list": { "label": "Outline button border, at rest (RGB)" }
+			},
+			"outline_button_border__hover__color__rgb": {
+				"edit": {
+					"label": "Outline button border, on hover (RGB)",
+					"visible": false
+				},
+				"list": { "label": "Outline button border, on hover (RGB)" }
+			},
+			"outline_button_border__active__color__rgb": {
+				"edit": {
+					"label": "Outline button border, pressed (RGB)",
+					"visible": false
+				},
+				"list": { "label": "Outline button border, pressed (RGB)" }
+			},
+			"outline_button_text__color__rgb": {
+				"edit": {
+					"label": "Outline button text, at rest (RGB)",
+					"visible": false
+				},
+				"list": { "label": "Outline button text, at rest (RGB)" }
+			},
+			"outline_button_text__hover__color__rgb": {
+				"edit": {
+					"label": "Outline button text, on hover (RGB)",
+					"visible": false
+				},
+				"list": { "label": "Outline button text, on hover (RGB)" }
+			},
+			"outline_button_text__active__color__rgb": {
+				"edit": {
+					"label": "Outline button text, pressed (RGB)",
+					"visible": false
+				},
+				"list": { "label": "Outline button text, pressed (RGB)" }
+			},
+			"solid_button_border__color__rgb": {
+				"edit": {
+					"label": "Solid button border, at rest (RGB)",
+					"visible": false
+				},
+				"list": { "label": "Solid button border, at rest (RGB)" }
+			},
+			"solid_button_border__hover__color__rgb": {
+				"edit": {
+					"label": "Solid button border, on hover (RGB)",
+					"visible": false
+				},
+				"list": { "label": "Solid button border, on hover (RGB)" }
+			},
+			"solid_button_border__active__color__rgb": {
+				"edit": {
+					"label": "Solid button border, pressed (RGB)",
+					"visible": false
+				},
+				"list": { "label": "Solid button border, pressed (RGB)" }
+			},
+			"solid_button_fill__color__rgb": {
+				"edit": {
+					"label": "Solid button fill, at rest (RGB)",
+					"visible": false
+				},
+				"list": { "label": "Solid button fill, at rest (RGB)" }
+			},
+			"solid_button_fill__hover__color__rgb": {
+				"edit": {
+					"label": "Solid button fill, on hover (RGB)",
+					"visible": false
+				},
+				"list": { "label": "Solid button fill, on hover (RGB)" }
+			},
+			"solid_button_fill__active__color__rgb": {
+				"edit": {
+					"label": "Solid button fill, pressed (RGB)",
+					"visible": false
+				},
+				"list": { "label": "Solid button fill, pressed (RGB)" }
+			}
+		},
+		"layouts": {
+			"edit": [
+				[
+					{ "name": "base__color", "size": 4 }
+				],
+				[
+					{ "name": "outline_button_border__color", "size": 4 },
+					{ "name": "outline_button_border__hover__color", "size": 4 },
+					{ "name": "outline_button_border__active__color", "size": 4 }
+				],
+				[
+					{ "name": "outline_button_text__color", "size": 4 },
+					{ "name": "outline_button_text__hover__color", "size": 4 },
+					{ "name": "outline_button_text__active__color", "size": 4 }
+				],
+				[
+					{ "name": "solid_button_border__color", "size": 4 },
+					{ "name": "solid_button_border__hover__color", "size": 4 },
+					{ "name": "solid_button_border__active__color", "size": 4 }
+				],
+				[
+					{ "name": "solid_button_fill__color", "size": 4 },
+					{ "name": "solid_button_fill__hover__color", "size": 4 },
+					{ "name": "solid_button_fill__active__color", "size": 4 }
+				]
+			]
+		}
+	}
+}

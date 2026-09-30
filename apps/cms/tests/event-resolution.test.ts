@@ -113,57 +113,243 @@ describe("the resolved event", () => {
 	})
 })
 
-describe("an event's colours", () => {
-	it("arrive as RGB channel triplets beside the colours themselves", async () => {
+describe("an event's palette", () => {
+	it("arrives as RGB channel triplets beside the colours themselves", async () => {
 		const { body } = await cms.get( "/api/envelope?path=/about" )
 		const event = body.data.resolved_event
 
-		expect( event.colour_theme ).toBe( "#0055E6" )
-		expect( event.colour_theme_rgb ).toBe( "0, 85, 230" )
-		expect( event.colour_showcase_rgb ).toBe( "240, 80, 61" )
-		expect( event.colour_experience_rgb ).toBe( "0, 225, 182" )
-		expect( event.colour_conversation_rgb ).toBe( "0, 85, 230" )
-		expect( event.colour_workshop_rgb ).toBe( "250, 188, 29" )
-		expect( event.colour_contributor_rgb ).toBe( "255, 92, 35" )
+		expect( event.theme.base__color ).toBe( "#0055E6" )
+		expect( event.theme.base__color__rgb ).toBe( "0, 85, 230" )
+		expect( event.showcase.base__color__rgb ).toBe( "240, 80, 61" )
+		expect( event.experience.base__color__rgb ).toBe( "0, 225, 182" )
+		expect( event.conversation.base__color__rgb ).toBe( "0, 85, 230" )
+		expect( event.workshop.base__color__rgb ).toBe( "250, 188, 29" )
+		expect( event.contributor.base__color__rgb ).toBe( "255, 92, 35" )
+	})
+
+	it("carries the button colours' triplets too", async () => {
+		const { body } = await cms.get( "/api/envelope?path=/about" )
+		const showcase = body.data.resolved_event.showcase
+
+		expect( showcase.solid_button_fill__hover__color ).toBe( "#D02510" )
+		expect( showcase.solid_button_fill__hover__color__rgb )
+			.toBe( "208, 37, 16" )
+		expect( showcase.outline_button_text__active__color__rgb )
+			.toBe( "238, 59, 37" )
+	})
+
+	it("reaches the chrome through the main event as well", async () => {
+		const { body } = await cms.get(
+			"/api/envelope?path=/conscious-collective-2029",
+		)
+
+		expect( body.data.main_event.theme.base__color__rgb )
+			.toBe( "0, 85, 230" )
+		expect( body.data.resolved_event.theme.base__color )
+			.toBe( "#5B71A1" )
+	})
+
+	it("fills every triplet a saved colour has, base and buttons alike", async () => {
+		const event = await create_event( {
+			contributor: {
+				base__color: "#123456",
+				outline_button_border__color: "#000000",
+				solid_button_fill__active__color: "#FFFFFF",
+			},
+		} )
+
+		expect( await stored_palette( event.documentId, "contributor" ) )
+			.toMatchObject( {
+				base__color__rgb: "18, 52, 86",
+				outline_button_border__color__rgb: "0, 0, 0",
+				solid_button_fill__active__color__rgb: "255, 255, 255",
+			} )
+	})
+
+	it("leaves the triplet of a button colour nobody set empty", async () => {
+		const event = await create_event( {
+			theme: { base__color: "#123456" },
+		} )
+
+		const theme = await stored_palette( event.documentId, "theme" )
+
+		expect( theme.solid_button_fill__color ).toBeNull()
+		expect( theme.solid_button_fill__color__rgb ).toBeNull()
+		expect( theme.outline_button_text__hover__color__rgb ).toBeNull()
 	})
 
 	it("re-derive the triplet when a colour is edited", async () => {
-		const event = await create_event( { colour_theme: "#FFFFFF" } )
+		const event = await create_event( {
+			theme: { base__color: "#FFFFFF" },
+		} )
+
+		// With the component's own id, the way the admin saves a form: the
+		// row is edited in place rather than replaced by a fresh one.
+		const { id } = await stored_palette( event.documentId, "theme" )
 
 		await cms.strapi.documents( EVENT ).update( {
-			data: { colour_theme: "#123456" },
+			data: { theme: { base__color: "#123456", id } },
 			documentId: event.documentId,
 		} )
 
-		expect( await stored_event( event.documentId ) ).toMatchObject( {
-			colour_theme_rgb: "18, 52, 86",
-		} )
+		expect( await stored_palette( event.documentId, "theme" ) )
+			.toMatchObject( { base__color__rgb: "18, 52, 86" } )
 	})
 
-	it("clear the triplet when the colour itself is cleared", async () => {
-		const event = await create_event( { colour_theme: "#123456" } )
+	it("clear the triplet when a button colour itself is cleared", async () => {
+		const event = await create_event( {
+			theme: {
+				base__color: "#123456",
+				solid_button_fill__color: "#654321",
+			},
+		} )
+
+		const { id } = await stored_palette( event.documentId, "theme" )
 
 		await cms.strapi.documents( EVENT ).update( {
-			data: { colour_theme: null },
+			data: {
+				theme: {
+					base__color: "#123456",
+					id,
+					solid_button_fill__color: null,
+				},
+			},
 			documentId: event.documentId,
 		} )
 
-		expect( await stored_event( event.documentId ) ).toMatchObject( {
-			colour_theme_rgb: null,
-		} )
+		expect( await stored_palette( event.documentId, "theme" ) )
+			.toMatchObject( { solid_button_fill__color__rgb: null } )
 	})
 
 	it("leave a triplet alone when its colour is not part of the save", async () => {
-		const event = await create_event( { colour_theme: "#123456" } )
+		const event = await create_event( {
+			theme: { base__color: "#123456" },
+		} )
 
 		await cms.strapi.documents( EVENT ).update( {
 			data: { name: "Renamed, nothing else" },
 			documentId: event.documentId,
 		} )
 
-		expect( await stored_event( event.documentId ) ).toMatchObject( {
-			colour_theme_rgb: "18, 52, 86",
+		expect( await stored_palette( event.documentId, "theme" ) )
+			.toMatchObject( { base__color__rgb: "18, 52, 86" } )
+	})
+})
+
+/**
+ |
+ | What the seed leaves behind, read back rather than restated: the 2027 values
+ | come off the design's button-state image, and the 2029 ones are a second,
+ | harmonious palette, so that a seeded site shows palettes belonging to an
+ | event rather than to the site.
+ |
+ */
+describe("the seeded events", () => {
+	const PALETTE_2027 = {
+		conversation: [ "#0055E6", "#003999", "#004BCC", "#004BCC" ],
+		contributor: [ "#FF5C23", "#D63700", "#FF4A0A", "#FF4A0A" ],
+		experience: [ "#00E1B6", "#009478", "#00C7A1", "#00C7A1" ],
+		showcase: [ "#F0503D", "#D02510", "#EE3B25", "#EE3B25" ],
+		theme: [ "#0055E6", "#003999", "#004BCC", "#003999" ],
+		workshop: [ "#FABC1D", "#C89104", "#F9B506", "#F9B506" ],
+	}
+
+	const PALETTE_2029 = {
+		conversation: [ "#2E7D8F", "#0B6677", "#1F7183", "#1F7183" ],
+		contributor: [ "#86628F", "#6F4B77", "#7A5783", "#7A5783" ],
+		experience: [ "#537E54", "#3C673E", "#487249", "#487249" ],
+		showcase: [ "#9B5F5A", "#824844", "#8E534F", "#8E534F" ],
+		theme: [ "#5B71A1", "#455A88", "#4F6594", "#4F6594" ],
+		workshop: [ "#8D6B39", "#755421", "#815F2D", "#815F2D" ],
+	}
+
+	it.each( [
+		[ MAIN_EVENT_NAME, PALETTE_2027 ],
+		[ OTHER_EVENT_NAME, PALETTE_2029 ],
+	] )( "%s carries its palette's hex values", async ( name, palette ) => {
+		const event = await seeded_event( name )
+
+		for (
+			const [ role, [ rest, hover, pressed, border_hover ] ] of Object
+				.entries( palette )
+		) {
+			expect( { colours: event[role], role } ).toMatchObject( {
+				colours: {
+					base__color: rest,
+					outline_button_border__active__color: pressed,
+					outline_button_border__color: rest,
+					outline_button_border__hover__color: hover,
+					outline_button_text__active__color: pressed,
+					outline_button_text__color: rest,
+					outline_button_text__hover__color: hover,
+					solid_button_border__active__color: pressed,
+					solid_button_border__color: rest,
+					solid_button_border__hover__color: border_hover,
+					solid_button_fill__active__color: pressed,
+					solid_button_fill__color: rest,
+					solid_button_fill__hover__color: hover,
+				},
+				role,
+			} )
+		}
+	} )
+})
+
+/**
+ |
+ | The event form, as the content manager stored it on boot. A boot that got
+ | this far has already validated every declaration against its attributes, so
+ | what is asserted here is only what an editor meets.
+ |
+ */
+describe("the event form", () => {
+	const store = () =>
+		cms.strapi.store( { name: "content_manager", type: "plugin" } )
+
+	it("labels the contributor box \"Collaborator\"", async () => {
+		const stored = await store().get( {
+			key: "configuration_content_types::api::event.event",
 		} )
+
+		expect( stored.metadatas.contributor.edit.label ).toBe(
+			"Collaborator",
+		)
+	})
+
+	it("lays a palette colour out as its base, then each button part's three states", async () => {
+		const stored = await store().get( {
+			key: "configuration_components::event.palette-colour-v1",
+		} )
+
+		expect(
+			stored.layouts.edit.map( ( row: { name: string }[] ) =>
+				row.map( ( field ) => field.name )
+			),
+		).toEqual( [
+			[ "base__color" ],
+			[
+				"outline_button_border__color",
+				"outline_button_border__hover__color",
+				"outline_button_border__active__color",
+			],
+			[
+				"outline_button_text__color",
+				"outline_button_text__hover__color",
+				"outline_button_text__active__color",
+			],
+			[
+				"solid_button_border__color",
+				"solid_button_border__hover__color",
+				"solid_button_border__active__color",
+			],
+			[
+				"solid_button_fill__color",
+				"solid_button_fill__hover__color",
+				"solid_button_fill__active__color",
+			],
+		] )
+		expect( stored.metadatas.solid_button_fill__hover__color.edit.label )
+			.toMatch( /solid.*fill.*hover|hover.*solid.*fill/i )
 	})
 })
 
@@ -369,6 +555,29 @@ async function create_event ( data: Record<string, unknown> = {} ) {
 async function stored_event ( documentId: string ) {
 	return await cms.strapi.db.query( EVENT ).findOne( {
 		where: { documentId },
+	} )
+}
+
+async function stored_palette ( documentId: string, role: string ) {
+	const row = await cms.strapi.db.query( EVENT ).findOne( {
+		populate: { [role]: true },
+		where: { documentId },
+	} )
+
+	return row?.[role]
+}
+
+async function seeded_event ( name: string ) {
+	return await cms.strapi.db.query( EVENT ).findOne( {
+		populate: {
+			contributor: true,
+			conversation: true,
+			experience: true,
+			showcase: true,
+			theme: true,
+			workshop: true,
+		},
+		where: { name },
 	} )
 }
 
