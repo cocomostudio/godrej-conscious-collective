@@ -36,29 +36,41 @@ import {
 	event,
 	heading,
 	page_shell,
+	palette_colour,
 	section,
 	session_card,
 	session_list,
 } from "./support/envelopes.ts"
 
+/**
+ |
+ | The main event tunes a few of its theme buttons' colours and leaves the
+ | rest, which is the ordinary state of an event somebody has half-finished.
+ |
+ */
 const MAIN = event( {
 	date_end: "2025-12-14",
 	date_start: "2025-12-11",
 	main: true,
 	name: "Conscious Collective 2025",
+	theme: palette_colour( "0, 85, 230", {
+		outline_button_border__hover: "0, 57, 153",
+		solid_button_fill: "0, 85, 230",
+		solid_button_fill__active: "0, 75, 204",
+	} ),
 } )
 
 const OTHER_EVENT = event( {
-	colour_contributor_rgb: "122, 92, 255",
-	colour_conversation_rgb: "27, 127, 75",
-	colour_experience_rgb: "232, 180, 160",
-	colour_showcase_rgb: "194, 65, 12",
-	colour_theme_rgb: "27, 127, 75",
-	colour_workshop_rgb: "245, 158, 11",
+	contributor: palette_colour( "122, 92, 255" ),
+	conversation: palette_colour( "27, 127, 75" ),
 	date_end: "2027-12-05",
 	date_start: "2027-12-02",
+	experience: palette_colour( "232, 180, 160" ),
 	main: false,
 	name: "Conscious Collective 2027",
+	showcase: palette_colour( "194, 65, 12" ),
+	theme: palette_colour( "27, 127, 75" ),
+	workshop: palette_colour( "245, 158, 11" ),
 } )
 
 const CLOSED = event( { ...MAIN, registrations_are_open: false } )
@@ -440,6 +452,94 @@ describe("the context colours", () => {
 		// page drew as before there was anything to choose.
 		expect( variables( html )["--ctx-context-color"] )
 			.toBe( "var(--ctx-theme-color)" )
+	})
+})
+
+/**
+ |
+ | The button colours: twelve per palette colour, beside the base colour, and
+ | re-pointed with the context colour whenever it is.
+ |
+ | Asserted on the declarations for the reason the colour scheme's tests give
+ | below: the alias is the whole mechanism, and a button carries the same
+ | classes whatever the alias points at.
+ |
+ */
+describe("the button colours", () => {
+	it("are carried for every one the resolved event tuned", async () => {
+		const { html } = await website.get( "/about" )
+
+		expect( variables( html ) ).toMatchObject( {
+			"--ctx-theme-outline-border-hover-color": "0, 57, 153",
+			"--ctx-theme-solid-fill-active-color": "0, 75, 204",
+			"--ctx-theme-solid-fill-color": "0, 85, 230",
+		} )
+	})
+
+	// No script works out what an untuned colour should be: the alias names
+	// the palette colour's base as its own fallback, and the browser does the
+	// rest.
+	it("fall back to their palette colour's base where nobody tuned them", async () => {
+		const found = variables( ( await website.get( "/about" ) ).html )
+
+		expect( found ).not.toHaveProperty(
+			"--ctx-theme-solid-fill-hover-color",
+		)
+		expect( found["--ctx-context-solid-fill-hover-color"] ).toBe(
+			"var(--ctx-theme-solid-fill-hover-color,var(--ctx-theme-color))",
+		)
+	})
+
+	it("follow the context colour when a page re-points it", async () => {
+		const found = variables(
+			( await website.get( "/workshop-page" ) ).html,
+		)
+
+		expect( found["--ctx-context-outline-border-color"] ).toBe(
+			"var(--ctx-workshop-outline-border-color,var(--ctx-workshop-color))",
+		)
+		expect( found["--ctx-context-solid-fill-active-color"] ).toBe(
+			"var(--ctx-workshop-solid-fill-active-color,var(--ctx-workshop-color))",
+		)
+	})
+
+	it("follow the context colour when a card re-points it", async () => {
+		const { html } = await website.get( "/mixed-cards" )
+
+		expect( html ).toContain(
+			"--ctx-context-outline-text-hover-color:var(--ctx-showcase-outline-text-hover-color,var(--ctx-showcase-color))",
+		)
+		expect( html ).toContain(
+			"--ctx-context-solid-border-color:var(--ctx-workshop-solid-border-color,var(--ctx-workshop-color))",
+		)
+	})
+
+	// Black and white have no button colours of their own, so every state
+	// draws in the scheme's one colour.
+	it("draw in the scheme's own colour at every state for black and white", async () => {
+		const black = variables( ( await website.get( "/black-page" ) ).html )
+		const white = variables( ( await website.get( "/white-page" ) ).html )
+
+		expect( black["--ctx-context-outline-border-hover-color"] )
+			.toBe( "var(--color-black)" )
+		expect( black["--ctx-context-solid-fill-active-color"] )
+			.toBe( "var(--color-black)" )
+		expect( white["--ctx-context-solid-fill-color"] )
+			.toBe( "var(--color-white)" )
+	})
+
+	// White words on every solid button, except one filled in white.
+	it("put white text on a solid button, and black on a white one", async () => {
+		const palette = variables( ( await website.get( "/about" ) ).html )
+		const black = variables( ( await website.get( "/black-page" ) ).html )
+		const white = variables( ( await website.get( "/white-page" ) ).html )
+
+		expect( palette["--ctx-context-solid-text-color"] )
+			.toBe( "var(--color-white)" )
+		expect( black["--ctx-context-solid-text-color"] )
+			.toBe( "var(--color-white)" )
+		expect( white["--ctx-context-solid-text-color"] )
+			.toBe( "var(--color-black)" )
 	})
 })
 

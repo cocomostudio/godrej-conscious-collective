@@ -19,6 +19,8 @@
 import { useRender } from "@base-ui/react/use-render"
 import { mergeProps } from "@base-ui/react/merge-props"
 
+import { PALETTE_BUTTON_COLOURS } from "./palette-button-colours.ts"
+
 type Emphasis = "solid" | "outline" | "none"
 type Colour = "theme" | "context" | "white" | "black"
 
@@ -53,6 +55,10 @@ const BASE_CLASS =
  | contrasting colour so that it reads against the fill; under `outline` and
  | `none` it is the colour itself.
  |
+ | **The two palette colours draw from the event's button colours** under
+ | `outline` and `solid`, at rest, under a pointer and while pressed. See
+ | `palette-button-colours.ts`.
+ |
  */
 const COLOUR_CLASSES: Record<Emphasis, Record<Colour, string>> = {
 	none: {
@@ -63,14 +69,14 @@ const COLOUR_CLASSES: Record<Emphasis, Record<Colour, string>> = {
 	},
 	outline: {
 		black: "border border-black text-black",
-		context: "border border-context text-context",
-		theme: "border border-theme text-theme",
+		context: `border ${PALETTE_BUTTON_COLOURS.outline.context}`,
+		theme: `border ${PALETTE_BUTTON_COLOURS.outline.theme}`,
 		white: "border border-white text-white",
 	},
 	solid: {
 		black: "bg-black border border-black text-white",
-		context: "bg-context border border-context text-white",
-		theme: "bg-theme border border-theme text-white",
+		context: `border ${PALETTE_BUTTON_COLOURS.solid.context}`,
+		theme: `border ${PALETTE_BUTTON_COLOURS.solid.theme}`,
 		white: "bg-white border border-white text-black",
 	},
 }

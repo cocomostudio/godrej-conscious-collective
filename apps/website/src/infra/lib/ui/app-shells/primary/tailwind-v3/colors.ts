@@ -62,6 +62,51 @@ export const colors = {
 	"conversation": "rgba( var( --ctx-conversation-color ), <alpha-value> )",
 	"workshop": "rgba( var( --ctx-workshop-color ), <alpha-value> )",
 	"contributor": "rgba( var( --ctx-contributor-color ), <alpha-value> )",
+
+	...button_colours( "theme" ),
+	...button_colours( "context" ),
+	"context-solid-text":
+		"rgba( var( --ctx-context-solid-text-color ), <alpha-value> )",
+}
+
+/**
+ |
+ | The twelve button colours of the theme and of the context colour — the
+ | outline button's border and text, and the solid button's border and fill,
+ | at rest, under a pointer and while pressed. `border-context-solid-fill-hover`
+ | and the rest.
+ |
+ | Set inline per route beside the base colours, as `--ctx-<owner>-<part>-color`.
+ | **A button colour the event left empty is not declared**, and falls back to
+ | the base colour it belongs to. The context alias carries that fallback
+ | inside its own value, so its tokens need none; the theme's are read
+ | directly, so theirs name it here.
+ |
+ */
+function button_colours ( owner: "theme" | "context" ) {
+	const parts = [
+		"outline-border",
+		"outline-text",
+		"solid-border",
+		"solid-fill",
+	]
+	const states = [ "", "-hover", "-active" ]
+
+	return Object.fromEntries(
+		parts.flatMap( ( part ) =>
+			states.map( ( state ) => {
+				const variable = `--ctx-${owner}-${part}${state}-color`
+				const value = owner === "theme"
+					? `var( ${variable}, var( --ctx-theme-color ) )`
+					: `var( ${variable} )`
+
+				return [
+					`${owner}-${part}${state}`,
+					`rgba( ${value}, <alpha-value> )`,
+				]
+			} )
+		),
+	)
 }
 
 // Emits the static-palette triplets on `:root` (the v4 `@theme` hex tokens'

@@ -58,6 +58,7 @@ import {
 	text_color_class,
 	text_color_token,
 } from "./blocks/text-color.ts"
+import { context_colour_of } from "./context-colours.ts"
 
 const Dark_Surface_Context = createContext<boolean>( false )
 
@@ -69,12 +70,11 @@ const Dark_Surface_Context = createContext<boolean>( false )
  | the whole mechanism: a block below carries `text-context` and knows nothing
  | about where it is, and re-pointing the alias is what makes the class draw
  | white. It is the third place in the codebase the alias is aimed, after the
- | page's root and a card's own element — see `context-colours.ts`.
+ | page's root and a card's own element — see `context-colours.ts`. The button
+ | colours go with it, exactly as they do under a page's white colour scheme.
  |
  */
-const FORCED_CONTEXT = {
-	"--ctx-context-color": "var( --color-white )",
-} as CSSProperties
+const FORCED_CONTEXT: CSSProperties = context_colour_of( "white" )
 
 /**
  |

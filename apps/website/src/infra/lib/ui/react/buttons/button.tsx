@@ -29,6 +29,7 @@ import {
 import { useRender } from "@base-ui/react/use-render"
 import { mergeProps } from "@base-ui/react/merge-props"
 import { ICON_MAP } from "../icons/index.ts"
+import { PALETTE_BUTTON_COLOURS } from "./palette-button-colours.ts"
 
 type Size = "base" | "md" | "lg"
 type Emphasis = "solid" | "outline" | "none" | "custom"
@@ -61,41 +62,65 @@ const BASE_CLASS =
 	+ " " + "disabled:cursor-not-allowed disabled:opacity-50"
 	+ " " + "aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
 
-// Each size bundles its own height + padding + font. Values are flat across all
+// Each size bundles its own height + font. Values are flat across all
 // breakpoints (the typography tokens themselves carry any responsive scaling).
 const SIZE_CLASSES: Record<Size, string> = {
-	base: "h-8.5 px-4 text-button font-medium",
-	// h:34 border:1 px:16 font:button weight:500 gap:4
-	md: "h-9 px-4 text-p font-medium",
-	// h:36 px:16 font:paragraph weight:500
-	lg: "h-10 px-6 text-h6 font-semibold",
-	// h:40 px:24 font:h6 weight:600
+	base: "h-8.5 text-button font-medium",
+	// h:34 font:button weight:500 gap:4
+	md: "h-9 text-p font-medium",
+	// h:36 font:paragraph weight:500
+	lg: "h-10 text-h6 font-semibold",
+	// h:40 font:h6 weight:600
 }
 
+// px:16, 16 and 24.
+const PADDING_CLASSES: Record<Size, string> = {
+	base: "px-4",
+	md: "px-4",
+	lg: "px-6",
+}
+
+// **A solid button carries a 1px border, and gives the pixel back from its
+// padding** on each side, so that it is no wider than it was without one. The
+// heights are fixed and absorb the border already.
+const SOLID_PADDING_CLASSES: Record<Size, string> = {
+	base: "px-3.75",
+	md: "px-3.75",
+	lg: "px-5.75",
+}
+
+/**
+ |
+ | **The two palette colours draw from the event's button colours**, border,
+ | words and fill alike, at rest, under a pointer and while pressed. See
+ | `palette-button-colours.ts`.
+ |
+ */
+function is_palette_colour ( color: Color ): color is "theme" | "context" {
+	return color === "theme" || color === "context"
+}
+
+// The fixed colours. **A solid button's border is its fill's colour**, so it
+// is there at every state without being seen.
 const BORDER_CLASSES: Partial<Record<Color, string>> = {
 	white: "border-white",
+	black: "border-black",
 	red: "border-red",
-	// add others when designs land
 }
 
 const BACKGROUND_CLASSES: Partial<Record<Color, string>> = {
-	theme: "bg-theme text-gray-light",
-	context: "bg-context text-white",
-	white: "bg-white text-black",
-	black: "bg-black text-white",
-	red: "bg-red text-white",
+	white: "bg-white",
+	black: "bg-black",
+	red: "bg-red",
 }
 
 const TEXT_CLASSES: Record<Emphasis, Partial<Record<Color, string>>> = {
 	outline: {
-		theme: "text-theme",
 		white: "text-white",
 		black: "text-black",
 		red: "text-red",
 	},
 	solid: {
-		theme: "text-gray-light",
-		context: "text-context",
 		white: "text-black",
 		black: "text-white",
 		red: "text-white",
@@ -111,30 +136,47 @@ function build_class_name (
 	const size_class = SIZE_CLASSES[size]
 	if ( size_class ) {
 		parts.push( size_class )
+		parts.push(
+			( emphasis === "solid"
+				? SOLID_PADDING_CLASSES
+				: PADDING_CLASSES )[
+					size
+				],
+		)
 	}
-	let text_color_class = text_color === "context"
-		? "text-context"
-		: TEXT_CLASSES[emphasis][text_color as Color]
-	// ↑ `text_color` also admits "default", which no emphasis names; the
-	// 	lookup is meant to miss in that case and fall through to no class.
 
-	if ( emphasis === "outline" ) {
+	const drawn = emphasis === "outline" || emphasis === "solid"
+
+	if ( drawn ) {
 		parts.push( "border" )
-		const border = BORDER_CLASSES[color]
-		parts.push( border ?? "border-current" )
 	}
-	else if ( emphasis === "solid" ) {
-		const border = BORDER_CLASSES[color]
-		parts.push( border ?? "border-current" )
 
-		const background = BACKGROUND_CLASSES[color]
-		if ( background ) {
-			parts.push( background )
+	if ( drawn && is_palette_colour( color ) ) {
+		parts.push( PALETTE_BUTTON_COLOURS[emphasis][color] )
+	}
+	else if ( drawn ) {
+		parts.push( BORDER_CLASSES[color] ?? "border-current" )
+
+		if ( emphasis === "solid" ) {
+			const background = BACKGROUND_CLASSES[color]
+			if ( background ) {
+				parts.push( background )
+			}
 		}
 	}
 
-	if ( text_color_class ) {
-		parts.push( text_color_class )
+	// A text colour of its own, unless the palette colour's classes above
+	// already answered for the words and the caller asked for nothing else.
+	if ( !( drawn && is_palette_colour( color ) && text_color === color ) ) {
+		const text_color_class = text_color === "context"
+			? "text-context"
+			: TEXT_CLASSES[emphasis][text_color as Color]
+		// ↑ `text_color` also admits "default", which no emphasis names; the
+		// 	lookup is meant to miss in that case and fall through to no class.
+
+		if ( text_color_class ) {
+			parts.push( text_color_class )
+		}
 	}
 
 	return parts.join( " " )

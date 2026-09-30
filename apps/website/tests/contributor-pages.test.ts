@@ -39,6 +39,7 @@ import {
 	envelope,
 	event,
 	image,
+	palette_colour,
 } from "./support/envelopes.ts"
 
 let website: Website
@@ -96,7 +97,7 @@ beforeAll( async () => {
 			role: "Curator",
 		}, {
 			resolved_event: event( {
-				colour_contributor_rgb: "9, 9, 9",
+				contributor: palette_colour( "9, 9, 9" ),
 				main: false,
 				name: "Conscious Collective 2027",
 			} ),

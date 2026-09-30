@@ -19,6 +19,7 @@ import type {
 	Link as Link_Attribute,
 	Page_Entry,
 	Page_Shell,
+	Palette_Colour,
 	Session_Card,
 	Session_Entry,
 	Session_Schedule_Row,
@@ -43,26 +44,71 @@ export function page_shell ( over: Partial<Page_Shell> = {} ): Page_Shell {
 
 /**
  |
+ | One of an event's six palette colours, as the CMS sends it: a base colour
+ | and twelve button colours, each as a hex value beside the RGB channel
+ | triplet the CMS derived from it. The website reads the triplets alone.
+ |
+ | Only the base is set unless a caller says otherwise, which is the state of
+ | an event nobody has tuned the buttons of.
+ |
+ */
+export function palette_colour (
+	base: string,
+	buttons: Partial<Record<Button_Colour, string>> = {},
+): Palette_Colour {
+	const colour: Palette_Colour = {
+		base__color: null,
+		base__color__rgb: base,
+	}
+
+	for ( const name of BUTTON_COLOURS ) {
+		colour[`${name}__color`] = null
+		colour[`${name}__color__rgb`] = buttons[name] ?? null
+	}
+
+	return colour
+}
+
+/** The twelve button colours, by the name each is stored under. */
+const BUTTON_COLOURS = [
+	"outline_button_border",
+	"outline_button_border__hover",
+	"outline_button_border__active",
+	"outline_button_text",
+	"outline_button_text__hover",
+	"outline_button_text__active",
+	"solid_button_border",
+	"solid_button_border__hover",
+	"solid_button_border__active",
+	"solid_button_fill",
+	"solid_button_fill__hover",
+	"solid_button_fill__active",
+] as const
+
+export type Button_Colour = typeof BUTTON_COLOURS[number]
+
+/**
+ |
  | One run of the programme. The colours arrive as RGB channel triplets because
- | is what the CMS derives and what the colour tokens compile against; the hex
- | siblings ride along unread by anything the website renders.
+ | that is what the CMS derives and what the colour tokens compile against; the
+ | hex siblings ride along unread by anything the website renders.
  |
  */
 export function event ( over: Partial<Event> = {} ): Event {
 	return {
-		colour_contributor_rgb: "255, 92, 35",
-		colour_conversation_rgb: "0, 85, 230",
-		colour_experience_rgb: "0, 225, 182",
-		colour_showcase_rgb: "240, 80, 61",
-		colour_theme_rgb: "0, 85, 230",
-		colour_workshop_rgb: "250, 188, 29",
+		contributor: palette_colour( "255, 92, 35" ),
+		conversation: palette_colour( "0, 85, 230" ),
 		date_end: "2025-12-14",
 		date_start: "2025-12-11",
 		documentId: `document-${id()}`,
+		experience: palette_colour( "0, 225, 182" ),
 		is_archived: false,
 		main: true,
 		name: "Conscious Collective 2025",
 		schedule: null,
+		showcase: palette_colour( "240, 80, 61" ),
+		theme: palette_colour( "0, 85, 230" ),
+		workshop: palette_colour( "250, 188, 29" ),
 		...over,
 	}
 }

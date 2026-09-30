@@ -262,7 +262,7 @@ describe("a heading and a link", () => {
  | and is therefore a decision rather than a slip.
  |
  */
-const FORCED_CONTEXT = "--ctx-context-color:var( --color-white )"
+const FORCED_CONTEXT = "--ctx-context-color:var(--color-white)"
 
 /**
  |

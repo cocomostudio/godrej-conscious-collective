@@ -34,6 +34,7 @@ import {
 	envelope,
 	event,
 	instance,
+	palette_colour,
 	plain_string,
 	responsive_image,
 	section,
@@ -96,7 +97,7 @@ beforeAll( async () => {
 			name: "Other Event",
 		}, {
 			resolved_event: event( {
-				colour_workshop_rgb: "1, 2, 3",
+				workshop: palette_colour( "1, 2, 3" ),
 				main: false,
 				name: "Conscious Collective 2027",
 			} ),

@@ -87,10 +87,7 @@ export type Media = {
  | on every page of the site. As the **resolved event** it is this page's own
  | context: its colours, its listing filters and its schedule document.
  |
- | The six colours arrive twice as well. `colour_*` is what the editor picked
- | and nothing here reads it; `colour_*_rgb` is the same colour as three bare
- | channels, derived by the CMS on save, and that is what the colour tokens
- | compile against.
+ | The six palette colours arrive as one component each. See `Palette_Colour`.
  |
  */
 export type Event = {
@@ -111,12 +108,29 @@ export type Event = {
 	 */
 	time_start?: string | null
 	time_end?: string | null
-	colour_theme_rgb: string | null
-	colour_showcase_rgb: string | null
-	colour_experience_rgb: string | null
-	colour_conversation_rgb: string | null
-	colour_workshop_rgb: string | null
-	colour_contributor_rgb: string | null
+	theme?: Palette_Colour | null
+	showcase?: Palette_Colour | null
+	experience?: Palette_Colour | null
+	conversation?: Palette_Colour | null
+	workshop?: Palette_Colour | null
+	contributor?: Palette_Colour | null
+	[attribute: string]: unknown
+}
+
+/**
+ |
+ | One of the event's six palette colours: a base colour, and the colours of
+ | the outline button and the solid button drawn in it, at rest, under a
+ | pointer and while pressed.
+ |
+ | Every colour arrives twice. `…__color` is what the editor picked and nothing
+ | here reads it; `…__color__rgb` is the same colour as three bare channels,
+ | derived by the CMS on save, and that is what the colour tokens compile
+ | against. Only the base is required, so any button colour may be empty.
+ |
+ */
+export type Palette_Colour = {
+	base__color__rgb: string | null
 	[attribute: string]: unknown
 }
 

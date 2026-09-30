@@ -18,12 +18,14 @@ import {
 	archive_entry,
 	archive_timeline_listing,
 	envelope,
+	event,
 	full_bleed_image_block,
 	heading,
 	image,
 	instance,
 	marquee,
 	page_shell,
+	palette_colour,
 	responsive_image,
 	section,
 	session_card,
@@ -117,6 +119,14 @@ export const COVER_SIZES = {
 	portrait: { height: 1600, width: 600 },
 }
 
+/**
+ |
+ | A page whose event tuned its theme buttons, with the 2027 design's values:
+ | the header's Register Now has a colour at each state to move between.
+ |
+ */
+export const TUNED_BUTTONS_PATH = "/tuned-buttons"
+
 /** One heading block at each of the six sizes. */
 export const HEADINGS_PATH = "/six-headings"
 
@@ -127,6 +137,7 @@ export const PAGES: Record<string, Envelope> = {
 	[FEATURED_PATHS.landscape]: featured_page( "landscape" ),
 	[FEATURED_PATHS.portrait]: featured_page( "portrait" ),
 	[HEADINGS_PATH]: headings_page(),
+	[TUNED_BUTTONS_PATH]: tuned_buttons_page(),
 	"/archives": archive_page( "below" ),
 	[BARE_SECTION_PATH]: archive_page( "none" ),
 	[BLEEDING_MARQUEE_PATHS["one-column"]]: bleeding_marquee_page( "one-column" ),
@@ -227,6 +238,25 @@ function headings_page () {
 		page_layout: "one-column",
 		title: "Headings",
 	} )
+}
+
+function tuned_buttons_page () {
+	const tuned = event( {
+		theme: palette_colour( "0, 85, 230", {
+			solid_button_border: "0, 85, 230",
+			solid_button_border__active: "0, 75, 204",
+			solid_button_border__hover: "0, 57, 153",
+			solid_button_fill: "0, 85, 230",
+			solid_button_fill__active: "0, 75, 204",
+			solid_button_fill__hover: "0, 57, 153",
+		} ),
+	} )
+
+	return envelope( {
+		main_region: [ section( "Buttons" ) ],
+		page_layout: "one-column",
+		title: "Buttons",
+	}, { main_event: tuned, resolved_event: tuned } )
 }
 
 function pattern_page ( placement: {
