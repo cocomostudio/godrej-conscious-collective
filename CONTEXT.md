@@ -9,8 +9,14 @@ An event listing website and the Strapi CMS behind that website. The site featur
 **Event**:
 A festival edition, such as "Conscious Collective 2025". An event owns a date range, a schedule document and a **palette** — the six colours a page can be drawn in. Not a "colour scheme", which is the separate thing a Page chooses.
 
+An event also owns its **daily hours**: the earliest start and the latest end across all of its days. One day may keep shorter hours than another, and the daily hours still name only the widest span.
+
 An event also says whether its **registrations are open**. While the main event's registrations are closed, nothing on the site offers the **registration form**.
 _Avoid_: "festival", "edition"
+
+**Palette colour**:
+One of the six colours in an event's palette: theme, showcase, experience, conversation, workshop or contributor. Each palette colour carries a base colour and the colours of the two buttons drawn in it — the outline button and the solid button — at rest, under a pointer and while pressed.
+_Avoid_: "session type colour", "category colour" for the theme and contributor ones
 
 **Main event**:
 The single event currently marked as live. Exactly one event carries that mark at any time. The main event supplies the site chrome, meaning the header, the footer, and the When and Where at the foot of a two-column page's sidebar.
@@ -37,7 +43,7 @@ The kind of a session, drawn from a fixed set: Showcase, Experience, Conversatio
 _Avoid_: "session type", "track"
 
 **Contributor**:
-A person who takes part in a session. The public label for a contributor is "Collaborator", and only the public label uses that second word.
+A person who takes part in a session. The label for a contributor is "Collaborator" wherever a person reads it — on the site and in the CMS form alike — and only those labels use that second word. Names in code and in the schema keep "contributor".
 _Avoid_: "collaborator" in code, "speaker", "participant", "fellow"
 
 **Lead**:
@@ -139,6 +145,26 @@ _Avoid_: "tile", "session block", "preview"
 **Treatment**:
 What a card does while a pointer is over it, as one of two named answers an editor picks from — the stroke, which leaves the card's details box white and takes the words beneath the title up to the category's colour, and the fill, which floods that box with the colour instead and drops those words to black. The stroke is the default and is therefore what a listing nobody has answered for draws as. The picture grows a little under either, and that part is not a treatment because nobody chooses it. The editor meets the choice as `style_and_transition`, which is the attribute's name and not a second word for this.
 _Avoid_: "hover style", "variant", "mode"
+
+**Arrangement**:
+How a listing of cards lays its cards out, decided by how many cards it holds. Three or fewer draw as a **three in a row**, exactly four as a **featured plus three in a row**, and five or more as a **carousel**. An editor never picks one.
+_Avoid_: "layout" — that is the page's; "rendering"
+
+**Three in a row**:
+The arrangement in which up to three cards sit side by side, each a third of the row wide.
+_Avoid_: "rows", "strip"
+
+**Featured plus three in a row**:
+The arrangement in which a **featured card** sits across the top and a three in a row follows it.
+_Avoid_: "wrapping", "workshops layout"
+
+**Carousel**:
+The arrangement in which the cards loop on a track that a visitor drags, scrolls or pages through, running out to the edges of whatever column holds it.
+_Avoid_: "turning", "slider", "track" — the track is the carousel's moving part
+
+**Featured card**:
+A card, not an arrangement: the first card of a featured plus three in a row, and nowhere else. It spans the full width of the row at a fixed height, with its picture beside its details rather than above them. A listing of one card draws that card at a third of the row, not as a featured card.
+_Avoid_: "hero card", "large card"
 
 **Portrait**:
 How a contributor row is drawn — a round picture with a name and a role beneath it.
