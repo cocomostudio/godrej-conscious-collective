@@ -39,6 +39,11 @@
 			"default": false,
 			"required": true
 		},
+		"registrations_are_open": {
+			"type": "boolean",
+			"default": true,
+			"required": true
+		},
 		"colour_theme": {
 			"type": "string",
 			"customField": "plugin::color-picker.color"
@@ -140,6 +145,15 @@
 					"label": "Archived"
 				}
 			},
+			"registrations_are_open": {
+				"edit": {
+					"label": "Registrations are open",
+					"description": "Whether the site offers the registration form while this is the main event. Switched off, the Register Now button in the header and the RSVP bar at the foot of a phone's screen both disappear."
+				},
+				"list": {
+					"label": "Registrations open"
+				}
+			},
 			"colour_theme": {
 				"edit": {
 					"label": "Theme colour",
@@ -228,7 +242,8 @@
 					{ "name": "is_archived", "size": 4 }
 				],
 				[
-					{ "name": "schedule", "size": 6 }
+					{ "name": "schedule", "size": 6 },
+					{ "name": "registrations_are_open", "size": 6 }
 				],
 				[
 					{ "name": "colour_theme", "size": 4 },

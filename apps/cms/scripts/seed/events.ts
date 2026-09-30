@@ -49,6 +49,7 @@ export async function write_events ( strapi: Strapi ): Promise<Seeded_Events> {
 			is_archived: false,
 			main: true,
 			name: "Conscious Collective 2027",
+			registrations_are_open: true,
 			schedule: await upload_schedule_document(
 				strapi,
 				"conscious-collective-2027-schedule.pdf",
@@ -70,6 +71,7 @@ export async function write_events ( strapi: Strapi ): Promise<Seeded_Events> {
 			is_archived: false,
 			main: false,
 			name: "Conscious Collective 2029",
+			registrations_are_open: true,
 			schedule: await upload_schedule_document(
 				strapi,
 				"conscious-collective-2029-schedule.pdf",
