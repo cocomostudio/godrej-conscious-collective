@@ -26,6 +26,7 @@ import {
 	marquee,
 	page_shell,
 	palette_colour,
+	quote,
 	responsive_image,
 	section,
 	session_card,
@@ -130,6 +131,9 @@ export const TUNED_BUTTONS_PATH = "/tuned-buttons"
 /** One heading block at each of the six sizes. */
 export const HEADINGS_PATH = "/six-headings"
 
+/** A quote with no portrait, in the white page's grey card. */
+export const PORTRAITLESS_QUOTE_PATH = "/a-quote-without-a-portrait"
+
 export const PAGES: Record<string, Envelope> = {
 	[CAROUSEL_PATHS["one-column"]]: carousels_page( "one-column" ),
 	[CAROUSEL_PATHS["two-column"]]: carousels_page( "two-column" ),
@@ -138,6 +142,7 @@ export const PAGES: Record<string, Envelope> = {
 	[FEATURED_PATHS.portrait]: featured_page( "portrait" ),
 	[HEADINGS_PATH]: headings_page(),
 	[TUNED_BUTTONS_PATH]: tuned_buttons_page(),
+	[PORTRAITLESS_QUOTE_PATH]: portraitless_quote_page(),
 	"/archives": archive_page( "below" ),
 	[BARE_SECTION_PATH]: archive_page( "none" ),
 	[BLEEDING_MARQUEE_PATHS["one-column"]]: bleeding_marquee_page( "one-column" ),
@@ -257,6 +262,23 @@ function tuned_buttons_page () {
 		page_layout: "one-column",
 		title: "Buttons",
 	}, { main_event: tuned, resolved_event: tuned } )
+}
+
+function portraitless_quote_page () {
+	return envelope( {
+		main_region: [
+			section( "Quoted", {
+				content: [
+					quote(
+						"A life spent making mistakes is not only more honourable, but more useful.",
+						"George Bernard Shaw",
+					),
+				],
+			} ),
+		],
+		page_layout: "one-column",
+		title: "Quoted",
+	} )
 }
 
 function pattern_page ( placement: {

@@ -57,8 +57,10 @@ export function Quote ( { attribution, image, quote }: Quote_Props ) {
 		return <Pull_Quote attribution={ attribution } quote={ quote } />
 	}
 
+	const layout = picture ? WITH_A_PORTRAIT : WITHOUT_A_PORTRAIT
+
 	return <figure
-		className={ `${BLOCK_SPACING} rounded-lg border border-gray-light p-4 md:p-8 bg-gray-light grid grid-cols-[64px_1fr] items-center gap-4 md:gap-x-8 md:gap-y-4 md:grid-cols-[auto_auto_1fr] md:items-center` }>
+		className={ `${BLOCK_SPACING} rounded-lg border border-gray-light p-4 md:p-8 bg-gray-light grid grid-cols-[64px_1fr] items-center gap-4 md:gap-x-8 md:gap-y-4 md:items-center ${layout.grid}` }>
 		<div className="max-md:hidden size-16" aria-hidden={ true }></div>
 
 		<blockquote className="relative col-span-2 md:col-span-1 md:self-end">
@@ -81,10 +83,32 @@ export function Quote ( { attribution, image, quote }: Quote_Props ) {
 			</div> }
 
 		{ attribution
-			&& <figcaption className="md:col-start-3 md:row-start-2 max-md:pr-16 md:self-start text-caption">
+			&& <figcaption
+				className={ `md:row-start-2 md:self-start text-caption ${layout.attribution}` }>
 				{ attribution }
 			</figcaption> }
 	</figure>
+}
+
+/**
+ |
+ | The card's grid, with a portrait and without one.
+ |
+ | **Without a portrait, nothing holds its place.** From the medium breakpoint
+ | the portrait's column is dropped, so the opening mark and the words move
+ | left into the room it took, and the attribution stays under the words.
+ | Below it the attribution is no longer set beside a portrait, so it takes the
+ | full width, and keeps no padding on the right to balance one either.
+ |
+ */
+const WITH_A_PORTRAIT = {
+	attribution: "md:col-start-3 max-md:pr-16",
+	grid: "md:grid-cols-[auto_auto_1fr]",
+}
+
+const WITHOUT_A_PORTRAIT = {
+	attribution: "col-span-2 md:col-span-1 md:col-start-2",
+	grid: "md:grid-cols-[auto_1fr]",
 }
 
 /**
