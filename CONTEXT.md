@@ -24,6 +24,10 @@ _Avoid_: "page event", "effective event", "context event"
 One programme item within an event, such as a single workshop or a single talk. A session is what the public sees labelled as an "Event" on the site.
 _Avoid_: "entry", "programme item", "post"
 
+**Booking link**:
+Where a visitor reserves a place in a session. A booking link is independent of the price, because a free session can still need one to cap attendance.
+_Avoid_: "checkout URL", "ticket link"
+
 **Instance**:
 One sitting of a session, carrying a start time and an end time. A session that runs on three days has three instances.
 _Avoid_: "occurrence", "sitting", "session date", "showing"
