@@ -37,9 +37,15 @@
 
 	/* _____
 	 | card--featured (md+)
+	 |
+	 | The height is marked important because every card also carries the
+	 | `h-full` utility, which lives in a later cascade layer than this
+	 | partial and would otherwise win. The list item holding a featured card
+	 | has no height of its own, so `h-full` resolves to the height of the
+	 | card's content, and the card would grow or shrink with its picture.
 	 */
 	@media screen(md) {
-		.card--featured { @apply flex w-full h-121.5; }
+		.card--featured { @apply flex w-full !h-121.5; }
 		.card--featured .points { @apply mt-4; }
 		.card--featured .additional-details { display: block; }
 		.card--featured .details .when { display: none; }
