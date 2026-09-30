@@ -150,7 +150,7 @@ describe("a session schedule list", () => {
 		for ( const row of list.sessions ) {
 			expect( row.main_region ).toBeUndefined()
 			expect( row.venue ).toBeUndefined()
-			expect( row.checkout_url ).toBeUndefined()
+			expect( row.booking_link ).toBeUndefined()
 			expect( row.path ).toMatch( /^\/sessions\// )
 		}
 	})

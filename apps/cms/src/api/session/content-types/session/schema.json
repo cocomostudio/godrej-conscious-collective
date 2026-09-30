@@ -89,7 +89,7 @@
 			"default": "All",
 			"required": true
 		},
-		"checkout_url": {
+		"booking_link": {
 			"type": "text",
 			"required": false
 		},
@@ -240,7 +240,7 @@
 					"label": "Age group"
 				}
 			},
-			"checkout_url": {
+			"booking_link": {
 				"edit": {
 					"label": "Booking link",
 					"description": "Where a visitor reserves a place. Independent of the price — a free session can still need one for capacity."
@@ -310,7 +310,7 @@
 				],
 				[
 					{ "name": "price", "size": 4 },
-					{ "name": "checkout_url", "size": 8 }
+					{ "name": "booking_link", "size": 8 }
 				],
 				[
 					{ "name": "venue", "size": 12 }

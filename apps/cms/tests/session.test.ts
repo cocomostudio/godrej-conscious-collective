@@ -51,7 +51,7 @@ describe("a session's envelope", () => {
 		expect( entry.age_group ).toBe( "All" )
 		expect( entry.all_day_event ).toBe( true )
 		expect( entry.price ).toBe( 1599 )
-		expect( entry.checkout_url ).toBe(
+		expect( entry.booking_link ).toBe(
 			"https://example.com/cc/living-with-the-land",
 		)
 	})

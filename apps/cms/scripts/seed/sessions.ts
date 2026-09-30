@@ -56,8 +56,8 @@ export async function write_sessions (
 
 	const living_with_the_land = await create_session( strapi, {
 		all_day_event: true,
+		booking_link: "https://example.com/cc/living-with-the-land",
 		category: "Showcase",
-		checkout_url: "https://example.com/cc/living-with-the-land",
 		contributors: [
 			contributors.debasmita.documentId,
 			contributors.arthur.documentId,
@@ -85,8 +85,8 @@ export async function write_sessions (
 	// a free session can need one for capacity.
 	const block_printing = await create_session( strapi, {
 		age_group: "Children",
+		booking_link: "https://example.com/cc/block-printing",
 		category: "Workshop",
-		checkout_url: "https://example.com/cc/block-printing",
 		contributors: [ contributors.priya.documentId ],
 		cover: COVERS_BY_NAME.block_printing,
 		event: main,
@@ -229,8 +229,8 @@ export async function write_sessions (
 
 		await create_session( strapi, {
 			age_group: filler.age_group,
+			booking_link: filler.booking_link,
 			category: filler.category,
-			checkout_url: filler.checkout_url,
 			cover: cover_for( filler.category, position ),
 			event: filler.year === 2029 ? events.other.documentId : main,
 			instances: [

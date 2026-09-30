@@ -172,7 +172,7 @@ describe("every row a listing pulls", () => {
 				// hours has no reader either.
 				expect( session.all_day_event ).toBeUndefined()
 				expect( session.venue ).toBeUndefined()
-				expect( session.checkout_url ).toBeUndefined()
+				expect( session.booking_link ).toBeUndefined()
 			}
 		}
 	})

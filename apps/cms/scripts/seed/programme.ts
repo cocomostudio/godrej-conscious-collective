@@ -25,8 +25,8 @@
 export const PROGRAMME = [
 	{
 		age_group: "All",
+		booking_link: undefined as string | undefined,
 		category: "Showcase",
-		checkout_url: undefined as string | undefined,
 		day: "2027-12-11",
 		from: "10:00",
 		name: "Reweaving the Ecosystem",
@@ -39,8 +39,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "All",
+		booking_link: undefined,
 		category: "Showcase",
-		checkout_url: undefined,
 		day: "2027-12-12",
 		from: "10:00",
 		name: "Making the Invisible Visible",
@@ -53,8 +53,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "All",
+		booking_link: undefined,
 		category: "Showcase",
-		checkout_url: undefined,
 		day: "2027-12-13",
 		from: "10:00",
 		name: "The Force Within",
@@ -66,8 +66,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "Children",
+		booking_link: "https://example.com/cc/shade-garden",
 		category: "Experience",
-		checkout_url: "https://example.com/cc/shade-garden",
 		day: "2027-12-12",
 		from: "09:30",
 		name: "The Shade Garden",
@@ -79,8 +79,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "All",
+		booking_link: undefined,
 		category: "Experience",
-		checkout_url: undefined,
 		day: "2027-12-13",
 		from: "09:30",
 		name: "Soundings from the Mangrove",
@@ -93,8 +93,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "Adults",
+		booking_link: undefined,
 		category: "Conversation",
-		checkout_url: undefined,
 		day: "2027-12-11",
 		from: "15:00",
 		name: "Who Pays for Cool",
@@ -106,8 +106,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "Adults",
+		booking_link: undefined,
 		category: "Conversation",
-		checkout_url: undefined,
 		day: "2027-12-13",
 		from: "15:00",
 		name: "Building with What Is Already There",
@@ -119,8 +119,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "Children",
+		booking_link: "https://example.com/cc/clay-pots",
 		category: "Workshop",
-		checkout_url: "https://example.com/cc/clay-pots",
 		day: "2027-12-11",
 		from: "11:00",
 		name: "Cooling Pots in Clay",
@@ -132,8 +132,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "Adults",
+		booking_link: "https://example.com/cc/reading-a-site",
 		category: "Workshop",
-		checkout_url: "https://example.com/cc/reading-a-site",
 		day: "2027-12-13",
 		from: "11:00",
 		name: "Reading a Site for Heat",
@@ -146,8 +146,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "All",
+		booking_link: undefined,
 		category: "Experience",
-		checkout_url: undefined,
 		day: "2029-12-02",
 		from: "10:00",
 		name: "A First Walk Through 2029",
@@ -159,8 +159,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "All",
+		booking_link: undefined,
 		category: "Workshop",
-		checkout_url: undefined,
 		day: "2029-12-04",
 		from: "11:00",
 		name: "Drawing What Comes Next",
@@ -173,8 +173,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "All",
+		booking_link: undefined,
 		category: "Showcase",
-		checkout_url: undefined,
 		day: "2027-12-11",
 		from: "10:00",
 		name: "Terracotta, Recast",
@@ -187,8 +187,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "All",
+		booking_link: undefined,
 		category: "Showcase",
-		checkout_url: undefined,
 		day: "2027-12-12",
 		from: "10:00",
 		name: "The Weight of Water",
@@ -200,8 +200,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "All",
+		booking_link: undefined,
 		category: "Showcase",
-		checkout_url: undefined,
 		day: "2027-12-13",
 		from: "10:00",
 		name: "Kiln and Contour",
@@ -213,8 +213,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "All",
+		booking_link: undefined,
 		category: "Showcase",
-		checkout_url: undefined,
 		day: "2027-12-11",
 		from: "10:00",
 		name: "Threads of the Deccan",
@@ -226,8 +226,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "All",
+		booking_link: undefined,
 		category: "Showcase",
-		checkout_url: undefined,
 		day: "2027-12-11",
 		from: "10:00",
 		name: "A Wall That Breathes",
@@ -239,8 +239,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "All",
+		booking_link: undefined,
 		category: "Showcase",
-		checkout_url: undefined,
 		day: "2027-12-12",
 		from: "10:00",
 		name: "Salt, Sun, Settlement",
@@ -252,8 +252,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "All",
+		booking_link: undefined,
 		category: "Showcase",
-		checkout_url: undefined,
 		day: "2027-12-13",
 		from: "10:00",
 		name: "After the Monsoon",
@@ -265,8 +265,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "All",
+		booking_link: undefined,
 		category: "Showcase",
-		checkout_url: undefined,
 		day: "2027-12-12",
 		from: "10:00",
 		name: "Common Ground",
@@ -278,8 +278,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "All",
+		booking_link: undefined,
 		category: "Experience",
-		checkout_url: undefined,
 		day: "2027-12-11",
 		from: "09:30",
 		name: "The Listening Room",
@@ -291,8 +291,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "Children",
+		booking_link: undefined,
 		category: "Experience",
-		checkout_url: undefined,
 		day: "2027-12-12",
 		from: "09:30",
 		name: "Barefoot on Seven Surfaces",
@@ -304,8 +304,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "Adults",
+		booking_link: undefined,
 		category: "Experience",
-		checkout_url: undefined,
 		day: "2027-12-13",
 		from: "09:30",
 		name: "A Room at Forty Degrees",
@@ -317,8 +317,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "All",
+		booking_link: "https://example.com/cc/long-table",
 		category: "Experience",
-		checkout_url: "https://example.com/cc/long-table",
 		day: "2027-12-11",
 		from: "12:00",
 		name: "The Long Table",
@@ -330,8 +330,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "All",
+		booking_link: undefined,
 		category: "Experience",
-		checkout_url: undefined,
 		day: "2027-12-11",
 		from: "11:00",
 		name: "Wind Tunnel, Slowly",
@@ -343,8 +343,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "Children",
+		booking_link: undefined,
 		category: "Experience",
-		checkout_url: undefined,
 		day: "2027-12-13",
 		from: "11:00",
 		name: "Ink and Rain",
@@ -356,8 +356,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "Adults",
+		booking_link: undefined,
 		category: "Conversation",
-		checkout_url: undefined,
 		day: "2027-12-12",
 		from: "15:00",
 		name: "The Cost of Comfort",
@@ -369,8 +369,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "Adults",
+		booking_link: undefined,
 		category: "Conversation",
-		checkout_url: undefined,
 		day: "2027-12-13",
 		from: "11:00",
 		name: "Drawing for the Unbuilt",
@@ -382,8 +382,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "All",
+		booking_link: undefined,
 		category: "Conversation",
-		checkout_url: undefined,
 		day: "2027-12-11",
 		from: "17:00",
 		name: "What the Craftsperson Knows",
@@ -395,8 +395,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "Adults",
+		booking_link: undefined,
 		category: "Conversation",
-		checkout_url: undefined,
 		day: "2027-12-12",
 		from: "11:00",
 		name: "Material Honesty, Revisited",
@@ -408,8 +408,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "Adults",
+		booking_link: undefined,
 		category: "Conversation",
-		checkout_url: undefined,
 		day: "2027-12-11",
 		from: "11:00",
 		name: "Heat and the Working Day",
@@ -421,8 +421,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "All",
+		booking_link: undefined,
 		category: "Conversation",
-		checkout_url: undefined,
 		day: "2027-12-13",
 		from: "17:00",
 		name: "Twenty Years of the Lab",
@@ -434,8 +434,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "Adults",
+		booking_link: "https://example.com/cc/lime-plaster",
 		category: "Workshop",
-		checkout_url: "https://example.com/cc/lime-plaster",
 		day: "2027-12-12",
 		from: "09:30",
 		name: "Lime Plaster, Start to Finish",
@@ -447,8 +447,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "Adults",
+		booking_link: "https://example.com/cc/bamboo-joints",
 		category: "Workshop",
-		checkout_url: "https://example.com/cc/bamboo-joints",
 		day: "2027-12-13",
 		from: "14:00",
 		name: "Bamboo Joints Without Nails",
@@ -460,8 +460,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "Children",
+		booking_link: "https://example.com/cc/natural-dye",
 		category: "Workshop",
-		checkout_url: "https://example.com/cc/natural-dye",
 		day: "2027-12-12",
 		from: "09:30",
 		name: "Natural Dye from the Kitchen",
@@ -473,8 +473,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "Adults",
+		booking_link: "https://example.com/cc/the-section",
 		category: "Workshop",
-		checkout_url: "https://example.com/cc/the-section",
 		day: "2027-12-11",
 		from: "14:00",
 		name: "Drawing the Section",
@@ -486,8 +486,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "Children",
+		booking_link: undefined,
 		category: "Workshop",
-		checkout_url: undefined,
 		day: "2027-12-12",
 		from: "16:00",
 		name: "Paper, Folded for Shade",
@@ -499,8 +499,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "All",
+		booking_link: "https://example.com/cc/your-street",
 		category: "Workshop",
-		checkout_url: "https://example.com/cc/your-street",
 		day: "2027-12-12",
 		from: "14:00",
 		name: "Measuring Your Own Street",
@@ -512,8 +512,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "All",
+		booking_link: undefined,
 		category: "Showcase",
-		checkout_url: undefined,
 		day: "2029-12-02",
 		from: "10:00",
 		name: "Site Notes: The North Yard",
@@ -525,8 +525,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "All",
+		booking_link: undefined,
 		category: "Showcase",
-		checkout_url: undefined,
 		day: "2029-12-03",
 		from: "10:00",
 		name: "Site Notes: The Water Tank",
@@ -538,8 +538,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "Adults",
+		booking_link: undefined,
 		category: "Conversation",
-		checkout_url: undefined,
 		day: "2029-12-02",
 		from: "15:00",
 		name: "An Open Brief",
@@ -551,8 +551,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "Adults",
+		booking_link: undefined,
 		category: "Conversation",
-		checkout_url: undefined,
 		day: "2029-12-03",
 		from: "15:00",
 		name: "Who Should Be Here",
@@ -564,8 +564,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "Adults",
+		booking_link: undefined,
 		category: "Conversation",
-		checkout_url: undefined,
 		day: "2029-12-05",
 		from: "11:00",
 		name: "Two Years of Lead Time",
@@ -577,8 +577,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "All",
+		booking_link: undefined,
 		category: "Experience",
-		checkout_url: undefined,
 		day: "2029-12-03",
 		from: "10:00",
 		name: "Prototype Yard",
@@ -590,8 +590,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "All",
+		booking_link: undefined,
 		category: "Experience",
-		checkout_url: undefined,
 		day: "2029-12-04",
 		from: "10:00",
 		name: "The Shade Trial",
@@ -603,8 +603,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "Adults",
+		booking_link: undefined,
 		category: "Experience",
-		checkout_url: undefined,
 		day: "2029-12-05",
 		from: "10:00",
 		name: "A Walk with the Engineers",
@@ -616,8 +616,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "Adults",
+		booking_link: undefined,
 		category: "Workshop",
-		checkout_url: undefined,
 		day: "2029-12-02",
 		from: "11:00",
 		name: "Making the Brief",
@@ -629,8 +629,8 @@ export const PROGRAMME = [
 	},
 	{
 		age_group: "Adults",
+		booking_link: undefined,
 		category: "Workshop",
-		checkout_url: undefined,
 		day: "2029-12-05",
 		from: "14:00",
 		name: "Casting a Test Panel",
