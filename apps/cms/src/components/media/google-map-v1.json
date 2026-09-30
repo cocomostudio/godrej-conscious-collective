@@ -7,7 +7,7 @@
 	"options": {},
 	"attributes": {
 		"place_url": {
-			"type": "string",
+			"type": "text",
 			"required": true
 		},
 		"latitude": {

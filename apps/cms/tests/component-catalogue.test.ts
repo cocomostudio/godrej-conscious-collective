@@ -519,6 +519,65 @@ describe("the composites", () => {
 		expect( composite.content[1].__component ).toBe( "navigation.link-v1" )
 		expect( composite.content[1].label ).toBe( "View on Maps" )
 	})
+
+	/**
+	 |
+	 | A Maps URL copied out of the address bar is routinely longer than 255
+	 | characters: the `data=` segment carrying the pin grows with every panel
+	 | the editor opened on the way to it.
+	 |
+	 */
+	it("saves and returns a place URL of any length", async () => {
+		const place_url =
+			"https://www.google.com/maps/place/Godrej+One/@19.0939921,72.9200579,17z"
+			+ "/data=!3m2!4b1!5s0x397878ffde0c8ab3:0x8b5bde3d4ef844a4!4m6!3m5"
+			+ "!1s0x3be7c752aef03905:0x95914985cbca39c8!8m2!3d19.0939921"
+			+ "!4d72.9226328!16s%2Fg%2F11hhrs35dw"
+			+ "?entry=ttu&g_ep=" + "EgoyMDI2MDkyOC4wIKXMDSoASAFQAw%3D%3D".repeat( 4 )
+
+		expect( place_url.length ).toBeGreaterThan( 255 )
+
+		const page = await cms.strapi.documents( "api::page.page" ).create( {
+			data: {
+				main_region: [ {
+					__component: "container.section-v1",
+					content: [ {
+						__component: "container.map-and-content-v1",
+						content: [],
+						map: { place_url },
+					} ],
+				} ],
+				title: "A Long Way To Godrej One",
+			},
+		} )
+
+		const stored = await cms.strapi.documents( "api::page.page" ).findOne( {
+			documentId: page.documentId,
+			populate: {
+				main_region: {
+					on: {
+						"container.section-v1": {
+							populate: {
+								content: {
+									on: {
+										"container.map-and-content-v1": {
+											populate: { map: true },
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			status: "draft",
+		} )
+
+		const map = stored.main_region[0].content[0].map
+
+		expect( map.place_url ).toBe( place_url )
+		expect( map.latitude ).toBe( 19.0939921 )
+	})
 })
 
 describe("the page shell's injected code", () => {
