@@ -69,10 +69,22 @@ const SHELL = page_shell( {
 			style: "plain",
 			url: "/legal-disclaimer",
 		},
+		{
+			label: "Terms in Context",
+			style: "plain",
+			text_color: "context",
+			url: "/terms",
+		},
 	],
 	navigation_header: [
 		{ label: "Showcases", style: "plain", url: "/showcases" },
 		{ label: "Schedule", style: "plain", url: "/schedule" },
+		{
+			label: "Archive in Theme",
+			style: "plain",
+			text_color: "theme",
+			url: "/archive",
+		},
 	],
 } )
 
@@ -239,6 +251,32 @@ describe("the header and the footer", () => {
 		expect( html ).toContain( "/privacy-policy" )
 	})
 
+	it("draw each navigation link in the colour its editor chose", async () => {
+		const { html } = await website.get( "/about" )
+
+		// The header draws its links twice, once for each viewport's menu, so
+		// every copy has to agree.
+		const header = elements_carrying( html, "Archive in Theme" )
+		expect( header ).toHaveLength( 2 )
+		for ( const element of header ) {
+			expect( element ).toContain( "text-theme" )
+			expect( element ).not.toContain( "text-black" )
+		}
+
+		expect( elements_carrying( html, "Terms in Context" )[0] )
+			.toContain( "text-context" )
+	})
+
+	it("draw a link nobody coloured black in the header and white in the footer", async () => {
+		const { html } = await website.get( "/about" )
+
+		for ( const element of elements_carrying( html, "Showcases" ) ) {
+			expect( element ).toContain( "text-black" )
+		}
+		expect( elements_carrying( html, "Privacy Policy" )[0] )
+			.toContain( "text-white" )
+	})
+
 	it("render without the shell's navigation when no shell is marked default", async () => {
 		const { html, status } = await website.get( "/no-shell" )
 
@@ -391,6 +429,30 @@ function element_carrying ( html: string, text: string ) {
 	}
 
 	return html.slice( html.lastIndexOf( "<", at ), at )
+}
+
+/**
+ |
+ | Every element carrying a given run of words, for a run that the page draws
+ | more than once.
+ |
+ */
+function elements_carrying ( html: string, text: string ) {
+	const elements: string[] = []
+
+	// Anchored on the tag's closing bracket, so that the same words inside the
+	// hydration data are not mistaken for an element.
+	const needle = `>${text}`
+
+	for (
+		let at = html.indexOf( needle );
+		at >= 0;
+		at = html.indexOf( needle, at + needle.length )
+	) {
+		elements.push( html.slice( html.lastIndexOf( "<", at ), at + 1 ) )
+	}
+
+	return elements
 }
 
 /**

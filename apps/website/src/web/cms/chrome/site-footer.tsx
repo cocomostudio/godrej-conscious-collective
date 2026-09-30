@@ -24,6 +24,7 @@ import type {
 	Page_Shell,
 } from "../envelope.ts"
 
+import { text_color_class } from "../blocks/text-color.ts"
 import { Nav_Link } from "../nav-link.tsx"
 import { When_And_Where } from "./when-and-where.tsx"
 
@@ -123,7 +124,7 @@ function Legal_And_Social (
 						<li key={ `${link.url}:${index}` }>
 							<Nav_Link
 								url={ link.url }
-								className="underline underline-offset-2">
+								className={ `underline underline-offset-2 ${text_color_class( link.text_color, "white" )}` }>
 								{ link.label }
 							</Nav_Link>
 						</li>

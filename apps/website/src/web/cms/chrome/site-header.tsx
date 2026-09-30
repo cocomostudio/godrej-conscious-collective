@@ -54,6 +54,7 @@ import type {
 } from "../envelope.ts"
 
 import { Event_Date_Range } from "./event-date-range.tsx"
+import { text_color_class } from "../blocks/text-color.ts"
 import { Nav_Link } from "../nav-link.tsx"
 import { use_registration_actions } from "../registration/registration-context.ts"
 
@@ -432,7 +433,7 @@ function Nav_Links ( { className = "", link_tab_index, links, on_link_click }: {
 			<li key={ `${link.url}:${index}` }>
 				<Nav_Link
 					url={ link.url }
-					className="text-h5 md:font-medium md:text-nav text-black"
+					className={ `text-h5 md:font-medium md:text-nav ${text_color_class( link.text_color, "black" )}` }
 					tabIndex={ link_tab_index }
 					onClick={ on_link_click }>
 					{ link.label }
