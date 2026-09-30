@@ -24,8 +24,9 @@
  | and the block carries no margin and the section lays down no padding at that
  | edge. It is a decision an editor makes rather than one this component makes
  | for them, so a ticker that does want air around it can have it. Either way it
- | runs out to both edges of the section. The `py-4` is the bar's own
- | height rather than spacing around it.
+ | runs out to both edges of the column it is in, as a full-bleed image does:
+ | the window on a one-column page, and the white box on a two-column one. The
+ | `py-4` is the bar's own height rather than spacing around it.
  |
  | The section's padding is not undone here but never laid down: a block cannot
  | undo padding from inside it, so the section reads this attribute off the
@@ -41,7 +42,7 @@ import type { Spacing_Around } from "./block-spacing.ts"
 import type { Text_Color } from "./text-color.ts"
 
 import { block_spacing } from "./block-spacing.ts"
-import { use_full_bleed } from "./section-frame.tsx"
+import { use_column_bleed } from "./section-frame.tsx"
 import { text_color_class } from "./text-color.ts"
 
 /**
@@ -67,7 +68,7 @@ type Marquee_Props = {
 export function Marquee (
 	{ background_color, items = [], spacing_around }: Marquee_Props,
 ) {
-	const full_bleed = use_full_bleed()
+	const bleed = use_column_bleed()
 	const bar = BARS[background_color ?? "black"] ?? BARS.black
 
 	const slides = items.flatMap( ( item ) =>
@@ -88,7 +89,7 @@ export function Marquee (
 	}
 
 	return <div
-		className={ `${full_bleed} ${
+		className={ `${bleed} ${
 			block_spacing( spacing_around )
 		} py-4 ${bar.background} text-h4 font-semibold` }>
 		<div className="overflow-hidden" ref={ viewport_ref }>

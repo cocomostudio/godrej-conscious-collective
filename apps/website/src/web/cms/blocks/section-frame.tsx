@@ -34,7 +34,7 @@
  |     is the same answer — the window's edges. On a two-column page it is the
  |     main column's own edges: out of the `md:pl-16` inset on the left, and
  |     across the two gutters the white box holds beyond the container on the
- |     right. The full-bleed image is what asks.
+ |     right. The full-bleed image and the marquee are what ask.
  |
  | And one way back in: **`use_column_inset`** is the padding that returns a
  | block's content to where an ordinary block's would have been, for a block

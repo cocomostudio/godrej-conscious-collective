@@ -741,12 +741,17 @@ describe("the full-bleed image", () => {
 	it("carries no rounded corners and no visible caption", async () => {
 		const { html } = await website.get( "/everything" )
 
-		const figure = html.slice( html.indexOf( "md:-ml-16" ) )
-			.slice(
-				0,
-				html.slice( html.indexOf( "md:-ml-16" ) )
-					.indexOf( "</figure>" ),
-			)
+		// Found through its own caption, because the marquee above it on this
+		// page bleeds by the same classes.
+		const markup = rendered( html )
+		const start = markup.lastIndexOf(
+			"<figure",
+			markup.indexOf( "A caption nobody sees." ),
+		)
+		const figure = markup.slice(
+			start,
+			markup.indexOf( "</figure>", start ),
+		)
 
 		expect( figure ).not.toContain( "rounded-lg" )
 		expect( figure ).toContain( "sr-only" )

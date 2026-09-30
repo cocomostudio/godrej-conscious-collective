@@ -2,7 +2,8 @@
 /**
  |
  | The pages the browser tests are served, in the same envelope shapes the
- | server-side tests use.
+ | server-side tests use: the Archive's timeline, and a marquee beside a
+ | full-bleed image.
  |
  | The Archive is laid out as the seed lays it out: a two-column page whose
  | section pads below itself and not above, so that the timeline opens the
@@ -17,7 +18,9 @@ import {
 	archive_entry,
 	archive_timeline_listing,
 	envelope,
+	full_bleed_image_block,
 	image,
+	marquee,
 	section,
 	wysiwyg,
 } from "../support/envelopes.ts"
@@ -51,9 +54,36 @@ export function front_photograph_of ( year: string ) {
 /** The same timeline, in a section that pads neither edge. */
 export const BARE_SECTION_PATH = "/archives-in-a-bare-section"
 
+/** A marquee above a full-bleed image, on each of the two page layouts. */
+export const BLEEDING_MARQUEE_PATHS = {
+	"one-column": "/a-bleeding-marquee-in-one-column",
+	"two-column": "/a-bleeding-marquee-in-two-columns",
+}
+
 export const PAGES: Record<string, Envelope> = {
 	"/archives": archive_page( "below" ),
 	[BARE_SECTION_PATH]: archive_page( "none" ),
+	[BLEEDING_MARQUEE_PATHS["one-column"]]: bleeding_marquee_page( "one-column" ),
+	[BLEEDING_MARQUEE_PATHS["two-column"]]: bleeding_marquee_page( "two-column" ),
+}
+
+function bleeding_marquee_page (
+	page_layout: keyof typeof BLEEDING_MARQUEE_PATHS,
+) {
+	return envelope( {
+		main_region: [
+			section( "Bleeding", {
+				content: [
+					marquee( "The venue", "The dates" ),
+					full_bleed_image_block( "/uploads/bled.png", {
+						alt: "Edge to edge",
+					} ),
+				],
+			} ),
+		],
+		page_layout,
+		title: "Bleeding",
+	} )
 }
 
 function entry_of ( { description, name, year }: typeof ARCHIVE_ENTRIES[number] ) {
