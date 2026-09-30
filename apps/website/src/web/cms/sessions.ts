@@ -312,7 +312,7 @@ const BOOKING = "Buy tickets"
 
 function price_detail ( session: Session_Entry ): Detail | null {
 	const label = price_label( session.price )
-	const booking = session.checkout_url
+	const booking = session.booking_link
 
 	if ( label === null && !booking ) {
 		return null

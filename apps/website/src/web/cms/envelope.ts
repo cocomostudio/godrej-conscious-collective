@@ -186,7 +186,7 @@ export type Session_Entry = Entry_Common & {
 	price: number | null
 	venue: Link | null
 	age_group: Age_Group
-	checkout_url: string | null
+	booking_link: string | null
 }
 
 /**

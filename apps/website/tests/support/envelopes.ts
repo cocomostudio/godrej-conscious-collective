@@ -113,8 +113,8 @@ export function session_envelope (
 		entry: {
 			age_group: "All",
 			all_day_event: false,
+			booking_link: null,
 			category: "Showcase",
-			checkout_url: null,
 			contentType: "api::session.session",
 			cover: null,
 			documentId: `document-${id()}`,

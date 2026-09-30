@@ -56,16 +56,16 @@ beforeAll( async () => {
 		} ),
 
 		"/sessions/free-with-booking": session_envelope( {
+			booking_link: "https://example.com/book",
 			category: "Workshop",
-			checkout_url: "https://example.com/book",
 			name: "Free With Booking",
 			price: 0,
 		} ),
 
 		"/sessions/living-with-the-land": session_envelope( {
 			age_group: "Children",
+			booking_link: "https://example.com/buy",
 			category: "Showcase",
-			checkout_url: "https://example.com/buy",
 			cover: responsive_image( "https://pictures.test/cover.jpg" ),
 			instances: [
 				instance( "2025-12-11", "10:00", "12:30" ),
