@@ -4,10 +4,8 @@
  | A horizontal track that loops: drag it, throw it, or scroll a wheel across
  | it, and it never runs out.
  |
- | Two of the four category renderings are this — showcases and conversations —
- | and they differ in their spacing rather than in their mechanism. One track
- | rather than two copies of the same Embla wiring: a fix to how a loop measures
- | itself must not repair one row and miss the other.
+ | A list of five or more session cards is drawn as this. See
+ | `arranged-cards.tsx`.
  |
  | **A carousel filled from a CMS has a problem the static site did not.** There,
  | the slide count was a literal in the source and always exceeded the viewport.
@@ -17,11 +15,13 @@
  | hidden from assistive technology. The measurement runs in a layout effect, so
  | the server renders two sets and the browser settles on the count it needs.
  |
- | **The alignment sentinel** is the static site's, unchanged: from the medium
- | breakpoint upward the track aligns to the content container's own margin
- | rather than to the centre, so the first card lines up with the text above it.
- | A hidden element carrying that width is the only way to read a value that
- | exists solely as a CSS custom property.
+ | **The alignment sentinel** lines the first card up with the text above it:
+ | from the medium breakpoint upward the track aligns to how far the words sit
+ | in from the edge of the column, rather than to the centre. That distance is
+ | measured from the column the track is in, so it differs between a one-column
+ | page and the main column of a two-column one. A hidden element carrying that
+ | width is the only way to read a value that exists solely as a CSS custom
+ | property.
  |
  */
 
@@ -38,8 +38,10 @@ import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import { use_repetitions_needed_for_looping } from "#infra/lib/ui/react/embla-carousel/use-repetitions-needed-for-looping.ts"
 import { breakpoints } from "#infra/lib/ui/app-shells/primary/breakpoints.ts"
 
+import { use_column_inset_width } from "./section-frame.tsx"
+
 type Looping_Track_Props = {
-	/** The viewport's own spacing, which is what the two rows differ in. */
+	/** The viewport's own spacing and bleed. */
 	className?: string
 	/** The width of one slide, at each breakpoint. */
 	slide_className?: string
@@ -52,12 +54,13 @@ export function Looping_Track (
 	const slides = Children.toArray( children )
 
 	const sentinel = useRef<HTMLDivElement>( null )
+	const inset_width = use_column_inset_width()
 
 	const [ embla_ref ] = useEmblaCarousel( {
 		align: "center",
 		breakpoints: {
 			[`( min-width: ${breakpoints.md} )`]: {
-				align: () => content_margin( sentinel.current ),
+				align: () => column_inset( sentinel.current ),
 			},
 		},
 		containScroll: false,
@@ -93,7 +96,9 @@ export function Looping_Track (
 	}
 
 	return <>
-		<div className="js_sentinel hidden w-1ccm" ref={ sentinel } />
+		<div
+			className={ `js_sentinel hidden ${inset_width}` }
+			ref={ sentinel } />
 
 		<div
 			className={ `overflow-hidden ${className}` }
@@ -119,14 +124,14 @@ export function Looping_Track (
 
 /**
  |
- | The width of the content container's margin, in pixels.
+ | How far the words sit in from the column's edge, in pixels.
  |
  | Zero when the sentinel is not there or is not carrying a length — an
  | alignment of zero is the track's left edge, which is what the sentinel was
  | approximating in the first place.
  |
  */
-function content_margin ( sentinel: HTMLElement | null ): number {
+function column_inset ( sentinel: HTMLElement | null ): number {
 	if ( !sentinel ) {
 		return 0
 	}

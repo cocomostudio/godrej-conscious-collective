@@ -17,8 +17,8 @@
  | never fetched rather than fetched and then not drawn. The field description
  | says so in the admin.
  |
- | Two columns from the medium breakpoint, one below it, which is the static
- | site's arrangement for this exact strip.
+ | **It is laid out the way the home page's rows are**, by how many sessions
+ | arrived. See `arranged-cards.tsx`.
  |
  | **`normalise_colors` is this block's alone.** A curated strip is where a page
  | most often mixes categories, so it is where a points line drawn in each
@@ -37,8 +37,7 @@
 import type { Session_Card } from "../envelope.ts"
 import type { Style_And_Transition } from "../cards.tsx"
 
-import { Card } from "../cards.tsx"
-
+import { Arranged_Cards } from "./arranged-cards.tsx"
 import { BLOCK_SPACING } from "./block-spacing.ts"
 
 export function Session_List (
@@ -52,15 +51,10 @@ export function Session_List (
 		return null
 	}
 
-	return <ul
-		className={ `${BLOCK_SPACING} grid grid-cols-1 gap-8 md:grid-cols-2` }>
-		{ sessions.map( ( session ) =>
-			<li key={ session.documentId }>
-				<Card
-					normalise_colors={ normalise_colors !== false }
-					session={ session }
-					style_and_transition={ style_and_transition } />
-			</li>
-		) }
-	</ul>
+	return <div className={ BLOCK_SPACING }>
+		<Arranged_Cards
+			normalise_colors={ normalise_colors !== false }
+			sessions={ sessions }
+			style_and_transition={ style_and_transition } />
+	</div>
 }

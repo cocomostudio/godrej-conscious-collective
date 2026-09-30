@@ -105,6 +105,15 @@ const COLUMN_BLEED_INSET = "pl-1ccm md:pl-16 pr-1ccm md:pr-2g"
 
 /**
  |
+ | The left half of each inset above, as a width: how far the words sit in
+ | from the column's left edge.
+ |
+ */
+const FULL_BLEED_INSET_WIDTH = "w-1ccm"
+const COLUMN_BLEED_INSET_WIDTH = "w-1ccm md:w-16"
+
+/**
+ |
  | The container a section introduces inside itself, so that its background can
  | be the full width of the column while its words are not.
  |
@@ -298,4 +307,21 @@ export function use_column_inset () {
 	return use_page_layout() === "one-column"
 		? FULL_BLEED_INSET
 		: COLUMN_BLEED_INSET
+}
+
+/**
+ |
+ | How far the words sit in from the left edge of the column, as a width class.
+ |
+ | For a block that bled out with `use_column_bleed` and has to line something
+ | up with the words it left behind — a carousel aligning its first card is the
+ | case. A width, rather than padding, because a script is what reads it: the
+ | value exists only as a custom property, and a hidden element carrying it is
+ | the one way to measure it.
+ |
+ */
+export function use_column_inset_width () {
+	return use_page_layout() === "one-column"
+		? FULL_BLEED_INSET_WIDTH
+		: COLUMN_BLEED_INSET_WIDTH
 }

@@ -23,8 +23,10 @@ import {
 	instance,
 	marquee,
 	page_shell,
+	responsive_image,
 	section,
 	session_card,
+	session_listing,
 	session_listing_with_filtration,
 	session_schedule_list,
 	session_schedule_row,
@@ -89,7 +91,37 @@ export const SCHEDULE_PATH = "/schedule"
 /** A page that scrolls, but by less than a screen, at the small breakpoint. */
 export const SHORT_PATH = "/a-short-page"
 
+/** Two session carousels, one under the other, on each of the two page layouts. */
+export const CAROUSEL_PATHS = {
+	"one-column": "/carousels-in-one-column",
+	"two-column": "/carousels-in-two-columns",
+}
+
+/** The same carousel, under a heading with no link beside it. */
+export const UNLINKED_CAROUSEL_PATH = "/a-carousel-without-a-link"
+
+/**
+ |
+ | Four sessions, so the first is featured, with a cover of each shape. The
+ | covers are served by the test itself, at the sizes their names say.
+ |
+ */
+export const FEATURED_PATHS = {
+	landscape: "/a-featured-landscape-cover",
+	portrait: "/a-featured-portrait-cover",
+}
+
+export const COVER_SIZES = {
+	landscape: { height: 600, width: 1600 },
+	portrait: { height: 1600, width: 600 },
+}
+
 export const PAGES: Record<string, Envelope> = {
+	[CAROUSEL_PATHS["one-column"]]: carousels_page( "one-column" ),
+	[CAROUSEL_PATHS["two-column"]]: carousels_page( "two-column" ),
+	[UNLINKED_CAROUSEL_PATH]: carousels_page( "one-column", false ),
+	[FEATURED_PATHS.landscape]: featured_page( "landscape" ),
+	[FEATURED_PATHS.portrait]: featured_page( "portrait" ),
 	"/archives": archive_page( "below" ),
 	[BARE_SECTION_PATH]: archive_page( "none" ),
 	[BLEEDING_MARQUEE_PATHS["one-column"]]: bleeding_marquee_page( "one-column" ),
@@ -121,6 +153,60 @@ function bleeding_marquee_page (
 		],
 		page_layout,
 		title: "Bleeding",
+	} )
+}
+
+function sessions ( category: string, count: number, cover?: string ) {
+	return Array.from( { length: count }, ( _, index ) =>
+		session_card( {
+			category: category as ReturnType<typeof session_card>["category"],
+			cover: cover ? responsive_image( cover ) : null,
+			name: `${category} ${index + 1}`,
+			path: `/sessions/${category.toLowerCase()}-${index + 1}`,
+			standfirst: "A standfirst, shown on the featured card alone.",
+		} )
+	)
+}
+
+function carousels_page (
+	page_layout: keyof typeof CAROUSEL_PATHS,
+	linked = true,
+) {
+	const row = ( title: string, category: string ) =>
+		section( title, {
+			content: [ session_listing( category, sessions( category, 6 ) ) ],
+			heading: {
+				content: title,
+				link: linked
+					? { label: "View All", style: "plain", url: "/all" }
+					: null,
+			},
+		} )
+
+	return envelope( {
+		main_region: [
+			row( "Showcases", "Showcase" ),
+			row( "Conversations", "Conversation" ),
+		],
+		page_layout,
+		title: "Carousels",
+	} )
+}
+
+function featured_page ( shape: keyof typeof FEATURED_PATHS ) {
+	return envelope( {
+		main_region: [
+			section( "Workshops", {
+				content: [
+					session_listing(
+						"Workshop",
+						sessions( "Workshop", 4, `/uploads/${shape}.svg` ),
+					),
+				],
+			} ),
+		],
+		page_layout: "one-column",
+		title: "Featured",
 	} )
 }
 

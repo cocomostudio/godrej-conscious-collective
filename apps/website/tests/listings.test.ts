@@ -11,11 +11,10 @@
  | hands the block rows — and the curated and the automatic tests use the same
  | row builder, because that is the contract.
  |
- | **That all four category renderings survived the collapse into one
- | component.** One schema, one registry entry, one populate fragment and one
- | seed branch replaced eight of each, and the way that goes wrong is quietly:
- | four categories that all come out looking like the plainest one. Each is
- | pinned by something only that rendering does.
+ | **That a listing is arranged by how many cards arrive**, in both listings of
+ | session cards, whatever the category. Each arrangement is pinned by
+ | something only it does: a featured card, or a track that repeats its cards
+ | to loop.
  |
  | The home page is asked for as `/`, and the CMS stub answers it under `/home`
  | — a Page titled "Home" resolves to `/home`, the website tries the incoming
@@ -34,6 +33,8 @@ import {
 	expect,
 	it,
 } from "vitest"
+
+import type { Session_Card } from "../src/web/cms/envelope.ts"
 
 import {
 	type Website,
@@ -74,8 +75,78 @@ const SHOWCASES = [
 	} ),
 ]
 
+/* _____
+ | Arrangements.
+ |
+ | One page per listing and per count. The arrangement is decided by how many
+ | cards arrive and by nothing else, so the session listing's pages use a
+ | different category at each count: a count that only worked for one category
+ | would fail on another.
+ |
+ */
+const COUNTS = [ 1, 3, 4, 5, 10 ] as const
+
+const LISTING_CATEGORIES = {
+	1: "Showcase",
+	3: "Conversation",
+	4: "Experience",
+	5: "Experience",
+	10: "Workshop",
+} as const
+
+function arranged_cards ( count: number, category: string ) {
+	return Array.from( { length: count }, ( _unused, index ) =>
+		session_card( {
+			category: category as Session_Card["category"],
+			name: `Arranged ${String.fromCharCode( 65 + index )}`,
+			path: `/sessions/arranged-${index}`,
+			standfirst: `The standfirst of card ${index}.`,
+		} ) )
+}
+
+const ARRANGED = Object.fromEntries( COUNTS.flatMap( ( count ) => {
+	const category = LISTING_CATEGORIES[count]
+
+	return [
+		[
+			`/arranged/session-listing/${count}`,
+			envelope( {
+				main_region: [
+					section( "Arranged", {
+						content: [
+							session_listing(
+								category,
+								arranged_cards( count, category ),
+								6,
+							),
+						],
+					} ),
+				],
+				title: `Arranged listing of ${count}`,
+			} ),
+		],
+		[
+			`/arranged/session-list/${count}`,
+			envelope( {
+				main_region: [
+					section( "Arranged", {
+						content: [
+							session_list(
+								arranged_cards( count, category ),
+							),
+						],
+					} ),
+				],
+				title: `Arranged list of ${count}`,
+			} ),
+		],
+	]
+} ) )
+
 beforeAll( async () => {
 	website = await boot_website( {
+		...ARRANGED,
+
 		"/collaborators": envelope( {
 			main_region: [
 				section( "Collaborators", {
@@ -302,38 +373,52 @@ describe("a card", () => {
 	})
 })
 
-describe("the four category renderings", () => {
-	// The two looping rows repeat their slides so the loop has something to
-	// wrap onto, and hide every repetition after the first from assistive
-	// technology. Nothing else in the catalogue renders a card twice.
-	it("turn showcases and conversations, and repeat the slides to do it", async () => {
-		const body = body_of( ( await website.get( "/" ) ).html )
+describe("the arrangement a listing of cards takes", () => {
+	for ( const listing of [ "session-listing", "session-list" ] ) {
+		describe(`in a ${listing.replace( "-", " " )}`, () => {
+			for ( const count of [ 1, 3 ] ) {
+				it(`sets ${count} in a row, each drawn once, none featured`, async () => {
+					const body = await arranged( listing, count )
 
-		expect( occurrences( body, "Living with the Land" ) )
-			.toBeGreaterThan( 1 )
-		expect( occurrences( body, "Who Pays for Cool" ) ).toBeGreaterThan( 1 )
-		expect( body ).toContain( "aria-hidden=\"true\"" )
-	})
+					expect( occurrences( body, "Arranged A" ) ).toBe( 1 )
+					expect( occurrences( body, "card--featured" ) ).toBe(
+						0,
+					)
+				})
+			}
 
-	// Few enough of them that a carousel would be an affordance with nothing
-	// behind it.
-	it("set experiences in a plain row, drawn once", async () => {
-		const body = body_of( ( await website.get( "/" ) ).html )
+			// Four reads as a deliberate composition: one featured above a
+			// row of three, and nothing turning.
+			it("features the first of exactly four above the other three", async () => {
+				const body = await arranged( listing, 4 )
 
-		expect( occurrences( body, "The Shade Garden" ) ).toBe( 1 )
-	})
+				expect( occurrences( body, "card--featured" ) ).toBe( 1 )
+				expect( body.indexOf( "card--featured" ) )
+					.toBeLessThan( body.indexOf( "Arranged A" ) )
+				expect( occurrences( body, "Arranged A" ) ).toBe( 1 )
+				expect( occurrences( body, "Arranged D" ) ).toBe( 1 )
+			})
 
-	it("feature the first workshop and no other", async () => {
-		const body = body_of( ( await website.get( "/" ) ).html )
+			// The loop repeats its slides so it has something to wrap onto,
+			// and hides every repetition after the first from assistive
+			// technology. Nothing else renders a card twice.
+			for ( const count of [ 5, 10 ] ) {
+				it(`turns ${count} in a looping carousel`, async () => {
+					const body = await arranged( listing, count )
 
-		expect( occurrences( body, "card--featured" ) ).toBe( 1 )
+					expect( occurrences( body, "Arranged A" ) )
+						.toBeGreaterThan( 1 )
+					expect( body ).toContain( "aria-hidden=\"true\"" )
+					expect( occurrences( body, "card--featured" ) ).toBe(
+						0,
+					)
+				})
+			}
+		})
+	}
+})
 
-		// Its standfirst rides along, hidden until the medium breakpoint,
-		// where `card--featured` reveals it.
-		expect( body ).toContain( "Throw a pot that keeps water cold." )
-		expect( body ).toContain( "additional-details" )
-	})
-
+describe("the cards on a page of several categories", () => {
 	// **By re-pointing the context colour, not by naming the category.** Every
 	// card on the page carries the same handful of classes and aims the alias
 	// at its own category on its own element, which is what lets four
@@ -368,15 +453,6 @@ describe("a curated session list", () => {
 
 		expect( body.indexOf( "Living with the Land" ) )
 			.toBeLessThan( body.indexOf( "The Force Within" ) )
-	})
-
-	// Two columns from the medium breakpoint, which is the static site's own
-	// arrangement for this strip and the one thing that distinguishes it.
-	it("sets them two across rather than in a track", async () => {
-		const body = body_of( ( await website.get( "/related" ) ).html )
-
-		expect( body ).toContain( "md:grid-cols-2" )
-		expect( occurrences( body, "Living with the Land" ) ).toBe( 1 )
 	})
 })
 
@@ -465,7 +541,6 @@ describe("a page holding several listings", () => {
 		const body = body_of( ( await website.get( "/whats-on" ) ).html )
 
 		expect( body ).toContain( "Living with the Land" )
-		expect( body ).toContain( "card--featured" )
 		expect( body ).toContain( "md:grid-cols-3" )
 	})
 })
@@ -482,6 +557,12 @@ describe("a listing with nothing in it", () => {
 		expect( body_of( html ) ).not.toContain( "points" )
 	})
 })
+
+async function arranged ( listing: string, count: number ) {
+	return body_of(
+		( await website.get( `/arranged/${listing}/${count}` ) ).html,
+	)
+}
 
 function body_of ( html: string ) {
 	return html.replace( /<script[\s\S]*?<\/script>/g, "" )

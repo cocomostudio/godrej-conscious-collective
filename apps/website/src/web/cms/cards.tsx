@@ -4,10 +4,10 @@
  | The two things a listing is made of: a card for a session, a portrait for a
  | collaborator.
  |
- | Neither is a block. Eight renderings across three listing components draw one
- | or the other — four category renderings, three collaborator layouts and the
- | curated strip — and a card that each of them drew for itself would drift from
- | the rest on the first change to how a price sits beside an age group.
+ | Neither is a block. Several renderings across the listing components draw one
+ | or the other — three arrangements of session cards and three collaborator
+ | layouts among them — and a card that each of them drew for itself would drift
+ | from the rest on the first change to how a price sits beside an age group.
  |
  | What varies between the renderings is the **track**: how wide a card is,
  | whether it scrolls, whether it loops, how many sit in a row. That is the
@@ -16,9 +16,10 @@
  |
  | The class hooks — `image`, `details`, `points`, `when`,
  | `additional-details` — are the ones `tailwind-v3/components/card.css`
- | reaches for. The workshops listing puts `card--featured` on its first card
- | and those rules do the rest, which is why the figure and the details box are
- | direct children of the card's own element and must stay that way.
+ | reaches for. A featured plus three in a row puts `card--featured` on its
+ | first card and those rules do the rest, which is why the figure and the
+ | details box are direct children of the card's own element and must stay that
+ | way.
  |
  | **What a card does when it is pointed at varies too, and it is the one thing
  | here an editor chooses.** It arrives as `style_and_transition` on each of the
@@ -249,8 +250,9 @@ export function Card (
 				points={ session_points( session ) } />
 
 			{
-				/* Shown only by `card--featured`, which the workshops listing
-			     puts on its first card from the medium breakpoint upward.
+				/* Shown only by `card--featured`, which a featured plus three
+			     in a row puts on its first card, from the medium breakpoint
+			     upward.
 			     `additional-details` is hidden by default in the card CSS
 			     partial and revealed by `.card--featured` — the utility
 			     `hidden` would land in a later cascade layer than the

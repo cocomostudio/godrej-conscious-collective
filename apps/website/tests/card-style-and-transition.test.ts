@@ -170,6 +170,31 @@ beforeAll( async () => {
 			title: "Normalised, stroking",
 		} ),
 
+		// Four cards, which is the one count a session list draws with a
+		// featured card — the card whose rule is on show.
+		"/normalised-four": envelope( {
+			main_region: [
+				section( "You might also like", {
+					content: [
+						session_list(
+							Array.from(
+								{ length: 4 },
+								( _unused, index ) =>
+									session_card( {
+										...FEATURED,
+										documentId:
+											`featured-${index}`,
+									} ),
+							),
+							"change-stroke-on-hover",
+							true,
+						),
+					],
+				} ),
+			],
+			title: "Normalised, four",
+		} ),
+
 		"/normalised-unset": envelope( {
 			main_region: [
 				section( "You might also like", {
@@ -405,6 +430,20 @@ describe("normalise_colors", () => {
 		// The panel behind them is the only thing that moves, which is what
 		// makes black legible at both ends of the transition.
 		expect( body ).toContain( "group-hover:bg-context" )
+	})
+
+	// A list of four is the one a session list features a card in, and the
+	// featured card is the one whose rule a visitor sees.
+	it("reaches the featured card in a list of four", async () => {
+		const body = body_of(
+			( await website.get( "/normalised-four" ) ).html,
+		)
+
+		const featured = body.slice( body.indexOf( "card--featured" ) )
+
+		expect( body ).toContain( "card--featured" )
+		expect( rule_of( featured ) ).toContain( "border-black" )
+		expect( rule_of( featured ) ).toContain( "group-hover:border-context" )
 	})
 
 	it("draws the strip as any other listing does when it is turned off", async () => {
