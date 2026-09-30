@@ -174,7 +174,7 @@ function Header (
 		className={ `sticky top-[var(--site-header-offset,0px)] z-10 ${use_column_bleed()} ${use_column_inset()} py-4 md:-mb-4 bg-context flex items-center gap-2` }
 		data-under-site-header>
 		<Showing
-			className="text-h6 md:text-h3 md:font-semibold font-light text-white"
+			className="text-h6 md:text-h3 md:font-semibold text-white"
 			count={ showing.length } />
 
 		<div className="ml-auto flex items-center gap-2">

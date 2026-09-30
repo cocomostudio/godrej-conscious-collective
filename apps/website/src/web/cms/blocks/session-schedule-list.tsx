@@ -228,7 +228,7 @@ function List_Header (
 		ref={ ref }>
 		<div className="flex items-center gap-2">
 			<Showing
-				className="text-h6 md:text-h3 md:font-semibold font-light text-theme md:text-black"
+				className="text-h6 md:text-h3 md:font-semibold text-theme md:text-black"
 				count={ count } />
 
 			<Filtration_Trigger

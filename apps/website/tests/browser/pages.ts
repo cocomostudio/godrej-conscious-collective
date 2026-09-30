@@ -19,6 +19,7 @@ import {
 	archive_timeline_listing,
 	envelope,
 	full_bleed_image_block,
+	heading,
 	image,
 	instance,
 	marquee,
@@ -116,12 +117,16 @@ export const COVER_SIZES = {
 	portrait: { height: 1600, width: 600 },
 }
 
+/** One heading block at each of the six sizes. */
+export const HEADINGS_PATH = "/six-headings"
+
 export const PAGES: Record<string, Envelope> = {
 	[CAROUSEL_PATHS["one-column"]]: carousels_page( "one-column" ),
 	[CAROUSEL_PATHS["two-column"]]: carousels_page( "two-column" ),
 	[UNLINKED_CAROUSEL_PATH]: carousels_page( "one-column", false ),
 	[FEATURED_PATHS.landscape]: featured_page( "landscape" ),
 	[FEATURED_PATHS.portrait]: featured_page( "portrait" ),
+	[HEADINGS_PATH]: headings_page(),
 	"/archives": archive_page( "below" ),
 	[BARE_SECTION_PATH]: archive_page( "none" ),
 	[BLEEDING_MARQUEE_PATHS["one-column"]]: bleeding_marquee_page( "one-column" ),
@@ -207,6 +212,20 @@ function featured_page ( shape: keyof typeof FEATURED_PATHS ) {
 		],
 		page_layout: "one-column",
 		title: "Featured",
+	} )
+}
+
+function headings_page () {
+	return envelope( {
+		main_region: [
+			section( "Headings", {
+				content: [ 1, 2, 3, 4, 5, 6 ].map( ( level ) =>
+					heading( `A heading at size ${level}`, { level: `h${level}` } )
+				),
+			} ),
+		],
+		page_layout: "one-column",
+		title: "Headings",
 	} )
 }
 

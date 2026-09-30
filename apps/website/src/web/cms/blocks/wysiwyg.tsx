@@ -292,7 +292,7 @@ export function Wysiwyg ( { rich_text, text_color }: Wysiwyg_Props ) {
 					<H
 						className={ `${HEADING_GAP} ${
 							heading_size_class( level )
-						} md:font-semibold text-context` }>
+						} text-context` }>
 						{ children }
 					</H>,
 				image: ( { image } ) =>

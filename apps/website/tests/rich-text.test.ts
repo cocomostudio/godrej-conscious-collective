@@ -294,8 +294,18 @@ describe("a heading inside rich text", () => {
 			.toContain( "text-h3" )
 		expect( classes_of( html, "Heading typed into a text block" ) )
 			.toContain( "text-h3" )
-		expect( classes_of( html, "Heading typed into a text block" ) )
-			.toContain( "md:font-semibold" )
+
+		// The weight follows the size, at every width, in both.
+		for (
+			const text of [
+				"Heading placed on its own",
+				"Heading typed into a text block",
+			]
+		) {
+			expect( classes_of( html, text ) ).toMatch(
+				/(^| )font-semibold( |$)/,
+			)
+		}
 	})
 
 	it("takes its element from nesting rather than from the size chosen", async () => {

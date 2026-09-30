@@ -122,7 +122,7 @@ function List_Header (
 
 	return <div
 		className={ `max-lg:px-1ccm max-lg:py-4 max-lg:bg-gray-light ${className}` }>
-		<p className="text-h6 lg:text-h3 lg:font-semibold font-light text-context lg:text-black">
+		<p className="text-h6 lg:text-h3 lg:font-semibold text-context lg:text-black">
 			{ `${entries_count} ${entries_count === 1 ? "Event" : "Events"}` }
 		</p>
 	</div>

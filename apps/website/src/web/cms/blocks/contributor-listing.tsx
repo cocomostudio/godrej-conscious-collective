@@ -124,7 +124,7 @@ export function Contributor_Listing (
  */
 function Header ( { count }: { count: number } ) {
 	return <div className={ `md:mb-8 max-md:px-1ccm max-md:py-4 ${ use_column_inset() }` }>
-		<p className="text-h6 md:text-h3 md:font-semibold font-light text-white">
+		<p className="text-h6 md:text-h3 md:font-semibold text-white">
 			{ `${count} ${count === 1 ? "Collaborator" : "Collaborators"}` }
 		</p>
 	</div>

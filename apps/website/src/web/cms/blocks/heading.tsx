@@ -30,18 +30,29 @@ import { use_text_colour_class } from "../dark-surface.tsx"
 import { Nav_Link } from "../nav-link.tsx"
 import { Chevron_Right } from "#infra/lib/ui/react/icons/chevron-right.tsx"
 
+/**
+ |
+ | **A heading's weight follows how large it looks, not its element**: the
+ | three largest sizes are semibold and the three smallest are regular, at
+ | every width. So the weight is written beside the size, and a heading's call
+ | site names neither.
+ |
+ | Only headings read this table. Text that borrows a heading's size — a
+ | card's title, a marquee item, a profile's name — keeps a weight of its own.
+ |
+ */
 const SIZES: Record<string, string> = {
-	h1: "text-h1",
-	h2: "text-h2",
-	h3: "text-h3",
-	h4: "text-h4",
-	h5: "text-h5",
-	h6: "text-h6",
+	h1: "text-h1 font-semibold",
+	h2: "text-h2 font-semibold",
+	h3: "text-h3 font-semibold",
+	h4: "text-h4 font-normal",
+	h5: "text-h5 font-normal",
+	h6: "text-h6 font-normal",
 }
 
 /**
  |
- | How large a heading of a given level looks.
+ | How large a heading of a given level looks, and therefore how heavy.
  |
  | Exported because a heading typed inside a text block is meant to be
  | indistinguishable from one placed as a component, and two copies of this table
@@ -73,9 +84,7 @@ export function Heading (
 		className="flex flex-wrap items-center md:items-baseline justify-between gap-4 scroll-mt-[calc(1rem+var(--site-header-offset,0px))]"
 		id={ anchor }>
 		<H
-			className={ `${
-				heading_size_class( level )
-			} md:font-semibold ${colour}` }>
+			className={ `${heading_size_class( level )} ${colour}` }>
 			{ content }
 		</H>
 
