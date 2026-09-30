@@ -3,19 +3,17 @@
  |
  | When the event is on, and where.
  |
- | The dates are the **main event's**, like everything else in the chrome.
+ | The dates and the daily hours are the **main event's**, like everything else
+ | in the chrome.
  |
- | **The opening hours and the address are not.** Nothing in the content model
- | holds either: an Event carries a date range and a schedule document, and a
- | venue is a Session attribute rather than an event-wide one. So these two
- | lines are still the literals the static site shipped, and an editor cannot
- | change them — which is the exact complaint this whole project exists to
- | answer, sitting in the footer of every page.
+ | **The address is not.** Nothing in the content model holds it: a venue is a
+ | Session attribute rather than an event-wide one. So that line is still the
+ | literal the static site shipped, and an editor cannot change it.
  |
- | They are kept rather than dropped because the design shows them and dropping
- | them would be a silent regression, and because inventing attributes the spec
- | does not name is worse than carrying a flagged one. Whoever adds
- | `time_start`, `time_end` and `venue` to Event deletes this comment with them.
+ | It is kept rather than dropped because the design shows it and dropping it
+ | would be a silent regression, and because inventing an attribute nobody has
+ | named is worse than carrying a flagged one. Whoever adds a `venue` to Event
+ | deletes this comment with it.
  |
  */
 
@@ -41,15 +39,66 @@ export function When_And_Where (
 			RSVP For <Event_Date_Range event={ event } separator=" – " />
 		</p> }
 
-		<p className="text-small font-medium">
-			<time dateTime="09:00">9:00 AM</time>
-			{ " – " }
-			<time dateTime="22:00">10:00 PM</time>
-		</p>
+		{ event && <Daily_Hours event={ event } /> }
 
 		<p className="text-small font-medium">
 			Plant 13, Godrej Enterprises Group, Pirojshanagar, Vikhroli,
 			Mumbai 400079
 		</p>
 	</div>
+}
+
+/**
+ |
+ | When the doors open and when the day ends, across every day of the event.
+ |
+ | **No start, no line.** An end with nothing before it is half a time, and a
+ | visitor reading it cannot tell when to arrive. A start with no end is still
+ | useful, and reads "onwards".
+ |
+ | **The times are the venue's wall clock**, as an editor typed them, and they
+ | go through no timezone conversion: a `Date` would read them in whichever zone
+ | the server happens to run in.
+ |
+ */
+function Daily_Hours ( { event }: { event: Event } ) {
+	const start = clock_time_of( event.time_start )
+	const end = clock_time_of( event.time_end )
+
+	if ( !start ) {
+		return null
+	}
+
+	return <p className="text-small font-medium">
+		<time dateTime={ start.value }>{ start.label }</time>
+		{ end
+			? <>
+				{ " – " }
+				<time dateTime={ end.value }>{ end.label }</time>
+			</>
+			: " onwards" }
+	</p>
+}
+
+const CLOCK_TIME = /^(\d{2}):(\d{2})/
+
+/**
+ |
+ | `"21:30:00.000"` → `{ value: "21:30", label: "9:30 PM" }`, or nothing.
+ |
+ */
+function clock_time_of ( stored: string | null | undefined ) {
+	const found = typeof stored === "string" ? CLOCK_TIME.exec( stored ) : null
+
+	if ( !found ) {
+		return null
+	}
+
+	const [ , hours, minutes ] = found
+	const hour = Number( hours )
+
+	return {
+		label: `${hour % 12 || 12}:${minutes} ${hour < 12 ? "AM" : "PM"}`,
+		value: `${hours}:${minutes}`,
+	}
 }

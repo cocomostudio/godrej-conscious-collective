@@ -97,6 +97,15 @@ export type Event = {
 	is_archived: boolean
 	registrations_are_open?: boolean | null
 	schedule: Media | null
+	/**
+	 |
+	 | The daily hours: the earliest start and the latest end across all of
+	 | the event's days, as Strapi writes a `time` — `"09:30:00.000"`. Wall
+	 | clock times at the venue, with no zone of their own.
+	 |
+	 */
+	time_start?: string | null
+	time_end?: string | null
 	colour_theme_rgb: string | null
 	colour_showcase_rgb: string | null
 	colour_experience_rgb: string | null

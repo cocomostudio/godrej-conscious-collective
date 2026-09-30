@@ -28,6 +28,8 @@ import {
 	it,
 } from "vitest"
 
+import type { Event } from "../src/web/cms/envelope.ts"
+
 import {
 	type Website,
 	boot_website,
@@ -93,6 +95,23 @@ beforeAll( async () => {
 		} ),
 
 		"/sessions/a-session": session_envelope( { name: "A Session" } ),
+
+		/* _____
+		 | The main event's daily hours, in the three states an editor can
+		 | leave them in. Times arrive as Strapi writes a `time` attribute.
+		 */
+		"/hours/both": hours_page( {
+			time_end: "22:00:00.000",
+			time_start: "09:00:00.000",
+		} ),
+		"/hours/start-only": hours_page( {
+			time_end: null,
+			time_start: "09:30:00.000",
+		} ),
+		"/hours/none": hours_page( {
+			time_end: "22:00:00.000",
+			time_start: null,
+		} ),
 	} )
 } )
 
@@ -169,6 +188,49 @@ describe("every content type that renders in two columns", () => {
 	})
 })
 
+describe("the main event's daily hours", () => {
+	for (
+		const [ copy, of ] of [
+			[ "the footer", footer_of ],
+			[ "the sidebar", first_column ],
+		] as const
+	) {
+		describe(`in ${copy}`, () => {
+			it("read as a range when the event has both", async () => {
+				const hours = of(
+					( await website.get( "/hours/both" ) ).html,
+				)
+
+				expect( hours ).toMatch(
+					/<time dateTime="09:00">9:00 AM<\/time> – <time dateTime="22:00">10:00 PM<\/time>/,
+				)
+			})
+
+			it("read as a start onwards when the event has no end", async () => {
+				const hours = of(
+					( await website.get( "/hours/start-only" ) ).html,
+				)
+
+				expect( hours ).toMatch(
+					/<time dateTime="09:30">9:30 AM<\/time> onwards/,
+				)
+			})
+
+			// A time line with nothing to start it is a wrong time or a
+			// half-empty one, and neither helps anybody arrive.
+			it("are not shown at all when the event has no start", async () => {
+				const hours = of(
+					( await website.get( "/hours/none" ) ).html,
+				)
+
+				expect( hours ).toContain( ADDRESS )
+				expect( hours ).not.toContain( "<time dateTime=\"22:00\"" )
+				expect( hours ).not.toContain( "10:00 PM" )
+			})
+		})
+	}
+})
+
 describe("a one-column page", () => {
 	it("has one copy, in the footer, because it has no sidebar to hold a second", async () => {
 		const { html } = await website.get( "/one-column" )
@@ -186,6 +248,19 @@ describe("a one-column page", () => {
  | per file is how two tests start failing for one reason.
  |
  */
+
+function hours_page ( times: Partial<Event> ) {
+	return envelope( {
+		main_region: [ section( "Body" ) ],
+		title: "Hours",
+	}, {
+		main_event: event( times ),
+	} )
+}
+
+function footer_of ( html: string ) {
+	return html.slice( html.indexOf( "<footer" ), html.indexOf( "</footer>" ) )
+}
 
 function first_column ( html: string ) {
 	const start = html.indexOf( "layout__1-4__col-1" )
