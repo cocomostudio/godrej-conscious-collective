@@ -1,12 +1,10 @@
 
 /**
  |
- | A section's background: a gradient, a pattern, and where the pattern sits.
+ | A section's background gradient, as one inline style.
  |
- | Built as one inline style rather than as utility classes, because the two
- | halves both write `background-image` and a class for each would have the
- | second silently replace the first. The static site composes the same two
- | layers inline for exactly that reason, so this is the shape it already has.
+ | The pattern that can sit over it is not part of this style. It is drawn as
+ | a layer of its own, by `section-pattern.tsx`, because an editor can turn it.
  |
  | The colours are named as roles rather than as values. They resolve against
  | the six `--ctx-*` variables the root sets from the resolved event, so a
@@ -106,53 +104,21 @@ const GRADIENTS: Record<
 	},
 }
 
-const PATTERNS: Record<string, string> = {
-	"spider-web-1": "/media/patterns-and-textures/spider-web-pattern-1.svg",
-	"spider-web-2": "/media/patterns-and-textures/spider-web-pattern-2.svg",
-	"spider-web-3": "/media/patterns-and-textures/spider-web-pattern-3.svg",
-}
-
-const POSITIONS: Record<string, string> = {
-	"bottom-left": "0 100%",
-	"bottom-right": "100% 100%",
-	"center": "center",
-	"left": "left",
-	"right": "right",
-	"top-left": "0 0",
-	"top-right": "100% 0",
-}
-
 export function section_background (
-	{ gradient = "none", pattern = "none", position = "left" }: {
-		gradient?: string
-		pattern?: string
-		position?: string
-	},
+	{ gradient = "none" }: { gradient?: string },
 ): CSSProperties | undefined {
 	const { colour, image } = GRADIENTS[gradient] ?? GRADIENTS.none
-	const pattern_url = PATTERNS[pattern]
 
-	// The pattern sits over the gradient, so it is the first layer. Its own
-	// position is the one an editor chose; the gradient underneath always
-	// starts at the top, because that is the only place a fade downward can
-	// start.
-	const layers = [
-		...( pattern_url ? [ `url( ${pattern_url} )` ] : [] ),
-		...( image ? [ image ] : [] ),
-	]
-
-	if ( layers.length === 0 && !colour ) {
+	if ( !image && !colour ) {
 		return undefined
 	}
 
 	return {
 		...( colour ? { backgroundColor: colour } : {} ),
-		...( layers.length > 0
+		...( image
 			? {
-				backgroundImage: layers.join( ", " ),
-				backgroundPosition: pattern_url
-					? `${POSITIONS[position] ?? POSITIONS.left}, 0 0`
-					: "0 0",
+				backgroundImage: image,
+				backgroundPosition: "0 0",
 				backgroundRepeat: "no-repeat",
 			}
 			: {} ),

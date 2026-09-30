@@ -2,8 +2,8 @@
 /**
  |
  | The pages the browser tests are served, in the same envelope shapes the
- | server-side tests use: the Archive's timeline, and a marquee beside a
- | full-bleed image.
+ | server-side tests use: the Archive's timeline, a marquee beside a full-bleed
+ | image, and a section's spider web.
  |
  | The Archive is laid out as the seed lays it out: a two-column page whose
  | section pads below itself and not above, so that the timeline opens the
@@ -60,11 +60,23 @@ export const BLEEDING_MARQUEE_PATHS = {
 	"two-column": "/a-bleeding-marquee-in-two-columns",
 }
 
+/** A section with a spider web turned a quarter in its top-right corner. */
+export const TURNED_PATTERN_PATH = "/a-turned-pattern"
+
+/** A section with a spider web nobody placed, coloured or turned. */
+export const PLAIN_PATTERN_PATH = "/a-plain-pattern"
+
 export const PAGES: Record<string, Envelope> = {
 	"/archives": archive_page( "below" ),
 	[BARE_SECTION_PATH]: archive_page( "none" ),
 	[BLEEDING_MARQUEE_PATHS["one-column"]]: bleeding_marquee_page( "one-column" ),
 	[BLEEDING_MARQUEE_PATHS["two-column"]]: bleeding_marquee_page( "two-column" ),
+	[PLAIN_PATTERN_PATH]: pattern_page( {} ),
+	[TURNED_PATTERN_PATH]: pattern_page( {
+		background_pattern_color: "white",
+		background_pattern_position: "top-right",
+		background_pattern_rotation: 90,
+	} ),
 }
 
 function bleeding_marquee_page (
@@ -83,6 +95,25 @@ function bleeding_marquee_page (
 		],
 		page_layout,
 		title: "Bleeding",
+	} )
+}
+
+function pattern_page ( placement: {
+	background_pattern_color?: string
+	background_pattern_position?: string
+	background_pattern_rotation?: number
+} ) {
+	return envelope( {
+		main_region: [
+			section( "Patterned", {
+				background_gradient: "light",
+				background_pattern: "spider-web",
+				content: [ wysiwyg( "Words over a spider web." ) ],
+				...placement,
+			} ),
+		],
+		page_layout: "one-column",
+		title: "Patterned",
 	} )
 }
 

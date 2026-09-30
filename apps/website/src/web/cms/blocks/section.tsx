@@ -67,6 +67,10 @@ import type { Text_Color } from "./text-color.ts"
 import { use_anchor } from "../anchors.tsx"
 import { use_page_layout } from "../page-layout.tsx"
 import { section_background } from "../section-backgrounds.ts"
+import {
+	Section_Pattern,
+	section_pattern_host,
+} from "../section-pattern.tsx"
 import { Heading } from "./heading.tsx"
 import { Link_Block } from "./link.tsx"
 import { Plain_String } from "./plain-string.tsx"
@@ -127,7 +131,9 @@ type Section_Props = Pick<Block, "__component" | "id"> & {
 	link?: Link_Attribute | null
 	background_gradient?: string
 	background_pattern?: string
-	background_position?: string
+	background_pattern_color?: string | null
+	background_pattern_position?: string | null
+	background_pattern_rotation?: number | null
 	/**
 	 |
 	 | A line below this section, drawn outside it and separating it from the
@@ -157,7 +163,9 @@ export function Section (
 		__component,
 		background_gradient = "none",
 		background_pattern = "none",
-		background_position = "left",
+		background_pattern_color,
+		background_pattern_position,
+		background_pattern_rotation,
 		children,
 		content,
 		heading,
@@ -173,8 +181,6 @@ export function Section (
 
 	const background = section_background( {
 		gradient: background_gradient,
-		pattern: background_pattern,
-		position: background_position,
 	} )
 
 	// The heading's link wins over the section's, because it sits nearer the
@@ -225,7 +231,9 @@ export function Section (
 
 	return <>
 		<section
-			className={ `scroll-mt-4 ${group} ${outer_edges}` }
+			className={ `scroll-mt-4 ${
+				section_pattern_host( background_pattern )
+			} ${group} ${outer_edges}` }
 			id={ anchor }
 			style={ background }
 			{ ...marks }
@@ -266,6 +274,12 @@ export function Section (
 						: children }
 				</div>
 			</div>
+
+			<Section_Pattern
+				pattern={ background_pattern }
+				color={ background_pattern_color }
+				position={ background_pattern_position }
+				rotation={ background_pattern_rotation } />
 		</section>
 		{
 			/* The rule is a sibling of the section rather than a child of it,

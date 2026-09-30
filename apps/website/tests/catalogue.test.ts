@@ -153,13 +153,28 @@ beforeAll( async () => {
 			main_region: [
 				section( "Filled", {
 					background_gradient: "showcase-to-light",
-					background_pattern: "spider-web-2",
-					background_position: "bottom-right",
+					background_pattern: "spider-web",
+					background_pattern_color: "white",
+					background_pattern_position: "top-right",
+					background_pattern_rotation: 90,
 					content: [ plain_string( "On a background." ) ],
 					horizontal_rule: true,
 				} ),
 			],
 			title: "Backgrounds",
+		} ),
+
+		// A pattern with nothing else said about it, as a section saved before
+		// the colour and the rotation existed comes back.
+		"/pattern-defaults": envelope( {
+			main_region: [
+				section( "Plain web", {
+					background_pattern: "spider-web",
+					background_pattern_rotation: null,
+					content: [ plain_string( "On a plain web." ) ],
+				} ),
+			],
+			title: "Pattern defaults",
 		} ),
 
 		"/cross-field-rules": envelope( {
@@ -561,11 +576,30 @@ describe("a section", () => {
 		expect( markup ).not.toMatch( /(?:^|["\s])-?m[trblxye]?-/ )
 	})
 
-	it("carries its background as one composed image", async () => {
+	it("carries its gradient as a background", async () => {
 		const { html } = await website.get( "/backgrounds" )
 
-		expect( html ).toContain( "spider-web-pattern-2.svg" )
 		expect( html ).toContain( "--ctx-showcase-color" )
+	})
+
+	// Where the web sits and how far it turns are layout, so the browser
+	// tests measure those. See tests/browser/section-pattern.spec.ts.
+	it("draws the spider web in the colour its editor chose", async () => {
+		const { html } = await website.get( "/backgrounds" )
+
+		expect( spider_web_of( html ) ).toContain( "text-white" )
+	})
+
+	it("draws the spider web in black when nobody said otherwise", async () => {
+		const { html } = await website.get( "/pattern-defaults" )
+
+		expect( spider_web_of( html ) ).toContain( "text-black" )
+	})
+
+	it("draws no spider web where there is no pattern", async () => {
+		const { html } = await website.get( "/spacing" )
+
+		expect( rendered( html ) ).not.toContain( SPIDER_WEB_VIEW_BOX )
 	})
 
 	it("draws its rule above itself when asked", async () => {
@@ -1034,6 +1068,8 @@ function map_link ( html: string ) {
 	return markup.slice( opened, markup.indexOf( ">", opened ) + 1 )
 }
 
+const SPIDER_WEB_VIEW_BOX = "viewBox=\"0 0 728.8 960.8\""
+
 /**
  |
  | The opening tag of the marquee's bar, found through one of its items. The
@@ -1051,6 +1087,19 @@ function bar_of ( html: string, item: string ) {
 	}
 
 	return markup.slice( at, markup.indexOf( ">", at ) + 1 )
+}
+
+/** The spider web's own opening tag. */
+function spider_web_of ( html: string ) {
+	const markup = rendered( html )
+	const at = markup.indexOf( SPIDER_WEB_VIEW_BOX )
+
+	expect( at ).toBeGreaterThan( -1 )
+
+	return markup.slice(
+		markup.lastIndexOf( "<svg", at ),
+		markup.indexOf( ">", at ) + 1,
+	)
 }
 
 /**

@@ -188,7 +188,9 @@ export function section (
 	{
 		background_gradient,
 		background_pattern,
-		background_position,
+		background_pattern_color,
+		background_pattern_position,
+		background_pattern_rotation,
 		content = [],
 		heading,
 		horizontal_rule,
@@ -199,7 +201,9 @@ export function section (
 	}: {
 		background_gradient?: string
 		background_pattern?: string
-		background_position?: string
+		background_pattern_color?: string
+		background_pattern_position?: string
+		background_pattern_rotation?: number | null
 		content?: Block[]
 		heading?: {
 			id?: number
@@ -220,7 +224,9 @@ export function section (
 		__component: "container.section-v1",
 		background_gradient,
 		background_pattern,
-		background_position,
+		background_pattern_color,
+		background_pattern_position,
+		background_pattern_rotation,
 		content,
 		heading,
 		horizontal_rule,
