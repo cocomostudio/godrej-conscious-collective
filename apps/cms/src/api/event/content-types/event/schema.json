@@ -44,6 +44,14 @@
 			"default": true,
 			"required": true
 		},
+		"time_start": {
+			"type": "time",
+			"required": false
+		},
+		"time_end": {
+			"type": "time",
+			"required": false
+		},
 		"theme": {
 			"type": "component",
 			"component": "event.palette-colour-v1",
@@ -148,6 +156,24 @@
 					"label": "Registrations open"
 				}
 			},
+			"time_start": {
+				"edit": {
+					"label": "Opens at",
+					"description": "The earliest time any of this event's days starts, as a clock at the venue reads it. One day may open later than another; this is the earliest of them. Shown in the footer and the floating RSVP. Leave it empty and no time is shown at all."
+				},
+				"list": {
+					"label": "Opens at"
+				}
+			},
+			"time_end": {
+				"edit": {
+					"label": "Closes at",
+					"description": "The latest time any of this event's days ends, as a clock at the venue reads it. One day may close earlier than another; this is the latest of them. Leave it empty and the site reads \"onwards\" after the opening time."
+				},
+				"list": {
+					"label": "Closes at"
+				}
+			},
 			"theme": {
 				"edit": {
 					"label": "Theme",
@@ -210,6 +236,10 @@
 					{ "name": "date_start", "size": 4 },
 					{ "name": "date_end", "size": 4 },
 					{ "name": "is_archived", "size": 4 }
+				],
+				[
+					{ "name": "time_start", "size": 4 },
+					{ "name": "time_end", "size": 4 }
 				],
 				[
 					{ "name": "schedule", "size": 6 },

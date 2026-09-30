@@ -236,6 +236,36 @@ describe("an event's palette", () => {
 	})
 })
 
+describe("an event's daily hours", () => {
+	it("are saved as times", async () => {
+		const event = await create_event( {
+			time_end: "21:45:00.000",
+			time_start: "08:15:00.000",
+		} )
+
+		expect( await stored_event( event.documentId ) ).toMatchObject( {
+			time_end: "21:45:00.000",
+			time_start: "08:15:00.000",
+		} )
+	})
+
+	it("arrive in the envelope's main event", async () => {
+		const { body } = await cms.get( "/api/envelope?path=/about" )
+
+		expect( body.data.main_event.time_start ).toBe( "09:00:00.000" )
+		expect( body.data.main_event.time_end ).toBe( "22:00:00.000" )
+	})
+
+	it("may name a start and no end", async () => {
+		const { body } = await cms.get(
+			"/api/envelope?path=/conscious-collective-2029",
+		)
+
+		expect( body.data.resolved_event.time_start ).toBe( "09:30:00.000" )
+		expect( body.data.resolved_event.time_end ).toBeNull()
+	})
+})
+
 /**
  |
  | What the seed leaves behind, read back rather than restated: the 2027 values
@@ -293,6 +323,20 @@ describe("the seeded events", () => {
 			} )
 		}
 	} )
+
+	it("2027 keeps its doors open from nine until ten", async () => {
+		expect( await seeded_event( MAIN_EVENT_NAME ) ).toMatchObject( {
+			time_end: "22:00:00.000",
+			time_start: "09:00:00.000",
+		} )
+	})
+
+	it("2029 opens at half past nine and names no end", async () => {
+		expect( await seeded_event( OTHER_EVENT_NAME ) ).toMatchObject( {
+			time_end: null,
+			time_start: "09:30:00.000",
+		} )
+	})
 })
 
 /**

@@ -22,16 +22,20 @@ export type Seeded_Events = {
  |
  | Two events.
  |
- | 2027 is the main one, so its dates and its Register Now button are the site
- | chrome on every page — including the pages belonging to 2029. 2029 exists so
- | that the resolution rule has something to resolve *to*: a page naming it
- | keeps its colours while wearing 2027's chrome, which is the whole shape of
- | the arrangement in one pair of rows.
+ | 2027 is the main one, so its dates, its daily hours and its Register Now
+ | button are the site chrome on every page — including the pages belonging to
+ | 2029. 2029 exists so that the resolution rule has something to resolve *to*:
+ | a page naming it keeps its colours while wearing 2027's chrome, which is the
+ | whole shape of the arrangement in one pair of rows.
  |
  | 2027's base colours are the website's fallback palette, and its button
  | colours come off the design's own button-state sheet. 2029's palette is a
  | second one entirely, so that a seeded site shows a palette belonging to an
  | event rather than to the site.
+ |
+ | The daily hours differ on purpose too. 2027 names both ends; 2029 names an
+ | opening time and no close, which is the one arrangement that makes the
+ | footer read "onwards".
  |
  | The seed writes hex values only. The RGB triplets are **not** written here —
  | a middleware derives each one from its colour on save, and writing them by
@@ -54,6 +58,8 @@ export async function write_events ( strapi: Strapi ): Promise<Seeded_Events> {
 				"conscious-collective-2027-schedule.pdf",
 				"Conscious Collective 2027",
 			),
+			time_end: "22:00:00.000",
+			time_start: "09:00:00.000",
 		},
 	} )
 
@@ -71,6 +77,7 @@ export async function write_events ( strapi: Strapi ): Promise<Seeded_Events> {
 				"conscious-collective-2029-schedule.pdf",
 				"Conscious Collective 2029",
 			),
+			time_start: "09:30:00.000",
 		},
 	} )
 
