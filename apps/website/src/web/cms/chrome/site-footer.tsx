@@ -3,11 +3,9 @@
  |
  | The site footer, lifted from the static site.
  |
- | Same two changes as the header: the secondary navigation comes from the page
- | shell rather than from literals in the source, and the date line comes from
- | the **main event**. The social links and the copyright line are still
- | literals — no attribute holds them, and the spec's Page Shell does not name
- | any.
+ | The secondary navigation and the social links come from the page shell, and
+ | the date line comes from the **main event**. The copyright line is still a
+ | literal, because no attribute holds it.
  |
  | The footer's own navigation is capped at three by the schema. It is the
  | fine-print row beside the copyright, not a second site menu.
@@ -37,18 +35,30 @@ import { YouTube_Logo } from "#infra/lib/ui/react/logos/youtube-logo.tsx"
 
 /**
  |
- | The social accounts, and the copyright line below, are literals: no attribute
- | holds either, and the spec's Page Shell names none. The URLs are the static
- | site's own **placeholders** and point at `example.com` — they were never real
- | and somebody has to replace them with the accounts the event actually has.
+ | The four social accounts, in the order the footer draws them, each with the
+ | page shell attribute that holds its URL.
  |
  */
-const SOCIAL_LINKS = [
-	{ Logo: Instagram_Logo, url: "https://example.com/instagram" },
-	{ Logo: Facebook_Logo, url: "https://example.com/facebook" },
-	{ Logo: LinkedIn_Logo, url: "https://example.com/linkedin" },
-	{ Logo: YouTube_Logo, url: "https://example.com/youtube" },
-]
+const SOCIAL_ACCOUNTS = [
+	{ Logo: Instagram_Logo, attribute: "instagram_url" },
+	{ Logo: Facebook_Logo, attribute: "facebook_url" },
+	{ Logo: LinkedIn_Logo, attribute: "linkedin_url" },
+	{ Logo: YouTube_Logo, attribute: "youtube_url" },
+] as const
+
+/**
+ |
+ | The accounts the page shell names. **An account with no URL has no icon**,
+ | because an icon that leads nowhere is worse than no icon at all.
+ |
+ */
+function social_links_of ( page_shell: Page_Shell | null ) {
+	return SOCIAL_ACCOUNTS.flatMap( ( { Logo, attribute } ) => {
+		const url = page_shell?.[attribute]?.trim()
+
+		return url ? [ { Logo, url } ] : []
+	} )
+}
 
 type Site_Footer_Props = {
 	main_event: Event | null
@@ -67,6 +77,7 @@ export function Site_Footer (
 	{ main_event, page_shell, ref }: Site_Footer_Props,
 ) {
 	const links = page_shell?.navigation_footer ?? []
+	const social_links = social_links_of( page_shell )
 
 	// The footer is dark, on every page. The static site's own footer took a
 	// colour scheme, but nothing in this build has ever wanted the light one,
@@ -94,22 +105,25 @@ export function Site_Footer (
 
 				<Legal_And_Social
 					className="md:max-lg:hidden md:mt-12 md:flex items-end gap-6"
-					links={ links } />
+					links={ links }
+					social_links={ social_links } />
 			</div>
 		</div>
 
 		<div className="cc mx-auto">
 			<Legal_And_Social
 				className="max-md:hidden lg:hidden mt-12 flex justify-between items-end"
-				links={ links } />
+				links={ links }
+				social_links={ social_links } />
 		</div>
 	</footer>
 }
 
 function Legal_And_Social (
-	{ className = "", links }: {
+	{ className = "", links, social_links }: {
 		className?: string
 		links: Navigation_Link[]
+		social_links: ReturnType<typeof social_links_of>
 	},
 ) {
 	return <div className={ className }>
@@ -133,16 +147,24 @@ function Legal_And_Social (
 			</nav>
 		</div>
 
-		<nav className="mt-8 md:m-0" aria-label="Social media">
-			<ul className="flex gap-8 *:hover:opacity-100 *:transition-opacity *:ease-in-out *:duration-500">
-				{ SOCIAL_LINKS.map( ( { Logo, url } ) =>
-					<li key={ url }>
-						<a href={ url }>
-							<Logo />
-						</a>
-					</li>
-				) }
-			</ul>
-		</nav>
+		{
+			/* A new tab, so that a visitor following the festival's account
+			   does not lose their place on the festival's site. */
+		}
+		{ social_links.length > 0
+			&& <nav className="mt-8 md:m-0" aria-label="Social media">
+				<ul className="flex gap-8 *:hover:opacity-100 *:transition-opacity *:ease-in-out *:duration-500">
+					{ social_links.map( ( { Logo, url } ) =>
+						<li key={ url }>
+							<a
+								href={ url }
+								rel="noopener noreferrer"
+								target="_blank">
+								<Logo />
+							</a>
+						</li>
+					) }
+				</ul>
+			</nav> }
 	</div>
 }

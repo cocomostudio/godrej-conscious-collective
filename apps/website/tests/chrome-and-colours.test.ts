@@ -228,6 +228,27 @@ beforeAll( async () => {
 			},
 			{ main_event: MAIN, page_shell: SHELL, resolved_event: MAIN },
 		),
+
+		// Two of the four accounts set; the other two left empty in the two
+		// ways Strapi can leave a string empty.
+		"/social": envelope(
+			{ main_region: [ section( "Social" ) ], title: "Social" },
+			{
+				main_event: MAIN,
+				page_shell: page_shell( {
+					facebook_url: "",
+					instagram_url: "https://instagram.test/collective",
+					linkedin_url: null,
+					youtube_url: "https://youtube.test/collective",
+				} ),
+				resolved_event: MAIN,
+			},
+		),
+
+		"/no-social": envelope(
+			{ main_region: [ section( "No Social" ) ], title: "No Social" },
+			{ main_event: MAIN, page_shell: SHELL, resolved_event: MAIN },
+		),
 	} )
 } )
 
@@ -334,6 +355,50 @@ describe("the header and the footer", () => {
 		// The event-derived furniture is simply absent.
 		expect( html ).not.toContain( "Register Now" )
 		expect( text_of( html ) ).not.toContain( "Dec 2025" )
+	})
+})
+
+describe("the footer's social links", () => {
+	it("draw an icon for each account the page shell names", async () => {
+		const footer = footer_of( ( await website.get( "/social" ) ).html )
+
+		expect( footer ).toContain(
+			"href=\"https://instagram.test/collective\"",
+		)
+		expect( footer ).toContain( "Instagram logo" )
+		expect( footer ).toContain(
+			"href=\"https://youtube.test/collective\"",
+		)
+		expect( footer ).toContain( "YouTube logo" )
+	})
+
+	// An icon that leads nowhere is worse than no icon.
+	it("draw no icon for an account left empty", async () => {
+		const footer = footer_of( ( await website.get( "/social" ) ).html )
+
+		expect( footer ).not.toContain( "Facebook logo" )
+		expect( footer ).not.toContain( "LinkedIn logo" )
+	})
+
+	it("open in a new tab", async () => {
+		const footer = footer_of( ( await website.get( "/social" ) ).html )
+
+		for (
+			const link of footer.match( /<a[^>]*\.test\/collective"[^>]*>/g )
+				?? []
+		) {
+			expect( link ).toContain( "target=\"_blank\"" )
+			expect( link ).toContain( "rel=\"noopener noreferrer\"" )
+		}
+
+		expect( footer ).toMatch( /<a[^>]*\.test\/collective"/ )
+	})
+
+	it("leave out the whole row when no account is named", async () => {
+		const footer = footer_of( ( await website.get( "/no-social" ) ).html )
+
+		expect( footer ).not.toContain( "Social media" )
+		expect( footer ).not.toContain( "example.com" )
 	})
 })
 
@@ -460,6 +525,10 @@ describe("a page's colour scheme", () => {
  | whether or not the element under test carries it.
  |
  */
+function footer_of ( html: string ) {
+	return html.slice( html.indexOf( "<footer" ), html.indexOf( "</footer>" ) )
+}
+
 function element_carrying ( html: string, text: string ) {
 	const at = html.indexOf( text )
 

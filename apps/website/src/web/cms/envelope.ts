@@ -55,6 +55,11 @@ export type Page_Shell = {
 	site_description: string | null
 	navigation_header: Link[]
 	navigation_footer: Link[]
+	/** The festival's social accounts. An empty one draws no icon. */
+	instagram_url?: string | null
+	facebook_url?: string | null
+	linkedin_url?: string | null
+	youtube_url?: string | null
 	[attribute: string]: unknown
 }
 
