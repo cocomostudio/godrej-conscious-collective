@@ -43,6 +43,7 @@ import {
 	useCallback,
 	useEffect,
 	useLayoutEffect,
+	useMemo,
 	useRef,
 	useState,
 } from "react"
@@ -56,6 +57,7 @@ import type { Contributor_Card } from "../envelope.ts"
 
 import { Portrait } from "../cards.tsx"
 
+import { use_carousel_pager } from "./carousel-controls.tsx"
 import { use_full_bleed } from "./section-frame.tsx"
 
 /* _____
@@ -303,8 +305,8 @@ export function Contributor_Carousel (
 		}
 	}, [] )
 
-	// The one place that marks the carousel as travelling. A swipe is the
-	// only way a visitor moves it, and it goes through here.
+	// The one place that marks the carousel as travelling. A swipe and a
+	// press of the heading row's buttons both go through here.
 	const begin = useCallback( () => {
 		travelling.current = true
 		viewport.current?.style.setProperty( "--caption-opacity", "0" )
@@ -320,6 +322,31 @@ export function Contributor_Carousel (
 			viewport.current?.style.setProperty( "--caption-opacity", "1" )
 		}, travel.current + FADE_MS )
 	}, [ clear_timers ] )
+
+	// A press is refused while the ring is travelling, exactly as a swipe is,
+	// so that it advances by one rather than piling moves on top of a move.
+	use_carousel_pager( useMemo( () => {
+		if ( !embla_api ) {
+			return null
+		}
+
+		const move = ( direction: "next" | "previous" ) => () => {
+			if ( travelling.current ) {
+				return
+			}
+
+			begin()
+
+			if ( direction === "next" ) {
+				embla_api.scrollNext()
+			}
+			else {
+				embla_api.scrollPrev()
+			}
+		}
+
+		return { next: move( "next" ), previous: move( "previous" ) }
+	}, [ begin, embla_api ] ) )
 
 	useLayoutEffect( () => {
 		if ( !embla_api ) {

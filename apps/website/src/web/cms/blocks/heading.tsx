@@ -14,7 +14,14 @@
  | a heading turned white over a dark ground does not drag the link with it
  | unless the editor says so too.
  |
+ | **Above a carousel, the row also carries the carousel's previous and next
+ | buttons**, to the right of the heading and after the link. They take the
+ | link's colour, or the heading's where there is no link, so the right-hand
+ | side of the row reads as one thing. See `carousel-controls.tsx`.
+ |
  */
+
+import type { ReactNode } from "react"
 
 import { H } from "#infra/lib/ui/react/headings.tsx"
 
@@ -26,7 +33,12 @@ import type {
 import type { Text_Color } from "./text-color.ts"
 
 import { use_anchor } from "../anchors.tsx"
-import { use_text_colour_class } from "../dark-surface.tsx"
+import {
+	use_text_colour_class,
+	use_text_colour_token,
+} from "../dark-surface.tsx"
+import { text_color_class } from "./text-color.ts"
+import { Carousel_Controls } from "./carousel-controls.tsx"
 import { Nav_Link } from "../nav-link.tsx"
 import { Chevron_Right } from "#infra/lib/ui/react/icons/chevron-right.tsx"
 
@@ -72,23 +84,76 @@ type Heading_Props = Pick<Block, "__component" | "id"> & {
 	level?: string
 	link?: Link_Attribute | null
 	text_color?: Text_Color
+	/**
+	 |
+	 | Whether a carousel sits immediately below, so that the row carries its
+	 | buttons. Decided by whoever renders the heading and the carousel side by
+	 | side, never by the editor.
+	 |
+	 */
+	carousel_controls?: boolean
+	/**
+	 |
+	 | A section's opening line, which sits beneath the heading. Set in the
+	 | heading's own column when the row carries a carousel's buttons, so the
+	 | buttons stand to the right of both.
+	 |
+	 */
+	opening_line?: ReactNode
 }
 
 export function Heading (
-	{ __component, content, id, level = "h2", link, text_color }: Heading_Props,
+	{
+		__component,
+		carousel_controls = false,
+		content,
+		id,
+		level = "h2",
+		link,
+		opening_line,
+		text_color,
+	}: Heading_Props,
 ) {
 	const anchor = use_anchor( { __component, id } )
-	const colour = use_text_colour_class( text_color, "context" )
+	const colour = use_text_colour_token( text_color, "context" )
+	const link_colour = use_text_colour_token( link?.text_color, "context" )
 
+	const heading = <H
+		className={ `${heading_size_class( level )} ${
+			text_color_class( colour, "context" )
+		}` }>
+		{ content }
+	</H>
+
+	if ( !carousel_controls ) {
+		return <>
+			<div
+				className="flex flex-wrap items-center md:items-baseline justify-between gap-4 scroll-mt-[calc(1rem+var(--site-header-offset,0px))]"
+				id={ anchor }>
+				{ heading }
+
+				{ link?.url && <Heading_Link link={ link } /> }
+			</div>
+
+			{ opening_line }
+		</>
+	}
+
+	// 32px from the link to the buttons, and the whole right-hand side
+	// centred against the heading and its opening line together.
 	return <div
-		className="flex flex-wrap items-center md:items-baseline justify-between gap-4 scroll-mt-[calc(1rem+var(--site-header-offset,0px))]"
+		className="flex items-center justify-between gap-4 md:gap-8 scroll-mt-[calc(1rem+var(--site-header-offset,0px))]"
 		id={ anchor }>
-		<H
-			className={ `${heading_size_class( level )} ${colour}` }>
-			{ content }
-		</H>
+		<div className="min-w-0">
+			{ heading }
+			{ opening_line }
+		</div>
 
-		{ link?.url && <Heading_Link link={ link } /> }
+		<div className="flex items-center gap-8 shrink-0">
+			{ link?.url && <Heading_Link link={ link } /> }
+
+			<Carousel_Controls colour={ link?.url ? link_colour : colour } />
+		</div>
 	</div>
 }
 

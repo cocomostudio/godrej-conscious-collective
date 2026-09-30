@@ -38,6 +38,7 @@ import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import { use_repetitions_needed_for_looping } from "#infra/lib/ui/react/embla-carousel/use-repetitions-needed-for-looping.ts"
 import { breakpoints } from "#infra/lib/ui/app-shells/primary/breakpoints.ts"
 
+import { use_embla_pager } from "./carousel-controls.tsx"
 import { use_column_inset_width } from "./section-frame.tsx"
 
 type Looping_Track_Props = {
@@ -56,7 +57,7 @@ export function Looping_Track (
 	const sentinel = useRef<HTMLDivElement>( null )
 	const inset_width = use_column_inset_width()
 
-	const [ embla_ref ] = useEmblaCarousel( {
+	const [ embla_ref, embla_api ] = useEmblaCarousel( {
 		align: "center",
 		breakpoints: {
 			[`( min-width: ${breakpoints.md} )`]: {
@@ -69,6 +70,8 @@ export function Looping_Track (
 	}, [
 		WheelGesturesPlugin( { forceWheelAxis: "x" } ),
 	] )
+
+	use_embla_pager( embla_api )
 
 	const [ viewport_node, set_viewport_node ] = useState<
 		HTMLDivElement | null

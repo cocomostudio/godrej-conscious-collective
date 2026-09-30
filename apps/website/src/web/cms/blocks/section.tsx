@@ -34,6 +34,11 @@
  | which keeps a gap of its own at a flush edge can tell — see
  | `section_edge_marks`.
  |
+ | **A section that opens with a carousel gives the carousel its buttons.** Its
+ | heading sits immediately above the first block, so the heading's row
+ | carries them; with no heading, a row of the buttons alone stands where the
+ | heading's row would. See `carousel-controls.tsx`.
+ |
  | Its `title` is not shown. The title names the section in the table of
  | contents; the heading is what a reader sees.
  |
@@ -71,6 +76,11 @@ import {
 	Section_Pattern,
 	section_pattern_host,
 } from "../section-pattern.tsx"
+import {
+	Carousel_Controls,
+	Carousel_Controls_Provider,
+	is_paged_carousel,
+} from "./carousel-controls.tsx"
 import { Heading } from "./heading.tsx"
 import { Link_Block } from "./link.tsx"
 import { Plain_String } from "./plain-string.tsx"
@@ -195,6 +205,9 @@ export function Section (
 		spacing_around,
 	}
 
+	const opens_with_carousel = Array.isArray( content )
+		&& is_paged_carousel( content[0] )
+
 	const pad_top = pads_at_top( edges )
 	const pad_bottom = pads_at_bottom( edges )
 
@@ -245,38 +258,47 @@ export function Section (
 		>
 			<div className={ padding }>
 				<div className={ section_container( { one_column } ) }>
-					{ heading?.content
-						? <Heading
-							__component="text.heading-v1"
-							id={ heading.id }
-							content={ heading.content }
-							level={ heading.level }
-							link={ section_link }
-							text_color={ heading.text_color } />
-						: section_link
-							&& <Link_Block { ...section_link } /> }
+					<Opens_With_Carousel when={ opens_with_carousel }>
+						{ heading?.content
+							? <Heading
+								__component="text.heading-v1"
+								carousel_controls={ opens_with_carousel }
+								id={ heading.id }
+								content={ heading.content }
+								level={ heading.level }
+								link={ section_link }
+								opening_line={ opening_line?.content
+									&& <Plain_String
+										content={ opening_line.content }
+										text_color={ opening_line.text_color } /> }
+								text_color={ heading.text_color } />
+							: <>
+								{ section_link
+									&& <Link_Block { ...section_link } /> }
 
-					{ heading?.content && opening_line?.content
-						&& <Plain_String
-							content={ opening_line.content }
-							text_color={ opening_line.text_color } /> }
+								{ opens_with_carousel
+									&& <div className="max-md:hidden flex justify-end">
+										<Carousel_Controls colour="context" />
+									</div> }
+							</> }
 
-					{
-						/* **A level is opened only where a heading was
-					     actually drawn.** A level exists because a heading
-					     divides the document, and a section with no heading
-					     divides nothing — opening one there pushes everything
-					     inside down a rank with no heading at the rank above,
-					     which is a skipped level and a real accessibility
-					     defect rather than a tidiness one.
+						{
+							/* **A level is opened only where a heading was
+						     actually drawn.** A level exists because a heading
+						     divides the document, and a section with no heading
+						     divides nothing — opening one there pushes everything
+						     inside down a rank with no heading at the rank above,
+						     which is a skipped level and a real accessibility
+						     defect rather than a tidiness one.
 
-					     It went unnoticed until the Archive, because a
-					     heading-less section had until then only ever held
-					     blocks that draw no headings of their own. */
-					}
-					{ heading?.content
-						? <Level>{ children }</Level>
-						: children }
+						     It went unnoticed until the Archive, because a
+						     heading-less section had until then only ever held
+						     blocks that draw no headings of their own. */
+						}
+						{ heading?.content
+							? <Level>{ children }</Level>
+							: children }
+					</Opens_With_Carousel>
 				</div>
 			</div>
 
@@ -298,4 +320,18 @@ export function Section (
 				<hr className="border-0 border-t-2 border-gray-light" />
 			</div> }
 	</>
+}
+
+/**
+ |
+ | The carousel's buttons and the carousel meet in a context, and only a
+ | section that opens with one needs it.
+ |
+ */
+function Opens_With_Carousel (
+	{ children, when }: { children: ReactNode; when: boolean },
+) {
+	return when
+		? <Carousel_Controls_Provider>{ children }</Carousel_Controls_Provider>
+		: children
 }

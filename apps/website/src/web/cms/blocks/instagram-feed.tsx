@@ -46,6 +46,7 @@ import { Nav_Link } from "../nav-link.tsx"
 import { Responsive_Picture } from "../pictures.tsx"
 
 import { BLOCK_SPACING } from "./block-spacing.ts"
+import { use_embla_pager } from "./carousel-controls.tsx"
 import { use_full_bleed } from "./section-frame.tsx"
 
 // A slide at rest, and the same slide at the centre of the strip. Both pairs
@@ -77,6 +78,8 @@ export function Instagram_Feed (
 	}, [
 		WheelGesturesPlugin( { forceWheelAxis: "x" } ),
 	] )
+
+	use_embla_pager( embla_api )
 
 	const tween_nodes = useRef<HTMLElement[]>( [] )
 

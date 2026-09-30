@@ -58,7 +58,8 @@ export type Arrangement =
 
 /**
  |
- | Which arrangement a count of cards takes.
+ | Which arrangement a count of cards takes. Exported because a heading row
+ | asks it too, of the raw rows, to know whether a carousel is coming.
  |
  */
 export function arrangement_of_count ( count: number ): Arrangement {

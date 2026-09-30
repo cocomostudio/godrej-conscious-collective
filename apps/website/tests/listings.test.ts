@@ -510,15 +510,6 @@ describe("the three collaborator layouts", () => {
 		// row: the other two layouts draw each collaborator once.
 		expect( occurrences( body, "Kaveri Nair" ) ).toBeGreaterThan( 1 )
 	})
-
-	// **The ring is turned by swiping it and by nothing else.** It had a pair
-	// of chevrons above it, lifted from the static site, and they are gone.
-	it("turn without a pair of controls above them", async () => {
-		const body = body_of( ( await website.get( "/" ) ).html )
-
-		expect( body ).not.toContain( "View the previous collaborator" )
-		expect( body ).not.toContain( "View the next collaborator" )
-	})
 })
 
 // The listings are resolved inside the envelope route and spliced into the

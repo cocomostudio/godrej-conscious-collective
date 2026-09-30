@@ -17,6 +17,11 @@
  |     and the block does what it likes with it. A repeatable entry carries no
  |     `__component`, which is what tells the two apart.
  |
+ | A **heading block immediately followed by a carousel** is drawn as a pair,
+ | the heading's row carrying the carousel's buttons. The renderer of the
+ | region is the one thing that sees both side by side. See
+ | `blocks/carousel-controls.tsx`.
+ |
  | An **unknown block does not crash the page.** The catalogue grows in the CMS
  | before it grows here, routinely, for the whole of this build — an editor
  | placing a component the website has not learned yet must cost them a gap on
@@ -32,6 +37,10 @@ import {
 import type { Block } from "./envelope.ts"
 
 import { BLOCK_REGISTRY } from "./block-registry.ts"
+import {
+	Carousel_Controls_Provider,
+	is_paged_carousel,
+} from "./blocks/carousel-controls.tsx"
 import { is_region } from "./regions.ts"
 
 export function render_blocks ( blocks: unknown ): ReactNode {
@@ -39,15 +48,42 @@ export function render_blocks ( blocks: unknown ): ReactNode {
 		return null
 	}
 
-	return blocks.map( ( block, index ) => (
-		// The id alone is not unique across a region: a dynamic zone draws from
-		// several component tables and each hands out its own ids, so a heading
-		// and a plain string can both be id 3 and collide as React keys.
-		<Fragment key={ `${block?.__component}:${block?.id ?? index}` }>
-			{ render_block( block ) }
-		</Fragment>
-	) )
+	const rendered: ReactNode[] = []
+
+	for ( let index = 0; index < blocks.length; index++ ) {
+		const block = blocks[index]
+		const next = blocks[index + 1]
+
+		// The id alone is not unique across a region: a dynamic zone draws
+		// from several component tables and each hands out its own ids, so a
+		// heading and a plain string can both be id 3 and collide as React
+		// keys.
+		const key = `${block?.__component}:${block?.id ?? index}`
+
+		if ( block?.__component === HEADING && is_paged_carousel( next ) ) {
+			rendered.push(
+				<Carousel_Controls_Provider key={ key }>
+					{ render_block( {
+						...block,
+						carousel_controls: true,
+					} ) }
+					{ render_block( next ) }
+				</Carousel_Controls_Provider>,
+			)
+
+			index += 1
+			continue
+		}
+
+		rendered.push(
+			<Fragment key={ key }>{ render_block( block ) }</Fragment>,
+		)
+	}
+
+	return rendered
 }
+
+const HEADING = "text.heading-v1"
 
 export function render_block ( block: Block | null | undefined ): ReactNode {
 	if ( !block || typeof block.__component !== "string" ) {
