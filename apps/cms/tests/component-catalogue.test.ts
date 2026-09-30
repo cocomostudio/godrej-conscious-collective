@@ -461,8 +461,23 @@ describe("a section", () => {
 		) => block.title === "Reclaiming Cool" )
 
 		expect( section.background_gradient ).toBe( "white-to-light" )
-		expect( section.background_pattern ).toBe( "spider-web-1" )
-		expect( section.background_position ).toBe( "left" )
+		expect( section.background_pattern ).toBe( "spider-web" )
+		expect( section.background_pattern_color ).toBe( "black" )
+		expect( section.background_pattern_position ).toBe( "left" )
+		expect( section.background_pattern_rotation ).toBe( 0 )
+	})
+
+	it("carries the pattern's colour, position and rotation", async () => {
+		const { body } = await cms.get( "/api/envelope?path=/home" )
+
+		const section = body.data.entry.main_region.find( (
+			block: any,
+		) => block.title === "Conversations" )
+
+		expect( section.background_pattern ).toBe( "spider-web" )
+		expect( section.background_pattern_color ).toBe( "white" )
+		expect( section.background_pattern_position ).toBe( "top-right" )
+		expect( section.background_pattern_rotation ).toBe( 90 )
 	})
 })
 

@@ -93,8 +93,10 @@ export async function write_home_page (
 			} ),
 			section( "Reclaiming Cool", {
 				background_gradient: "white-to-light",
-				background_pattern: "spider-web-1",
-				background_position: "left",
+				background_pattern: "spider-web",
+				background_pattern_color: "black",
+				background_pattern_position: "left",
+				background_pattern_rotation: 0,
 				blocks: [
 					{
 						__component:
@@ -181,8 +183,10 @@ export async function write_home_page (
 			} ),
 			section( "Conversations", {
 				background_gradient: "conversation-to-light",
-				background_pattern: "spider-web-2",
-				background_position: "bottom-right",
+				background_pattern: "spider-web",
+				background_pattern_color: "white",
+				background_pattern_position: "top-right",
+				background_pattern_rotation: 90,
 				blocks: [
 					session_listing( "Conversation", 5 ),
 				],
@@ -201,6 +205,10 @@ export async function write_home_page (
 			} ),
 			section( "Workshops", {
 				background_gradient: "light",
+				background_pattern: "spider-web",
+				background_pattern_color: "black",
+				background_pattern_position: "left",
+				background_pattern_rotation: 180,
 				blocks: [
 					session_listing(
 						"Workshop",
@@ -225,8 +233,10 @@ export async function write_home_page (
 			// curated half.
 			section( "Collaborators", {
 				background_gradient: "contributor-to-light",
-				background_pattern: "spider-web-3",
-				background_position: "left",
+				background_pattern: "spider-web",
+				background_pattern_color: "white",
+				background_pattern_position: "left",
+				background_pattern_rotation: 270,
 				blocks: [ contributor_listing( "carousel", 10 ) ],
 				heading: heading_component(
 					"Collaborators",

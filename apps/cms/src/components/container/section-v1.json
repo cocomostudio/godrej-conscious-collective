@@ -65,14 +65,21 @@
 			"type": "enumeration",
 			"enum": [
 				"none",
-				"spider-web-1",
-				"spider-web-2",
-				"spider-web-3"
+				"spider-web"
 			],
 			"default": "none",
 			"required": true
 		},
-		"background_position": {
+		"background_pattern_color": {
+			"type": "enumeration",
+			"enum": [
+				"black",
+				"white"
+			],
+			"default": "black",
+			"required": true
+		},
+		"background_pattern_position": {
 			"type": "enumeration",
 			"enum": [
 				"left",
@@ -84,6 +91,11 @@
 				"center"
 			],
 			"default": "left",
+			"required": true
+		},
+		"background_pattern_rotation": {
+			"type": "integer",
+			"default": 0,
 			"required": true
 		},
 		"horizontal_rule": {
@@ -202,13 +214,31 @@
 					"label": "Background pattern"
 				}
 			},
-			"background_position": {
+			"background_pattern_color": {
+				"edit": {
+					"label": "Background pattern colour",
+					"description": "The colour the pattern is drawn in. It has no effect where there is no pattern."
+				},
+				"list": {
+					"label": "Background pattern colour"
+				}
+			},
+			"background_pattern_position": {
 				"edit": {
 					"label": "Background pattern position",
 					"description": "Where the pattern sits. It has no effect where there is no pattern."
 				},
 				"list": {
 					"label": "Background pattern position"
+				}
+			},
+			"background_pattern_rotation": {
+				"edit": {
+					"label": "Background pattern rotation",
+					"description": "How far the pattern turns, in degrees, clockwise about its own centre. A negative number turns it the other way. Any part that turns past the section's edge is cut off. It has no effect where there is no pattern."
+				},
+				"list": {
+					"label": "Background pattern rotation"
 				}
 			},
 			"horizontal_rule": {
@@ -255,9 +285,13 @@
 					{ "name": "link", "size": 12 }
 				],
 				[
-					{ "name": "background_gradient", "size": 4 },
-					{ "name": "background_pattern", "size": 4 },
-					{ "name": "background_position", "size": 4 }
+					{ "name": "background_gradient", "size": 6 },
+					{ "name": "background_pattern", "size": 6 }
+				],
+				[
+					{ "name": "background_pattern_color", "size": 4 },
+					{ "name": "background_pattern_position", "size": 4 },
+					{ "name": "background_pattern_rotation", "size": 4 }
 				],
 				[
 					{ "name": "horizontal_rule", "size": 4 },

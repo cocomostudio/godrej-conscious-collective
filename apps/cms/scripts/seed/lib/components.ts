@@ -347,7 +347,9 @@ export function section (
 	{
 		background_gradient,
 		background_pattern,
-		background_position,
+		background_pattern_color,
+		background_pattern_position,
+		background_pattern_rotation,
 		blocks = [] as any[],
 		heading: section_heading,
 		horizontal_rule,
@@ -359,7 +361,9 @@ export function section (
 	}: {
 		background_gradient?: string
 		background_pattern?: string
-		background_position?: string
+		background_pattern_color?: string
+		background_pattern_position?: string
+		background_pattern_rotation?: number
 		/** Catalogue components, after whatever `strings` contributed. */
 		blocks?: any[]
 		heading?: ReturnType<typeof heading_component>
@@ -382,7 +386,13 @@ export function section (
 		...( section_link ? { link: section_link } : {} ),
 		...( background_gradient ? { background_gradient } : {} ),
 		...( background_pattern ? { background_pattern } : {} ),
-		...( background_position ? { background_position } : {} ),
+		...( background_pattern_color ? { background_pattern_color } : {} ),
+		...( background_pattern_position
+			? { background_pattern_position }
+			: {} ),
+		...( background_pattern_rotation === undefined
+			? {}
+			: { background_pattern_rotation } ),
 		...( horizontal_rule === undefined ? {} : { horizontal_rule } ),
 		...( opening_line ? { opening_line } : {} ),
 		...( spacing_around ? { spacing_around } : {} ),
