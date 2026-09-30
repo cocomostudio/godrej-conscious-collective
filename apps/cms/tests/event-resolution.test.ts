@@ -395,6 +395,15 @@ describe("the event form", () => {
 		expect( stored.metadatas.solid_button_fill__hover__color.edit.label )
 			.toMatch( /solid.*fill.*hover|hover.*solid.*fill/i )
 	})
+
+	it("labels the session list's colour switch \"Normalise Colors\"", async () => {
+		const stored = await store().get( {
+			key: "configuration_components::list.session-list-v1",
+		} )
+
+		expect( stored.metadatas.normalise_colors.edit.label )
+			.toBe( "Normalise Colors" )
+	})
 })
 
 describe("an inverted date range", () => {

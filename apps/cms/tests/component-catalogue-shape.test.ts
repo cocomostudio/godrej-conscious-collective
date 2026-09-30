@@ -572,6 +572,14 @@ describe("normalising a card's colours", () => {
 		} )
 	})
 
+	// The name an editor already uses for it. The attribute keeps its own.
+	it("is labelled \"Normalise Colors\", in the form and in the list", () => {
+		expect( session_list.__.metadatas.normalise_colors.edit.label )
+			.toBe( "Normalise Colors" )
+		expect( session_list.__.metadatas.normalise_colors.list.label )
+			.toBe( "Normalise Colors" )
+	})
+
 	it("declares its own admin metadata and a place in the form", () => {
 		expect( session_list.__.metadatas.normalise_colors.edit.label )
 			.toBeTruthy()

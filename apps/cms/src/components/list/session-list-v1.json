@@ -42,11 +42,11 @@
 			},
 			"normalise_colors": {
 				"edit": {
-					"label": "Keep the card details legible?",
-					"description": "Draws the line beneath a card's title, and the short rule on a featured card, in black rather than in the session's category colour. Leave it on unless the design wants the category colour there. With \"change-stroke-on-hover\" both still take the colour up when a card is pointed at."
+					"label": "Normalise Colors",
+					"description": "1. Each card is drawn in its own session's category colour. 2. At rest, that colour reaches two small parts of a card: the details line beneath the title, and the short rule on a featured card. 3. A hand-picked list can mix categories, so those parts can show several colours side by side. 4. With this on, those parts are drawn in black at rest. 5. How far that goes depends on the style: with \"change-stroke-on-hover\" the details line is already black at rest, so only the rule changes — black at rest, and the category colour when a card is pointed at; with \"change-fill-on-hover\" both parts stay black throughout."
 				},
 				"list": {
-					"label": "Keep the card details legible?"
+					"label": "Normalise Colors"
 				}
 			},
 			"style_and_transition": {
