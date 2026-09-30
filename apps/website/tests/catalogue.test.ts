@@ -256,6 +256,47 @@ beforeAll( async () => {
 			title: "Spacing",
 		} ),
 
+		"/marquee-colours": envelope( {
+			main_region: [
+				section( "Coloured ticker", {
+					content: [ marquee(
+						"Words nobody coloured",
+						{ content: "Words in the theme", text_color: "theme" },
+						{ content: "Words left on auto", text_color: "auto" },
+					) ],
+				} ),
+			],
+			title: "Marquee colours",
+		} ),
+
+		"/white-marquee": envelope( {
+			main_region: [
+				section( "White ticker", {
+					content: [ {
+						...marquee(
+							"Words on a white bar",
+							{ content: "Theme on a white bar", text_color: "theme" },
+						),
+						background_color: "white",
+					} ],
+				} ),
+			],
+			title: "White marquee",
+		} ),
+
+		// What every marquee saved before the attribute existed comes back as.
+		"/unset-marquee": envelope( {
+			main_region: [
+				section( "Unset ticker", {
+					content: [ {
+						...marquee( "Words on an unset bar" ),
+						background_color: null,
+					} ],
+				} ),
+			],
+			title: "Unset marquee",
+		} ),
+
 		// A ruled section at the front, an unruled one to measure it against,
 		// and a ruled one at the back — the last is the case that matters,
 		// because its trailing `<hr>` is what used to cost it `:last-child`.
@@ -454,6 +495,42 @@ describe("a repeatable component list", () => {
 		expect( html ).toContain( "<li" )
 		expect( html ).toContain( "The dates" )
 		expect( html ).toContain( "The hours" )
+	})
+})
+
+describe("a marquee", () => {
+	it("draws each item in the colour its editor chose", async () => {
+		const { html } = await website.get( "/marquee-colours" )
+
+		expect( element_carrying( html, "Words in the theme" ) )
+			.toContain( "text-theme" )
+	})
+
+	it("draws a white bar, with an item nobody coloured in black", async () => {
+		const { html } = await website.get( "/white-marquee" )
+
+		expect( bar_of( html, "Words on a white bar" ) ).toContain( "bg-white" )
+		expect( element_carrying( html, "Words on a white bar" ) )
+			.toContain( "text-black" )
+		expect( element_carrying( html, "Theme on a white bar" ) )
+			.toContain( "text-theme" )
+	})
+
+	it("draws a black bar when nobody chose a background", async () => {
+		const { html } = await website.get( "/unset-marquee" )
+
+		expect( bar_of( html, "Words on an unset bar" ) ).toContain( "bg-black" )
+		expect( element_carrying( html, "Words on an unset bar" ) )
+			.toContain( "text-white" )
+	})
+
+	it("draws an item nobody coloured in white", async () => {
+		const { html } = await website.get( "/marquee-colours" )
+
+		expect( element_carrying( html, "Words nobody coloured" ) )
+			.toContain( "text-white" )
+		expect( element_carrying( html, "Words left on auto" ) )
+			.toContain( "text-white" )
 	})
 })
 
@@ -950,6 +1027,25 @@ function map_link ( html: string ) {
 	expect( opened ).toBeGreaterThan( -1 )
 
 	return markup.slice( opened, markup.indexOf( ">", opened ) + 1 )
+}
+
+/**
+ |
+ | The opening tag of the marquee's bar, found through one of its items. The
+ | bar is the third element up: bar, viewport, list, item.
+ |
+ */
+function bar_of ( html: string, item: string ) {
+	const markup = rendered( html )
+	let at = markup.indexOf( `>${item}` )
+
+	expect( at ).toBeGreaterThan( -1 )
+
+	for ( let level = 0; level < 4; level += 1 ) {
+		at = markup.lastIndexOf( "<", at - 1 )
+	}
+
+	return markup.slice( at, markup.indexOf( ">", at ) + 1 )
 }
 
 /**

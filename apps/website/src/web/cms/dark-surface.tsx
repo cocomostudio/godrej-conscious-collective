@@ -108,7 +108,9 @@ export function use_dark_surface () {
  | On a white page this is exactly `text_color_token`. On a dark one it is
  | white, full stop: **every component carrying `text_color` asks this**, so
  | one answer here is what makes the dialog's guarantee hold however deeply a
- | block is nested inside it.
+ | block is nested inside it. The marquee does not ask, because an editor can
+ | place a marquee only directly in a section, so a marquee never reaches the
+ | dialog.
  |
  */
 export function use_text_colour_token (

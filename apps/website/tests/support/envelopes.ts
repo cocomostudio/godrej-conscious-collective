@@ -466,13 +466,18 @@ export function quote (
 	}
 }
 
-export function marquee ( ...items: string[] ): Block {
+export function marquee (
+	...items: (string | { content: string; text_color: string | null })[]
+): Block {
 	return {
 		__component: "text.marquee-v1",
 		id: id(),
 		// A repeatable component list: no `__component` on its members, which
 		// is what keeps the renderer from walking into it as a region.
-		items: items.map( ( content ) => ( { content, id: id() } ) ),
+		items: items.map( ( item ) => ( {
+			...typeof item === "string" ? { content: item } : item,
+			id: id(),
+		} ) ),
 	}
 }
 
