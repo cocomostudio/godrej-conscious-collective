@@ -8,6 +8,8 @@ An event listing website and the Strapi CMS behind that website. The site featur
 
 **Event**:
 A festival edition, such as "Conscious Collective 2025". An event owns a date range, a schedule document and a **palette** — the six colours a page can be drawn in. Not a "colour scheme", which is the separate thing a Page chooses.
+
+An event also says whether its **registrations are open**. While the main event's registrations are closed, nothing on the site offers the **registration form**.
 _Avoid_: "festival", "edition"
 
 **Main event**:
