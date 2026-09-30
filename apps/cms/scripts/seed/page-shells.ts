@@ -14,6 +14,23 @@ import { link } from "./lib/components.ts"
 import type { Strapi } from "./lib/strapi.ts"
 import { upload_slideshow } from "./lib/uploads.ts"
 
+/**
+ |
+ | The footer's four social links, on both shells.
+ |
+ | Placeholders rather than the festival's accounts, which the seed does not
+ | know. All four are set so that a freshly seeded footer draws every icon;
+ | an empty one would hide its icon, which is a state worth reaching on
+ | purpose rather than by default.
+ |
+ */
+const PLACEHOLDER_SOCIAL_LINKS = {
+	facebook_url: "https://example.com/facebook",
+	instagram_url: "https://example.com/instagram",
+	linkedin_url: "https://example.com/linkedin",
+	youtube_url: "https://example.com/youtube",
+}
+
 export type Seeded_Page_Shells = {
 	archive: any
 	primary: any
@@ -39,6 +56,7 @@ export async function write_page_shells (
 					? await upload_slideshow( strapi )
 					: [],
 				name: "Primary",
+				...PLACEHOLDER_SOCIAL_LINKS,
 				navigation_footer: [
 					link(
 						"godrejenterprises.com",
@@ -82,6 +100,7 @@ export async function write_page_shells (
 				},
 				default: false,
 				name: "Archive",
+				...PLACEHOLDER_SOCIAL_LINKS,
 				navigation_header: [
 					link( "Back to this year", "/" ),
 				],

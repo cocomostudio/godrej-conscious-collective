@@ -51,6 +51,22 @@
 			"type": "component",
 			"component": "code.html-document-hooks-v1",
 			"required": false
+		},
+		"instagram_url": {
+			"type": "string",
+			"required": false
+		},
+		"facebook_url": {
+			"type": "string",
+			"required": false
+		},
+		"linkedin_url": {
+			"type": "string",
+			"required": false
+		},
+		"youtube_url": {
+			"type": "string",
+			"required": false
 		}
 	},
 
@@ -128,6 +144,42 @@
 				"list": {
 					"label": "Injected code"
 				}
+			},
+			"instagram_url": {
+				"edit": {
+					"label": "Instagram URL",
+					"description": "The festival's Instagram account, as a full address — https://www.instagram.com/…. Its icon in the footer links here and opens in a new tab. Leave it empty and the icon is not shown."
+				},
+				"list": {
+					"label": "Instagram URL"
+				}
+			},
+			"facebook_url": {
+				"edit": {
+					"label": "Facebook URL",
+					"description": "The festival's Facebook page, as a full address — https://www.facebook.com/…. Its icon in the footer links here and opens in a new tab. Leave it empty and the icon is not shown."
+				},
+				"list": {
+					"label": "Facebook URL"
+				}
+			},
+			"linkedin_url": {
+				"edit": {
+					"label": "LinkedIn URL",
+					"description": "The festival's LinkedIn page, as a full address — https://www.linkedin.com/…. Its icon in the footer links here and opens in a new tab. Leave it empty and the icon is not shown."
+				},
+				"list": {
+					"label": "LinkedIn URL"
+				}
+			},
+			"youtube_url": {
+				"edit": {
+					"label": "YouTube URL",
+					"description": "The festival's YouTube channel, as a full address — https://www.youtube.com/…. Its icon in the footer links here and opens in a new tab. Leave it empty and the icon is not shown. With all four empty, the footer shows no row of icons at all."
+				},
+				"list": {
+					"label": "YouTube URL"
+				}
 			}
 		},
 		"layouts": {
@@ -148,6 +200,14 @@
 				],
 				[
 					{ "name": "navigation_footer", "size": 12 }
+				],
+				[
+					{ "name": "instagram_url", "size": 6 },
+					{ "name": "facebook_url", "size": 6 }
+				],
+				[
+					{ "name": "linkedin_url", "size": 6 },
+					{ "name": "youtube_url", "size": 6 }
 				],
 				[
 					{ "name": "form_slideshow", "size": 12 }

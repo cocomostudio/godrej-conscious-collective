@@ -106,6 +106,60 @@ describe("the envelope", () => {
 	})
 })
 
+/**
+ |
+ | The footer's four social links are data on the page shell, so an editor can
+ | point them at the festival's own accounts. An unset one is `null` rather
+ | than absent, because the footer hides an icon on exactly that.
+ |
+ */
+describe("the page shell's social links", () => {
+	const SOCIAL = [
+		"instagram_url",
+		"facebook_url",
+		"linkedin_url",
+		"youtube_url",
+	]
+
+	it("arrive with the seeded placeholders", async () => {
+		const { body } = await cms.get( "/api/envelope?path=/home" )
+
+		expect( body.data.page_shell ).toMatchObject( {
+			facebook_url: "https://example.com/facebook",
+			instagram_url: "https://example.com/instagram",
+			linkedin_url: "https://example.com/linkedin",
+			youtube_url: "https://example.com/youtube",
+		} )
+	})
+
+	it("arrive as an editor saved them, set or cleared", async () => {
+		const [ primary ] = await cms.strapi
+			.documents( "api::page-shell.page-shell" )
+			.findMany( { filters: { name: "Primary" } } )
+
+		await cms.strapi.documents( "api::page-shell.page-shell" ).update( {
+			data: {
+				facebook_url: null,
+				instagram_url: "https://www.instagram.com/godrejdesignlab/",
+				linkedin_url: null,
+				youtube_url: null,
+			},
+			documentId: primary.documentId,
+		} )
+
+		const { body } = await cms.get( "/api/envelope?path=/home" )
+
+		expect( body.data.page_shell.instagram_url ).toBe(
+			"https://www.instagram.com/godrejdesignlab/",
+		)
+
+		for ( const name of SOCIAL.slice( 1 ) ) {
+			expect( { name, value: body.data.page_shell[name] } )
+				.toEqual( { name, value: null } )
+		}
+	})
+})
+
 describe("paths", () => {
 	it("resolves a page through the alias table, by its title", async () => {
 		const { body, status } = await cms.get( "/api/envelope?path=/about" )
