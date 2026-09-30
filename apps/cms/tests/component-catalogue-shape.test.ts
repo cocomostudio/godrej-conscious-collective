@@ -589,6 +589,47 @@ describe("normalising a card's colours", () => {
 
 /**
  |
+ | **The count decides the arrangement, not the category.** Both listings of
+ | session cards hand what arrived to one shared drawing, which picks three in
+ | a row, featured plus three in a row or a carousel by how many cards there
+ | are. A description still promising that the category decides would have an
+ | editor choosing a category for its layout, and getting something else.
+ |
+ */
+describe("a listing of session cards", () => {
+	const descriptions = ( uid: string ) => {
+		const schema = component( uid )
+
+		return [
+			schema.info.description,
+			...Object.values( schema.__.metadatas ).map( ( metadata: any ) =>
+				metadata.edit?.description
+			),
+		].filter( Boolean ).join( "\n" )
+	}
+
+	it.each( [
+		"list.session-listing-v1",
+		"list.session-list-v1",
+	] )( "does not claim the category decides the layout: %s", ( uid ) => {
+		expect( descriptions( uid ) ).not.toMatch( /shown differently/i )
+		expect( descriptions( uid ) ).not.toMatch(
+			/category also decides how/i,
+		)
+	} )
+
+	it("says that the count decides it", () => {
+		expect( descriptions( "list.session-listing-v1" ) ).toMatch(
+			/four/i,
+		)
+		expect( descriptions( "list.session-listing-v1" ) ).toMatch(
+			/carousel/i,
+		)
+	})
+})
+
+/**
+ |
  | The Archive entry says, where an editor meets it, that the dialog its
  | snapshots open in forces its own colours. It is the one place in the
  | catalogue where a colour an editor picks does not apply, so it is the one
