@@ -13,6 +13,15 @@
 			"required": true,
 			"min": 1
 		},
+		"background_color": {
+			"type": "enumeration",
+			"enum": [
+				"black",
+				"white"
+			],
+			"default": "black",
+			"required": true
+		},
 		"spacing_around": {
 			"type": "enumeration",
 			"enum": [
@@ -32,10 +41,19 @@
 			"items": {
 				"edit": {
 					"label": "Items",
-					"description": "Each one is separated from the next by a dot. Keep them short — the venue, the dates, the opening hours. Each item offers a text colour because an item is a plain string and every plain string does; the ticker does not read it, and draws all of its words in one colour."
+					"description": "Each one is separated from the next by a dot. Keep them short — the venue, the dates, the opening hours. Each item draws its words in its own text colour. \"auto\" draws them in the opposite of the bar: white on black, black on white. An item set to the bar's own colour cannot be seen."
 				},
 				"list": {
 					"label": "Items"
+				}
+			},
+			"background_color": {
+				"edit": {
+					"label": "Background colour",
+					"description": "The colour of the bar the items scroll along."
+				},
+				"list": {
+					"label": "Background colour"
 				}
 			},
 			"spacing_around": {
@@ -54,6 +72,7 @@
 					{ "name": "items", "size": 12 }
 				],
 				[
+					{ "name": "background_color", "size": 6 },
 					{ "name": "spacing_around", "size": 6 }
 				]
 			]
